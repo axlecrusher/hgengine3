@@ -23,14 +23,15 @@ extern "C" {
 #include <HgRenderQueue.h>
 #include <oglShaders.h>
 #include <HgMath.h>
+#include <HgTypes.h>
 }
 
 #define M_PI 3.14159265358979323846
 
 float projection[16];
 
-float camera_position[3];
-quaternion camera_rot;
+
+HgCamera camera;
 
 HANDLE endOfRenderFrame;
 
@@ -137,8 +138,8 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 //		glUniformMatrix4fv(4, 1, GL_TRUE, view);
 		glUniformMatrix4fv(5, 1, GL_TRUE, projection);
 
-		glUniform4f(6, camera_rot.x, camera_rot.y, camera_rot.z, camera_rot.w);
-		glUniform3f(7, camera_position[0], camera_position[1], camera_position[2]);
+		glUniform4f(6, camera.rotation.x, camera.rotation.y, camera.rotation.z, camera.rotation.w);
+		glUniform3f(7, camera.position.components.x, camera.position.components.y, camera.position.components.z);
 
 		while (stop == 0) {
 			HgRenderQueue* x = hgRenderQueue_pop();
@@ -150,14 +151,17 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 				stop = 1;
 			}
 			else {
-				glUniform3f(7, camera_position[0], camera_position[1], camera_position[2]);
-				glViewport(0, 0, 1280*0.5, 480);
+				glUniform3f(7, x->rp->cam_position[0], x->rp->cam_position[1], x->rp->cam_position[2]);
+//				glViewport(0, 0, 1280*0.5, 480);
+				glViewport(1280 * 0.5 * x->rp->eye,0,1280*0.5,480);
 				x->rp->element->m_renderData->renderFunc(x->rp->element);
-				//change perspective
 
-				glUniform3f(7, camera_position[0]+0.07, camera_position[1], camera_position[2]);
-				glViewport(1280 * 0.5,0,1280*0.5,480);
-				glDrawArrays(GL_TRIANGLES, 0, 3);
+				//change perspective, and re-render
+				//currently, it seems faster to render all of one view, followed by all of another view.
+				//this could change with scene complexity that woudl require more shader switching
+//				glUniform3f(7, camera_position[0]+0.07, camera_position[1], camera_position[2]);
+//				glViewport(1280 * 0.5,0,1280*0.5,480);
+//				glDrawArrays(GL_TRIANGLES, 0, 3);
 
 //				x->rp->element->m_renderData->renderFunc(x->rp->element);
 			}
@@ -195,8 +199,13 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	}
 }
 
+uint8_t eye = 0;
+
 void send_to_render_queue(HgElement* e) {
 	render_packet* rp = (render_packet*)calloc(1, sizeof* rp);
+	memcpy(rp->cam_position, camera.position.array, 3* sizeof* camera.position.array);
+	rp->eye = eye;
+
 	rp->element = e;
 	if (e != NULL) {
 		//	rp->position = e->position;
@@ -226,11 +235,11 @@ int main()
 	gluPerspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
 //	gluPerspective2(60, 320.0 / 480.0, 0.1f, 100.0f, projection);
 
-	quaternion_init(&camera_rot);
-	memset(camera_position, 0, 3 * sizeof *camera_position);
-	camera_position[2] = -1.5f;
-	camera_position[1] = -2.0f;
-	toQuaternion2(0, 15, 0, &camera_rot); //y,x,z
+	quaternion_init(&camera.rotation);
+	memset(camera.position.array, 0, sizeof camera.position);
+	camera.position.components.z = -1.5f;
+	camera.position.components.y = -2.0f;
+	toQuaternion2(0, 15, 0, &camera.rotation); //y,x,z
 
 //	MatrixMultiply4f(projection, camera, view);
 
@@ -314,6 +323,7 @@ int main()
 			memcpy(&tris[i]->rotation, &element->rotation, sizeof element->rotation);
 		}
 
+		eye = 0;
 		while (e != NULL) {
 			if (e->updateFunc != NULL) e->updateFunc(e,0);
 			if (is_destroyed(e) > 0) scene_delete_element(&itr);
@@ -321,7 +331,20 @@ int main()
 			e = scene_next_element(&itr);
 		}
 
+		float tmp = camera.position.components.x;
+		camera.position.components.x += 0.07;
+
+		scene_init_iterator(&itr, &scene);
+		e = scene_next_element(&itr);
+
+		eye = 1;
+		while (e != NULL) {
+			if (check_flag(e, HGE_HIDDEN) == 0) send_to_render_queue(e); //submit to renderer
+			e = scene_next_element(&itr);
+		}
+
 //		scene_clearUpdate(&scene);
+		camera.position.components.x = tmp;
 
 		InterlockedAdd(&itrctr,1);
 

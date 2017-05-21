@@ -8,7 +8,9 @@
 
 typedef struct render_packet {
 	float position[3];
+	float cam_position[3];
 	quaternion rotation;
+	uint8_t eye;
 //	GLuint vao;
 	HgElement* element;
 } render_packet;

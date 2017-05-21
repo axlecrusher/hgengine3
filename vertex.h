@@ -9,7 +9,7 @@ typedef struct _vertex_internal {
 typedef struct vertex {
 	union {
 		_vertex_internal components;
-		float* array;
+		float array[3];
 	};
 } vertex;
 
