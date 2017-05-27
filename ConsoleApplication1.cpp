@@ -204,32 +204,13 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 
 #define ANI_TRIS 400
 
-void setup_viewports() {
-	uint8_t i = 0;
-
-	view_port[i].x = view_port[i].y = 0;
-	view_port[i].width = 1280;
-	view_port[i].height = 480;
-	++i;
-
-	view_port[i].x = view_port[i].y = 0;
-	view_port[i].width = 1280 * 0.5;
-	view_port[i].height = 480;
-	++i;
-
-	view_port[i].x = 1280 * 0.5;
-	view_port[i].y = 0;
-	view_port[i].width = 1280 * 0.5;
-	view_port[i].height = 480;
-}
-
 int main()
 {
 //	MercuryWindow* w = MercuryWindow::MakeWindow();
 	
 //	gen_triangle(&points);
 
-	setup_viewports();
+	setup_viewports(1280,480);
 	
 	uint8_t s = sizeof(HgElement);
 	printf("element size %d\n", s);

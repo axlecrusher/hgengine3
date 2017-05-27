@@ -42,3 +42,21 @@ void ogl_destroy_renderData(OGLRenderData* d) {
 	}
 }
 
+void setup_viewports(uint16_t width, uint16_t height) {
+	uint8_t i = 0;
+
+	view_port[i].x = view_port[i].y = 0;
+	view_port[i].width = width;
+	view_port[i].height = 480;
+	++i;
+
+	view_port[i].x = view_port[i].y = 0;
+	view_port[i].width = width * 0.5;
+	view_port[i].height = 480;
+	++i;
+
+	view_port[i].x = width * 0.5;
+	view_port[i].y = 0;
+	view_port[i].width = width * 0.5;
+	view_port[i].height = 480;
+}
