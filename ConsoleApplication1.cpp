@@ -202,28 +202,6 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	}
 }
 
-uint8_t viewport_idx = 0;
-
-void send_to_render_queue(HgElement* e) {
-//	render_packet* rp = (render_packet*)calloc(1, sizeof* rp);
-	RenderElement* rp = new RenderElement();
-
-	rp->camera = camera;
-//	memcpy(rp->cam_position, camera.position.array, 3* sizeof* camera.position.array);
-	rp->viewport_idx = viewport_idx;
-
-	rp->element = e;
-	if (e != NULL) {
-		//	rp->position = e->position;
-		//	rp->rotation = e->rotation;
-		//	rp->vao = e->m_renderData->renderFunc
-	}
-	else {
-//		printf("null\n");
-	}
-
-	hgRenderQueue_push(rp);
-}
 #define ANI_TRIS 400
 
 void setup_viewports() {
@@ -350,11 +328,10 @@ int main()
 			memcpy(&tris[i]->rotation, &element->rotation, sizeof element->rotation);
 		}
 
-		viewport_idx = 1;
 		while (e != NULL) {
 			if (e->updateFunc != NULL) e->updateFunc(e,0);
 			if (is_destroyed(e) > 0) scene_delete_element(&itr);
-			if (check_flag(e, HGE_HIDDEN) == 0) send_to_render_queue(e); //submit to renderer
+			if (check_flag(e, HGE_HIDDEN) == 0) hgRenderQueue_push( create_render_packet(e, 1, &camera) ); //submit to renderer
 			e = scene_next_element(&itr);
 		}
 
@@ -364,9 +341,8 @@ int main()
 		scene_init_iterator(&itr, &scene);
 		e = scene_next_element(&itr);
 
-		viewport_idx = 2;
 		while (e != NULL) {
-			if (check_flag(e, HGE_HIDDEN) == 0) send_to_render_queue(e); //submit to renderer
+			if (check_flag(e, HGE_HIDDEN) == 0) hgRenderQueue_push( create_render_packet(e, 2, &camera) ); //submit to renderer
 			e = scene_next_element(&itr);
 		}
 

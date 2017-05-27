@@ -56,3 +56,14 @@ HgRenderQueue* hgRenderQueue_pop() {
 
 	return x;
 }
+
+RenderPacket* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera* camera) {
+	//	render_packet* rp = (render_packet*)calloc(1, sizeof* rp);
+	RenderElement* rp = new RenderElement();
+
+	rp->camera = *camera;
+	rp->viewport_idx = viewport_idx;
+
+	rp->element = e;
+	return rp;
+}
