@@ -4,6 +4,8 @@
 #include <vertex.h>
 #include <HgElement.h>
 
+typedef struct viewport viewport;
+
 typedef struct OGLRenderData {
 	RenderData baseRender;
 	GLuint vao;
@@ -16,3 +18,5 @@ typedef struct OGLRenderData {
 GLuint hgOglVbo(vertices v);
 
 void ogl_destroy_renderData();
+
+void hgViewport(viewport* vp);

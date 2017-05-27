@@ -2,6 +2,19 @@
 
 #include <stdlib.h>
 
+static GLuint _currenViewPort = 0;
+
+typedef struct viewport {
+	uint16_t x, y, width, height;
+} viewport;
+
+void hgViewport(viewport* vp) {
+	if (vp != _currenViewPort);
+	_currenViewPort = vp;
+	glViewport(vp->x, vp->y, vp->width, vp->height);
+}
+
+
 GLuint hgOglVbo(vertices v) {
 	GLuint vbo = 0;
 	GLuint vao = 0;

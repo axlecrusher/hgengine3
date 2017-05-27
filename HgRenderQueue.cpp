@@ -13,8 +13,9 @@ volatile uint32_t hgRenderQueue_length() {
 	return count;
 }
 
-void hgRenderQueue_push(render_packet* p) {
-	HgRenderQueue* x = calloc(1, sizeof *x);
+void hgRenderQueue_push(RenderPacket* p) {
+//	HgRenderQueue* x = calloc(1, sizeof *x);
+	HgRenderQueue* x = new HgRenderQueue();
 	x->next = NULL;
 	x->rp = p;
 
@@ -39,7 +40,7 @@ HgRenderQueue* hgRenderQueue_pop() {
 	while (InterlockedCompareExchange(&wait, 1, 0)>0);
 
 	if (queue_head != NULL) {
-		x = queue_head;
+		x = const_cast<HgRenderQueue*>(queue_head);
 
 		if (queue_head == queue_tail) {
 			queue_head = queue_tail = NULL;

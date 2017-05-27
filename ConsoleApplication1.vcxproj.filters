@@ -51,13 +51,16 @@
     <ClCompile Include="triangle.c">
       <Filter>Shapes</Filter>
     </ClCompile>
-    <ClCompile Include="HgRenderQueue.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="oglShaders.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HgMath.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OglRenderPackets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HgRenderQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

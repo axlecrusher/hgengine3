@@ -20,17 +20,18 @@ extern "C" {
 
 #include <triangle.h>
 
-#include <HgRenderQueue.h>
 #include <oglShaders.h>
 #include <HgMath.h>
 #include <HgTypes.h>
 }
 
+#include <HgRenderQueue.h>
+
 #define M_PI 3.14159265358979323846
 
 float projection[16];
 
-
+viewport view_port[2];
 HgCamera camera;
 
 HANDLE endOfRenderFrame;
@@ -147,6 +148,9 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 				Sleep(1);
 				x = hgRenderQueue_pop();
 			}
+
+			stop = !x->rp->render();
+/*
 			if (x->rp->element == NULL) {
 				stop = 1;
 			}
@@ -165,7 +169,9 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 
 //				x->rp->element->m_renderData->renderFunc(x->rp->element);
 			}
-			free(x->rp);
+			*/
+//			delete(x);
+			delete(x->rp);
 			free(x);
 		}
 
@@ -202,9 +208,12 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 uint8_t eye = 0;
 
 void send_to_render_queue(HgElement* e) {
-	render_packet* rp = (render_packet*)calloc(1, sizeof* rp);
+//	render_packet* rp = (render_packet*)calloc(1, sizeof* rp);
+	RenderElement* rp = new RenderElement();
+
 	memcpy(rp->cam_position, camera.position.array, 3* sizeof* camera.position.array);
 	rp->eye = eye;
+	rp->vp = view_port + eye;
 
 	rp->element = e;
 	if (e != NULL) {
@@ -226,6 +235,16 @@ int main()
 	
 //	gen_triangle(&points);
 
+	view_port[0].x = view_port[0].y = 0;
+	view_port[0].width = 1280 * 0.5;
+	view_port[0].height = 480;
+
+
+	view_port[1].x = 1280 * 0.5;
+	view_port[1].y = 0;
+	view_port[1].width = 1280 * 0.5;
+	view_port[1].height = 480;
+	
 	uint8_t s = sizeof(HgElement);
 	printf("element size %d\n", s);
 	printf("vertex size %d\n", sizeof(vertex));
@@ -348,7 +367,8 @@ int main()
 
 		InterlockedAdd(&itrctr,1);
 
-		send_to_render_queue(NULL); //null element to indicate end of frame
+		hgRenderQueue_push(new EndOfFrame());
+//		send_to_render_queue(NULL); //null element to indicate end of frame
 
 		DWORD dwWaitResult = WaitForSingleObject(
 			endOfRenderFrame, // event handle
