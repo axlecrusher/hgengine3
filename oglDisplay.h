@@ -4,7 +4,14 @@
 #include <vertex.h>
 #include <HgElement.h>
 
-typedef struct viewport viewport;
+#include <HgTypes.h>
+
+#define U_VIEW 4
+#define U_PROJECTION 5
+#define U_CAMERA_ROT 6
+#define U_CAMERA_POS 7
+
+extern viewport view_port[];
 
 typedef struct OGLRenderData {
 	RenderData baseRender;
@@ -19,4 +26,4 @@ GLuint hgOglVbo(vertices v);
 
 void ogl_destroy_renderData();
 
-void hgViewport(viewport* vp);
+void hgViewport(uint8_t vp);

@@ -6,9 +6,7 @@
 
 #include <HgElement.h>
 
-typedef struct viewport {
-	uint16_t x, y, width, height;
-} viewport;
+#include <HgTypes.h>
 
 class RenderPacket {
 	public:
@@ -24,11 +22,14 @@ class EndOfFrame : public RenderPacket {
 class RenderElement : public RenderPacket {
 public:
 	float position[3];
-	float cam_position[3];
+//	float cam_position[3];
 	quaternion rotation;
-	uint8_t eye;
+	HgCamera camera;
+	
+	//	uint8_t eye;
 	HgElement* element;
-	viewport* vp;
+//	viewport* vp;
+	uint8_t viewport_idx;
 
 	bool render();
 };

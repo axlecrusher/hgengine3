@@ -2,16 +2,16 @@
 
 #include <stdlib.h>
 
-static GLuint _currenViewPort = 0;
+viewport view_port[3];
 
-typedef struct viewport {
-	uint16_t x, y, width, height;
-} viewport;
+static uint8_t _currenViewPort_idx = 0;
 
-void hgViewport(viewport* vp) {
-	if (vp != _currenViewPort);
-	_currenViewPort = vp;
-	glViewport(vp->x, vp->y, vp->width, vp->height);
+void hgViewport(uint8_t idx) {
+	if (idx == _currenViewPort_idx) return;
+	_currenViewPort_idx = idx;
+
+	const viewport vp = view_port[idx];
+	glViewport(vp.x, vp.y, vp.width, vp.height);
 }
 
 

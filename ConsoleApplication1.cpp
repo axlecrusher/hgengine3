@@ -31,7 +31,7 @@ extern "C" {
 
 float projection[16];
 
-viewport view_port[2];
+extern viewport view_port[];
 HgCamera camera;
 
 HANDLE endOfRenderFrame;
@@ -136,11 +136,8 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 		
 		w->Clear();
 
-//		glUniformMatrix4fv(4, 1, GL_TRUE, view);
-		glUniformMatrix4fv(5, 1, GL_TRUE, projection);
-
-		glUniform4f(6, camera.rotation.x, camera.rotation.y, camera.rotation.z, camera.rotation.w);
-		glUniform3f(7, camera.position.components.x, camera.position.components.y, camera.position.components.z);
+//		glUniformMatrix4fv(U_VIEW, 1, GL_TRUE, view);
+		glUniformMatrix4fv(U_PROJECTION, 1, GL_TRUE, projection);
 
 		while (stop == 0) {
 			HgRenderQueue* x = hgRenderQueue_pop();
@@ -205,15 +202,15 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	}
 }
 
-uint8_t eye = 0;
+uint8_t viewport_idx = 0;
 
 void send_to_render_queue(HgElement* e) {
 //	render_packet* rp = (render_packet*)calloc(1, sizeof* rp);
 	RenderElement* rp = new RenderElement();
 
-	memcpy(rp->cam_position, camera.position.array, 3* sizeof* camera.position.array);
-	rp->eye = eye;
-	rp->vp = view_port + eye;
+	rp->camera = camera;
+//	memcpy(rp->cam_position, camera.position.array, 3* sizeof* camera.position.array);
+	rp->viewport_idx = viewport_idx;
 
 	rp->element = e;
 	if (e != NULL) {
@@ -229,21 +226,32 @@ void send_to_render_queue(HgElement* e) {
 }
 #define ANI_TRIS 400
 
+void setup_viewports() {
+	uint8_t i = 0;
+
+	view_port[i].x = view_port[i].y = 0;
+	view_port[i].width = 1280;
+	view_port[i].height = 480;
+	++i;
+
+	view_port[i].x = view_port[i].y = 0;
+	view_port[i].width = 1280 * 0.5;
+	view_port[i].height = 480;
+	++i;
+
+	view_port[i].x = 1280 * 0.5;
+	view_port[i].y = 0;
+	view_port[i].width = 1280 * 0.5;
+	view_port[i].height = 480;
+}
+
 int main()
 {
 //	MercuryWindow* w = MercuryWindow::MakeWindow();
 	
 //	gen_triangle(&points);
 
-	view_port[0].x = view_port[0].y = 0;
-	view_port[0].width = 1280 * 0.5;
-	view_port[0].height = 480;
-
-
-	view_port[1].x = 1280 * 0.5;
-	view_port[1].y = 0;
-	view_port[1].width = 1280 * 0.5;
-	view_port[1].height = 480;
+	setup_viewports();
 	
 	uint8_t s = sizeof(HgElement);
 	printf("element size %d\n", s);
@@ -342,7 +350,7 @@ int main()
 			memcpy(&tris[i]->rotation, &element->rotation, sizeof element->rotation);
 		}
 
-		eye = 0;
+		viewport_idx = 1;
 		while (e != NULL) {
 			if (e->updateFunc != NULL) e->updateFunc(e,0);
 			if (is_destroyed(e) > 0) scene_delete_element(&itr);
@@ -356,7 +364,7 @@ int main()
 		scene_init_iterator(&itr, &scene);
 		e = scene_next_element(&itr);
 
-		eye = 1;
+		viewport_idx = 2;
 		while (e != NULL) {
 			if (check_flag(e, HGE_HIDDEN) == 0) send_to_render_queue(e); //submit to renderer
 			e = scene_next_element(&itr);
