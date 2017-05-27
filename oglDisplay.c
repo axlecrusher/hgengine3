@@ -4,14 +4,16 @@
 
 viewport view_port[3];
 
-static uint8_t _currenViewPort_idx = 0;
+static int8_t _currenViewPort_idx =  -1;
 
-void hgViewport(uint8_t idx) {
+void hgViewport(int8_t idx) {
 	if (idx == _currenViewPort_idx) return;
 	_currenViewPort_idx = idx;
 
 	const viewport vp = view_port[idx];
 	glViewport(vp.x, vp.y, vp.width, vp.height);
+	glScissor(vp.x, vp.y, vp.width, vp.height);
+	glEnable(GL_SCISSOR_TEST);
 }
 
 

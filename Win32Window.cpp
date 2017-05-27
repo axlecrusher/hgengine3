@@ -338,6 +338,8 @@ void* Win32Window::GetProcAddress(const MString& x)
 
 void Win32Window::Clear()
 {
+	glDisable(GL_SCISSOR_TEST);
+
 	glClearColor( .1f, .1f, .1f, 0.0f );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
