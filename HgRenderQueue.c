@@ -73,7 +73,7 @@ void HgRenderQueue_init(HgRenderQueue* x) {
 void hgRenderQueue_push(render_packet* p) {
 	HgRenderQueue* x = _pop(&unused);
 	if (x == NULL) {
-		printf("ALLOCATE\n");
+//		printf("ALLOCATE\n");
 		x = calloc(1, sizeof *x);
 	}
 
