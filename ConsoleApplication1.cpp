@@ -73,15 +73,14 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 		glUniformMatrix4fv(U_PROJECTION, 1, GL_TRUE, projection);
 
 		while (stop_frame == 0) {
-			HgRenderQueue* x = hgRenderQueue_pop();
+			render_packet* x = hgRenderQueue_pop();
 			while (x == NULL) {
 				Sleep(1);
 				x = hgRenderQueue_pop();
 			}
 
-			stop_frame = draw_render_packet(x->rp);
+			stop_frame = draw_render_packet(x);
 
-			free(x->rp);
 			free(x);
 		}
 

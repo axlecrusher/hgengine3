@@ -3,57 +3,89 @@
 
 #include <Windows.h>
 
+static render_queue to_draw;
+static render_queue unused;
+/*
 static volatile HgRenderQueue* queue_head = NULL;
 static volatile HgRenderQueue* queue_tail = NULL;
 static volatile uint32_t count;
 
 volatile LONG wait = 0;
+*/
 
 volatile uint32_t hgRenderQueue_length() {
-	return count;
+	return to_draw.count;
 }
 
+void _push(render_queue* q, HgRenderQueue* x) {
+	x->next = NULL;
+
+	while (InterlockedCompareExchange(&q->wait, 1, 0)>0);
+
+	if (q->queue_head == NULL) q->queue_head = x;
+
+	if (q->queue_tail == NULL) {
+		q->queue_tail = x;
+	}
+	else {
+		q->queue_tail->next = x;
+		q->queue_tail = x;
+	}
+
+	q->count++;
+	InterlockedDecrement(&q->wait);
+}
+
+HgRenderQueue* _pop(render_queue* q) {
+	HgRenderQueue* x = NULL;
+	while (InterlockedCompareExchange(&q->wait, 1, 0)>0);
+
+	if (q->queue_head != NULL) {
+		x = (HgRenderQueue*)q->queue_head;
+
+		if (q->queue_head == q->queue_tail) {
+			q->queue_head = q->queue_tail = NULL;
+		}
+		else {
+			q->queue_head = x->next;
+		}
+
+		q->count--;
+	}
+
+	InterlockedDecrement(&q->wait);
+
+	return x;
+}
+
+void HgRenderQueue_init(HgRenderQueue* x) {
+	x->next = NULL;
+	x->rp = NULL;
+};
+
 void hgRenderQueue_push(render_packet* p) {
-	HgRenderQueue* x = calloc(1, sizeof *x);
+	HgRenderQueue* x = _pop(&unused);
+	if (x == NULL) {
+		printf("ALLOCATE\n");
+		x = calloc(1, sizeof *x);
+	}
+
 	x->next = NULL;
 	x->rp = p;
 
-	while (InterlockedCompareExchange(&wait, 1, 0)>0);
-
-	if (queue_head == NULL) queue_head = x;
-
-	if (queue_tail == NULL) {
-		queue_tail = x;
-	}
-	else {
-		queue_tail->next = x;
-		queue_tail = x;
-	}
-
-	count++;
-	InterlockedDecrement(&wait);
+	_push(&to_draw, x);
 }
 
-HgRenderQueue* hgRenderQueue_pop() {
-	HgRenderQueue* x = NULL;
-	while (InterlockedCompareExchange(&wait, 1, 0)>0);
+render_packet* hgRenderQueue_pop() {
+	HgRenderQueue* x = _pop(&to_draw);
+	if (x == NULL) return NULL;
 
-	if (queue_head != NULL) {
-		x = (HgRenderQueue*)queue_head;
+	render_packet* rp = x->rp;
 
-		if (queue_head == queue_tail) {
-			queue_head = queue_tail = NULL;
-		}
-		else {
-			queue_head = x->next;
-		}
+	HgRenderQueue_init(x);
+	_push(&unused,x);
 
-		count--;
-	}
-
-	InterlockedDecrement(&wait);
-
-	return x;
+	return rp;
 }
 
 render_packet* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera* camera) {
