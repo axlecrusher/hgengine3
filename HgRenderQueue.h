@@ -19,11 +19,6 @@ typedef struct render_packet {
 
 int8_t draw_render_packet(const render_packet* p);
 
-typedef struct HgRenderQueue {
-	render_packet* rp;
-	struct HgRenderQueue* next;
-} HgRenderQueue;
-
 volatile uint32_t hgRenderQueue_length();
 void hgRenderQueue_push(render_packet* p);
 render_packet* hgRenderQueue_pop();

@@ -3,6 +3,12 @@
 
 #include <Windows.h>
 
+//this structure is pretty compact. It may be good to allocate as an array for better caching
+typedef struct HgRenderQueue {
+	render_packet* rp;
+	struct HgRenderQueue* next;
+} HgRenderQueue;
+
 typedef struct render_queue {
 	volatile HgRenderQueue* queue_head;
 	volatile HgRenderQueue* queue_tail;
@@ -24,7 +30,7 @@ volatile uint32_t hgRenderQueue_length() {
 	return to_draw.count;
 }
 
-void _push(render_queue* q, HgRenderQueue* x) {
+static void _push(render_queue* q, HgRenderQueue* x) {
 	x->next = NULL;
 
 	while (InterlockedCompareExchange(&q->wait, 1, 0)>0);
@@ -43,7 +49,7 @@ void _push(render_queue* q, HgRenderQueue* x) {
 	InterlockedDecrement(&q->wait);
 }
 
-HgRenderQueue* _pop(render_queue* q) {
+static HgRenderQueue* _pop(render_queue* q) {
 	HgRenderQueue* x = NULL;
 	while (InterlockedCompareExchange(&q->wait, 1, 0)>0);
 
@@ -65,7 +71,7 @@ HgRenderQueue* _pop(render_queue* q) {
 	return x;
 }
 
-void HgRenderQueue_init(HgRenderQueue* x) {
+static void HgRenderQueue_init(HgRenderQueue* x) {
 	x->next = NULL;
 	x->rp = NULL;
 };
