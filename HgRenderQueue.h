@@ -8,8 +8,6 @@
 
 #include <HgTypes.h>
 
-#include <Windows.h>
-
 typedef struct render_packet {
 	point poisition;
 	quaternion rotation;
@@ -25,13 +23,6 @@ typedef struct HgRenderQueue {
 	render_packet* rp;
 	struct HgRenderQueue* next;
 } HgRenderQueue;
-
-typedef struct render_queue {
-	volatile HgRenderQueue* queue_head;
-	volatile HgRenderQueue* queue_tail;
-	volatile uint32_t count;
-	volatile LONG wait;
-} render_queue;
 
 volatile uint32_t hgRenderQueue_length();
 void hgRenderQueue_push(render_packet* p);

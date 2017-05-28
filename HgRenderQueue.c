@@ -3,6 +3,13 @@
 
 #include <Windows.h>
 
+typedef struct render_queue {
+	volatile HgRenderQueue* queue_head;
+	volatile HgRenderQueue* queue_tail;
+	volatile uint32_t count;
+	volatile LONG wait;
+} render_queue;
+
 static render_queue to_draw;
 static render_queue unused;
 /*
