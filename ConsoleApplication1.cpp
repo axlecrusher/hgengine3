@@ -23,90 +23,23 @@ extern "C" {
 #include <oglShaders.h>
 #include <HgMath.h>
 #include <HgTypes.h>
+#include <HgRenderQueue.h>
 }
 
-#include <HgRenderQueue.h>
+
 
 #define M_PI 3.14159265358979323846
 
 float projection[16];
 
 extern viewport view_port[];
-HgCamera camera;
+HgCamera camera[2];
 
 HANDLE endOfRenderFrame;
 
-void gluPerspective(
-	double fov,
-	const double aspect,
-	const double znear,
-	const double zfar, float* M)
-{
-	double top = tan(fov*0.5 * RADIANS) * znear;
-	double bottom = -top;
-	double right = aspect*top;
-	double left = -right;
-
-	M[0] = (2*znear) / (right-left);
-	M[2] = (right+left) / (right - left);
-	M[6] = (top+bottom) / (top - bottom);
-	M[5] = (2 * znear) / (top-bottom);
-	M[10] = (zfar + znear) / (zfar-znear);
-	M[11] = (2 * zfar*znear) / (zfar-znear);
-	M[14] = -1.0f;
-}
-
-void gluPerspective2(
-	double fov,
-	const double aspect,
-	const double znear,
-	const double zfar, float* M)
-{
-	fov *= RADIANS;
-
-	double f = 1.0 / tan(fov*0.5);
-	memset(M, 0, 16 * sizeof* M);
-
-
-	M[0] = f / aspect;
-	M[5] = f;
-	M[10] = (zfar + znear) / (znear - zfar);
-	M[11] = (2*zfar*znear) / (znear - zfar);
-	M[14] = -1.0f;
-}
 
 
 
-/*
-// set the OpenGL perspective projection matrix
-void glFrustum(
-	const float &bottom, const float &top, const float &left, const float &right,
-	const float &zNear, const float &zFar,
-	float *M)
-{
-	//Should go in projection matrix
-	float near2 = 2 * zNear;
-	float rml = right - left;
-	float tmb = top - bottom;
-	float fmn = zFar - zNear;
-
-	float A = (right + left) / rml;
-	float B = (top + bottom) / tmb;
-	float C = -(zFar + zNear) / fmn;
-	float D = -(near2*zFar*zNear) / fmn;
-
-	memset(M, 0, 16 * sizeof* M);
-
-	//row major
-	M[0] = near2 / rml;
-	M[2] = A;
-	M[5] = near2 / tmb;
-	M[6] = B;
-	M[10] = C;
-	M[11] = D;
-	M[14] = -1;
-}
-*/
 
 
 DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
@@ -146,29 +79,9 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 				x = hgRenderQueue_pop();
 			}
 
-			stop = !x->rp->render();
-/*
-			if (x->rp->element == NULL) {
-				stop = 1;
-			}
-			else {
-				glUniform3f(7, x->rp->cam_position[0], x->rp->cam_position[1], x->rp->cam_position[2]);
-//				glViewport(0, 0, 1280*0.5, 480);
-				glViewport(1280 * 0.5 * x->rp->eye,0,1280*0.5,480);
-				x->rp->element->m_renderData->renderFunc(x->rp->element);
+			stop = draw_render_packet(x->rp);
 
-				//change perspective, and re-render
-				//currently, it seems faster to render all of one view, followed by all of another view.
-				//this could change with scene complexity that woudl require more shader switching
-//				glUniform3f(7, camera_position[0]+0.07, camera_position[1], camera_position[2]);
-//				glViewport(1280 * 0.5,0,1280*0.5,480);
-//				glDrawArrays(GL_TRIANGLES, 0, 3);
-
-//				x->rp->element->m_renderData->renderFunc(x->rp->element);
-			}
-			*/
-//			delete(x);
-			delete(x->rp);
+			free(x->rp);
 			free(x);
 		}
 
@@ -217,15 +130,18 @@ int main()
 	printf("vertex size %d\n", sizeof(vertex));
 	printf("oglrd size %d\n", sizeof(OGLRenderData));
 
-//	gluPerspective(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
-	gluPerspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
-//	gluPerspective2(60, 320.0 / 480.0, 0.1f, 100.0f, projection);
+//	Perspective(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
+	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
+//	Perspective2(60, 320.0 / 480.0, 0.1f, 100.0f, projection);
 
-	quaternion_init(&camera.rotation);
-	memset(camera.position.array, 0, sizeof camera.position);
-	camera.position.components.z = -1.5f;
-	camera.position.components.y = -2.0f;
-	toQuaternion2(0, 15, 0, &camera.rotation); //y,x,z
+	quaternion_init(&camera[0].rotation);
+	memset(camera[0].position.array, 0, sizeof camera[0].position);
+	camera[0].position.components.z = -1.5f;
+	camera[0].position.components.y = -2.0f;
+	toQuaternion2(0, 15, 0, &camera[0].rotation); //y,x,z
+
+	camera[1] = camera[0];
+	camera[1].position.components.x += 0.07;
 
 //	MatrixMultiply4f(projection, camera, view);
 
@@ -312,28 +228,23 @@ int main()
 		while (e != NULL) {
 			if (e->updateFunc != NULL) e->updateFunc(e,0);
 			if (is_destroyed(e) > 0) scene_delete_element(&itr);
-			if (check_flag(e, HGE_HIDDEN) == 0) hgRenderQueue_push( create_render_packet(e, 1, &camera) ); //submit to renderer
+			if (check_flag(e, HGE_HIDDEN) == 0) hgRenderQueue_push( create_render_packet(e, 1, camera+0) ); //submit to renderer
 			e = scene_next_element(&itr);
 		}
-
-		float tmp = camera.position.components.x;
-		camera.position.components.x += 0.07;
 
 		scene_init_iterator(&itr, &scene);
 		e = scene_next_element(&itr);
 
 		while (e != NULL) {
-			if (check_flag(e, HGE_HIDDEN) == 0) hgRenderQueue_push( create_render_packet(e, 2, &camera) ); //submit to renderer
+			if (check_flag(e, HGE_HIDDEN) == 0) hgRenderQueue_push( create_render_packet(e, 2, camera+1) ); //submit to renderer
 			e = scene_next_element(&itr);
 		}
 
 //		scene_clearUpdate(&scene);
-		camera.position.components.x = tmp;
 
 		InterlockedAdd(&itrctr,1);
 
-		hgRenderQueue_push(new EndOfFrame());
-//		send_to_render_queue(NULL); //null element to indicate end of frame
+		hgRenderQueue_push(create_render_packet(NULL, 2, camera + 1)); //null element to indicate end of frame
 
 		DWORD dwWaitResult = WaitForSingleObject(
 			endOfRenderFrame, // event handle

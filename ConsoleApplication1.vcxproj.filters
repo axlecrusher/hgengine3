@@ -57,10 +57,10 @@
     <ClCompile Include="HgMath.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OglRenderPackets.cpp">
+    <ClCompile Include="HgRenderQueue.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HgRenderQueue.cpp">
+    <ClCompile Include="OglRenderPackets.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

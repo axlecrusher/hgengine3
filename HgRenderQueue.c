@@ -13,9 +13,8 @@ volatile uint32_t hgRenderQueue_length() {
 	return count;
 }
 
-void hgRenderQueue_push(RenderPacket* p) {
-//	HgRenderQueue* x = calloc(1, sizeof *x);
-	HgRenderQueue* x = new HgRenderQueue();
+void hgRenderQueue_push(render_packet* p) {
+	HgRenderQueue* x = calloc(1, sizeof *x);
 	x->next = NULL;
 	x->rp = p;
 
@@ -40,7 +39,7 @@ HgRenderQueue* hgRenderQueue_pop() {
 	while (InterlockedCompareExchange(&wait, 1, 0)>0);
 
 	if (queue_head != NULL) {
-		x = const_cast<HgRenderQueue*>(queue_head);
+		x = (HgRenderQueue*)queue_head;
 
 		if (queue_head == queue_tail) {
 			queue_head = queue_tail = NULL;
@@ -57,9 +56,9 @@ HgRenderQueue* hgRenderQueue_pop() {
 	return x;
 }
 
-RenderPacket* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera* camera) {
-	//	render_packet* rp = (render_packet*)calloc(1, sizeof* rp);
-	RenderElement* rp = new RenderElement();
+render_packet* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera* camera) {
+	render_packet* rp = calloc(1, sizeof* rp);
+//	RenderElement* rp = new RenderElement();
 
 	rp->camera = *camera;
 	rp->viewport_idx = viewport_idx;

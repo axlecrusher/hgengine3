@@ -8,28 +8,17 @@
 
 #include <HgTypes.h>
 
-class RenderPacket {
-	public:
-		virtual bool render() = 0;
-	private:
-};
-
-class EndOfFrame : public RenderPacket {
-	public:
-		bool render();
-};
-
-class RenderElement : public RenderPacket {
-public:
-	float position[3];
+typedef struct render_packet {
+	point poisition;
 	quaternion rotation;
 	HgCamera camera;
 	
 	HgElement* element;
 	uint8_t viewport_idx;
+} render_packet;
 
-	bool render();
-};
+int8_t draw_render_packet(const render_packet* p);
+
 /*
 typedef struct render_packet {
 	float position[3];
@@ -41,13 +30,13 @@ typedef struct render_packet {
 } render_packet;
 */
 typedef struct HgRenderQueue {
-	RenderPacket* rp;
+	render_packet* rp;
 	struct HgRenderQueue* next;
 } HgRenderQueue;
 
 volatile uint32_t hgRenderQueue_length();
-void hgRenderQueue_push(RenderPacket* p);
+void hgRenderQueue_push(render_packet* p);
 HgRenderQueue* hgRenderQueue_pop();
 
-RenderPacket* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera* camera);
+render_packet* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera* camera);
 

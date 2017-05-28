@@ -157,11 +157,11 @@
     <ClCompile Include="ConsoleApplication1.cpp" />
     <ClCompile Include="HgElement.c" />
     <ClCompile Include="HgMath.c" />
-    <ClCompile Include="HgRenderQueue.cpp" />
+    <ClCompile Include="HgRenderQueue.c" />
     <ClCompile Include="HgScene.c" />
     <ClCompile Include="MercuryWindow.cpp" />
     <ClCompile Include="oglDisplay.c" />
-    <ClCompile Include="OglRenderPackets.cpp" />
+    <ClCompile Include="OglRenderPackets.c" />
     <ClCompile Include="oglShaders.c" />
     <ClCompile Include="quaternion.c" />
     <ClCompile Include="shapes.c" />

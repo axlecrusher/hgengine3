@@ -4,3 +4,15 @@
 
 void MatrixMultiply4f(const float* in1, const float* in2, float* outa);
 void print_matrix(const float* m);
+
+void Perspective(
+	double fov,
+	const double aspect,
+	const double znear,
+	const double zfar, float* M);
+
+void Perspective2(
+	double fov,
+	const double aspect,
+	const double znear,
+	const double zfar, float* M);
