@@ -19,16 +19,6 @@ typedef struct render_packet {
 
 int8_t draw_render_packet(const render_packet* p);
 
-/*
-typedef struct render_packet {
-	float position[3];
-	float cam_position[3];
-	quaternion rotation;
-	uint8_t eye;
-//	GLuint vao;
-	HgElement* element;
-} render_packet;
-*/
 typedef struct HgRenderQueue {
 	render_packet* rp;
 	struct HgRenderQueue* next;

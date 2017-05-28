@@ -118,7 +118,7 @@ void triangle_render(HgElement* element) {
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
 	glUniform4f(1, element->rotation.x, element->rotation.y, element->rotation.z, element->rotation.w);
-	glUniform3f(3, element->position[0], element->position[1], element->position[2]);
+	glUniform3f(3, element->position.components.x, element->position.components.y, element->position.components.z);
 
 	glBindVertexArray(d->oglRender.vao);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -126,9 +126,9 @@ void triangle_render(HgElement* element) {
 }
 
 void shape_create_triangle(HgElement* element) {
-	element->position[0] = 0.0f;
-	element->position[1] = 0.0f;
-	element->position[2] = 0.0f;
+	element->position.components.x = 0.0f;
+	element->position.components.y = 0.0f;
+	element->position.components.z = 0.0f;
 
 	element->rotation.w = 1.0f;
 //	element->rotation.z = 0.707f;

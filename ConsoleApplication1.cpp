@@ -63,7 +63,7 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &d);
 	printf("GL_MAX_VERTEX_UNIFORM_BLOCKS %d\n", d);
 
-	uint8_t stop = 0;
+	uint8_t stop_frame = 0;
 	while (1) {
 		w->PumpMessages();
 		
@@ -72,14 +72,14 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 //		glUniformMatrix4fv(U_VIEW, 1, GL_TRUE, view);
 		glUniformMatrix4fv(U_PROJECTION, 1, GL_TRUE, projection);
 
-		while (stop == 0) {
+		while (stop_frame == 0) {
 			HgRenderQueue* x = hgRenderQueue_pop();
 			while (x == NULL) {
 				Sleep(1);
 				x = hgRenderQueue_pop();
 			}
 
-			stop = draw_render_packet(x->rp);
+			stop_frame = draw_render_packet(x->rp);
 
 			free(x->rp);
 			free(x);
@@ -93,12 +93,8 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 			return 1;
 		}
 
-		stop = 0;
-//		HgElement* e = (HgElement*)render_thing;
-//		if (e != NULL) {
-//			e->m_renderData->renderFunc(e);
-//		}
-//		glFlush();
+		stop_frame = 0;
+
 		w->SwapBuffers();
 		
 //		Sleep(10);
@@ -141,7 +137,7 @@ int main()
 	toQuaternion2(0, 15, 0, &camera[0].rotation); //y,x,z
 
 	camera[1] = camera[0];
-	camera[1].position.components.x += 0.07;
+	camera[1].position.components.x += 0.07f;
 
 //	MatrixMultiply4f(projection, camera, view);
 
@@ -153,14 +149,14 @@ int main()
 
 	HgElement* element = scene_newElement(&scene);
 	shape_create_triangle(element);
-	element->position[0] = 1.5f;
-	element->position[2] = -1.0f;
+	element->position.components.x = 1.5f;
+	element->position.components.z = -1.0f;
 //	toQuaternion2(0, 0, 90, &element->rotation);
 
 	element = scene_newElement(&scene);
 	shape_create_triangle(element);
-	element->position[0] = -0.0f;
-	element->position[2] = -2.0f;
+	element->position.components.x = -0.0f;
+	element->position.components.z = -2.0f;
 //	toQuaternion2(45,0,0,&element->rotation);
 
 	HgElement* tris[ANI_TRIS];
@@ -171,8 +167,8 @@ int main()
 		shape_create_triangle(element);
 		float x = (i % 20)*1.1;
 		float z = (i / 20)*1.1;
-		element->position[0] = -10.0 + x;
-		element->position[2] = -2.0f - z;
+		element->position.components.x = -10.0 + x;
+		element->position.components.z = -2.0f - z;
 	}
 
 	printf("\n%f %f %f %f\n", element->rotation.w, element->rotation.x, element->rotation.y, element->rotation.z);
@@ -203,19 +199,11 @@ int main()
 //	SetupOGLExtensions();
 #endif
 
-	int16_t r = 0;
 	uint32_t stime = GetTickCount();
 	uint32_t time = stime;
 	uint32_t dtime = time - stime;
 	while (1) {
 		dtime = GetTickCount() - stime;
-
-		HgScene_iterator itr;
-		scene_init_iterator(&itr,&scene);
-		HgElement* e = scene_next_element(&itr);
-
-		r++;
-		r = r % 3600;
 
 //		y,x,z
 		toQuaternion2((dtime%1000)/ 2.7777777777777777777777777777778, 0, 0, &element->rotation);
@@ -224,6 +212,10 @@ int main()
 		for (i = 0; i < ANI_TRIS; i++) {
 			memcpy(&tris[i]->rotation, &element->rotation, sizeof element->rotation);
 		}
+
+		HgScene_iterator itr;
+		scene_init_iterator(&itr,&scene);
+		HgElement* e = scene_next_element(&itr);
 
 		while (e != NULL) {
 			if (e->updateFunc != NULL) e->updateFunc(e,0);

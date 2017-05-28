@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <quaternion.h>
 
+#include <HgTypes.h>
+
 #define HGE_USED	0x01 //used in scene graph
 #define HGE_ACTIVE	0x02
 #define HGE_HIDDEN	0x04
@@ -18,10 +20,9 @@ typedef struct HgElement{
 	uint16_t flags;
 //	uint32_t index;
 //	uint32_t parent;
-	float position[3];
+	point position;
 	quaternion rotation;
 	void (*updateFunc)(struct HgElement* e, uint32_t tdelta);
-//	void (*renderFunc)(struct HgElement* e);
 	RenderData* m_renderData;
 } HgElement;
 
