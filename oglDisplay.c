@@ -4,9 +4,9 @@
 
 viewport view_port[3];
 
-static int8_t _currenViewPort_idx =  -1;
+static uint8_t _currenViewPort_idx =  0xFF;
 
-void hgViewport(int8_t idx) {
+void hgViewport(uint8_t idx) {
 	if (idx == _currenViewPort_idx) return;
 	_currenViewPort_idx = idx;
 
