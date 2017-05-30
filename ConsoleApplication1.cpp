@@ -37,10 +37,7 @@ HgCamera camera[2];
 
 HANDLE endOfRenderFrame;
 
-
-
-
-
+volatile int8_t needRender = 1;
 
 DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 	MercuryWindow* w = MercuryWindow::MakeWindow();
@@ -84,8 +81,16 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 			free(x);
 		}
 
+		needRender = 1;
+
+//		glFlush();
+//		glFinish();
+
+//		w->SwapBuffers();
+
 		//signal main game thread that we are done rendering frame.
 		//swap buffers is slow, calling this before swapping allows the main thread to begin processing the next frame step
+		//I think this screws up the main thread's time step because the time will be read well before the frame is done causing jitter in time based movement.
 		if (!SetEvent(endOfRenderFrame))
 		{
 			printf("SetEvent failed endOfRenderFrame (%d)\n", GetLastError());
@@ -95,6 +100,7 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 		stop_frame = 0;
 
 		w->SwapBuffers();
+
 		
 //		Sleep(10);
 	}
@@ -104,7 +110,7 @@ volatile LONG itrctr;
 
 DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	while (1) {
-		printf("FPS %u\n", itrctr);
+		printf("UPS %u\n", itrctr);
 		itrctr = 0;
 		Sleep(1000);
 	}
@@ -201,8 +207,22 @@ int main()
 	uint32_t stime = GetTickCount();
 	uint32_t time = stime;
 	uint32_t dtime = time - stime;
+
+	uint32_t ltime = 0;
+	uint32_t ddtime = time - stime;
+
+	int8_t do_render = 1;
 	while (1) {
 		dtime = GetTickCount() - stime;
+		ddtime = dtime - ltime;
+		ltime = dtime;
+
+		if (needRender > 0) {
+			do_render = needRender;
+			needRender = 0;
+		}
+
+//		printf("dtime: %d\n", ddtime);
 
 //		y,x,z
 		toQuaternion2((dtime%1000)/ 2.7777777777777777777777777777778, 0, 0, &element->rotation);
@@ -219,7 +239,7 @@ int main()
 		while (e != NULL) {
 			if (e->updateFunc != NULL) e->updateFunc(e,0);
 			if (is_destroyed(e) > 0) scene_delete_element(&itr);
-			if (check_flag(e, HGE_HIDDEN) == 0) hgRenderQueue_push( create_render_packet(e, 1, camera+0) ); //submit to renderer
+			if ((check_flag(e, HGE_HIDDEN) == 0) && (do_render>0)) hgRenderQueue_push( create_render_packet(e, 1, camera+0) ); //submit to renderer
 			e = scene_next_element(&itr);
 		}
 
@@ -227,7 +247,7 @@ int main()
 		e = scene_next_element(&itr);
 
 		while (e != NULL) {
-			if (check_flag(e, HGE_HIDDEN) == 0) hgRenderQueue_push( create_render_packet(e, 2, camera+1) ); //submit to renderer
+			if ((check_flag(e, HGE_HIDDEN) == 0) && (do_render>0)) hgRenderQueue_push( create_render_packet(e, 2, camera+1) ); //submit to renderer
 			e = scene_next_element(&itr);
 		}
 
@@ -235,13 +255,19 @@ int main()
 
 		InterlockedAdd(&itrctr,1);
 
-		hgRenderQueue_push(create_render_packet(NULL, 2, camera + 1)); //null element to indicate end of frame
 
+		if ((do_render>0))hgRenderQueue_push(create_render_packet(NULL, 2, camera + 1)); //null element to indicate end of frame
+
+		do_render = 0;
+
+		Sleep(1);
+/*		
 		DWORD dwWaitResult = WaitForSingleObject(
 			endOfRenderFrame, // event handle
 			INFINITE);    // indefinite wait
 
 		ResetEvent(endOfRenderFrame);
+		*/
 	}
 
     return 0;

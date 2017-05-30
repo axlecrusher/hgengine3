@@ -7,6 +7,8 @@
 #include <HgElement.h>
 
 #include <HgTypes.h>
+#include <windows.h>
+
 
 typedef struct render_packet {
 	point poisition;
