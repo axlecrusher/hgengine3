@@ -7,13 +7,12 @@
 #include <stdio.h>
 #include <oglShaders.h>
 
-/*
-static float points[] = {
--0.5f, -0.5f, 0.0f,
-0.5f, -0.5f, 0.0f,
-0.0f, 0.5f, 0.0f
+static float vv[9] = {
+	-0.5f, -0.5f, 0.0f,
+	0.5f, -0.5f, 0.0f,
+	0.0f, 0.5f, 0.0f
 };
-*/
+
 static float colours[] = {
 	1.0f, 0.0f,  0.0f,
 	0.0f, 1.0f,  0.0f,
@@ -42,11 +41,13 @@ void gen_triangle(vertices* v) {
 */
 void setup_ogl(OGLRenderData* rd) {
 	vertices points;
-	gen_triangle(&points);
+	points.points.array = vv;
+	points.f_size = 9;
+//	gen_triangle(&points);
 
 	GLuint* vbo = calloc(2, sizeof(GLuint));
 	vbo[0] = hgOglVbo(points);
-	free(points.points.array);
+//	free(points.points.array);
 
 	//colors
 	glGenBuffers(1, vbo+1);

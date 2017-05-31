@@ -53,12 +53,12 @@ void setup_viewports(uint16_t width, uint16_t height) {
 	++i;
 
 	view_port[i].x = view_port[i].y = 0;
-	view_port[i].width = width * 0.5;
+	view_port[i].width = width * 0.5f;
 	view_port[i].height = height;
 	++i;
 
-	view_port[i].x = width * 0.5;
+	view_port[i].x = width * 0.5f;
 	view_port[i].y = 0;
-	view_port[i].width = width * 0.5;
+	view_port[i].width = width * 0.5f;
 	view_port[i].height = height;
 }

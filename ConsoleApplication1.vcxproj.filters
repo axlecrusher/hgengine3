@@ -42,9 +42,6 @@
     <ClCompile Include="HgScene.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shapes.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="oglDisplay.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,9 +84,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shapes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="oglDisplay.h">

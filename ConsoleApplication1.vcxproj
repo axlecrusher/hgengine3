@@ -164,7 +164,6 @@
     <ClCompile Include="OglRenderPackets.c" />
     <ClCompile Include="oglShaders.c" />
     <ClCompile Include="quaternion.c" />
-    <ClCompile Include="shapes.c" />
     <ClCompile Include="triangle.c" />
     <ClCompile Include="Win32Window.cpp" />
   </ItemGroup>
@@ -183,7 +182,6 @@
     <ClInclude Include="oglDisplay.h" />
     <ClInclude Include="oglShaders.h" />
     <ClInclude Include="quaternion.h" />
-    <ClInclude Include="shapes.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="vertex.h" />
     <ClInclude Include="Win32Window.h" />
