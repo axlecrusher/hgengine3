@@ -12,6 +12,8 @@
 #define U_CAMERA_POS 7
 
 extern viewport view_port[];
+extern HgCamera* _camera;
+extern float* _projection;
 
 typedef struct OGLRenderData {
 	RenderData baseRender;
@@ -25,7 +27,7 @@ typedef struct OGLRenderData {
 GLuint hgOglVbo(vertices v);
 
 void ogl_destroy_renderData();
-
+void setGlobalUniforms();
 void hgViewport(uint8_t vp);
 
 void setup_viewports(uint16_t width, uint16_t height);

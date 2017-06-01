@@ -67,7 +67,8 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 		w->Clear();
 
 //		glUniformMatrix4fv(U_VIEW, 1, GL_TRUE, view);
-		glUniformMatrix4fv(U_PROJECTION, 1, GL_TRUE, projection);
+//		glUniformMatrix4fv(U_PROJECTION, 1, GL_TRUE, projection);
+		_projection = projection;
 
 		while (stop_frame == 0) {
 			render_packet* x = hgRenderQueue_pop();

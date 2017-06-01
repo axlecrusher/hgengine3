@@ -6,6 +6,9 @@ viewport view_port[3];
 
 static uint8_t _currenViewPort_idx =  0xFF;
 
+HgCamera* _camera;
+float* _projection;
+
 void hgViewport(uint8_t idx) {
 	if (idx == _currenViewPort_idx) return;
 	_currenViewPort_idx = idx;
@@ -16,6 +19,11 @@ void hgViewport(uint8_t idx) {
 	glEnable(GL_SCISSOR_TEST);
 }
 
+void setGlobalUniforms() {
+	glUniformMatrix4fv(U_PROJECTION, 1, GL_TRUE, _projection);
+	glUniform4f(U_CAMERA_ROT, _camera->rotation.x, _camera->rotation.y, _camera->rotation.z, _camera->rotation.w);
+	glUniform3f(U_CAMERA_POS, _camera->position.components.x, _camera->position.components.y, _camera->position.components.z);
+}
 
 GLuint hgOglVbo(vertices v) {
 	GLuint vbo = 0;

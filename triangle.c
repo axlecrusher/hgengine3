@@ -115,6 +115,7 @@ void triangle_render(HgElement* element) {
 
 	if (d->oglRender.shader_program > 0) useShaderProgram(d->oglRender.shader_program);
 
+	setGlobalUniforms();
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
