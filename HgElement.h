@@ -16,13 +16,17 @@ typedef struct RenderData {
 	void (*destroy)(struct HgElement* e);
 } RenderData;
 
+typedef struct HgElement_vtable {
+	void(*updateFunc)(struct HgElement* e, uint32_t tdelta);
+} HgElement_vtable;
+
 typedef struct HgElement{
+	HgElement_vtable* vptr;
 	uint16_t flags;
 //	uint32_t index;
 //	uint32_t parent;
 	point position;
 	quaternion rotation;
-	void (*updateFunc)(struct HgElement* e, uint32_t tdelta);
 	RenderData* m_renderData;
 } HgElement;
 
@@ -33,3 +37,5 @@ inline void set_flag(HgElement* element, uint16_t f) { element->flags |= f; }
 inline void clear_flag(HgElement* element, uint16_t f) { element->flags |= ~f; }
 
 inline uint16_t is_destroyed(HgElement* e) { return check_flag(e, HGE_DESTROY); }
+
+//#define VCALL(element,function) #element.vptr

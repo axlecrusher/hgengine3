@@ -156,11 +156,16 @@ void cube_render(HgElement* element) {
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
 }
 
+static void updateClbk(struct HgElement* e, uint32_t tdelta) {
+}
+
+static HgElement_vtable vtable = { .updateFunc = updateClbk };
+
 void shape_create_cube(HgElement* element) {
 	element->position.components.x = 0.0f;
 	element->position.components.y = 0.0f;
 	element->position.components.z = 0.0f;
-
+	element->vptr = &vtable;
 	element->rotation.w = 1.0f;
 	//	element->rotation.z = 0.707f;
 
