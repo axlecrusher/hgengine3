@@ -200,7 +200,7 @@ bool Win32Window::SwapBuffers()
 {
 	
 	glEnable(GL_DEPTH_TEST);
-//	glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 //	glEnable(GL_NORMALIZE); //deprecated
 //	glEnable (GL_BLEND); 
