@@ -244,8 +244,8 @@ int main()
 
 		while (e != NULL) {
 			VCALL(e, updateFunc, dtime);
-			if (is_destroyed(e) > 0) scene_delete_element(&itr);
-			if ((check_flag(e, HGE_HIDDEN) == 0) && (do_render>0)) hgRenderQueue_push( create_render_packet(e, 1, camera+0) ); //submit to renderer
+			if (CHECK_FLAG(e,HGE_DESTROY) > 0) scene_delete_element(&itr);
+			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render>0)) hgRenderQueue_push( create_render_packet(e, 1, camera+0) ); //submit to renderer
 			e = scene_next_element(&itr);
 		}
 
@@ -253,7 +253,7 @@ int main()
 		e = scene_next_element(&itr);
 
 		while (e != NULL) {
-			if ((check_flag(e, HGE_HIDDEN) == 0) && (do_render>0)) hgRenderQueue_push( create_render_packet(e, 2, camera+1) ); //submit to renderer
+			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render>0)) hgRenderQueue_push( create_render_packet(e, 2, camera+1) ); //submit to renderer
 			e = scene_next_element(&itr);
 		}
 

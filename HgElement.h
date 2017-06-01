@@ -32,10 +32,12 @@ typedef struct HgElement{
 
 void init_hgelement(HgElement* element);
 
-inline uint16_t check_flag(HgElement* element, uint8_t x) { return element->flags & x; }
+//inline uint16_t check_flag(HgElement* element, uint8_t x) { return element->flags & x; }
 inline void set_flag(HgElement* element, uint16_t f) { element->flags |= f; }
 inline void clear_flag(HgElement* element, uint16_t f) { element->flags |= ~f; }
 
-inline uint16_t is_destroyed(HgElement* e) { return check_flag(e, HGE_DESTROY); }
+//inline uint16_t is_destroyed(HgElement* e) { return CHECK_FLAG(e, HGE_DESTROY); }
+
+#define CHECK_FLAG(e,x) (e->flags&x)
 
 #define VCALL(e,function,...) if (e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)

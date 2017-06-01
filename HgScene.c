@@ -44,7 +44,7 @@ HgElement* scene_newElement(HgScene* scene) {
 	uint32_t i = 0;
 	for (i = 0; i < scene->_size; ++i) {
 		HgElement* e = scene->elements + i;
-		if (check_flag(e, HGE_USED) == 0) {
+		if (CHECK_FLAG(e, HGE_USED) == 0) {
 			quaternion_init(&e->rotation);
 			set_flag(e, HGE_USED);
 			return e;
@@ -67,7 +67,7 @@ void scene_clearUpdate(HgScene* scene) {
 HgElement* scene_next_element(HgScene_iterator* itr) {
 	uint32_t x;
 	for (x = itr->_current; x < itr->s->_size; ++x) {
-		if (check_flag(itr->s->elements + x, HGE_USED) > 0) {
+		if (CHECK_FLAG((itr->s->elements + x), HGE_USED) > 0) {
 			++itr->_current;
 			return itr->s->elements + x;
 		}
