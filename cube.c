@@ -147,16 +147,13 @@ void cube_render(HgElement* element) {
 	glUniform4f(1, element->rotation.x, element->rotation.y, element->rotation.z, element->rotation.w);
 	glUniform3f(3, element->position.components.x, element->position.components.y, element->position.components.z);
 
-//	glBindVertexArray(d->oglRender.vao);
-//	glDrawArrays(GL_TRIANGLES, 0, 36);
-//	glBindVertexArray(0);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->oglRender.vbo[2]);
 	glBindVertexArray(d->oglRender.vao);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
 }
 
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
+//	printf("cube\n");
 }
 
 static HgElement_vtable vtable = { .updateFunc = updateClbk };

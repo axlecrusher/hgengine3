@@ -38,4 +38,4 @@ inline void clear_flag(HgElement* element, uint16_t f) { element->flags |= ~f; }
 
 inline uint16_t is_destroyed(HgElement* e) { return check_flag(e, HGE_DESTROY); }
 
-//#define VCALL(element,function) #element.vptr
+#define VCALL(e,function,...) if (e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
