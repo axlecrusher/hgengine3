@@ -39,10 +39,10 @@ void gen_triangle(vertices* v) {
 	v->f_size = 9;
 }
 */
-void setup_ogl(OGLRenderData* rd) {
+static void setup_ogl(OGLRenderData* rd) {
 	vertices points;
 	points.points.array = vv;
-	points.f_size = 9;
+	points.size = 3;
 //	gen_triangle(&points);
 
 	GLuint* vbo = calloc(2, sizeof(GLuint));

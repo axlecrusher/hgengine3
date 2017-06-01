@@ -29,12 +29,12 @@ GLuint hgOglVbo(vertices v) {
 	GLuint vbo = 0;
 	GLuint vao = 0;
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+//	glGenVertexArrays(1, &vao);
+//	glBindVertexArray(vao);
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, v.f_size * sizeof(float), v.points.array, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, v.size * sizeof(*(v.points.v)), v.points.array, GL_STATIC_DRAW);
 	return vbo;
 }
 

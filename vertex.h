@@ -18,7 +18,7 @@ typedef struct vertices {
 		vertex* v;
 		float* array;
 	} points;
-	uint32_t f_size;
+	uint32_t size;
 } vertices;
 
 //typedef vertex* vertices;
