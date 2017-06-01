@@ -60,6 +60,9 @@
     <ClCompile Include="OglRenderPackets.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cube.c">
+      <Filter>Shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MercuryWindow.h">
@@ -112,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="HgTypes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cube.h">
+      <Filter>Shapes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

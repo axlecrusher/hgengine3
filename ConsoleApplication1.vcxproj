@@ -155,6 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
+    <ClCompile Include="cube.c" />
     <ClCompile Include="HgElement.c" />
     <ClCompile Include="HgMath.c" />
     <ClCompile Include="HgRenderQueue.c" />
@@ -169,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Callback.h" />
+    <ClInclude Include="cube.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="HgElement.h" />
     <ClInclude Include="HgMath.h" />

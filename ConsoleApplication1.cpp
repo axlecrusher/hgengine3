@@ -19,6 +19,7 @@ extern "C" {
 #include <oglDisplay.h>
 
 #include <triangle.h>
+#include <cube.h>
 
 #include <oglShaders.h>
 #include <HgMath.h>
@@ -153,7 +154,10 @@ int main()
 	HgScene scene;
 	scene_init(&scene, 1000);
 
-	HgElement* element = scene_newElement(&scene);
+	HgElement* element = NULL;
+
+	
+	element = scene_newElement(&scene);
 	shape_create_triangle(element);
 	element->position.components.x = 1.5f;
 	element->position.components.z = -1.0f;
@@ -170,7 +174,8 @@ int main()
 	uint32_t i;
 	for (i = 0; i < ANI_TRIS; i++) {
 		tris[i] = element = scene_newElement(&scene);
-		shape_create_triangle(element);
+//		shape_create_triangle(element);
+		shape_create_cube(element);
 		float x = (i % 20)*1.1;
 		float z = (i / 20)*1.1;
 		element->position.components.x = -10.0 + x;
@@ -227,7 +232,7 @@ int main()
 
 //		y,x,z
 		toQuaternion2((dtime%1000)/ 2.7777777777777777777777777777778, 0, 0, &element->rotation);
-//		toQuaternion2((dtime % 10000) / 27.777777777777777777777777777778, 0, 0, &camera_rot);
+
 
 		for (i = 0; i < ANI_TRIS; i++) {
 			memcpy(&tris[i]->rotation, &element->rotation, sizeof element->rotation);
