@@ -120,11 +120,21 @@ void triangle_render(HgElement* element) {
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
 	glUniform4f(1, element->rotation.x, element->rotation.y, element->rotation.z, element->rotation.w);
-	glUniform3f(3, element->position.components.x, element->position.components.y, element->position.components.z);
+	glUniform4f(3, element->position.components.x, element->position.components.y, element->position.components.z, element->scale);
 
 	glBindVertexArray(d->oglRender.vao);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 //	glBindVertexArray(0);
+}
+
+void change_to_triangle(HgElement* element) {
+	element->vptr = NULL;
+	//create an instance of the render data for all triangles to share
+	if (trd == NULL) {
+		trd = calloc(1, sizeof(triangle_render_data));
+		trd->oglRender.baseRender.renderFunc = triangle_render;
+	}
+	element->m_renderData = (RenderData*)trd;
 }
 
 void shape_create_triangle(HgElement* element) {
@@ -135,10 +145,7 @@ void shape_create_triangle(HgElement* element) {
 	element->rotation.w = 1.0f;
 //	element->rotation.z = 0.707f;
 
-	//create an instance of the render data for all triangles to share
-	if (trd == NULL) {
-		trd = calloc(1, sizeof(triangle_render_data));
-		trd->oglRender.baseRender.renderFunc = triangle_render;
-	}
-	element->m_renderData = (RenderData*)trd;
+	element->scale = 1;
+
+	change_to_triangle(element);
 }

@@ -76,5 +76,7 @@ HgElement* scene_next_element(HgScene_iterator* itr) {
 }
 
 void scene_delete_element(HgScene_iterator* i) {
-	//
+	HgElement* e = i->s->elements + i->_current;
+	VCALL(e, destroy);
+	init_hgelement(e);
 }

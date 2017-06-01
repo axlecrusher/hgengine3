@@ -6,7 +6,7 @@ layout(location = 1) in vec3 v_color;
 
 //uniforms have their own locations separate from attributes
 layout(location = 1) uniform vec4 rotation;
-layout(location = 3) uniform vec3 translation;
+layout(location = 3) uniform vec4 translation;
 layout(location = 5) uniform mat4 projection;
 
 layout(location = 6) uniform vec4 cam_rot;
@@ -31,8 +31,9 @@ vec3 point_quat_rotate(vec3 v, vec4 quaternion)
 
 void main() {
 	//roatate around vector first if rotation needs to be around an arbitrary vector
-
-	vec3 v1 = point_quat_rotate(vertex,rotation) + translation + cam_position;
+	vec3 trans = translation.xyz;
+	float scale = translation.w;
+	vec3 v1 = point_quat_rotate(vertex*scale,rotation) + trans + cam_position;
 	vec4 v2 = vec4(point_quat_rotate(v1,cam_rot), 1.0);
 
 	gl_Position = projection * v2;

@@ -218,6 +218,8 @@ int main()
 	uint32_t ddtime = time - stime;
 
 	int8_t do_render = 1;
+	uint8_t did_change = 0;
+
 	while (1) {
 		dtime = GetTickCount() - stime;
 		ddtime = dtime - ltime;
@@ -226,6 +228,13 @@ int main()
 		if (needRender > 0) {
 			do_render = needRender;
 			needRender = 0;
+		}
+
+		if (dtime > 10000 && did_change==0) {
+			did_change = 1;
+			for (i = 0; i < ANI_TRIS; i++) {
+				change_to_triangle(tris[i]);
+			}
 		}
 
 //		printf("dtime: %d\n", ddtime);

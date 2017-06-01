@@ -17,6 +17,7 @@ typedef struct RenderData {
 } RenderData;
 
 typedef struct HgElement_vtable {
+	void(*destroy)(struct HgElement* e);
 	void(*updateFunc)(struct HgElement* e, uint32_t tdelta);
 } HgElement_vtable;
 
@@ -25,7 +26,7 @@ typedef struct HgElement{
 	uint16_t flags;
 //	uint32_t index;
 //	uint32_t parent;
-	point position;
+	point position; float scale;
 	quaternion rotation;
 	RenderData* m_renderData;
 } HgElement;

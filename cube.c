@@ -46,25 +46,10 @@ typedef struct render_data {
 	uint8_t vbo_created;
 } render_data;
 
-/*
-void gen_triangle(vertices* v) {
-static float vv[9] = {
--0.5f, -0.5f, 0.0f,
-0.5f, -0.5f, 0.0f,
-0.0f, 0.5f, 0.0f
-};
-
-v->points.f = (float*)malloc(9 * sizeof(float));
-memcpy(v->points.f, vv, 9 * sizeof(float));
-v->f_size = 9;
-}
-*/
-
 static void cube_setup_ogl(OGLRenderData* rd) {
 	vertices points;
 	points.points.array = cube_verts;
 	points.size = 8;
-//	gen_triangle(&points);
 
 	GLuint* vbo = calloc(3, sizeof(GLuint));
 	vbo[0] = hgOglVbo(points);
@@ -145,7 +130,7 @@ void cube_render(HgElement* element) {
 	setGlobalUniforms();
 
 	glUniform4f(1, element->rotation.x, element->rotation.y, element->rotation.z, element->rotation.w);
-	glUniform3f(3, element->position.components.x, element->position.components.y, element->position.components.z);
+	glUniform4f(3, element->position.components.x, element->position.components.y, element->position.components.z, element->scale);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->oglRender.vbo[2]);
 	glBindVertexArray(d->oglRender.vao);
@@ -156,20 +141,34 @@ static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 //	printf("cube\n");
 }
 
-static HgElement_vtable vtable = { .updateFunc = updateClbk };
+static void destroy(struct HgElement* e) {
 
-void shape_create_cube(HgElement* element) {
-	element->position.components.x = 0.0f;
-	element->position.components.y = 0.0f;
-	element->position.components.z = 0.0f;
+	//	printf("cube\n");
+}
+
+static HgElement_vtable vtable = {
+	.destroy = destroy,
+	.updateFunc = updateClbk
+};
+
+void change_to_cube(HgElement* element) {
 	element->vptr = &vtable;
-	element->rotation.w = 1.0f;
-	//	element->rotation.z = 0.707f;
-
 	//create an instance of the render data for all triangles to share
 	if (crd == NULL) {
 		crd = calloc(1, sizeof(render_data));
 		crd->oglRender.baseRender.renderFunc = cube_render;
 	}
 	element->m_renderData = (RenderData*)crd;
+}
+
+void shape_create_cube(HgElement* element) {
+	element->position.components.x = 0.0f;
+	element->position.components.y = 0.0f;
+	element->position.components.z = 0.0f;
+
+	element->rotation.w = 1.0f;
+	//	element->rotation.z = 0.707f;
+	element->scale = 0.3;
+
+	change_to_cube(element);
 }
