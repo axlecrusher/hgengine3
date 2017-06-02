@@ -1,4 +1,5 @@
 #include <HgShader.h>
+#include <HgElement.h>
 
 #include <stdint.h>
 #include <string.h>
@@ -47,6 +48,9 @@ HgShader* HGShader_acquire(char* vert, char* frag) {
 	shader_list[i].name = name;
 	shader_list[i].use_count = 1;
 	shader_list[i].shader = _create_shader(vert,frag);
+
+	VCALL(shader_list[i].shader, load);
+
 	return shader_list[i].shader;
 }
 

@@ -96,7 +96,6 @@ void change_to_triangle(HgElement* element) {
 		trd->baseRender.renderFunc = triangle_render;
 
 		trd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
-		VCALL(trd->baseRender.shader, load);
 	}
 	element->m_renderData = (RenderData*)trd;
 }

@@ -122,7 +122,6 @@ void change_to_cube(HgElement* element) {
 		crd = calloc(1, sizeof(*crd));
 		crd->baseRender.renderFunc = cube_render;
 		crd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
-		VCALL(crd->baseRender.shader, load);
 	}
 	element->m_renderData = (RenderData*)crd;
 }
