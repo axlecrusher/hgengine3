@@ -81,8 +81,8 @@ static void cube_setup_ogl(OGLRenderData* rd) {
 	glEnableVertexAttribArray(1);
 
 	rd->vao = vao;
-	rd->vbo = vbo;
-	rd->vbo_size = 3;
+	rd->vbo.id = vbo;
+	rd->vbo.count = 3;
 }
 
 //instanced render data
@@ -102,7 +102,7 @@ void cube_render(HgElement* element) {
 	setGlobalUniforms();
 	setLocalUniforms(&element->rotation, &element->position, element->scale);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->oglRender.vbo[2]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->oglRender.vbo.id[2]);
 	glBindVertexArray(d->oglRender.vao);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
 }

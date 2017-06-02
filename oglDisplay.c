@@ -43,12 +43,12 @@ GLuint hgOglVbo(vertices v) {
 	return vbo;
 }
 
-void ogl_destroy_renderData(OGLRenderData* d) {
-	if (d->vbo != NULL) {
-		glDeleteBuffers(d->vbo_size, d->vbo);
-		d->vbo_size = 0;
-		free(d->vbo);
-		d->vbo = NULL;
+void OGLRenderData_destroy(OGLRenderData* d) {
+	if (d->vbo.id != NULL) {
+		glDeleteBuffers(d->vbo.count, d->vbo.id);
+		d->vbo.count = 0;
+		free(d->vbo.id);
+		d->vbo.id = NULL;
 	}
 
 	if (d->vao > 0) {

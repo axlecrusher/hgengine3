@@ -17,13 +17,15 @@ extern viewport view_port[];
 extern HgCamera* _camera;
 extern float* _projection;
 
+typedef struct ogl_vbo {
+	GLuint* id;
+	uint8_t count;
+} ogl_vbo;
+
 typedef struct OGLRenderData {
 	RenderData baseRender;
 	GLuint vao;
-	GLuint* vbo;
-	uint8_t vbo_size;
-
-	GLuint shader_program;
+	ogl_vbo vbo;
 } OGLRenderData;
 
 GLuint hgOglVbo(vertices v);

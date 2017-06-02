@@ -70,8 +70,8 @@ static void setup_ogl(OGLRenderData* rd) {
 	glEnableVertexAttribArray(1);
 
 	rd->vao = vao;
-	rd->vbo = vbo;
-	rd->vbo_size = 2;
+	rd->vbo.id = vbo;
+	rd->vbo.count = 2;
 }
 
 //instanced render data
