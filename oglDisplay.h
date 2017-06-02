@@ -8,6 +8,8 @@
 
 #define U_VIEW 4
 #define U_PROJECTION 5
+#define U_ROTATION		1
+#define U_POSITION		3
 #define U_CAMERA_ROT 6
 #define U_CAMERA_POS 7
 
@@ -28,6 +30,7 @@ GLuint hgOglVbo(vertices v);
 
 void ogl_destroy_renderData();
 void setGlobalUniforms();
+void setLocalUniforms(quaternion* rotation, point* position, float scale);
 void hgViewport(uint8_t vp);
 
 void setup_viewports(uint16_t width, uint16_t height);

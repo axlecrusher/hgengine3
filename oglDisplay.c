@@ -25,6 +25,11 @@ void setGlobalUniforms() {
 	glUniform3f(U_CAMERA_POS, _camera->position.components.x, _camera->position.components.y, _camera->position.components.z);
 }
 
+void setLocalUniforms(quaternion* rotation, point* position, float scale) {
+	glUniform4f(U_ROTATION, rotation->x, rotation->y, rotation->z, rotation->w);
+	glUniform4f(U_POSITION, position->components.x, position->components.y, position->components.z, scale);
+}
+
 GLuint hgOglVbo(vertices v) {
 	GLuint vbo = 0;
 	GLuint vao = 0;
