@@ -51,5 +51,11 @@ HgShader* HGShader_aquire(char* vert, char* frag) {
 }
 
 void HGShader_release(HgShader* s) {
-
+	uint32_t i = 0;
+	for (i = 0; i < MAX_SHADERS; ++i) {
+		if (s == shader_list[i].shader) {
+			shader_list[i].use_count--;
+			return;
+		}
+	}
 }
