@@ -27,7 +27,7 @@ static char* str_cat(const char* s1, const char* s2) {
 	return str;
 }
 
-HgShader* HGShader_aquire(char* vert, char* frag) {
+HgShader* HGShader_acquire(char* vert, char* frag) {
 	uint32_t i = 0;
 	char* name = str_cat(vert, frag);
 	uint32_t funused = 0xFFFFFFFF;
