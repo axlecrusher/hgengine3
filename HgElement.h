@@ -14,7 +14,7 @@
 
 typedef struct RenderData {
 	void (*renderFunc)(struct HgElement* e);
-	void (*destroy)(struct HgElement* e);
+	void (*destroy)(struct RenderData* e);
 	HgShader* shader;
 } RenderData;
 
@@ -34,6 +34,7 @@ typedef struct HgElement{
 } HgElement;
 
 void init_hgelement(HgElement* element);
+void HgElement_destroy(HgElement* element);
 
 //inline uint16_t check_flag(HgElement* element, uint8_t x) { return element->flags & x; }
 inline void set_flag(HgElement* element, uint16_t f) { element->flags |= f; }

@@ -11,6 +11,6 @@ typedef struct HgShader {
 } HgShader;
 
 HgShader* HGShader_aquire(char* vert, char* frag);
-void HGShader_release(char* vert, char* frag);
+void HGShader_release(HgShader* shader);
 
 extern HgShader*(*_create_shader)(const char* vert, const char* frag);
