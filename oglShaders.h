@@ -9,7 +9,6 @@ typedef struct HgShader_ogl {
 	HgShader _base;
 	GLuint program_id;
 	uint8_t source_loaded;
-	uint8_t ready;
 
 	//other things not needed often
 	void* program_code;

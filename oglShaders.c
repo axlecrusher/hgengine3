@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #include <memory.h>
+#include <string.h>
 
 static GLuint _currentShaderProgram = 0;
 
@@ -14,9 +15,9 @@ typedef struct shader_source {
 	char* frag_file_path;
 	char* geom_file_path;
 
-	char* vert;
-	char* frag;
-	char* geom;
+	char* vert_source;
+	char* frag_source;
+	char* geom_source;
 } shader_source;
 
 void _print_shader_info_log(GLuint idx) {
@@ -68,9 +69,9 @@ static char* read_from_disk(const char* path) {
 	}
 
 	size = bytes_read;
-	char* s = realloc(str, size+1);
-	assert(s != NULL);
-	str = s;
+	char* realloc_ptr = realloc(str, size+1);
+	assert(realloc_ptr != NULL);
+	str = realloc_ptr;
 	str[size] = 0;
 
 	return str;
@@ -104,11 +105,11 @@ static void setup_shader(HgShader_ogl* s) {
 	GLuint frag_id = 0;
 	GLuint geom_id = 0;
 
-	if (source->vert) vert_id = compile_shader(source->vert, GL_VERTEX_SHADER);
-	if (source->frag) frag_id = compile_shader(source->frag, GL_FRAGMENT_SHADER);
-	if (source->geom) geom_id = compile_shader(source->geom, GL_GEOMETRY_SHADER);
+	if (source->vert_source) vert_id = compile_shader(source->vert_source, GL_VERTEX_SHADER);
+	if (source->frag_source) frag_id = compile_shader(source->frag_source, GL_FRAGMENT_SHADER);
+	if (source->geom_source) geom_id = compile_shader(source->geom_source, GL_GEOMETRY_SHADER);
 
-	source->vert = source->frag = source->geom = NULL;
+	source->vert_source = source->frag_source = source->geom_source = NULL;
 
 	if ((vert_id == 0) && (frag_id == 0) && (geom_id == 0)) return;
 
@@ -133,7 +134,6 @@ static void setup_shader(HgShader_ogl* s) {
 		return;
 	}
 	shader->program_id = shader_program;
-	shader->ready = 1;
 }
 
 static void load_from_disk(HgShader* s) {
@@ -144,9 +144,9 @@ static void load_from_disk(HgShader* s) {
 	GLuint frag_id = 0;
 	GLuint geom_id = 0;
 
-	if (source->vert_file_path) source->vert = read_from_disk(source->vert_file_path);
-	if (source->frag_file_path) source->frag = read_from_disk(source->frag_file_path);
-	if (source->geom_file_path) source->geom = read_from_disk(source->geom_file_path);
+	if (source->vert_file_path) source->vert_source = read_from_disk(source->vert_file_path);
+	if (source->frag_file_path) source->frag_source = read_from_disk(source->frag_file_path);
+	if (source->geom_file_path) source->geom_source = read_from_disk(source->geom_file_path);
 
 	shader->source_loaded = 1;
 }
