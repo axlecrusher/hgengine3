@@ -48,7 +48,7 @@ static char* read_from_disk(const char* path) {
 	FILE* f = fopen(path, "r");
 	if (f == NULL) {
 		assert(f);
-		return 0;
+		return NULL;
 	}
 
 	fseek(f, 0, SEEK_END);
@@ -56,8 +56,21 @@ static char* read_from_disk(const char* path) {
 	fseek(f, 0, SEEK_SET);
 
 	char *str = malloc(size + 1);
-	fread(str, size, 1, f);
+	uint32_t bytes_read = fread(str, 1, size, f);
+	int error = ferror(f);
 	fclose(f);
+
+	if (error != 0) {
+		printf("File error: %d\n", error);
+		free(str);
+		str = NULL;
+		return str;
+	}
+
+	size = bytes_read;
+	char* s = realloc(str, size+1);
+	assert(s != NULL);
+	str = s;
 	str[size] = 0;
 
 	return str;
@@ -67,7 +80,6 @@ static GLuint compile_shader(char* str, GLuint shader_type) {
 	GLuint f_shader = glCreateShader(shader_type);
 	glShaderSource(f_shader, 1, &str, NULL);
 	glCompileShader(f_shader);
-	free(str);
 
 	// check for compile errors
 	int params = -1;
@@ -76,8 +88,10 @@ static GLuint compile_shader(char* str, GLuint shader_type) {
 		fprintf(stderr, "ERROR: GL shader index %i did not compile\n", f_shader);
 		_print_shader_info_log(f_shader);
 		glDeleteShader(f_shader);
+		free(str);
 		return 0;
 	}
+	free(str);
 
 	return f_shader;
 }
@@ -94,8 +108,9 @@ static void setup_shader(HgShader_ogl* s) {
 	if (source->frag) frag_id = compile_shader(source->frag, GL_FRAGMENT_SHADER);
 	if (source->geom) geom_id = compile_shader(source->geom, GL_GEOMETRY_SHADER);
 
-	if ((vert_id == 0) && (frag_id == 0) && (geom_id == 0)) return;
 	source->vert = source->frag = source->geom = NULL;
+
+	if ((vert_id == 0) && (frag_id == 0) && (geom_id == 0)) return;
 
 	GLuint shader_program = glCreateProgram();
 	if (vert_id>0) glAttachShader(shader_program, vert_id);
@@ -144,7 +159,7 @@ static void enable_shader(HgShader* s) {
 
 	if (shader->source_loaded == 0) return;
 
-	if (!shader->ready) setup_shader(shader);
+	if (shader->program_id==0) setup_shader(shader);
 	if (shader->program_id>0) useShaderProgram(shader->program_id);
 }
 
