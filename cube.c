@@ -127,7 +127,7 @@ void change_to_cube(HgElement* element) {
 	if (crd == NULL) {
 		crd = calloc(1, sizeof(render_data));
 		crd->oglRender.baseRender.renderFunc = cube_render;
-		crd->oglRender.baseRender.shader = HGShader_ogl_create("test_vertex.glsl", "test_frag.glsl");
+		crd->oglRender.baseRender.shader = HGShader_aquire("test_vertex.glsl", "test_frag.glsl");
 		VCALL(crd->oglRender.baseRender.shader, load);
 	}
 	element->m_renderData = (RenderData*)crd;

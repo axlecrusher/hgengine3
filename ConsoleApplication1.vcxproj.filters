@@ -63,6 +63,9 @@
     <ClCompile Include="cube.c">
       <Filter>Shapes</Filter>
     </ClCompile>
+    <ClCompile Include="HgShader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MercuryWindow.h">

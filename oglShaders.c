@@ -169,7 +169,7 @@ static HgShader_vtable vtable = {
 	.enable = enable_shader
 };
 
-static char* copy_str(char* str) {
+static char* copy_str(const char* str) {
 	uint32_t size = strlen(str);
 	char* s = malloc(size + 1);
 	s[size] = 0;
@@ -177,7 +177,7 @@ static char* copy_str(char* str) {
 	return s;
 }
 
-void* HGShader_ogl_create(char* vert, char* frag) {
+HgShader* HGShader_ogl_create(const char* vert, const char* frag) {
 	HgShader_ogl* s = calloc(1, sizeof* s);
 
 	s->_base.vptr = &vtable;
