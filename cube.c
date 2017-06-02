@@ -41,11 +41,6 @@ static uint8_t indices[] = {
 	1,5,4,4,0,1  //L side
 };
 
-typedef struct render_data {
-	OGLRenderData oglRender;
-	uint8_t vbo_created;
-} render_data;
-
 static void cube_setup_ogl(OGLRenderData* rd) {
 	vertices points;
 	points.points.array = cube_verts;
@@ -86,13 +81,12 @@ static void cube_setup_ogl(OGLRenderData* rd) {
 }
 
 //instanced render data
-static render_data *crd = NULL;
+static OGLRenderData *crd = NULL;
 
 void cube_render(HgElement* element) {
-	render_data *d = (render_data*)element->m_renderData;
-	if (d->vbo_created == 0) {
-		cube_setup_ogl(&d->oglRender);
-		d->vbo_created = 1;
+	OGLRenderData *d = (OGLRenderData*)element->m_renderData;
+	if (d->vbo.count == 0) {
+		cube_setup_ogl(d);
 	}
 
 //	if (d->oglRender.shader_program > 0) useShaderProgram(d->oglRender.shader_program);
@@ -102,8 +96,8 @@ void cube_render(HgElement* element) {
 	setGlobalUniforms();
 	setLocalUniforms(&element->rotation, &element->position, element->scale);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->oglRender.vbo.id[2]);
-	glBindVertexArray(d->oglRender.vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->vbo.id[2]);
+	glBindVertexArray(d->vao);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
 }
 
@@ -125,10 +119,10 @@ void change_to_cube(HgElement* element) {
 	element->vptr = &vtable;
 	//create an instance of the render data for all triangles to share
 	if (crd == NULL) {
-		crd = calloc(1, sizeof(render_data));
-		crd->oglRender.baseRender.renderFunc = cube_render;
-		crd->oglRender.baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
-		VCALL(crd->oglRender.baseRender.shader, load);
+		crd = calloc(1, sizeof(*crd));
+		crd->baseRender.renderFunc = cube_render;
+		crd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
+		VCALL(crd->baseRender.shader, load);
 	}
 	element->m_renderData = (RenderData*)crd;
 }

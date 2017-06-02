@@ -19,11 +19,6 @@ static float colours[] = {
 	0.0f, 0.0f,  1.0f
 };
 
-typedef struct triangle_render_data {
-	OGLRenderData oglRender;
-	uint8_t vbo_created;
-} triangle_render_data;
-
 extern HgElement* render_thing;
 
 /*
@@ -75,13 +70,12 @@ static void setup_ogl(OGLRenderData* rd) {
 }
 
 //instanced render data
-static triangle_render_data *trd = NULL;
+static OGLRenderData *trd = NULL;
 
 void triangle_render(HgElement* element) {
-	triangle_render_data *d = (triangle_render_data*)element->m_renderData;
-	if (d->vbo_created == 0) {
-		setup_ogl(&d->oglRender);
-		d->vbo_created = 1;
+	OGLRenderData *d = (OGLRenderData*)element->m_renderData;
+	if (d->vbo.count == 0) {
+		setup_ogl(d);
 	}
 
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
@@ -89,7 +83,7 @@ void triangle_render(HgElement* element) {
 	setGlobalUniforms();
 	setLocalUniforms(&element->rotation, &element->position, element->scale);
 
-	glBindVertexArray(d->oglRender.vao);
+	glBindVertexArray(d->vao);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 //	glBindVertexArray(0);
 }
@@ -98,11 +92,11 @@ void change_to_triangle(HgElement* element) {
 	element->vptr = NULL;
 	//create an instance of the render data for all triangles to share
 	if (trd == NULL) {
-		trd = calloc(1, sizeof(triangle_render_data));
-		trd->oglRender.baseRender.renderFunc = triangle_render;
+		trd = calloc(1, sizeof(*trd));
+		trd->baseRender.renderFunc = triangle_render;
 
-		trd->oglRender.baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
-		VCALL(trd->oglRender.baseRender.shader, load);
+		trd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
+		VCALL(trd->baseRender.shader, load);
 	}
 	element->m_renderData = (RenderData*)trd;
 }
