@@ -25,6 +25,8 @@ extern "C" {
 #include <HgMath.h>
 #include <HgTypes.h>
 #include <HgRenderQueue.h>
+
+#include <HgShader.h>
 }
 
 
@@ -125,6 +127,8 @@ int main()
 //	MercuryWindow* w = MercuryWindow::MakeWindow();
 	
 //	gen_triangle(&points);
+
+	_create_shader = HGShader_ogl_create;
 
 	setup_viewports(1280,480);
 	

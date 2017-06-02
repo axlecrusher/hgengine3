@@ -20,4 +20,4 @@ typedef struct HgShader_ogl {
 //void _print_programme_info_log(GLuint programme);
 //void _print_shader_info_log(GLuint idx);
 
-void* HGShader_ogl_create(char* vert, char* frag);
+HgShader* HGShader_ogl_create(const char* vert, const char* frag);

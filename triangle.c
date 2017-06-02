@@ -100,7 +100,8 @@ void change_to_triangle(HgElement* element) {
 	if (trd == NULL) {
 		trd = calloc(1, sizeof(triangle_render_data));
 		trd->oglRender.baseRender.renderFunc = triangle_render;
-		trd->oglRender.baseRender.shader = HGShader_ogl_create("test_vertex.glsl", "test_frag.glsl");
+
+		trd->oglRender.baseRender.shader = HGShader_aquire("test_vertex.glsl", "test_frag.glsl");
 		VCALL(trd->oglRender.baseRender.shader, load);
 	}
 	element->m_renderData = (RenderData*)trd;

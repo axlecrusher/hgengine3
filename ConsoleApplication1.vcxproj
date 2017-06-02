@@ -160,6 +160,7 @@
     <ClCompile Include="HgMath.c" />
     <ClCompile Include="HgRenderQueue.c" />
     <ClCompile Include="HgScene.c" />
+    <ClCompile Include="HgShader.c" />
     <ClCompile Include="MercuryWindow.cpp" />
     <ClCompile Include="oglDisplay.c" />
     <ClCompile Include="OglRenderPackets.c" />
