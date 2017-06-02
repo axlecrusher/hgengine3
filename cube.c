@@ -83,34 +83,6 @@ static void cube_setup_ogl(OGLRenderData* rd) {
 	rd->vao = vao;
 	rd->vbo = vbo;
 	rd->vbo_size = 3;
-
-	GLuint vert_shader = shaders_load("test_vertex.glsl", GL_VERTEX_SHADER);
-	GLuint frag_shader = shaders_load("test_frag.glsl", GL_FRAGMENT_SHADER);
-
-	GLuint shader_program = glCreateProgram();
-	glAttachShader(shader_program, vert_shader);
-	glAttachShader(shader_program, frag_shader);
-	glLinkProgram(shader_program);
-
-	glDeleteShader(vert_shader);
-	glDeleteShader(frag_shader);
-
-	// check if link was successful
-	int params = -1;
-	glGetProgramiv(shader_program, GL_LINK_STATUS, &params);
-	if (GL_TRUE != params) {
-		fprintf(stderr,
-			"ERROR: could not link shader programme GL index %u\n",
-			shader_program);
-		_print_programme_info_log(shader_program);
-		//		return false;
-	}
-
-	//	glUseProgram(shader_program);
-
-	rd->shader_program = shader_program;
-
-	//clean up shader pieces?
 }
 
 //instanced render data
@@ -123,7 +95,7 @@ void cube_render(HgElement* element) {
 		d->vbo_created = 1;
 	}
 
-	if (d->oglRender.shader_program > 0) useShaderProgram(d->oglRender.shader_program);
+//	if (d->oglRender.shader_program > 0) useShaderProgram(d->oglRender.shader_program);
 
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
@@ -155,6 +127,8 @@ void change_to_cube(HgElement* element) {
 	if (crd == NULL) {
 		crd = calloc(1, sizeof(render_data));
 		crd->oglRender.baseRender.renderFunc = cube_render;
+		crd->oglRender.baseRender.shader = HGShader_ogl_create("test_vertex.glsl", "test_frag.glsl");
+		VCALL(crd->oglRender.baseRender.shader, load);
 	}
 	element->m_renderData = (RenderData*)crd;
 }
@@ -166,7 +140,7 @@ void shape_create_cube(HgElement* element) {
 
 	element->rotation.w = 1.0f;
 	//	element->rotation.z = 0.707f;
-	element->scale = 0.3;
+	element->scale = 1.0f;
 
 	change_to_cube(element);
 }

@@ -180,6 +180,7 @@ int main()
 		float z = (i / 20)*1.1;
 		element->position.components.x = -10.0 + x;
 		element->position.components.z = -2.0f - z;
+		element->scale = 0.3f;
 	}
 
 	printf("\n%f %f %f %f\n", element->rotation.w, element->rotation.x, element->rotation.y, element->rotation.z);
@@ -230,12 +231,14 @@ int main()
 			needRender = 0;
 		}
 
+		/*
 		if (dtime > 10000 && did_change==0) {
 			did_change = 1;
 			for (i = 0; i < ANI_TRIS; i++) {
 				change_to_triangle(tris[i]);
 			}
 		}
+		*/
 
 //		printf("dtime: %d\n", ddtime);
 
@@ -276,13 +279,12 @@ int main()
 		do_render = 0;
 
 //		Sleep(1);
-/*		
+		
 		DWORD dwWaitResult = WaitForSingleObject(
 			endOfRenderFrame, // event handle
 			INFINITE);    // indefinite wait
 
 		ResetEvent(endOfRenderFrame);
-		*/
 	}
 
     return 0;

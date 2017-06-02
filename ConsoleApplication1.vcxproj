@@ -176,6 +176,7 @@
     <ClInclude Include="HgMath.h" />
     <ClInclude Include="HgRenderQueue.h" />
     <ClInclude Include="HgScene.h" />
+    <ClInclude Include="HgShader.h" />
     <ClInclude Include="HgTypes.h" />
     <ClInclude Include="include\glcorearb.h" />
     <ClInclude Include="include\glew.h" />

@@ -72,35 +72,6 @@ static void setup_ogl(OGLRenderData* rd) {
 	rd->vao = vao;
 	rd->vbo = vbo;
 	rd->vbo_size = 2;
-
-	GLuint vert_shader = shaders_load("test_vertex.glsl", GL_VERTEX_SHADER);
-	GLuint frag_shader = shaders_load("test_frag.glsl", GL_FRAGMENT_SHADER);
-
-	GLuint shader_program = glCreateProgram();
-	glAttachShader(shader_program, vert_shader);
-	glAttachShader(shader_program, frag_shader);
-	glLinkProgram(shader_program);
-
-	glDeleteShader(vert_shader);
-	glDeleteShader(frag_shader);
-
-	// check if link was successful
-	int params = -1;
-	glGetProgramiv(shader_program, GL_LINK_STATUS, &params);
-	if (GL_TRUE != params) {
-		fprintf(stderr,
-			"ERROR: could not link shader programme GL index %u\n",
-			shader_program);
-		_print_programme_info_log(shader_program);
-		//		return false;
-	}
-
-//	glUseProgram(shader_program);
-
-	rd->shader_program = shader_program;
-
-	//clean up shader pieces?
-
 }
 
 //instanced render data
@@ -112,8 +83,6 @@ void triangle_render(HgElement* element) {
 		setup_ogl(&d->oglRender);
 		d->vbo_created = 1;
 	}
-
-	if (d->oglRender.shader_program > 0) useShaderProgram(d->oglRender.shader_program);
 
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
@@ -131,6 +100,8 @@ void change_to_triangle(HgElement* element) {
 	if (trd == NULL) {
 		trd = calloc(1, sizeof(triangle_render_data));
 		trd->oglRender.baseRender.renderFunc = triangle_render;
+		trd->oglRender.baseRender.shader = HGShader_ogl_create("test_vertex.glsl", "test_frag.glsl");
+		VCALL(trd->oglRender.baseRender.shader, load);
 	}
 	element->m_renderData = (RenderData*)trd;
 }

@@ -4,6 +4,7 @@
 #include <quaternion.h>
 
 #include <HgTypes.h>
+#include <HgShader.h>
 
 #define HGE_USED	0x01 //used in scene graph
 #define HGE_ACTIVE	0x02
@@ -14,6 +15,7 @@
 typedef struct RenderData {
 	void (*renderFunc)(struct HgElement* e);
 	void (*destroy)(struct HgElement* e);
+	HgShader* shader;
 } RenderData;
 
 typedef struct HgElement_vtable {
@@ -41,4 +43,4 @@ inline void clear_flag(HgElement* element, uint16_t f) { element->flags |= ~f; }
 
 #define CHECK_FLAG(e,x) (e->flags&x)
 
-#define VCALL(e,function,...) if (e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
+#define VCALL(e,function,...) if (e && e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
