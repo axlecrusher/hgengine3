@@ -105,6 +105,11 @@ render_packet* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera
 	render_packet* rp = calloc(1, sizeof* rp);
 //	RenderElement* rp = new RenderElement();
 
+	if (e) {
+		rp->position = e->position;
+		rp->rotation = e->rotation;
+		rp->scale = e->scale;
+	}
 	rp->camera = *camera;
 	rp->viewport_idx = viewport_idx;
 

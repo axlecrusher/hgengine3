@@ -91,11 +91,6 @@ void cube_render(HgElement* element) {
 
 //	if (d->oglRender.shader_program > 0) useShaderProgram(d->oglRender.shader_program);
 
-	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
-	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
-	setGlobalUniforms();
-	setLocalUniforms(&element->rotation, &element->position, element->scale);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->vbo.id[2]);
 	glBindVertexArray(d->vao);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);

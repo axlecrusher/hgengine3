@@ -78,11 +78,6 @@ void triangle_render(HgElement* element) {
 		setup_ogl(d);
 	}
 
-	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
-	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
-	setGlobalUniforms();
-	setLocalUniforms(&element->rotation, &element->position, element->scale);
-
 	glBindVertexArray(d->vao);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 //	glBindVertexArray(0);

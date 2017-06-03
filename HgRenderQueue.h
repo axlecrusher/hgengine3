@@ -11,9 +11,10 @@
 
 
 typedef struct render_packet {
-	point poisition;
+	point position;
 	quaternion rotation;
 	HgCamera camera;
+	float scale;
 	
 	HgElement* element;
 	uint8_t viewport_idx;

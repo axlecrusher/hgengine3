@@ -19,10 +19,10 @@ void hgViewport(uint8_t idx) {
 	glEnable(GL_SCISSOR_TEST);
 }
 
-void setGlobalUniforms() {
+void setGlobalUniforms(HgCamera* c) {
 	glUniformMatrix4fv(U_PROJECTION, 1, GL_TRUE, _projection);
-	glUniform4f(U_CAMERA_ROT, _camera->rotation.x, _camera->rotation.y, _camera->rotation.z, _camera->rotation.w);
-	glUniform3f(U_CAMERA_POS, _camera->position.components.x, _camera->position.components.y, _camera->position.components.z);
+	glUniform4f(U_CAMERA_ROT, c->rotation.x, c->rotation.y, c->rotation.z, c->rotation.w);
+	glUniform3f(U_CAMERA_POS, c->position.components.x, c->position.components.y, c->position.components.z);
 }
 
 void setLocalUniforms(quaternion* rotation, point* position, float scale) {
