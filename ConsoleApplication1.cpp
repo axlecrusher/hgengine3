@@ -135,6 +135,7 @@ int main()
 	uint8_t s = sizeof(HgElement);
 	printf("element size %d\n", s);
 	printf("vertex size %d\n", sizeof(vertex));
+	printf("render_packet size %d\n", sizeof(render_packet));
 	printf("oglrd size %d\n", sizeof(OGLRenderData));
 
 //	Perspective(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
@@ -262,6 +263,7 @@ int main()
 			VCALL(e, updateFunc, dtime);
 			if (CHECK_FLAG(e,HGE_DESTROY) > 0) scene_delete_element(&itr);
 			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render>0)) hgRenderQueue_push( create_render_packet(e, 1, camera+0) ); //submit to renderer
+
 			e = scene_next_element(&itr);
 		}
 
