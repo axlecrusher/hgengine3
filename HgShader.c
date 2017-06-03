@@ -11,11 +11,12 @@
 HgShader*(*_create_shader)(const char* vert, const char* frag);
 
 typedef struct shader_entry {
-	char* name;
 	uint32_t use_count;
 	HgShader* shader;
 } shader_entry;
 
+/* keep shader_names seperate, we iterate through the list, want it cached*/
+static char* shader_names[MAX_SHADERS] = { NULL }; //replace strings with CRC32?
 shader_entry shader_list[MAX_SHADERS];
 
 static char* str_cat(const char* s1, const char* s2) {
@@ -33,9 +34,9 @@ HgShader* HGShader_acquire(char* vert, char* frag) {
 	char* name = str_cat(vert, frag);
 	uint32_t funused = 0xFFFFFFFF;
 	for (i = 0; i < MAX_SHADERS; ++i) {
-		if (shader_list[i].name == NULL && funused == 0xFFFFFFFF) funused = i;
-		if (shader_list[i].name == NULL) continue;
-		if (strcmp(name, shader_list[i].name) == 0) {
+		if (shader_names[i] == NULL && funused == 0xFFFFFFFF) funused = i;
+		if (shader_names[i] == NULL) continue;
+		if (strcmp(name, shader_names[i]) == 0) {
 			free(name);
 			shader_list[i].use_count++;
 			return shader_list[i].shader;
@@ -45,7 +46,7 @@ HgShader* HGShader_acquire(char* vert, char* frag) {
 	assert(funused != 0xFFFFFFFF); //out of shader spaces! increase MAX_SHADERS
 
 	i = funused;
-	shader_list[i].name = name;
+	shader_names[i] = name;
 	shader_list[i].use_count = 1;
 	shader_list[i].shader = _create_shader(vert,frag);
 
