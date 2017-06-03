@@ -31,8 +31,8 @@ typedef struct OGLRenderData {
 GLuint hgOglVbo(vertices v);
 
 void ogl_destroy_renderData();
-void setGlobalUniforms(HgCamera* camera);
-void setLocalUniforms(quaternion* rotation, point* position, float scale);
+void setGlobalUniforms(const HgCamera* camera);
+void setLocalUniforms(const quaternion* rotation, const point* position, float scale);
 void hgViewport(uint8_t vp);
 
 void setup_viewports(uint16_t width, uint16_t height);
