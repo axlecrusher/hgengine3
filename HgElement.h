@@ -44,4 +44,6 @@ inline void clear_flag(HgElement* element, uint16_t f) { element->flags |= ~f; }
 
 #define CHECK_FLAG(e,x) (e->flags&x)
 
-#define VCALL(e,function,...) if (e && e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
+//#define VCALL(e,function,...) if (e && e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
+#define VCALL(e,function,...) if (e->vptr->function) e->vptr->function(e,__VA_ARGS__)
+#define VCALL_F(e,function,...) e->vptr->function(e,__VA_ARGS__)

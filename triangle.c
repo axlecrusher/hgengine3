@@ -72,6 +72,20 @@ static void setup_ogl(OGLRenderData* rd) {
 //instanced render data
 static OGLRenderData *trd = NULL;
 
+static void updateClbk(struct HgElement* e, uint32_t tdelta) {
+	//	printf("cube\n");
+}
+
+static void destroy(struct HgElement* e) {
+
+	//	printf("cube\n");
+}
+
+static HgElement_vtable vtable = {
+	.destroy = NULL,
+	.updateFunc = NULL
+};
+
 void triangle_render(HgElement* element) {
 	OGLRenderData *d = (OGLRenderData*)element->m_renderData;
 	if (d->vbo.count == 0) {
@@ -84,7 +98,7 @@ void triangle_render(HgElement* element) {
 }
 
 void change_to_triangle(HgElement* element) {
-	element->vptr = NULL;
+	element->vptr = &vtable;
 	//create an instance of the render data for all triangles to share
 	if (trd == NULL) {
 		trd = calloc(1, sizeof(*trd));

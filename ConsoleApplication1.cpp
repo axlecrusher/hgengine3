@@ -80,7 +80,12 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 				x = hgRenderQueue_pop();
 			}
 
-			stop_frame = draw_render_packet(x);
+			if (x->element == NULL) {
+				stop_frame = 1;
+			}
+			else {
+				draw_render_packet(x);
+			}
 
 			free(x);
 		}
