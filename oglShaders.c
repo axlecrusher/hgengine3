@@ -187,5 +187,5 @@ HgShader* HGShader_ogl_create(const char* vert, const char* frag) {
 	source->frag_file_path = copy_str(frag);
 	s->program_code = source;
 
-	return s;
+	return &s->_base;
 }
