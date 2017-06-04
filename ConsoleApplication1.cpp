@@ -167,23 +167,23 @@ int main()
 	HgElement* element = NULL;
 
 	
-	element = scene_newElement(&scene);
+	scene_newElement(&scene, &element);
 	shape_create_triangle(element);
 	element->position.components.x = 1.5f;
 	element->position.components.z = -1.0f;
 //	toQuaternion2(0, 0, 90, &element->rotation);
 
-	element = scene_newElement(&scene);
+	scene_newElement(&scene, &element);
 	shape_create_triangle(element);
 	element->position.components.x = -0.0f;
 	element->position.components.z = -2.0f;
 //	toQuaternion2(45,0,0,&element->rotation);
 
-	HgElement* tris[ANI_TRIS];
+	uint32_t tris[ANI_TRIS];
 
 	uint32_t i;
 	for (i = 0; i < ANI_TRIS; i++) {
-		tris[i] = element = scene_newElement(&scene);
+		tris[i] = scene_newElement(&scene, &element);
 //		shape_create_triangle(element);
 		shape_create_cube(element);
 		float x = (i % 20)*1.1;
@@ -255,15 +255,16 @@ int main()
 //		y,x,z
 		toQuaternion2((dtime%1000)/ 2.7777777777777777777777777777778, 0, 0, &element->rotation);
 
-
 		for (i = 0; i < ANI_TRIS; i++) {
-			memcpy(&tris[i]->rotation, &element->rotation, sizeof element->rotation);
+			HgElement* e = scene.elements + tris[i];
+			memcpy(&e->rotation, &element->rotation, sizeof element->rotation);
 		}
 
 		for (uint32_t i=0; i<scene._size; ++i) {
+//			if (IS_USED(&scene, i) == 0) continue;
+			if(is_used(&scene, i) == 0) continue;
 			HgElement* e = scene.elements + i;
 
-			if (CHECK_FLAG(e, HGE_USED) == 0) continue;
 			VCALL_IDX(e, updateFunc, dtime);
 			if (CHECK_FLAG(e, HGE_DESTROY) > 0) {
 				scene_delete_element(&scene, i);
@@ -273,8 +274,8 @@ int main()
 		}
 
 		for (uint32_t i = 0; i<scene._size; ++i) {
+			if (is_used(&scene,i) == 0) continue;
 			HgElement* e = scene.elements + i;
-			if (CHECK_FLAG(e, HGE_USED) == 0) continue;
 			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render>0)) hgRenderQueue_push( create_render_packet(e, 2, camera+1) ); //submit to renderer
 		}
 

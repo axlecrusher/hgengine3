@@ -8,6 +8,7 @@
 void scene_resize(HgScene* scene, uint32_t size) {
 //	uint32_t size = scene->_size + 1000;
 	HgElement* e = scene->elements;
+
 	e = realloc(e, size * sizeof *e);
 	assert(e != NULL);
 
@@ -15,16 +16,41 @@ void scene_resize(HgScene* scene, uint32_t size) {
 	for (i = scene->_size; i < size; ++i) {
 		init_hgelement(e + i);
 	}
+
+	uint32_t usize = (size / 8)+1;
+	uint8_t* u = scene->used;
+	u = realloc(u, usize * sizeof *u);
+	assert(u != NULL);
+
+	for (i = (scene->_size/8)+(scene->_size%8>0); i < usize; ++i) {
+		u[i] = 0;
+	}
+
 	scene->_size = size;
 	scene->elements = e;
+	scene->used = u;
 }
 
 void scene_init(HgScene* scene, uint32_t size) {
 	scene->elements = NULL;
+	scene->used = NULL;
 	scene->_size = 0;
 	scene->_next_empty = 0;
 	scene_resize(scene, size);
 }
+
+static void set_used(HgScene* s, uint32_t idx) {
+	uint32_t q = idx / 8;
+	uint32_t r = idx % 8;
+	s->used[q] |= (1 << r);
+}
+
+static void clear_used(HgScene* s, uint32_t idx) {
+	uint32_t q = idx / 8;
+	uint32_t r = idx % 8;
+	s->used[q] |= ~(1 << r);
+}
+
 /*
 void scene_add_element(HgScene* scene, HgElement* element) {
 	uint32_t i = 0;
@@ -40,20 +66,20 @@ void scene_add_element(HgScene* scene, HgElement* element) {
 	scene_add_element(scene, element);
 }
 */
-HgElement* scene_newElement(HgScene* scene) {
+uint32_t scene_newElement(HgScene* scene,HgElement** element) {
 	uint32_t i = 0;
 	for (i = 0; i < scene->_size; ++i) {
-		HgElement* e = scene->elements + i;
-		if (CHECK_FLAG(e, HGE_USED) == 0) {
-			quaternion_init(&e->rotation);
-			SET_FLAG(e, HGE_USED);
-			return e;
+		if (IS_USED(scene, i) == 0) {
+			set_used(scene,i);
+//			scene->used[i] = 1;
+			*element = scene->elements + i;
+			return i;
 		}
 	}
 
 	//resize
-	scene_resize(scene, scene->_size + 1000);
-	return scene_newElement(scene);
+	scene_resize(scene, scene->_size + 100);
+	return scene_newElement(scene, element);
 }
 
 void scene_clearUpdate(HgScene* scene) {
@@ -67,8 +93,8 @@ void scene_clearUpdate(HgScene* scene) {
 HgElement* scene_next_element(HgScene_iterator* itr) {
 	uint32_t x;
 	for (x = itr->_current; x < itr->s->_size; ++x) {
-		if (CHECK_FLAG(itr->s->elements + x, HGE_USED) > 0) {
-			++itr->_current;
+		if (IS_USED(itr->s, HGE_USED) > 0) {
+			itr->_current=x;
 			return itr->s->elements + x;
 		}
 	}
@@ -79,10 +105,21 @@ void scene_delete_element_itr(HgScene_iterator* i) {
 	HgElement* e = i->s->elements + i->_current;
 	VCALL_IDX(e, destroy);
 	init_hgelement(e);
+	clear_used(i->s,i->_current);
+//	i->s->used[i->_current] = 0;
 }
 
 void scene_delete_element(HgScene* scene, uint32_t idx) {
 	HgElement* e = scene->elements + idx;
 	VCALL_IDX(e, destroy);
 	init_hgelement(e);
+//	scene->used[idx] = 0;
+	clear_used(scene,idx);
+}
+
+uint8_t is_used(HgScene* s, uint32_t index)
+{
+	uint32_t q = index / 8;
+	uint32_t r = index % 8;
+	return s->used[q] & (1 << r);
 }
