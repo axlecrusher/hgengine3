@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <oglShaders.h>
 
+#define VTABLE_INDEX 1
+
 static float vv[9] = {
 	-0.5f, -0.5f, 0.0f,
 	0.5f, -0.5f, 0.0f,
@@ -98,7 +100,8 @@ void triangle_render(HgElement* element) {
 }
 
 void change_to_triangle(HgElement* element) {
-	element->vptr = &vtable;
+//	element->vptr = &vtable;
+	element->vptr_idx = 0;
 	//create an instance of the render data for all triangles to share
 	if (trd == NULL) {
 		trd = calloc(1, sizeof(*trd));

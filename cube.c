@@ -9,6 +9,8 @@
 
 #include <assert.h>
 
+#define VTABLE_INDEX 2
+
 static float cube_verts[] = {
 	0.5f, 0.5, 0.5,		//0
 	0.5f, -0.5, 0.5,	//1
@@ -111,7 +113,10 @@ static HgElement_vtable vtable = {
 };
 
 void change_to_cube(HgElement* element) {
-	element->vptr = &vtable;
+	HGELEMT_VTABLES[VTABLE_INDEX] = vtable;
+
+//	element->vptr = &vtable;
+	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
 	if (crd == NULL) {
 		crd = calloc(1, sizeof(*crd));

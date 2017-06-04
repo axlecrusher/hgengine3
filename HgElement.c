@@ -1,10 +1,13 @@
 #include <HgElement.h>
 #include <stdlib.h>
 
+extern HgElement_vtable HGELEMT_VTABLES[255] = { 0 };
+
 void init_hgelement(HgElement* element) {
 	element->flags = 0;
 //	element->index = 0;
-	element->vptr = NULL;
+//	element->vptr = NULL;
+	element->vptr_idx = 0;
 //	element->renderFunc = NULL;
 	element->m_renderData = NULL;
 	element->position.components.x = 0;
@@ -15,7 +18,7 @@ void init_hgelement(HgElement* element) {
 }
 
 void HgElement_destroy(HgElement* element) {
-	VCALL(element, destroy);
+	VCALL_IDX(element, destroy);
 	if (element->m_renderData) {
 		if (element->m_renderData->shader) {
 			HGShader_release(element->m_renderData->shader);

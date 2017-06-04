@@ -265,7 +265,7 @@ int main()
 		HgElement* e = scene_next_element(&itr);
 
 		while (e != NULL) {
-			VCALL(e, updateFunc, dtime);
+			VCALL_IDX(e, updateFunc, dtime);
 			if (CHECK_FLAG(e,HGE_DESTROY) > 0) scene_delete_element(&itr);
 			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render>0)) hgRenderQueue_push( create_render_packet(e, 1, camera+0) ); //submit to renderer
 
@@ -290,12 +290,13 @@ int main()
 		do_render = 0;
 
 //		Sleep(1);
-		
+		/*
 		DWORD dwWaitResult = WaitForSingleObject(
 			endOfRenderFrame, // event handle
 			INFINITE);    // indefinite wait
 
 		ResetEvent(endOfRenderFrame);
+		*/
 	}
 
     return 0;

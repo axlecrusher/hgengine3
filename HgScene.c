@@ -46,7 +46,7 @@ HgElement* scene_newElement(HgScene* scene) {
 		HgElement* e = scene->elements + i;
 		if (CHECK_FLAG(e, HGE_USED) == 0) {
 			quaternion_init(&e->rotation);
-			set_flag(e, HGE_USED);
+			SET_FLAG(e, HGE_USED);
 			return e;
 		}
 	}
@@ -59,7 +59,7 @@ HgElement* scene_newElement(HgScene* scene) {
 void scene_clearUpdate(HgScene* scene) {
 	uint32_t i = 0;
 	for (i = 0; i < scene->_size; ++i) {
-		clear_flag(scene->elements + i, HGE_UPDATED);
+		CLEAR_FLAG(scene->elements + i, HGE_UPDATED);
 	}
 }
 
@@ -77,6 +77,6 @@ HgElement* scene_next_element(HgScene_iterator* itr) {
 
 void scene_delete_element(HgScene_iterator* i) {
 	HgElement* e = i->s->elements + i->_current;
-	VCALL(e, destroy);
+	VCALL_IDX(e, destroy);
 	init_hgelement(e);
 }
