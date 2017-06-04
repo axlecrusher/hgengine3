@@ -67,7 +67,7 @@ void scene_clearUpdate(HgScene* scene) {
 HgElement* scene_next_element(HgScene_iterator* itr) {
 	uint32_t x;
 	for (x = itr->_current; x < itr->s->_size; ++x) {
-		if (CHECK_FLAG((itr->s->elements + x), HGE_USED) > 0) {
+		if (CHECK_FLAG(itr->s->elements + x, HGE_USED) > 0) {
 			++itr->_current;
 			return itr->s->elements + x;
 		}
@@ -75,8 +75,14 @@ HgElement* scene_next_element(HgScene_iterator* itr) {
 	return NULL;
 }
 
-void scene_delete_element(HgScene_iterator* i) {
+void scene_delete_element_itr(HgScene_iterator* i) {
 	HgElement* e = i->s->elements + i->_current;
+	VCALL_IDX(e, destroy);
+	init_hgelement(e);
+}
+
+void scene_delete_element(HgScene* scene, uint32_t idx) {
+	HgElement* e = scene->elements + idx;
 	VCALL_IDX(e, destroy);
 	init_hgelement(e);
 }

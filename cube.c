@@ -113,7 +113,7 @@ static HgElement_vtable vtable = {
 };
 
 void change_to_cube(HgElement* element) {
-	HGELEMT_VTABLES[VTABLE_INDEX] = vtable;
+	HGELEMT_VTABLES[VTABLE_INDEX] = vtable; //how to only do this once?
 
 //	element->vptr = &vtable;
 	element->vptr_idx = VTABLE_INDEX;

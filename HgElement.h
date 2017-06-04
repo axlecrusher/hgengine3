@@ -46,7 +46,7 @@ void HgElement_destroy(HgElement* element);
 
 //inline uint16_t is_destroyed(HgElement* e) { return CHECK_FLAG(e, HGE_DESTROY); }
 
-#define CHECK_FLAG(e,x) (e->flags&x)
+#define CHECK_FLAG(e,x) ((e)->flags&x)
 #define CLEAR_FLAG(e,x) (e)->flags |= ~x
 #define SET_FLAG(e,x) (e)->flags |= x
 
