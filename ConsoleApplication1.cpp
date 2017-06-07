@@ -270,9 +270,9 @@ int main()
 			v = vector3_normalize(&v);
 //			v = vector3_scale(&v, -1.0f);
 
-			camera->rotation.w *= -1.0; //invert coordinate system for vector rotation
+			camera->rotation.w = -camera->rotation.w; //invert coordinate system for vector rotation
 			v= vector3_quat_rotate(&v, &camera->rotation);
-			camera->rotation.w *= -1.0; //restore
+			camera->rotation.w = -camera->rotation.w; //restore
 
 			v = vector3_scale(&v, scale);
 			camera->position = vector3_add(&camera->position, &v);
