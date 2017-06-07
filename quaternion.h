@@ -13,3 +13,5 @@ inline void quaternion_init(quaternion* q) { q->x = q->y = q->z = 0; q->w = 1.0f
 
 void toQuaternion(double x, double y, double z, double deg, quaternion* q);
 void toQuaternion2(double pitch, double roll, double yaw, quaternion* q);
+
+quaternion quat_mult(const quaternion* q1, const quaternion* q2);

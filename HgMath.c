@@ -6,6 +6,8 @@
 #include <memory.h>
 #include <stdlib.h>
 
+#include <quaternion.h>
+
 void MatrixMultiply4f(const float* in1, const float* in2, float* outa)
 {
 	float* r = outa;
@@ -131,6 +133,26 @@ vector3 vector3_normalize(const vector3* v) {
 	r.array[2] /= length;
 
 	return r;
+}
+
+vector3 vector3_cross(const vector3* v1, const vector3* v2) {
+	float* x = v1->array;
+	float* y = v2->array;
+	vector3 r;
+	r.array[0] = (x[1] * y[2]) - (x[2] * y[1]);
+	r.array[1] = (x[2] * y[0]) - (x[0] * y[2]);
+	r.array[2] = (x[0] * y[1]) - (x[1] * y[0]);
+	return r;
+}
+
+vector3 vector3_quat_rotate(const vector3* v, const quaternion* q) {
+	vector3 r1 = vector3_scale(v, q->w);
+	vector3 r2 = vector3_cross((vector3*)&q->x, v);
+	r1 = vector3_add(&r1, &r2);
+	r2 = vector3_cross((vector3*)&q->x, &r1);
+	r1 = vector3_scale(&r2, 2.0);
+	r2 = vector3_add(v, &r1);
+	return r2;
 }
 
 /*

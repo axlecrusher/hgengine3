@@ -34,3 +34,12 @@ void toQuaternion2(double pitch, double roll, double yaw, quaternion* q) {
 	q->y = (float)(t0 * t2 * t5 + t1 * t3 * t4);
 	q->z = (float)(t1 * t2 * t4 - t0 * t3 * t5);
 }
+
+quaternion quat_mult(const quaternion* q, const quaternion* r) {
+	quaternion t;
+	t.w = (r->w*q->w) - (r->x*q->x) - (r->y*q->y) - (r->z*q->z);
+	t.x = (r->w*q->x) + (r->x*q->w) - (r->y*q->z) + (r->z*q->y);
+	t.y = (r->w*q->y) + (r->x*q->z) + (r->y*q->w) - (r->z*q->x);
+	t.z = (r->w*q->z) - (r->x*q->y) + (r->y*q->x) + (r->z*q->w);
+	return t;
+}
