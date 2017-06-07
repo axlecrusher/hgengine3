@@ -264,17 +264,31 @@ int main()
 				mouse_x = 0; mouse_y = -41.66666666666667;
 			}
 
+//			if (v.components.z > 0) DebugBreak();
+
 			float scale = (1.0 / 1000.0f) * ddtime;
 			v = vector3_normalize(&v);
-			v = vector3_scale(&v, scale);
+//			v = vector3_scale(&v, -1.0f);
 
+			camera->rotation.w *= -1.0; //invert coordinate system for vector rotation
+			v= vector3_quat_rotate(&v, &camera->rotation);
+			camera->rotation.w *= -1.0; //restore
+
+			v = vector3_scale(&v, scale);
 			camera->position = vector3_add(&camera->position, &v);
 
 			mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
 			mouse_y = (MOUSE_INPUT.dy + mouse_y) % 2000;
 
-			//		y,x,z
-			toQuaternion2((-mouse_x / 2000.0f)*360, (-mouse_y / 2000.0f)*360, 0, &camera->rotation);
+
+			//seperate quaternions keep the camera from rolling when yawing and pitching
+			quaternion yaw, pitch;
+			toQuaternion2((-MOUSE_INPUT.dx / 2000.0f)*360, 0, 0, &yaw);
+			toQuaternion2(0, (-MOUSE_INPUT.dy / 2000.0f) * 360, 0, &pitch);
+
+			camera->rotation = quat_mult(&pitch, &camera->rotation);
+			camera->rotation = quat_mult(&camera->rotation, &yaw);
+			//normalize quaternion?
 
 			MOUSE_INPUT.dx = 0;
 			MOUSE_INPUT.dy = 0;
@@ -288,7 +302,7 @@ int main()
 		if (dtime > 10000) { // && did_change==0) {
 			did_change = 1;
 
-			if (ddtime>0) gravity_update(&gravity, ddtime);
+//			if (ddtime>0) gravity_update(&gravity, ddtime);
 			/*
 			for (i = 0; i < ANI_TRIS; i++) {
 				change_to_triangle(tris[i]);
