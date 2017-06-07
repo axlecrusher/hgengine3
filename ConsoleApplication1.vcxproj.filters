@@ -66,6 +66,12 @@
     <ClCompile Include="HgShader.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GravityTest.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HgInput.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MercuryWindow.h">
@@ -123,6 +129,12 @@
       <Filter>Shapes</Filter>
     </ClInclude>
     <ClInclude Include="HgShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Gravity.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HgInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

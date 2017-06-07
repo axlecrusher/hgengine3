@@ -27,6 +27,9 @@ extern "C" {
 #include <HgRenderQueue.h>
 
 #include <HgShader.h>
+
+#include <Gravity.h>
+#include <HgInput.h>
 }
 
 
@@ -41,6 +44,8 @@ HgCamera camera[2];
 HANDLE endOfRenderFrame;
 
 volatile int8_t needRender = 1;
+
+//uint8_t KeyDownMap[512];
 
 DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 	MercuryWindow* w = MercuryWindow::MakeWindow();
@@ -62,6 +67,8 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 
 	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &d);
 	printf("GL_MAX_VERTEX_UNIFORM_BLOCKS %d\n", d);
+
+	glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	uint8_t stop_frame = 0;
 	while (1) {
@@ -181,13 +188,20 @@ int main()
 
 	uint32_t tris[ANI_TRIS];
 
+	GravityField gravity = { 0 };
+	allocate_space(&gravity, ANI_TRIS);
+	gravity.scene = &scene;
+	gravity.vector.components.y=-1;
+
 	uint32_t i;
 	for (i = 0; i < ANI_TRIS; i++) {
 		tris[i] = scene_newElement(&scene, &element);
+		gravity.indices[i] = tris[i];
 //		shape_create_triangle(element);
 		shape_create_cube(element);
 		float x = (i % 20)*1.1;
 		float z = (i / 20)*1.1;
+		element->position.components.y = 5.0f;
 		element->position.components.x = -10.0 + x;
 		element->position.components.z = -2.0f - z;
 		element->scale = 0.3f;
@@ -236,19 +250,40 @@ int main()
 		ddtime = dtime - ltime;
 		ltime = dtime;
 
+		if (ddtime > 0) {
+			vector3 v;
+			vector3_zero(&v);
+
+			if (KeyDownMap['w']) v.components.z += 1.0f;
+			if (KeyDownMap['s']) v.components.z -= 1.0f;
+			if (KeyDownMap['a']) v.components.x += 1.0f;
+			if (KeyDownMap['d']) v.components.x -= 1.0f;
+
+			float scale = (1.0 / 1000.0f) * ddtime;
+			v = vector3_normalize(&v);
+			v = vector3_scale(&v, scale);
+
+			camera->position = vector3_add(&camera->position, &v);
+
+			MOUSE_INPUT.dx = 0;
+			MOUSE_INPUT.dy = 0;
+		}
+
 		if (needRender > 0) {
 			do_render = needRender;
 			needRender = 0;
 		}
 
-		/*
-		if (dtime > 10000 && did_change==0) {
+		if (dtime > 10000) { // && did_change==0) {
 			did_change = 1;
+
+			if (ddtime>0) gravity_update(&gravity, ddtime);
+			/*
 			for (i = 0; i < ANI_TRIS; i++) {
 				change_to_triangle(tris[i]);
 			}
+			*/
 		}
-		*/
 
 //		printf("dtime: %d\n", ddtime);
 
@@ -273,10 +308,14 @@ int main()
 			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) hgRenderQueue_push(create_render_packet(e, 1, camera + 0)); //submit to renderer
 		}
 
-		for (uint32_t i = 0; i<scene._size; ++i) {
-			if (is_used(&scene,i) == 0) continue;
-			HgElement* e = scene.elements + i;
-			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render>0)) hgRenderQueue_push( create_render_packet(e, 2, camera+1) ); //submit to renderer
+		if (do_render > 0) {
+			camera[1] = camera[0];
+			camera[1].position.components.x += 0.07f;
+			for (uint32_t i = 0; i < scene._size; ++i) {
+				if (is_used(&scene, i) == 0) continue;
+				HgElement* e = scene.elements + i;
+				if (CHECK_FLAG(e, HGE_HIDDEN) == 0) hgRenderQueue_push(create_render_packet(e, 2, camera + 1)); //submit to renderer
+			}
 		}
 
 //		scene_clearUpdate(&scene);
