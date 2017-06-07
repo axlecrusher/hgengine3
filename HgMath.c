@@ -4,6 +4,7 @@
 
 #include <math.h>
 #include <memory.h>
+#include <stdlib.h>
 
 void MatrixMultiply4f(const float* in1, const float* in2, float* outa)
 {
@@ -91,6 +92,45 @@ void Perspective2(
 	M[10] = (zfar + znear) / (znear - zfar);
 	M[11] = (2 * zfar*znear) / (znear - zfar);
 	M[14] = -1.0f;
+}
+
+vector3 vector3_scale(const vector3* v, float scale) {
+	vector3 r = *v;
+	r.array[0] *= scale;
+	r.array[1] *= scale;
+	r.array[2] *= scale;
+	return r;
+}
+
+vector3 vector3_add(const vector3* v, const vector3* v2) {
+	vector3 r = *v;
+	r.array[0] += v2->array[0];
+	r.array[1] += v2->array[1];
+	r.array[2] += v2->array[2];
+	return r;
+}
+
+#define SQUARE(x) (x*x)
+
+float vector3_length(const vector3* v) {
+	float x = SQUARE(v->array[0])
+			+ SQUARE(v->array[1])
+			+ SQUARE(v->array[2]);
+
+	return (float)sqrt(x);
+}
+
+vector3 vector3_normalize(const vector3* v) {
+	float length = vector3_length(v);
+//	if (fabs(length) < 0.000000000001f) return *v;
+	if (length == 0.0) return *v;
+
+	vector3 r = *v;
+	r.array[0] /= length;
+	r.array[1] /= length;
+	r.array[2] /= length;
+
+	return r;
 }
 
 /*
