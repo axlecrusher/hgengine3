@@ -4,6 +4,7 @@
 #include <quaternion.h>
 
 typedef vertex point;
+typedef vertex vector3;
 
 typedef struct HgCamera {
 	point position;
