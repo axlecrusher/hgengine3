@@ -245,6 +245,8 @@ int main()
 	int8_t do_render = 1;
 	uint8_t did_change = 0;
 
+	int16_t mouse_x, mouse_y;
+	mouse_x = mouse_y = 0;
 	while (1) {
 		dtime = GetTickCount() - stime;
 		ddtime = dtime - ltime;
@@ -258,12 +260,21 @@ int main()
 			if (KeyDownMap['s']) v.components.z -= 1.0f;
 			if (KeyDownMap['a']) v.components.x += 1.0f;
 			if (KeyDownMap['d']) v.components.x -= 1.0f;
+			if (KeyDownMap['r']) {
+				mouse_x = 0; mouse_y = -41.66666666666667;
+			}
 
 			float scale = (1.0 / 1000.0f) * ddtime;
 			v = vector3_normalize(&v);
 			v = vector3_scale(&v, scale);
 
 			camera->position = vector3_add(&camera->position, &v);
+
+			mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
+			mouse_y = (MOUSE_INPUT.dy + mouse_y) % 2000;
+
+			//		y,x,z
+			toQuaternion2((-mouse_x / 2000.0f)*360, (-mouse_y / 2000.0f)*360, 0, &camera->rotation);
 
 			MOUSE_INPUT.dx = 0;
 			MOUSE_INPUT.dy = 0;

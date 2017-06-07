@@ -16,7 +16,7 @@ extern "C" {
 #include <HgInput.h>
 }
 
-uint8_t GlobalMouseGrabbed_Set = 0;
+uint8_t GlobalMouseGrabbed_Set = 1;
 
 
 
