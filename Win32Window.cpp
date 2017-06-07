@@ -12,7 +12,13 @@
 */
 #include <glew.h>
 
-//MVRefBool GlobalMouseGrabbed_Set( "Input.CursorGrabbed" );
+extern "C" {
+#include <HgInput.h>
+}
+
+uint8_t GlobalMouseGrabbed_Set = 0;
+
+
 
 LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //Window callback
 Callback0R< MercuryWindow* > MercuryWindow::genWindowClbk(Win32Window::GenWin32Window); //Register window generation callback
@@ -219,14 +225,14 @@ bool Win32Window::PumpMessages()
 	{
 		m_inFocus = ACTIVE;
 //		ShowCursor(!m_inFocus);
-		/*
-		if( GlobalMouseGrabbed_Set.Get() )
+		
+		if( GlobalMouseGrabbed_Set )
 		{
 			RECT rect;
 			GetWindowRect(m_hwnd, &rect);
 			SetCursorPos( rect.left + m_width/2, rect.top + m_height/2 );
 		}
-		*/
+		
 	}
 
 	while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
@@ -243,12 +249,17 @@ bool Win32Window::PumpMessages()
 			case WM_KEYDOWN:
 				{
 					if ( IsKeyRepeat(message.lParam) ) break;
+//					printf("event %d\n", ConvertScancode(message.lParam));
+					uint16_t x = ConvertScancode(message.lParam);
+					KeyDownMap[x] = 1;
 //					KeyboardInput::ProcessKeyInput( ConvertScancode( message.lParam ), true, false);
 				}
 				break;
 			case WM_KEYUP:
 				{
 					if ( IsKeyRepeat(message.lParam) ) break;
+					uint16_t x = ConvertScancode(message.lParam);
+					KeyDownMap[x] = 0;
 //					KeyboardInput::ProcessKeyInput( ConvertScancode( message.lParam ), false, false);
 				}
 				break;
@@ -266,17 +277,22 @@ bool Win32Window::PumpMessages()
 					bool sd = 0;
 					int px = pos.x;// - rect.left - borderx;
 					int py = pos.y;// - rect.top - bordery;
-/*
-					if( GlobalMouseGrabbed_Set.Get() )
+
+					if( GlobalMouseGrabbed_Set )
 					{
 						int x, y;
 						x = m_width/2 - px;
 						y = m_height/2 - py;
+
+
 						if (x!=0 || y!=0) //prevent recursive XWarp
 						{
 							m_iLastMouseX = x;
 							m_iLastMouseY = y;
-							MouseInput::ProcessMouseInput(x, y, left, right, center, su, sd, true);
+							MOUSE_INPUT.dx += x;
+							MOUSE_INPUT.dy += y;
+//							printf("mouse %d %d\n", MOUSE_INPUT.dx, MOUSE_INPUT.dy);
+							//							MouseInput::ProcessMouseInput(x, y, left, right, center, su, sd, true);
 							lastx = x; lasty = y;
 							
 							pos.x = m_width/2;
@@ -292,17 +308,22 @@ bool Win32Window::PumpMessages()
 					}
 					else
 					{
+						MOUSE_INPUT.dx += m_iLastMouseX - px;
+						MOUSE_INPUT.dy += m_iLastMouseY - py;
+
 						m_iLastMouseX = px;
 						m_iLastMouseY = py;
 						lastx = px; lasty = py;
-						MouseInput::ProcessMouseInput(px, py, left, right, center, su, sd, true);
+
+//						printf("mouse %d %d\n", MOUSE_INPUT.dx, MOUSE_INPUT.dy);
+
+//						MouseInput::ProcessMouseInput(px, py, left, right, center, su, sd, true);
 						if( !bWasCursorVisible )
 						{
 							ShowCursor( true );
 							bWasCursorVisible = true;
 						}
 					}
-					*/
 				}
 				break;
 			case WM_LBUTTONDOWN:
@@ -350,7 +371,7 @@ bool Win32Window::IsKeyRepeat(uint32_t c)
 	return (c&65535) > 1;
 }
 
-short Win32Window::ConvertScancode( uint32_t scanin )
+uint16_t Win32Window::ConvertScancode( uint32_t scanin )
 {
 //	Specifies the scan code. The value depends on the OEM.
 	scanin = (scanin>>16)&511;

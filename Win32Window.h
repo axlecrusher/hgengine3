@@ -17,7 +17,7 @@ public:
 	static MercuryWindow* GenWin32Window();
 	virtual void* GetProcAddress(const MString& x);
 	virtual void Clear();
-	static short ConvertScancode( uint32_t scanin );
+	static uint16_t ConvertScancode( uint32_t scanin );
 
 private:
 	bool IsKeyRepeat(uint32_t c);
