@@ -7,6 +7,8 @@ typedef struct HgScene {
 	uint8_t* used;
 	uint32_t _size;
 	uint32_t _next_empty;
+
+	uint32_t size_used;
 } HgScene;
 
 typedef struct HgScene_iterator {
@@ -15,7 +17,7 @@ typedef struct HgScene_iterator {
 } HgScene_iterator;
 
 //void scene_resize(HgScene* scene);
-void scene_init(HgScene* scene, uint32_t size);
+void scene_init(HgScene* scene);
 //void scene_add_element(HgScene* scene, HgElement* element);
 
 
