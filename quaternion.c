@@ -33,6 +33,18 @@ void toQuaternion2(double pitch, double roll, double yaw, quaternion* q) {
 	q->x = (float)(t0 * t3 * t4 - t1 * t2 * t5);
 	q->y = (float)(t0 * t2 * t5 + t1 * t3 * t4);
 	q->z = (float)(t1 * t2 * t4 - t0 * t3 * t5);
+
+	quaternion_normalize(q);
+}
+
+#define SQUARE(x) (x*x)
+
+void quaternion_normalize(quaternion* q) {
+	float l = sqrt( SQUARE(q->x) + SQUARE(q->y) + SQUARE(q->z) + SQUARE(q->w) );
+	q->w = q->w / l;
+	q->x = q->x / l;
+	q->y = q->y / l;
+	q->z = q->z / l;
 }
 
 quaternion quat_mult(const quaternion* q, const quaternion* r) {
@@ -41,5 +53,6 @@ quaternion quat_mult(const quaternion* q, const quaternion* r) {
 	t.x = (r->w*q->x) + (r->x*q->w) - (r->y*q->z) + (r->z*q->y);
 	t.y = (r->w*q->y) + (r->x*q->z) + (r->y*q->w) - (r->z*q->x);
 	t.z = (r->w*q->z) - (r->x*q->y) + (r->y*q->x) + (r->z*q->w);
+//	quaternion_normal(&t);
 	return t;
 }
