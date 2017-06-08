@@ -35,6 +35,7 @@ typedef struct HgElement{
 	point position; float scale; //16
 	quaternion rotation; //16
 	RenderData* m_renderData; //4
+	void* extraData;
 } HgElement;
 
 void init_hgelement(HgElement* element);

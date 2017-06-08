@@ -30,6 +30,8 @@ extern "C" {
 
 #include <Gravity.h>
 #include <HgInput.h>
+#include <Projectile.h>
+
 }
 
 
@@ -140,15 +142,19 @@ void fire(HgScene* scene) {
 	HgElement* element = NULL;
 
 	scene_newElement(scene, &element);
-	shape_create_triangle(element);
+	projectile_create(element);
 
+	vector3 v = { 0 };
+	v.components.z = -1; //into screen from camera seems to be -1
+
+	camera->rotation.w = -camera->rotation.w;
+	v = vector3_quat_rotate(&v, &camera->rotation);
+	element->rotation = camera->rotation;
+	camera->rotation.w = -camera->rotation.w;
+
+	ProjectileData *pd = (ProjectileData*)element->extraData;
+	pd->direction = v;
 	element->position = camera->position;
-	/*
-	element->position.components.x = -element->position.components.x;
-	element->position.components.y = -element->position.components.y;
-	element->position.components.z = -element->position.components.z;
-	*/
-	//	toQuaternion2(0, 0, 90, &element->rotation);
 }
 
 int main()
@@ -282,7 +288,7 @@ int main()
 			}
 
 			if (KeyDownMap[' ']) {
-				printf("fire!\n");
+//				printf("fire!\n");
 				fire(&scene);
 			}
 
@@ -347,7 +353,11 @@ int main()
 			if(is_used(&scene, i) == 0) continue;
 			HgElement* e = scene.elements + i;
 
-			VCALL_IDX(e, updateFunc, dtime);
+			if (ddtime > 0) {
+				VCALL_IDX(e, updateFunc, ddtime);
+			}
+
+			/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash!*/
 			if (CHECK_FLAG(e, HGE_DESTROY) > 0) {
 				scene_delete_element(&scene, i);
 				continue;
@@ -375,13 +385,12 @@ int main()
 		do_render = 0;
 
 //		Sleep(1);
-		/*
+		
 		DWORD dwWaitResult = WaitForSingleObject(
 			endOfRenderFrame, // event handle
 			INFINITE);    // indefinite wait
 
 		ResetEvent(endOfRenderFrame);
-		*/
 	}
 
     return 0;

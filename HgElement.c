@@ -13,6 +13,7 @@ void init_hgelement(HgElement* element) {
 	element->position.components.x = 0;
 	element->position.components.y = 0;
 	element->position.components.z = 0;
+	element->extraData = NULL;
 
 	quaternion_init(&element->rotation);
 }
