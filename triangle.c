@@ -71,9 +71,6 @@ static void setup_ogl(OGLRenderData* rd) {
 	rd->vbo.count = 2;
 }
 
-//instanced render data
-static OGLRenderData *trd = NULL;
-
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 	//	printf("cube\n");
 }
@@ -99,17 +96,24 @@ void triangle_render(HgElement* element) {
 //	glBindVertexArray(0);
 }
 
-void change_to_triangle(HgElement* element) {
-//	element->vptr = &vtable;
-	element->vptr_idx = 0;
-	//create an instance of the render data for all triangles to share
+//instanced render data
+static OGLRenderData* trd = NULL;
+
+OGLRenderData* triangle_init_render_data() {
 	if (trd == NULL) {
 		trd = calloc(1, sizeof(*trd));
 		trd->baseRender.renderFunc = triangle_render;
-
 		trd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
 	}
-	element->m_renderData = (RenderData*)trd;
+	return trd;
+}
+
+void change_to_triangle(HgElement* element) {
+//	element->vptr = &vtable;
+	element->vptr_idx = 0;
+
+	//create an instance of the render data for all triangles to share
+	element->m_renderData = (RenderData*)triangle_init_render_data();
 }
 
 void shape_create_triangle(HgElement* element) {

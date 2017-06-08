@@ -136,6 +136,21 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 
 #define ANI_TRIS 400
 
+void fire(HgScene* scene) {
+	HgElement* element = NULL;
+
+	scene_newElement(scene, &element);
+	shape_create_triangle(element);
+
+	element->position = camera->position;
+	/*
+	element->position.components.x = -element->position.components.x;
+	element->position.components.y = -element->position.components.y;
+	element->position.components.z = -element->position.components.z;
+	*/
+	//	toQuaternion2(0, 0, 90, &element->rotation);
+}
+
 int main()
 {
 //	MercuryWindow* w = MercuryWindow::MakeWindow();
@@ -264,6 +279,11 @@ int main()
 			if (KeyDownMap['d']) v.components.x += 1.0f;
 			if (KeyDownMap['r']) {
 				mouse_x = 0; mouse_y = -41.66666666666667;
+			}
+
+			if (KeyDownMap[' ']) {
+				printf("fire!\n");
+				fire(&scene);
 			}
 
 //			if (v.components.z > 0) DebugBreak();

@@ -72,6 +72,9 @@
     <ClCompile Include="HgInput.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Projectile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MercuryWindow.h">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="HgInput.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
