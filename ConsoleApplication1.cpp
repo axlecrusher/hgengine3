@@ -45,6 +45,8 @@ HANDLE endOfRenderFrame;
 
 volatile int8_t needRender = 1;
 
+#define EYE_DISTANCE -0.07
+
 //uint8_t KeyDownMap[512];
 
 DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
@@ -156,12 +158,12 @@ int main()
 
 	quaternion_init(&camera[0].rotation);
 	memset(camera[0].position.array, 0, sizeof camera[0].position);
-	camera[0].position.components.z = -1.5f;
-	camera[0].position.components.y = -2.0f;
+	camera[0].position.components.z = 1.5f;
+	camera[0].position.components.y = 2.0f;
 	toQuaternion2(0, 15, 0, &camera[0].rotation); //y,x,z
 
 	camera[1] = camera[0];
-	camera[1].position.components.x += 0.07f;
+	camera[1].position.components.x += EYE_DISTANCE;
 
 //	MatrixMultiply4f(projection, camera, view);
 
@@ -256,10 +258,10 @@ int main()
 			vector3 v;
 			vector3_zero(&v);
 
-			if (KeyDownMap['w']) v.components.z += 1.0f;
-			if (KeyDownMap['s']) v.components.z -= 1.0f;
-			if (KeyDownMap['a']) v.components.x += 1.0f;
-			if (KeyDownMap['d']) v.components.x -= 1.0f;
+			if (KeyDownMap['w']) v.components.z -= 1.0f;
+			if (KeyDownMap['s']) v.components.z += 1.0f;
+			if (KeyDownMap['a']) v.components.x -= 1.0f;
+			if (KeyDownMap['d']) v.components.x += 1.0f;
 			if (KeyDownMap['r']) {
 				mouse_x = 0; mouse_y = -41.66666666666667;
 			}
@@ -335,7 +337,7 @@ int main()
 
 		if (do_render > 0) {
 			camera[1] = camera[0];
-			camera[1].position.components.x += 0.07f;
+			camera[1].position.components.x += EYE_DISTANCE;
 			for (uint32_t i = 0; i < scene._size; ++i) {
 				if (is_used(&scene, i) == 0) continue;
 				HgElement* e = scene.elements + i;

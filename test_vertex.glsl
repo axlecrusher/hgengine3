@@ -33,7 +33,7 @@ void main() {
 	//roatate around vector first if rotation needs to be around an arbitrary vector
 	vec3 trans = translation.xyz;
 	float scale = translation.w;
-	vec3 v1 = point_quat_rotate(vertex*scale,rotation) + trans + cam_position;
+	vec3 v1 = point_quat_rotate(vertex*scale,rotation) + trans - cam_position;
 	vec4 v2 = vec4(point_quat_rotate(v1,cam_rot), 1.0);
 
 	gl_Position = projection * v2;
