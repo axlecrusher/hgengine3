@@ -48,7 +48,7 @@ static void set_used(HgScene* s, uint32_t idx) {
 static void clear_used(HgScene* s, uint32_t idx) {
 	uint32_t q = idx / 8;
 	uint32_t r = idx % 8;
-	s->used[q] |= ~(1 << r);
+	s->used[q] &= ~(1 << r);
 }
 
 /*
@@ -110,6 +110,7 @@ void scene_delete_element_itr(HgScene_iterator* i) {
 }
 
 void scene_delete_element(HgScene* scene, uint32_t idx) {
+//	printf("do destroy\n");
 	HgElement* e = scene->elements + idx;
 	VCALL_IDX(e, destroy);
 	init_hgelement(e);
