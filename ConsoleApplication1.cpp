@@ -92,7 +92,7 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 				x = hgRenderQueue_pop();
 			}
 
-			if (x->scene == NULL) {
+			if (x->renderData == NULL) {
 				stop_frame = 1;
 			}
 			else {
@@ -392,12 +392,13 @@ uint32_t i;
 		do_render = 0;
 
 //		Sleep(1);
-		
+		/*
 		DWORD dwWaitResult = WaitForSingleObject(
 			endOfRenderFrame, // event handle
 			INFINITE);    // indefinite wait
 
 		ResetEvent(endOfRenderFrame);
+		*/
 	}
 
     return 0;

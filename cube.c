@@ -85,8 +85,8 @@ static void cube_setup_ogl(OGLRenderData* rd) {
 //instanced render data
 static OGLRenderData *crd = NULL;
 
-void cube_render(HgElement* element) {
-	OGLRenderData *d = (OGLRenderData*)element->m_renderData;
+static void cube_render(RenderData* rd) {
+	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->vbo.count == 0) {
 		cube_setup_ogl(d);
 	}

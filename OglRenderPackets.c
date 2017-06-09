@@ -11,8 +11,8 @@ int8_t draw_render_packet(const render_packet* p) {
 //	glUniform3f(U_CAMERA_POS, p->camera.position.components.x, p->camera.position.components.y, p->camera.position.components.z);
 //	RenderData* rd = p->element->m_renderData;
 
-	HgElement* e = p->scene->elements + p->element_idx;
-	RenderData* rd = e->m_renderData;
+//	HgElement* e = p->scene->elements + p->element_idx;
+	RenderData* rd = p->renderData;
 	VCALL(rd->shader, enable);
 
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
@@ -21,6 +21,6 @@ int8_t draw_render_packet(const render_packet* p) {
 	setGlobalUniforms(&p->camera);
 	setLocalUniforms(&p->rotation, &p->position, p->scale);
 
-	rd->renderFunc(e);
+	rd->renderFunc(rd);
 	return 0;
 }

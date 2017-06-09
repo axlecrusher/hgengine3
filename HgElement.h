@@ -13,7 +13,7 @@
 #define HGE_DESTROY	0x10
 
 typedef struct RenderData {
-	void (*renderFunc)(struct HgElement* e);
+	void (*renderFunc)(struct RenderData* render_data);
 	void (*destroy)(struct RenderData* e);
 	HgShader* shader;
 } RenderData;
@@ -46,6 +46,8 @@ void HgElement_destroy(HgElement* element);
 //inline void clear_flag(HgElement* element, uint16_t f) { element->flags |= ~f; }
 
 //inline uint16_t is_destroyed(HgElement* e) { return CHECK_FLAG(e, HGE_DESTROY); }
+
+
 
 #define CHECK_FLAG(e,x) ((e)->flags&x)
 #define CLEAR_FLAG(e,x) (e)->flags |= ~x

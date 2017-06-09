@@ -85,8 +85,8 @@ static HgElement_vtable vtable = {
 	.updateFunc = NULL
 };
 
-void triangle_render(HgElement* element) {
-	OGLRenderData *d = (OGLRenderData*)element->m_renderData;
+static void triangle_render(RenderData* rd) {
+	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->vbo.count == 0) {
 		setup_ogl(d);
 	}

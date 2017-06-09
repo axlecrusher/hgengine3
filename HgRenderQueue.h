@@ -11,6 +11,13 @@
 
 #include <HgScene.h>
 
+/* render_packet should contain everything that is needed to render.
+This is to decouple render data from HgElement data and update loops.
+WHen the update loop is running async to the render thread, it is entirely possible
+for HgElement to be deleted before its last state was rendered.  Rendering should
+be possible with render_packet, unless something in RenderData was destroyed when
+deleting HgElement.
+*/
 typedef struct render_packet {
 	point position;
 	quaternion rotation;
@@ -18,8 +25,9 @@ typedef struct render_packet {
 	float scale;
 	
 //	HgElement* element;
-	uint16_t element_idx;
-	HgScene* scene;
+//	uint16_t element_idx;
+//	HgScene* scene;
+	RenderData* renderData;
 	uint8_t viewport_idx;
 } render_packet;
 
