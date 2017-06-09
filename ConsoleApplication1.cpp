@@ -91,7 +91,7 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 				x = hgRenderQueue_pop();
 			}
 
-			if (x->element == NULL) {
+			if (x->scene == NULL) {
 				stop_frame = 1;
 			}
 			else {
@@ -130,7 +130,7 @@ volatile LONG itrctr;
 
 DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	while (1) {
-		printf("UPS %u\n", itrctr);
+		printf("UPS %u e_count %d %d\n", itrctr, scene.size_used, scene._size);
 		itrctr = 0;
 		Sleep(1000);
 	}
@@ -362,7 +362,7 @@ int main()
 				scene_delete_element(&scene, i);
 				continue;
 			}
-			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) hgRenderQueue_push(create_render_packet(e, 1, camera + 0)); //submit to renderer
+			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) hgRenderQueue_push(create_render_packet(e, 0, camera + 0,&scene,i)); //submit to renderer
 		}
 
 		if (do_render > 0) {
@@ -380,7 +380,7 @@ int main()
 		InterlockedAdd(&itrctr,1);
 
 
-		if ((do_render>0))hgRenderQueue_push(create_render_packet(NULL, 2, camera + 1)); //null element to indicate end of frame
+		if ((do_render>0))hgRenderQueue_push(create_render_packet(NULL, 2, camera + 1, NULL, 0)); //null element to indicate end of frame
 
 		do_render = 0;
 

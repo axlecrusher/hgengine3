@@ -9,6 +9,7 @@
 #include <HgTypes.h>
 #include <windows.h>
 
+#include <HgScene.h>
 
 typedef struct render_packet {
 	point position;
@@ -16,7 +17,9 @@ typedef struct render_packet {
 	HgCamera camera;
 	float scale;
 	
-	HgElement* element;
+//	HgElement* element;
+	uint16_t element_idx;
+	HgScene* scene;
 	uint8_t viewport_idx;
 } render_packet;
 
@@ -26,5 +29,5 @@ volatile uint32_t hgRenderQueue_length();
 void hgRenderQueue_push(render_packet* p);
 render_packet* hgRenderQueue_pop();
 
-render_packet* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera* camera);
+render_packet* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera* camera, HgScene* scene, uint16_t idx);
 
