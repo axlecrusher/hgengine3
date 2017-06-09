@@ -14,6 +14,7 @@ void init_hgelement(HgElement* element) {
 	element->position.components.y = 0;
 	element->position.components.z = 0;
 	element->extraData = NULL;
+	element->m_renderData = NULL;
 
 	quaternion_init(&element->rotation);
 }
