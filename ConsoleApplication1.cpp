@@ -165,8 +165,9 @@ int main()
 
 	_create_shader = HGShader_ogl_create;
 
-	setup_viewports(1280,480);
-	
+//	setup_viewports(1280,480);
+	setup_viewports(640, 480);
+
 	uint8_t s = sizeof(HgElement);
 	printf("element size %d\n", s);
 	printf("vertex size %d\n", sizeof(vertex));
@@ -364,6 +365,7 @@ int main()
 			}
 			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) hgRenderQueue_push(create_render_packet(e, 0, camera + 0,&scene,i)); //submit to renderer
 		}
+		/*
 
 		if (do_render > 0) {
 			camera[1] = camera[0];
@@ -374,6 +376,7 @@ int main()
 				if (CHECK_FLAG(e, HGE_HIDDEN) == 0) hgRenderQueue_push(create_render_packet(e, 2, camera + 1)); //submit to renderer
 			}
 		}
+		*/
 
 //		scene_clearUpdate(&scene);
 

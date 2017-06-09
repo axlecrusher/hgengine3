@@ -27,7 +27,7 @@ bool ACTIVE = false;
 
 MercuryWindow* Win32Window::GenWin32Window()
 {
-	return new Win32Window("Mercury3", 1280, 480, 24, 16, false);
+	return new Win32Window("Mercury3", 640, 480, 24, 16, false);
 }
 
 LPCTSTR StringToLPCTSTR(const MString & s)
