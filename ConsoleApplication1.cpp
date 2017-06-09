@@ -51,6 +51,7 @@ volatile int8_t needRender = 1;
 
 //uint8_t KeyDownMap[512];
 
+
 DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 	MercuryWindow* w = MercuryWindow::MakeWindow();
 
@@ -127,6 +128,7 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 }
 
 volatile LONG itrctr;
+HgScene scene;
 
 DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	while (1) {
@@ -192,46 +194,43 @@ int main()
 	print_matrix(projection);
 	printf("\n");
 
-	HgScene scene;
-	scene_init(&scene, 1000);
-
-	HgElement* element = NULL;
-
-	
-	scene_newElement(&scene, &element);
-	shape_create_triangle(element);
-	element->position.components.x = 1.5f;
-	element->position.components.z = -1.0f;
-//	toQuaternion2(0, 0, 90, &element->rotation);
-
-	scene_newElement(&scene, &element);
-	shape_create_triangle(element);
-	element->position.components.x = -0.0f;
-	element->position.components.z = -2.0f;
-//	toQuaternion2(45,0,0,&element->rotation);
-
+	scene_init(&scene);
 	uint32_t tris[ANI_TRIS];
 
 	GravityField gravity = { 0 };
 	allocate_space(&gravity, ANI_TRIS);
 	gravity.scene = &scene;
-	gravity.vector.components.y=-1;
+	gravity.vector.components.y = -1;
+uint32_t i;
+	{
+		HgElement* element = NULL;
 
-	uint32_t i;
-	for (i = 0; i < ANI_TRIS; i++) {
-		tris[i] = scene_newElement(&scene, &element);
-		gravity.indices[i] = tris[i];
-//		shape_create_triangle(element);
-		shape_create_cube(element);
-		float x = (i % 20)*1.1;
-		float z = (i / 20)*1.1;
-		element->position.components.y = 5.0f;
-		element->position.components.x = -10.0 + x;
-		element->position.components.z = -2.0f - z;
-		element->scale = 0.3f;
+		scene_newElement(&scene, &element);
+		shape_create_triangle(element);
+		element->position.components.x = 1.5f;
+		element->position.components.z = -1.0f;
+		//	toQuaternion2(0, 0, 90, &element->rotation);
+
+		scene_newElement(&scene, &element);
+		shape_create_triangle(element);
+		element->position.components.x = -0.0f;
+		element->position.components.z = -2.0f;
+		//	toQuaternion2(45,0,0,&element->rotation);
+
+		
+		for (i = 0; i < ANI_TRIS; i++) {
+			tris[i] = scene_newElement(&scene, &element);
+			gravity.indices[i] = tris[i];
+			//		shape_create_triangle(element);
+			shape_create_cube(element);
+			float x = (i % 20)*1.1;
+			float z = (i / 20)*1.1;
+			element->position.components.y = 5.0f;
+			element->position.components.x = -10.0 + x;
+			element->position.components.z = -2.0f - z;
+			element->scale = 0.3f;
+		}
 	}
-
-	printf("\n%f %f %f %f\n", element->rotation.w, element->rotation.x, element->rotation.y, element->rotation.z);
 	
 	endOfRenderFrame = CreateEvent(
 		NULL,               // default security attributes
@@ -303,6 +302,8 @@ int main()
 			v= vector3_quat_rotate(&v, &camera->rotation);
 			camera->rotation.w = -camera->rotation.w; //restore
 
+//			v = vector3_normalize(&v);
+
 			v = vector3_scale(&v, scale);
 			camera->position = vector3_add(&camera->position, &v);
 
@@ -341,12 +342,15 @@ int main()
 
 //		printf("dtime: %d\n", ddtime);
 
-//		y,x,z
-		toQuaternion2((dtime%1000)/ 2.7777777777777777777777777777778, 0, 0, &element->rotation);
+		{
+			HgElement* element = scene.elements + tris[0];
+			//		y,x,z
+			toQuaternion2((dtime % 1000) / 2.7777777777777777777777777777778, 0, 0, &element->rotation);
 
-		for (i = 0; i < ANI_TRIS; i++) {
-			HgElement* e = scene.elements + tris[i];
-			memcpy(&e->rotation, &element->rotation, sizeof element->rotation);
+			for (i = 0; i < ANI_TRIS; i++) {
+				HgElement* e = scene.elements + tris[i];
+				memcpy(&e->rotation, &element->rotation, sizeof element->rotation);
+			}
 		}
 
 		for (uint32_t i=0; i<scene._size; ++i) {
