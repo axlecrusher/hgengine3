@@ -47,7 +47,7 @@ HANDLE endOfRenderFrame;
 
 volatile int8_t needRender = 1;
 
-#define EYE_DISTANCE -0.07
+#define EYE_DISTANCE -0.07f
 
 //uint8_t KeyDownMap[512];
 
@@ -223,10 +223,10 @@ uint32_t i;
 			gravity.indices[i] = tris[i];
 			//		shape_create_triangle(element);
 			shape_create_cube(element);
-			float x = (i % 20)*1.1;
-			float z = (i / 20)*1.1;
+			float x = (i % 20)*1.1f;
+			float z = (i / 20)*1.1f;
 			element->position.components.y = 5.0f;
-			element->position.components.x = -10.0 + x;
+			element->position.components.x = -10.0f + x;
 			element->position.components.z = -2.0f - z;
 			element->scale = 0.3f;
 		}
@@ -284,7 +284,7 @@ uint32_t i;
 			if (KeyDownMap['a']) v.components.x -= 1.0f;
 			if (KeyDownMap['d']) v.components.x += 1.0f;
 			if (KeyDownMap['r']) {
-				mouse_x = 0; mouse_y = -41.66666666666667;
+				mouse_x = 0; mouse_y = -42;
 			}
 
 			if (KeyDownMap[' ']) {
@@ -294,7 +294,7 @@ uint32_t i;
 
 //			if (v.components.z > 0) DebugBreak();
 
-			float scale = (1.0 / 1000.0f) * ddtime;
+			float scale = (1.0f / 1000.0f) * ddtime;
 			v = vector3_normalize(&v);
 //			v = vector3_scale(&v, -1.0f);
 

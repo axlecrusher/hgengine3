@@ -6,6 +6,8 @@
 
 #include <HgMath.h>
 
+#include <stdlib.h>
+
 //FIXME: must automate this number generation
 #define VTABLE_INDEX 3
 

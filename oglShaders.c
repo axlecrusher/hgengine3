@@ -9,6 +9,7 @@
 
 static GLuint _currentShaderProgram = 0;
 
+#pragma warning(disable:4996)
 
 typedef struct shader_source {
 	char* vert_file_path;

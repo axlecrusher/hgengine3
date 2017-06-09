@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#pragma warning(disable:4996)
+
 #define MAX_SHADERS 1000
 
 HgShader*(*_create_shader)(const char* vert, const char* frag);

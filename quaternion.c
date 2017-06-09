@@ -40,7 +40,7 @@ void toQuaternion2(double pitch, double roll, double yaw, quaternion* q) {
 #define SQUARE(x) (x*x)
 
 void quaternion_normalize(quaternion* q) {
-	float l = sqrt( SQUARE(q->x) + SQUARE(q->y) + SQUARE(q->z) + SQUARE(q->w) );
+	float l = (float)sqrt( SQUARE(q->x) + SQUARE(q->y) + SQUARE(q->z) + SQUARE(q->w) );
 	q->w = q->w / l;
 	q->x = q->x / l;
 	q->y = q->y / l;

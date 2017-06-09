@@ -68,12 +68,12 @@ void Perspective(
 	double right = aspect*top;
 	double left = -right;
 
-	M[0] = (2 * znear) / (right - left);
-	M[2] = (right + left) / (right - left);
-	M[6] = (top + bottom) / (top - bottom);
-	M[5] = (2 * znear) / (top - bottom);
-	M[10] = (zfar + znear) / (zfar - znear);
-	M[11] = (2 * zfar*znear) / (zfar - znear);
+	M[0] = (float)((2 * znear) / (right - left));
+	M[2] = (float)((right + left) / (right - left));
+	M[6] = (float)((top + bottom) / (top - bottom));
+	M[5] = (float)((2 * znear) / (top - bottom));
+	M[10] = (float)((zfar + znear) / (zfar - znear));
+	M[11] = (float)((2 * zfar*znear) / (zfar - znear));
 	M[14] = -1.0f;
 }
 
@@ -89,10 +89,10 @@ void Perspective2(
 	memset(M, 0, 16 * sizeof* M);
 
 
-	M[0] = f / aspect;
-	M[5] = f;
-	M[10] = (zfar + znear) / (znear - zfar);
-	M[11] = (2 * zfar*znear) / (znear - zfar);
+	M[0] = (float)(f / aspect);
+	M[5] = (float)f;
+	M[10] = (float)((zfar + znear) / (znear - zfar));
+	M[11] = (float)((2 * zfar*znear) / (znear - zfar));
 	M[14] = -1.0f;
 }
 
@@ -136,8 +136,8 @@ vector3 vector3_normalize(const vector3* v) {
 }
 
 vector3 vector3_cross(const vector3* v1, const vector3* v2) {
-	float* x = v1->array;
-	float* y = v2->array;
+	const float* x = v1->array;
+	const float* y = v2->array;
 	vector3 r;
 	r.array[0] = (x[1] * y[2]) - (x[2] * y[1]);
 	r.array[1] = (x[2] * y[0]) - (x[0] * y[2]);
