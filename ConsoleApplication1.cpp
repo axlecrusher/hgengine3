@@ -43,7 +43,7 @@ float projection[16];
 extern viewport view_port[];
 HgCamera camera[2];
 
-HANDLE endOfRenderFrame;
+HANDLE endOfRenderFrame = NULL;
 
 volatile int8_t needRender = 1;
 
@@ -276,6 +276,9 @@ uint32_t i;
 		}
 	}
 	
+	HANDLE thread1 = CreateThread(NULL, 0, &PrintCtr, NULL, 0, NULL);
+
+#if (USE_RENDER_THREAD)
 	endOfRenderFrame = CreateEvent(
 		NULL,               // default security attributes
 		TRUE,               // manual-reset event
@@ -283,9 +286,6 @@ uint32_t i;
 		NULL  // object name
 	);
 
-	HANDLE thread1 = CreateThread(NULL, 0, &PrintCtr, NULL, 0, NULL);
-
-#if (USE_RENDER_THREAD)
 	HANDLE thread = CreateThread(NULL, 0, &StartRenderThread, NULL, 0, NULL);
 	submit_for_render = submit_for_render_threaded;
 #else
