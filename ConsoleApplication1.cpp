@@ -159,11 +159,24 @@ void fire(HgScene* scene) {
 	element->position = camera->position;
 }
 
+void(*submit_for_render)(uint8_t viewport_idx, HgCamera* camera, HgScene *s, uint32_t idx);
+
+void submit_for_render_threaded(uint8_t viewport_idx, HgCamera* camera, HgScene *s, uint32_t idx) {
+	if (s == NULL) {
+		hgRenderQueue_push(create_render_packet(NULL, 0, NULL, NULL, 0));
+		return;
+	}
+	HgElement* e = s->elements + idx;
+	hgRenderQueue_push(create_render_packet(e, viewport_idx, camera + 0, s, idx)); //submit to renderer
+}
+
 int main()
 {
 //	MercuryWindow* w = MercuryWindow::MakeWindow();
 	
 //	gen_triangle(&points);
+
+	submit_for_render = submit_for_render_threaded;
 
 	_create_shader = HGShader_ogl_create;
 
@@ -367,7 +380,7 @@ uint32_t i;
 				scene_delete_element(&scene, i);
 				continue;
 			}
-			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) hgRenderQueue_push(create_render_packet(e, 0, camera + 0,&scene,i)); //submit to renderer
+			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) submit_for_render(0, camera + 0, &scene, i);
 		}
 		/*
 
@@ -377,7 +390,7 @@ uint32_t i;
 			for (uint32_t i = 0; i < scene._size; ++i) {
 				if (is_used(&scene, i) == 0) continue;
 				HgElement* e = scene.elements + i;
-				if (CHECK_FLAG(e, HGE_HIDDEN) == 0) hgRenderQueue_push(create_render_packet(e, 2, camera + 1)); //submit to renderer
+				if (CHECK_FLAG(e, HGE_HIDDEN) == 0) submit_for_render(2, camera + 1, &scene, i);
 			}
 		}
 		*/
@@ -387,18 +400,18 @@ uint32_t i;
 		InterlockedAdd(&itrctr,1);
 
 
-		if ((do_render>0))hgRenderQueue_push(create_render_packet(NULL, 2, camera + 1, NULL, 0)); //null element to indicate end of frame
+		if ((do_render > 0)) submit_for_render(2, camera + 1, NULL, 0);
+//			hgRenderQueue_push(create_render_packet(NULL, 2, camera + 1, NULL, 0)); //null element to indicate end of frame
 
 		do_render = 0;
 
 //		Sleep(1);
-		/*
+
 		DWORD dwWaitResult = WaitForSingleObject(
 			endOfRenderFrame, // event handle
 			INFINITE);    // indefinite wait
 
 		ResetEvent(endOfRenderFrame);
-		*/
 	}
 
     return 0;

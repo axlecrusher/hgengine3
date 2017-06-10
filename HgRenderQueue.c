@@ -106,6 +106,7 @@ render_packet* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera
 //	RenderElement* rp = new RenderElement();
 
 	rp->renderData = NULL;
+	if (scene == NULL) return rp;
 
 	if (e) {
 		rp->position = e->position;
