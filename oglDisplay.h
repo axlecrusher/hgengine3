@@ -13,6 +13,9 @@
 #define U_CAMERA_ROT 6
 #define U_CAMERA_POS 7
 
+#define L_VERTEX	0
+#define L_COLOR		1
+
 extern viewport view_port[];
 extern HgCamera* _camera;
 extern float* _projection;
