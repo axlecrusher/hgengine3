@@ -25,15 +25,6 @@ static uint8_t indices[] = {
 	0,1,2
 };
 
-static void setup_ogl(OGLRenderData* rd) {
-	GLuint buf_id;
-	glGenBuffers(1, &buf_id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(*indices), indices, GL_STATIC_DRAW);
-
-	rd->idx_id = buf_id;
-}
-
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 	//	printf("cube\n");
 }
@@ -52,7 +43,7 @@ static void triangle_render(RenderData* rd) {
 	//This can almost be generic, except for setup_ogl function call
 	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->idx_id == 0) {
-		setup_ogl(d);
+		d->idx_id = new_index_buffer8(indices, 3);
 	}
 
 	hgvbo_use(&staticVbo);
@@ -76,7 +67,7 @@ static void SetupRenderData() {
 	trd->hgVbo = &staticVbo;
 	trd->vertex_count = points.size;
 	trd->index_count = 3;
-	trd->vbo_offset = hgvbo_add_data(&staticVbo, points.points.v, colors, trd->vertex_count);
+	trd->vbo_offset = hgvbo_add_data_vc(&staticVbo, points.points.v, colors, trd->vertex_count);
 }
 
 OGLRenderData* triangle_init_render_data() {

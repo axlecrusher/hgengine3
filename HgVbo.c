@@ -36,7 +36,7 @@ uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color,
 	return offset;
 }
 
-void hgvbo_sendogl(HgVboMemory* vbo_mem) {
+static void hgvbo_sendogl(HgVboMemory* vbo_mem) {
 	if (vbo_mem->vbo_id == 0) glGenBuffers(1, &vbo_mem->vbo_id);
 	if (vbo_mem->vao_id == 0) glGenVertexArrays(1, &vbo_mem->vao_id);
 

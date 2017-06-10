@@ -2,7 +2,7 @@
 #extension GL_ARB_explicit_uniform_location : enable
 
 layout(location = 0) in vec3 vertex;
-layout(location = 1) in vec4 v_color;
+layout(location = 3) in vec4 v_color;
 
 //uniforms have their own locations separate from attributes
 layout(location = 1) uniform vec4 rotation;

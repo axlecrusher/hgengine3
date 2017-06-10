@@ -48,16 +48,6 @@ static uint8_t indices[] = {
 	1,5,4,4,0,1  //L side
 };
 
-static void cube_setup_ogl(OGLRenderData* rd) {
-	//indices
-	GLuint buf_id;
-	glGenBuffers(1, &buf_id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(*indices), indices, GL_STATIC_DRAW);
-
-	rd->idx_id = buf_id;
-}
-
 //instanced render data
 static OGLRenderData *crd = NULL;
 
@@ -65,7 +55,7 @@ static void cube_render(RenderData* rd) {
 	//This can almost be generic, except for setup_ogl function call
 	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->idx_id == 0) {
-		cube_setup_ogl(d);
+		d->idx_id = new_index_buffer8(indices, 36);
 	}
 
 	hgvbo_use(&staticVbo);
@@ -99,7 +89,7 @@ static void SetupRenderData() {
 
 	crd->index_count = 36;
 	crd->hgVbo = &staticVbo;
-	crd->vbo_offset = hgvbo_add_data(&staticVbo, points.points.v, colors, 8);
+	crd->vbo_offset = hgvbo_add_data_vc(&staticVbo, points.points.v, colors, 8);
 }
 
 void change_to_cube(HgElement* element) {

@@ -83,3 +83,21 @@ void ogl_render_renderData(RenderData* rd) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
 	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_BYTE, 0, d->vbo_offset);
 }
+
+GLuint new_index_buffer8(uint8_t* indices, uint32_t count) {
+	GLuint buf_id;
+	glGenBuffers(1, &buf_id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(*indices), indices, GL_STATIC_DRAW);
+
+	return buf_id;
+}
+
+GLuint new_index_buffer16(uint16_t* indices, uint32_t count) {
+	GLuint buf_id;
+	glGenBuffers(1, &buf_id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(*indices), indices, GL_STATIC_DRAW);
+
+	return buf_id;
+}
