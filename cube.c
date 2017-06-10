@@ -9,6 +9,8 @@
 
 #include <assert.h>
 
+#include <memory.h>
+
 #define VTABLE_INDEX 2
 
 static float cube_verts[] = {
@@ -22,15 +24,15 @@ static float cube_verts[] = {
 	-0.5f, 0.5, -0.5	//7
 };
 
-static float colours[] = {
-	1.0f, 0.0f,  0.0f, //0
-	0.0f, 1.0f,  0.0f, //1
-	0.0f, 0.0f,  1.0f, //2
-	1.0f, 0.0f,  0.0f, //3
-	0.0f, 1.0f,  0.0f, //4
-	0.0f, 0.0f,  1.0f, //5
-	1.0f, 0.0f,  0.0f, //6
-	0.0f, 1.0f,  0.0f //7
+static uint8_t colors[] = {
+	255, 0, 0, //0
+	0, 255, 0, //1
+	0, 0, 255, //2
+	255, 0, 0, //3
+	0, 255, 0, //4
+	0, 0, 255, //5
+	255, 0, 0, //6
+	0, 255, 0 //7
 };
 
 
@@ -48,17 +50,30 @@ static void cube_setup_ogl(OGLRenderData* rd) {
 	points.points.array = cube_verts;
 	points.size = 8;
 
-	GLuint* vbo = calloc(3, sizeof(GLuint));
-	vbo[0] = hgOglVbo(points);
+	uint32_t vbo_size = (points.size * sizeof(*points.points.v)) //vertices
+		+ (24 * sizeof(*colors));
+//		+ (36 * sizeof(*indices));
 
-	//colors
-	glGenBuffers(1, vbo + 1);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(*colours), colours, GL_STATIC_DRAW);
+	uint8_t* buffer = malloc(vbo_size);
+	uint8_t* fptr = buffer;
+	uint8_t* cptr = buffer + (points.size * sizeof(*points.points.v));
+//	uint8_t* iptr = cptr + (24 * sizeof(*cptr));
+
+	memcpy(fptr, cube_verts, (points.size * sizeof(*points.points.v)));
+	memcpy(cptr, colors, (24 * sizeof(*colors)));
+//	memcpy(iptr, indices, (36 * sizeof(*indices)));
+
+	GLuint* vbo = malloc(2*sizeof(*vbo));
+
+	glGenBuffers(2, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+
+	glBufferData(GL_ARRAY_BUFFER, vbo_size, buffer, GL_STATIC_DRAW);
+
+	free(buffer);
 
 	//indices
-	glGenBuffers(1, vbo + 2);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[2]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(*indices), indices, GL_STATIC_DRAW);
 	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[2]);
 
@@ -69,17 +84,16 @@ static void cube_setup_ogl(OGLRenderData* rd) {
 	glBindVertexArray(vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	//minimize calls to glVertexAttribPointer, use same format for all meshes in a VBO
+	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(L_COLOR, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, cptr-fptr);
 
 	glEnableVertexAttribArray(0); //enable access to attribute
 	glEnableVertexAttribArray(1);
 
 	rd->vao = vao;
 	rd->vbo.id = vbo;
-	rd->vbo.count = 3;
+	rd->vbo.count = 2;
 }
 
 //instanced render data
@@ -93,7 +107,7 @@ static void cube_render(RenderData* rd) {
 
 //	if (d->oglRender.shader_program > 0) useShaderProgram(d->oglRender.shader_program);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->vbo.id[2]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->vbo.id[1]);
 	glBindVertexArray(d->vao);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
 }
