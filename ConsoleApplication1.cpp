@@ -51,9 +51,12 @@ volatile int8_t needRender = 1;
 
 //uint8_t KeyDownMap[512];
 
+MercuryWindow* window = NULL;
 
-DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
-	MercuryWindow* w = MercuryWindow::MakeWindow();
+#define USE_RENDER_THREAD 0
+
+void StartWindowSystem() {
+	window = MercuryWindow::MakeWindow();
 
 	GLenum err = glewInit();
 
@@ -74,16 +77,20 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 	printf("GL_MAX_VERTEX_UNIFORM_BLOCKS %d\n", d);
 
 	glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void BeginFrame() {
+		window->PumpMessages();
+		window->Clear();
+		_projection = projection;
+}
+
+int32_t RenderThreadLoop() {
+	MercuryWindow* w = window;
 
 	uint8_t stop_frame = 0;
 	while (1) {
-		w->PumpMessages();
-		
-		w->Clear();
-
-//		glUniformMatrix4fv(U_VIEW, 1, GL_TRUE, view);
-//		glUniformMatrix4fv(U_PROJECTION, 1, GL_TRUE, projection);
-		_projection = projection;
+		BeginFrame();
 
 		while (stop_frame == 0) {
 			render_packet* x = hgRenderQueue_pop();
@@ -125,6 +132,11 @@ DWORD WINAPI StartWindowSystem(LPVOID lpParam) {
 		
 //		Sleep(10);
 	}
+}
+
+DWORD WINAPI StartRenderThread(LPVOID lpParam) {
+	StartWindowSystem();
+	return RenderThreadLoop();
 }
 
 volatile LONG itrctr;
@@ -170,13 +182,32 @@ void submit_for_render_threaded(uint8_t viewport_idx, HgCamera* camera, HgScene 
 	hgRenderQueue_push(create_render_packet(e, viewport_idx, camera + 0, s, idx)); //submit to renderer
 }
 
+void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgScene *s, uint32_t idx) {
+	if (s == NULL) {
+		window->SwapBuffers();
+		return;
+	}
+//	printf("serial\n");
+	hgViewport(viewport_idx);
+
+	HgElement* e = s->elements + idx;
+	RenderData* rd = e->m_renderData;
+	VCALL(rd->shader, enable);
+
+	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
+	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
+
+	setGlobalUniforms(camera);
+	setLocalUniforms(&e->rotation, &e->position, e->scale);
+
+	rd->renderFunc(rd);
+}
+
 int main()
 {
 //	MercuryWindow* w = MercuryWindow::MakeWindow();
 	
 //	gen_triangle(&points);
-
-	submit_for_render = submit_for_render_threaded;
 
 	_create_shader = HGShader_ogl_create;
 
@@ -253,7 +284,15 @@ uint32_t i;
 	);
 
 	HANDLE thread1 = CreateThread(NULL, 0, &PrintCtr, NULL, 0, NULL);
-	HANDLE thread = CreateThread(NULL, 0, &StartWindowSystem, NULL, 0, NULL);
+
+#if (USE_RENDER_THREAD)
+	HANDLE thread = CreateThread(NULL, 0, &StartRenderThread, NULL, 0, NULL);
+	submit_for_render = submit_for_render_threaded;
+#else
+	StartWindowSystem();
+	submit_for_render = submit_for_render_serial;
+#endif
+
 	/*
 	StartThreadData *mkThreadData;
 	void * m_thread;
@@ -287,6 +326,10 @@ uint32_t i;
 		dtime = GetTickCount() - stime;
 		ddtime = dtime - ltime;
 		ltime = dtime;
+
+#if (!USE_RENDER_THREAD)
+		BeginFrame();
+#endif
 
 		if (ddtime > 0) {
 			vector3 v;
@@ -407,11 +450,15 @@ uint32_t i;
 
 //		Sleep(1);
 
+#if  (USE_RENDER_THREAD)
 		DWORD dwWaitResult = WaitForSingleObject(
 			endOfRenderFrame, // event handle
 			INFINITE);    // indefinite wait
 
 		ResetEvent(endOfRenderFrame);
+#else
+		needRender = 1;
+#endif
 	}
 
     return 0;
