@@ -207,7 +207,7 @@ int main()
 {
 //	MercuryWindow* w = MercuryWindow::MakeWindow();
 	
-//	gen_triangle(&points);
+	hgvbo_init(&staticVbo, VBO_VC);
 
 	_create_shader = HGShader_ogl_create;
 

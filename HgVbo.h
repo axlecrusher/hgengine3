@@ -22,23 +22,44 @@
 	padding, you need to make it a vec4 of GLushorts."
 */
 
+#define VBO_VC 0
 //Vertex,Color
-typedef struct vbo_layout1 {
+typedef struct vbo_layout_vc {
 	vertex v;
 	color c;
-} vbo_layout1;
+} vbo_layout_vc;
+
+#define VBO_VN 1
+typedef struct vbo_layout_vn {
+	vertex v;
+	normal c;
+} vbo_layout_vn;
+
+#define VBO_VNU 3
+typedef struct vbo_layout_vnu {
+	vertex v;
+	normal c;
+	uv_coord uv;
+} vbo_layout_vnu;
 
 typedef struct HgVboMemory{
-	vbo_layout1* buffer;
+	void* buffer;
 
-	uint32_t size;
+	uint32_t count;
 	GLuint vbo_id;
 	GLuint vao_id;
 	uint8_t needsUpdate;
+
+	uint16_t size; //size of the structure pointed to by buffer, stride
+	uint8_t type;
+//	void(*send_to_ogl)(struct HgVboMemory* vbo);
 } HgVboMemory;
 
-uint32_t hgvbo_add_data(HgVboMemory* vbo_mem, vertex* vertices, color* color, uint16_t vertex_count);
-void hgvbo_sendToOGL(HgVboMemory* vbo_mem);
-void hgvbo_use(HgVboMemory* vbo);
+
+
+uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color, uint16_t vertex_count);
+//void hgvbo_sendToOGL(HgVboMemory* vbo_mem);
+void hgvbo_use(HgVboMemory* vbo_mem);
+void hgvbo_init(HgVboMemory* vbo_mem, uint8_t vbo_type);
 
 extern HgVboMemory staticVbo;

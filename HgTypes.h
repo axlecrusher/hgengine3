@@ -18,3 +18,11 @@ typedef struct viewport {
 typedef struct color {
 	uint8_t r, g, b, a;
 } color;
+
+typedef struct uv_coord {
+	uint16_t u,v;
+} uv_coord;
+
+typedef struct normal {
+	float x, y, z;
+} normal;

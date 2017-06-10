@@ -16,7 +16,9 @@
 #define U_CAMERA_POS 7
 
 #define L_VERTEX	0
-#define L_COLOR		1
+#define L_NORMAL	1
+#define L_UV		2
+#define L_COLOR		3
 
 extern viewport view_port[];
 extern HgCamera* _camera;
