@@ -24,15 +24,16 @@ static float cube_verts[] = {
 	-0.5f, 0.5, -0.5	//7
 };
 
-static uint8_t colors[] = {
-	255, 0, 0, //0
-	0, 255, 0, //1
-	0, 0, 255, //2
-	255, 0, 0, //3
-	0, 255, 0, //4
-	0, 0, 255, //5
-	255, 0, 0, //6
-	0, 255, 0 //7
+//rgba
+static color colors[] = {
+	255, 0, 0, 255, //0
+	0, 255, 0, 255, //1
+	0, 0, 255, 255, //2
+	255, 0, 0, 255, //3
+	0, 255, 0, 255, //4
+	0, 0, 255, 255, //5
+	255, 0, 0, 255, //6
+	0, 255, 0, 255 //7
 };
 
 
@@ -51,17 +52,14 @@ static void cube_setup_ogl(OGLRenderData* rd) {
 	points.size = 8;
 
 	uint32_t vbo_size = (points.size * sizeof(*points.points.v)) //vertices
-		+ (24 * sizeof(*colors));
-//		+ (36 * sizeof(*indices));
+		+ (8 * sizeof(*colors));
 
 	uint8_t* buffer = malloc(vbo_size);
 	uint8_t* fptr = buffer;
 	uint8_t* cptr = buffer + (points.size * sizeof(*points.points.v));
-//	uint8_t* iptr = cptr + (24 * sizeof(*cptr));
 
 	memcpy(fptr, cube_verts, (points.size * sizeof(*points.points.v)));
-	memcpy(cptr, colors, (24 * sizeof(*colors)));
-//	memcpy(iptr, indices, (36 * sizeof(*indices)));
+	memcpy(cptr, colors, (8 * sizeof(*colors)));
 
 	GLuint* vbo = malloc(2*sizeof(*vbo));
 
@@ -86,7 +84,7 @@ static void cube_setup_ogl(OGLRenderData* rd) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 	//minimize calls to glVertexAttribPointer, use same format for all meshes in a VBO
 	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glVertexAttribPointer(L_COLOR, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, cptr-fptr);
+	glVertexAttribPointer(L_COLOR, sizeof(*colors), GL_UNSIGNED_BYTE, GL_TRUE, 0, cptr-fptr);
 
 	glEnableVertexAttribArray(0); //enable access to attribute
 	glEnableVertexAttribArray(1);

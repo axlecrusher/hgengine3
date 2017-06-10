@@ -15,10 +15,14 @@ static float vv[9] = {
 	0.0f, 0.5f, 0.0f
 };
 
-static uint8_t colors[] = {
-	255, 0, 0,
-	0, 255, 0,
-	0, 0, 255
+static color colors[] = {
+	255, 0, 0, 255,
+	0, 255, 0, 255,
+	0, 0, 255, 255
+};
+
+static uint8_t indices[] = {
+	0,1,2
 };
 
 extern HgElement* render_thing;
@@ -49,7 +53,7 @@ static void setup_ogl(OGLRenderData* rd) {
 	//colors
 	glGenBuffers(1, vbo+1);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), colors, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(*colors), colors, GL_STATIC_DRAW);
 
 	//vao is used to group GL state to supply vertex data
 	//once you have all the state set, you only need to bind the vao to draw again later
@@ -61,7 +65,7 @@ static void setup_ogl(OGLRenderData* rd) {
 	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	glVertexAttribPointer(L_COLOR, 3, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
+	glVertexAttribPointer(L_COLOR, sizeof(*colors), GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
 
 	glEnableVertexAttribArray(0); //enable access to attribute
 	glEnableVertexAttribArray(1);
