@@ -6,6 +6,8 @@
 
 #include <HgTypes.h>
 
+#include <HgVbo.h>
+
 #define U_VIEW 4
 #define U_PROJECTION 5
 #define U_ROTATION		1
@@ -27,8 +29,15 @@ typedef struct ogl_vbo {
 
 typedef struct OGLRenderData {
 	RenderData baseRender;
-	GLuint vao;
-	ogl_vbo vbo;
+//	GLuint vao;
+//	ogl_vbo vbo;
+
+	struct HgVboMemory* hgVbo;
+	uint32_t vbo_offset;
+	uint16_t vertex_count;
+
+	GLuint idx_id;
+	uint32_t index_count;
 } OGLRenderData;
 
 GLuint hgOglVbo(vertices v);
@@ -39,3 +48,4 @@ void setLocalUniforms(const quaternion* rotation, const point* position, float s
 void hgViewport(uint8_t vp);
 
 void setup_viewports(uint16_t width, uint16_t height);
+void ogl_render_renderData(RenderData* rd);

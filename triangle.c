@@ -25,54 +25,13 @@ static uint8_t indices[] = {
 	0,1,2
 };
 
-extern HgElement* render_thing;
-
-/*
-void gen_triangle(vertices* v) {
-	static float vv[9] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f
-	};
-
-	v->points.f = (float*)malloc(9 * sizeof(float));
-	memcpy(v->points.f, vv, 9 * sizeof(float));
-	v->f_size = 9;
-}
-*/
 static void setup_ogl(OGLRenderData* rd) {
-	vertices points;
-	points.points.array = vv;
-	points.size = 3;
-//	gen_triangle(&points);
+	GLuint buf_id;
+	glGenBuffers(1, &buf_id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(*indices), indices, GL_STATIC_DRAW);
 
-	GLuint* vbo = calloc(2, sizeof(GLuint));
-	vbo[0] = hgOglVbo(points);
-//	free(points.points.array);
-
-	//colors
-	glGenBuffers(1, vbo+1);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(*colors), colors, GL_STATIC_DRAW);
-
-	//vao is used to group GL state to supply vertex data
-	//once you have all the state set, you only need to bind the vao to draw again later
-	GLuint vao = 0;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	glVertexAttribPointer(L_COLOR, sizeof(*colors), GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
-
-	glEnableVertexAttribArray(0); //enable access to attribute
-	glEnableVertexAttribArray(1);
-
-	rd->vao = vao;
-	rd->vbo.id = vbo;
-	rd->vbo.count = 2;
+	rd->idx_id = buf_id;
 }
 
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
@@ -90,25 +49,38 @@ static HgElement_vtable vtable = {
 };
 
 static void triangle_render(RenderData* rd) {
+	//This can almost be generic, except for setup_ogl function call
 	OGLRenderData *d = (OGLRenderData*)rd;
-	if (d->vbo.count == 0) {
+	if (d->idx_id == 0) {
 		setup_ogl(d);
 	}
 
-	glBindVertexArray(d->vao);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-//	glBindVertexArray(0);
+	hgvbo_use(&staticVbo);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
+	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_BYTE, 0, d->vbo_offset);
 }
 
 //instanced render data
 static OGLRenderData* trd = NULL;
 
+static void SetupRenderData() {
+	trd = calloc(1, sizeof(*trd));
+	trd->baseRender.renderFunc = triangle_render;
+	trd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
+
+	vertices points;
+	points.points.array = vv;
+	points.size = 3;
+
+	trd->hgVbo = &staticVbo;
+	trd->vertex_count = points.size;
+	trd->index_count = 3;
+	trd->vbo_offset = hgvbo_add_data(&staticVbo, points.points.v, colors, trd->vertex_count);
+}
+
 OGLRenderData* triangle_init_render_data() {
-	if (trd == NULL) {
-		trd = calloc(1, sizeof(*trd));
-		trd->baseRender.renderFunc = triangle_render;
-		trd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
-	}
+	if (trd == NULL) SetupRenderData();
 	return trd;
 }
 

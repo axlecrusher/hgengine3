@@ -44,16 +44,12 @@ GLuint hgOglVbo(vertices v) {
 }
 
 void OGLRenderData_destroy(OGLRenderData* d) {
-	if (d->vbo.id != NULL) {
-		glDeleteBuffers(d->vbo.count, d->vbo.id);
-		d->vbo.count = 0;
-		free(d->vbo.id);
-		d->vbo.id = NULL;
-	}
+	//FIXME: Do something to clean up hgVbo
+	//hgvbo_remove(d->hgvbo, d->vbo_offset, d->vertex_count)
 
-	if (d->vao > 0) {
-		glDeleteVertexArrays(1, &d->vao);
-		d->vao = 0;
+	if (d->idx_id > 0) {
+		glDeleteBuffers(1, &d->idx_id);
+		d->idx_id = 0;
 	}
 }
 
@@ -74,4 +70,16 @@ void setup_viewports(uint16_t width, uint16_t height) {
 	view_port[i].y = 0;
 	view_port[i].width = width/2;
 	view_port[i].height = height;
+}
+
+void ogl_render_renderData(RenderData* rd) {
+	OGLRenderData *d = (OGLRenderData*)rd;
+	if (d->idx_id == 0) {
+//		setup_ogl(d); //do something about this
+	}
+
+	hgvbo_use(&staticVbo);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
+	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_BYTE, 0, d->vbo_offset);
 }

@@ -11,6 +11,8 @@
 
 #include <memory.h>
 
+#include <HgVbo.h>
+
 #define VTABLE_INDEX 2
 
 static float cube_verts[] = {
@@ -47,67 +49,29 @@ static uint8_t indices[] = {
 };
 
 static void cube_setup_ogl(OGLRenderData* rd) {
-	vertices points;
-	points.points.array = cube_verts;
-	points.size = 8;
-
-	uint32_t vbo_size = (points.size * sizeof(*points.points.v)) //vertices
-		+ (8 * sizeof(*colors));
-
-	uint8_t* buffer = malloc(vbo_size);
-	uint8_t* fptr = buffer;
-	uint8_t* cptr = buffer + (points.size * sizeof(*points.points.v));
-
-	memcpy(fptr, cube_verts, (points.size * sizeof(*points.points.v)));
-	memcpy(cptr, colors, (8 * sizeof(*colors)));
-
-	GLuint* vbo = malloc(2*sizeof(*vbo));
-
-	glGenBuffers(2, vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-
-	glBufferData(GL_ARRAY_BUFFER, vbo_size, buffer, GL_STATIC_DRAW);
-
-	free(buffer);
-
 	//indices
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+	GLuint buf_id;
+	glGenBuffers(1, &buf_id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(*indices), indices, GL_STATIC_DRAW);
-	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[2]);
 
-	//vao is used to group GL state to supply vertex data
-	//once you have all the state set, you only need to bind the vao to draw again later
-	GLuint vao = 0;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	//minimize calls to glVertexAttribPointer, use same format for all meshes in a VBO
-	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glVertexAttribPointer(L_COLOR, sizeof(*colors), GL_UNSIGNED_BYTE, GL_TRUE, 0, cptr-fptr);
-
-	glEnableVertexAttribArray(0); //enable access to attribute
-	glEnableVertexAttribArray(1);
-
-	rd->vao = vao;
-	rd->vbo.id = vbo;
-	rd->vbo.count = 2;
+	rd->idx_id = buf_id;
 }
 
 //instanced render data
 static OGLRenderData *crd = NULL;
 
 static void cube_render(RenderData* rd) {
+	//This can almost be generic, except for setup_ogl function call
 	OGLRenderData *d = (OGLRenderData*)rd;
-	if (d->vbo.count == 0) {
+	if (d->idx_id == 0) {
 		cube_setup_ogl(d);
 	}
 
-//	if (d->oglRender.shader_program > 0) useShaderProgram(d->oglRender.shader_program);
+	hgvbo_use(&staticVbo);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->vbo.id[1]);
-	glBindVertexArray(d->vao);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
+	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_BYTE, 0, d->vbo_offset);
 }
 
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
@@ -124,17 +88,28 @@ static HgElement_vtable vtable = {
 	.updateFunc = updateClbk
 };
 
+static void SetupRenderData() {
+	crd = calloc(1, sizeof(*crd));
+	crd->baseRender.renderFunc = cube_render;
+	crd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
+
+	vertices points;
+	points.points.array = cube_verts;
+	points.size = 8;
+
+	crd->index_count = 36;
+	crd->hgVbo = &staticVbo;
+	crd->vbo_offset = hgvbo_add_data(&staticVbo, points.points.v, colors, 8);
+}
+
 void change_to_cube(HgElement* element) {
 	HGELEMT_VTABLES[VTABLE_INDEX] = vtable; //how to only do this once?
 
 //	element->vptr = &vtable;
 	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
-	if (crd == NULL) {
-		crd = calloc(1, sizeof(*crd));
-		crd->baseRender.renderFunc = cube_render;
-		crd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
-	}
+	if (crd == NULL) SetupRenderData();
+
 	element->m_renderData = (RenderData*)crd;
 }
 
