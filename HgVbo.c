@@ -4,6 +4,8 @@
 
 HgVboMemory staticVbo;
 
+static HgVboMemory* _currentVbo;
+
 static vbo_layout1* resize(HgVboMemory* vbo_mem, uint32_t count) {
 	vbo_layout1* buf = realloc(vbo_mem->buffer, count * sizeof* buf);
 	assert(buf != NULL);
@@ -50,10 +52,13 @@ void hgvbo_sendToOGL(HgVboMemory* vbo_mem) {
 
 
 void hgvbo_use(HgVboMemory* vbo) {
+	if (_currentVbo == vbo) return;
+	_currentVbo = vbo;
+
 	if (vbo->needsUpdate > 0) {
 		hgvbo_sendToOGL(vbo);
 	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo->vbo_id);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo->vbo_id); //is this needed or does the vao_id do this for us?
 	glBindVertexArray(vbo->vao_id);
 }
