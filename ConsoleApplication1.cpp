@@ -48,6 +48,7 @@ HANDLE endOfRenderFrame = NULL;
 volatile int8_t needRender = 1;
 
 #define EYE_DISTANCE -0.07f
+uint8_t stereo_view = 0;
 
 //uint8_t KeyDownMap[512];
 
@@ -192,7 +193,7 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgScene *s
 
 	HgElement* e = s->elements + idx;
 	RenderData* rd = e->m_renderData;
-	VCALL(rd->shader, enable);
+	if (rd->shader) VCALL(rd->shader, enable);
 
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
@@ -215,8 +216,15 @@ int main()
 
 	_create_shader = HGShader_ogl_create;
 
-//	setup_viewports(1280,480);
-	setup_viewports(640, 480);
+	if (stereo_view) {
+		setup_viewports(1280, 480);
+//		Perspective2(60, 1280.0 / 480.0, 0.1f, 100.0f, projection);
+	}
+	else {
+		setup_viewports(640, 480);
+	}
+
+	Perspective2(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
 
 	uint8_t s = sizeof(HgElement);
 	printf("element size %d\n", s);
@@ -226,7 +234,7 @@ int main()
 	printf("vbo type size %d\n", sizeof(VBO_TYPE));
 
 //	Perspective(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
-	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
+//	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
 //	Perspective2(60, 320.0 / 480.0, 0.1f, 100.0f, projection);
 
 	quaternion_init(&camera[0].rotation);
@@ -281,10 +289,10 @@ uint32_t i;
 		}
 
 		scene_newElement(&scene, &element);
-		model_create(element);
 		model_load(element, "test.hgmdl");
 		element->scale = 0.5f;
 		element->position.components.z = -4;
+		element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
 		//	model_data d = LoadModel("test.hgmdl");
 	}
 	
@@ -435,11 +443,10 @@ uint32_t i;
 				scene_delete_element(&scene, i);
 				continue;
 			}
-			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) submit_for_render(0, camera + 0, &scene, i);
+			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) submit_for_render(stereo_view, camera + 0, &scene, i);
 		}
-		/*
 
-		if (do_render > 0) {
+		if (stereo_view && do_render > 0) {
 			camera[1] = camera[0];
 			camera[1].position.components.x += EYE_DISTANCE;
 			for (uint32_t i = 0; i < scene._size; ++i) {
@@ -448,7 +455,6 @@ uint32_t i;
 				if (CHECK_FLAG(e, HGE_HIDDEN) == 0) submit_for_render(2, camera + 1, &scene, i);
 			}
 		}
-		*/
 
 //		scene_clearUpdate(&scene);
 
