@@ -6,7 +6,7 @@ HgVboMemory staticVbo;
 
 static HgVboMemory* _currentVbo;
 
-void hgvbo_init(HgVboMemory* vbo_mem, uint8_t type) {
+void hgvbo_init(HgVboMemory* vbo_mem, VBO_TYPE type) {
 	vbo_mem->type = type;
 
 	if (type == VBO_VC)	vbo_mem->size = sizeof(vbo_layout_vc);
@@ -53,6 +53,10 @@ static void hgvbo_sendogl(HgVboMemory* vbo_mem) {
 
 	if (vbo_mem->type == VBO_VC) {
 		glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, vbo_mem->size, (void*)sizeof(vertex));
+		glEnableVertexAttribArray(L_COLOR);
+	}
+	else if (vbo_mem->type == VBO_VN) {
+		glVertexAttribPointer(L_NORMAL, 4, GL_FLOAT, GL_FALSE, vbo_mem->size, (void*)sizeof(vertex));
 		glEnableVertexAttribArray(L_COLOR);
 	}
 

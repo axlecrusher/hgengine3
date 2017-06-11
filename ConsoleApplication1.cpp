@@ -219,6 +219,7 @@ int main()
 	printf("vertex size %d\n", sizeof(vertex));
 	printf("render_packet size %d\n", sizeof(render_packet));
 	printf("oglrd size %d\n", sizeof(OGLRenderData));
+	printf("vbo type size %d\n", sizeof(VBO_TYPE));
 
 //	Perspective(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
 	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);

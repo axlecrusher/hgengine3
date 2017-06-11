@@ -22,20 +22,25 @@
 	padding, you need to make it a vec4 of GLushorts."
 */
 
-#define VBO_VC 0
+typedef enum VBO_TYPE {
+	VBO_VC = 0,
+	VBO_VN,
+	VBO_VNU,
+	VBO_TYPE_COUNT
+} VBO_TYPE;
+
+
 //Vertex,Color
 typedef struct vbo_layout_vc {
 	vertex v;
 	color c;
 } vbo_layout_vc;
 
-#define VBO_VN 1
 typedef struct vbo_layout_vn {
 	vertex v;
 	normal c;
 } vbo_layout_vn;
 
-#define VBO_VNU 3
 typedef struct vbo_layout_vnu {
 	vertex v;
 	normal c;
@@ -55,11 +60,9 @@ typedef struct HgVboMemory{
 //	void(*send_to_ogl)(struct HgVboMemory* vbo);
 } HgVboMemory;
 
-
-
 uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color, uint16_t vertex_count);
 //void hgvbo_sendToOGL(HgVboMemory* vbo_mem);
 void hgvbo_use(HgVboMemory* vbo_mem);
-void hgvbo_init(HgVboMemory* vbo_mem, uint8_t vbo_type);
+void hgvbo_init(HgVboMemory* vbo_mem, VBO_TYPE vbo_type);
 
 extern HgVboMemory staticVbo;
