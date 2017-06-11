@@ -78,6 +78,9 @@
     <ClCompile Include="HgVbo.c">
       <Filter>Shapes</Filter>
     </ClCompile>
+    <ClCompile Include="HgModel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MercuryWindow.h">
@@ -147,6 +150,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="HgVbo.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HgModel.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

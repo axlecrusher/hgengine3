@@ -164,6 +164,7 @@
     <ClCompile Include="HgElement.c" />
     <ClCompile Include="HgInput.c" />
     <ClCompile Include="HgMath.c" />
+    <ClCompile Include="HgModel.c" />
     <ClCompile Include="HgRenderQueue.c" />
     <ClCompile Include="HgScene.c" />
     <ClCompile Include="HgShader.c" />
@@ -185,6 +186,7 @@
     <ClInclude Include="HgElement.h" />
     <ClInclude Include="HgInput.h" />
     <ClInclude Include="HgMath.h" />
+    <ClInclude Include="HgModel.h" />
     <ClInclude Include="HgRenderQueue.h" />
     <ClInclude Include="HgScene.h" />
     <ClInclude Include="HgShader.h" />

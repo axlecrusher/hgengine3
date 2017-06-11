@@ -38,12 +38,12 @@ typedef struct vbo_layout_vc {
 
 typedef struct vbo_layout_vn {
 	vertex v;
-	normal c;
+	normal n;
 } vbo_layout_vn;
 
 typedef struct vbo_layout_vnu {
 	vertex v;
-	normal c;
+	normal n;
 	uv_coord uv;
 } vbo_layout_vnu;
 
@@ -61,8 +61,12 @@ typedef struct HgVboMemory{
 } HgVboMemory;
 
 uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color, uint16_t vertex_count);
+uint32_t hgvbo_add_data_vnu_raw(HgVboMemory* vbo_mem, vbo_layout_vnu* data, uint16_t count);
+
 //void hgvbo_sendToOGL(HgVboMemory* vbo_mem);
 void hgvbo_use(HgVboMemory* vbo_mem);
 void hgvbo_init(HgVboMemory* vbo_mem, VBO_TYPE vbo_type);
 
 extern HgVboMemory staticVbo;
+
+extern HgVboMemory staticVboVNU;

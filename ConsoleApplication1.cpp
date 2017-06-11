@@ -31,7 +31,7 @@ extern "C" {
 #include <Gravity.h>
 #include <HgInput.h>
 #include <Projectile.h>
-
+#include <HgModel.h>
 }
 
 
@@ -208,6 +208,10 @@ int main()
 //	MercuryWindow* w = MercuryWindow::MakeWindow();
 	
 	hgvbo_init(&staticVbo, VBO_VC);
+	hgvbo_init(&staticVboVNU, VBO_VNU);
+
+//	model_data d = LoadModel("test.hgmdl");
+//	hgvbo_add_data_vc(&staticVbo, d.vertices, d.vertices, d.vertex_count);
 
 	_create_shader = HGShader_ogl_create;
 
@@ -275,6 +279,13 @@ uint32_t i;
 			element->position.components.z = -2.0f - z;
 			element->scale = 0.3f;
 		}
+
+		scene_newElement(&scene, &element);
+		model_create(element);
+		model_load(element, "test.hgmdl");
+		element->scale = 0.5f;
+		element->position.components.z = -4;
+		//	model_data d = LoadModel("test.hgmdl");
 	}
 	
 	HANDLE thread1 = CreateThread(NULL, 0, &PrintCtr, NULL, 0, NULL);

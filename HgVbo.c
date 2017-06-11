@@ -1,15 +1,26 @@
 #include <HgVbo.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
 
 HgVboMemory staticVbo;
+HgVboMemory staticVboVNU;
 
 static HgVboMemory* _currentVbo;
 
 void hgvbo_init(HgVboMemory* vbo_mem, VBO_TYPE type) {
 	vbo_mem->type = type;
 
-	if (type == VBO_VC)	vbo_mem->size = sizeof(vbo_layout_vc);
+	if (type == VBO_VC) {
+		vbo_mem->size = sizeof(vbo_layout_vc);
+	}
+	else if (type == VBO_VNU) {
+		vbo_mem->size = sizeof(vbo_layout_vnu);
+	}
+	else {
+		fprintf(stderr, "Unknown vbo type:%d\n", vbo_mem->type);
+		assert(!"Unknown vbo type");
+	}
 }
 
 static void* resize(HgVboMemory* vbo_mem, uint32_t count, uint32_t size) {
@@ -27,6 +38,21 @@ uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color,
 	for (uint16_t i = 0; i < count; ++i) {
 		buf[i].v = vertices[i];
 		buf[i].c = color[i];
+	}
+
+	uint32_t offset = vbo_mem->count;
+	vbo_mem->count += count;
+	vbo_mem->needsUpdate = 1;
+
+	return offset;
+}
+
+uint32_t hgvbo_add_data_vnu_raw(HgVboMemory* vbo_mem, vbo_layout_vnu* data, uint16_t count) {
+	vbo_layout_vnu* buf = resize(vbo_mem, vbo_mem->count + count, sizeof(*buf));
+	buf = buf + vbo_mem->count;
+
+	for (uint16_t i = 0; i < count; ++i) {
+		buf[i]= data[i];
 	}
 
 	uint32_t offset = vbo_mem->count;
@@ -57,7 +83,17 @@ static void hgvbo_sendogl(HgVboMemory* vbo_mem) {
 	}
 	else if (vbo_mem->type == VBO_VN) {
 		glVertexAttribPointer(L_NORMAL, 4, GL_FLOAT, GL_FALSE, vbo_mem->size, (void*)sizeof(vertex));
-		glEnableVertexAttribArray(L_COLOR);
+		glEnableVertexAttribArray(L_NORMAL);
+	}
+	else if (vbo_mem->type == VBO_VNU) {
+		glVertexAttribPointer(L_NORMAL, 4, GL_FLOAT, GL_FALSE, vbo_mem->size, (void*)sizeof(vertex));
+		glEnableVertexAttribArray(L_NORMAL);
+		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_FALSE, vbo_mem->size, (void*)(sizeof(vertex)+sizeof(normal)));
+		glEnableVertexAttribArray(L_UV);
+	}
+	else {
+		fprintf(stderr, "Unknown vbo type:%d\n", vbo_mem->type);
+		assert(!"Unknown vbo type");
 	}
 
 	vbo_mem->needsUpdate = 0;
