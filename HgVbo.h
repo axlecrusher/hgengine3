@@ -63,9 +63,15 @@ typedef struct HgVboMemory{
 uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color, uint16_t vertex_count);
 uint32_t hgvbo_add_data_vnu_raw(HgVboMemory* vbo_mem, vbo_layout_vnu* data, uint16_t count);
 
+//	Copy data straight into VBO. Ensure that vbo_mem, is using the correct vbo layout for your data
+uint32_t hgvbo_add_data_raw(HgVboMemory* vbo_mem, void* data, uint16_t count);
+
 //void hgvbo_sendToOGL(HgVboMemory* vbo_mem);
 void hgvbo_use(HgVboMemory* vbo_mem);
 void hgvbo_init(HgVboMemory* vbo_mem, VBO_TYPE vbo_type);
+
+//	Clear data from RAM. Will not upload new data to GPU until new data is added.
+void hgvbo_clear(HgVboMemory* vbo_mem);
 
 extern HgVboMemory staticVbo;
 

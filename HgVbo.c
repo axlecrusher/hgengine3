@@ -3,24 +3,24 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include <string.h>
+
 HgVboMemory staticVbo;
 HgVboMemory staticVboVNU;
 
 static HgVboMemory* _currentVbo;
 
+static uint16_t struct_size(VBO_TYPE type) {
+	if (type == VBO_VC) return sizeof(vbo_layout_vc);
+	if (type == VBO_VNU) return sizeof(vbo_layout_vnu);
+
+	fprintf(stderr, "Unknown vbo type:%d\n", type);
+	assert(!"Unknown vbo type");
+}
+
 void hgvbo_init(HgVboMemory* vbo_mem, VBO_TYPE type) {
 	vbo_mem->type = type;
-
-	if (type == VBO_VC) {
-		vbo_mem->size = sizeof(vbo_layout_vc);
-	}
-	else if (type == VBO_VNU) {
-		vbo_mem->size = sizeof(vbo_layout_vnu);
-	}
-	else {
-		fprintf(stderr, "Unknown vbo type:%d\n", vbo_mem->type);
-		assert(!"Unknown vbo type");
-	}
+	vbo_mem->size = struct_size(type);
 }
 
 static void* resize(HgVboMemory* vbo_mem, uint32_t count, uint32_t size) {
@@ -29,6 +29,12 @@ static void* resize(HgVboMemory* vbo_mem, uint32_t count, uint32_t size) {
 	vbo_mem->buffer = buf;
 
 	return buf;
+}
+
+void hgvbo_clear(HgVboMemory* vbo_mem) {
+	free(vbo_mem->buffer);
+	vbo_mem->buffer = NULL;
+	vbo_mem->count = 0;
 }
 
 uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color, uint16_t count) {
@@ -54,6 +60,19 @@ uint32_t hgvbo_add_data_vnu_raw(HgVboMemory* vbo_mem, vbo_layout_vnu* data, uint
 	for (uint16_t i = 0; i < count; ++i) {
 		buf[i]= data[i];
 	}
+
+	uint32_t offset = vbo_mem->count;
+	vbo_mem->count += count;
+	vbo_mem->needsUpdate = 1;
+
+	return offset;
+}
+
+uint32_t hgvbo_add_data_raw(HgVboMemory* vbo_mem, void* data, uint16_t count) {
+	vbo_layout_vnu* buf = resize(vbo_mem, vbo_mem->count + count, vbo_mem->size);
+	buf = buf + vbo_mem->count;
+
+	memcpy(buf, data, count*vbo_mem->size);
 
 	uint32_t offset = vbo_mem->count;
 	vbo_mem->count += count;
