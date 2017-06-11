@@ -79,7 +79,6 @@ static model_data LoadModel(const char* filename) {
 typedef struct model_render_data {
 	OGLRenderData ogl_render_data;
 	uint16_t* indices;
-	uint32_t index_count;
 } model_render_data;
 
 static void model_render(RenderData* rd) {
@@ -87,7 +86,7 @@ static void model_render(RenderData* rd) {
 	model_render_data* mrd = (model_render_data*)rd;
 	OGLRenderData *d = &mrd->ogl_render_data;
 	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer16(mrd->indices, mrd->index_count);
+		d->idx_id = new_index_buffer16(mrd->indices, d->index_count);
 		free(mrd->indices);
 	}
 
@@ -143,7 +142,7 @@ int8_t model_load(HgElement* element, const char* filename) {
 	rd->vbo_offset = hgvbo_add_data_vnu_raw(rd->hgVbo, mdl.vertices, rd->vertex_count);
 	free(mdl.vertices);
 
-	mrd->index_count = mdl.index_count;
+//	mrd->index_count = mdl.index_count;
 	mrd->indices = mdl.indices;
 
 	CLEAR_FLAG(element, HGE_DESTROY);
