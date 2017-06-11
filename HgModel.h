@@ -12,7 +12,7 @@ typedef struct model_data {
 
 //model_data LoadModel(const char* filename);
 
-void model_load(HgElement* element, const char* filename);
+int8_t model_load(HgElement* element, const char* filename);
 
 void change_to_model(HgElement* element);
 void model_create(HgElement* element);

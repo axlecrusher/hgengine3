@@ -39,7 +39,7 @@ typedef struct HgElement{
 } HgElement;
 
 void init_hgelement(HgElement* element);
-void HgElement_destroy(HgElement* element);
+//void HgElement_destroy(HgElement* element);
 
 //inline uint16_t check_flag(HgElement* element, uint8_t x) { return element->flags & x; }
 //inline void set_flag(HgElement* element, uint16_t f) { element->flags |= f; }
@@ -50,7 +50,7 @@ void HgElement_destroy(HgElement* element);
 
 
 #define CHECK_FLAG(e,x) ((e)->flags&x)
-#define CLEAR_FLAG(e,x) (e)->flags |= ~x
+#define CLEAR_FLAG(e,x) (e)->flags &= ~x
 #define SET_FLAG(e,x) (e)->flags |= x
 
 //#define VCALL(e,function,...) if (e && e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
