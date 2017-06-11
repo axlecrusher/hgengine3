@@ -95,17 +95,11 @@ static void model_render(RenderData* rd) {
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
 	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_SHORT, 0, d->vbo_offset);
-//	glDrawElementsBaseVertex(GL_TRIANGLE_FAN, d->index_count, GL_UNSIGNED_SHORT, 0, d->vbo_offset);
-//	glDrawElementsBaseVertex(GL_QUADS, d->index_count, GL_UNSIGNED_SHORT, 0, d->vbo_offset);
-	//	glDrawElementsBaseVertex(GL_TRIANGLE_STRIP, d->index_count, GL_UNSIGNED_BYTE, 0, d->vbo_offset);
 }
 
 static RenderData* init_render_data() {
 	model_render_data* rd = calloc(1,sizeof* rd);
-
 	rd->ogl_render_data.baseRender.renderFunc = model_render;
-//	rd->ogl_render_data.baseRender.shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
-
 	return (void*)rd;
 }
 

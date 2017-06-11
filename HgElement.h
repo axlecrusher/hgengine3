@@ -49,9 +49,9 @@ void init_hgelement(HgElement* element);
 
 
 
-#define CHECK_FLAG(e,x) ((e)->flags&x)
-#define CLEAR_FLAG(e,x) (e)->flags &= ~x
-#define SET_FLAG(e,x) (e)->flags |= x
+#define CHECK_FLAG(e,x) ((e)->flags&(x))
+#define CLEAR_FLAG(e,x) ((e)->flags &= ~(x))
+#define SET_FLAG(e,x) ((e)->flags |= (x))
 
 //#define VCALL(e,function,...) if (e && e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
 #define VCALL(e,function,...) if (e->vptr->function) e->vptr->function(e,__VA_ARGS__)

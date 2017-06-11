@@ -33,7 +33,7 @@ uint8_t is_used(HgScene* s, uint32_t index);
 inline void scene_init_iterator(HgScene_iterator* i, HgScene* scene) { i->_current = 0; i->s = scene; }
 HgElement* scene_next_element(HgScene_iterator* i);
 
-void scene_delete_element_itr(HgScene_iterator* i);
 void scene_delete_element(HgScene* scene, uint32_t index);
+inline void scene_delete_element_itr(HgScene_iterator* i) { scene_delete_element(i->s, i->_current); }
 
 #define IS_USED(scene,index) is_used(scene,index)

@@ -108,14 +108,6 @@ HgElement* scene_next_element(HgScene_iterator* itr) {
 	return NULL;
 }
 
-void scene_delete_element_itr(HgScene_iterator* i) {
-	HgElement* e = i->s->elements + i->_current;
-	VCALL_IDX(e, destroy);
-	init_hgelement(e);
-	clear_used(i->s,i->_current);
-//	i->s->used[i->_current] = 0;
-}
-
 void scene_delete_element(HgScene* scene, uint32_t idx) {
 //	printf("do destroy\n");
 	if (IS_USED(scene, idx) > 0) {
