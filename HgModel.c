@@ -109,7 +109,32 @@ static RenderData* init_render_data() {
 	return (void*)rd;
 }
 
+static void updateClbk(struct HgElement* e, uint32_t tdelta) {
+	//	printf("cube\n");
+}
+
+static void destroy(struct HgElement* e) {
+	free(e->m_renderData);
+	e->m_renderData = NULL;
+	//	printf("cube\n");
+}
+
+static HgElement_vtable vtable = {
+	.destroy = destroy
+//	.updateFunc = updateClbk
+};
+
+static void change_to_model(HgElement* element) {
+	HGELEMT_VTABLES[VTABLE_INDEX] = vtable; //how to only do this once?
+	element->vptr_idx = VTABLE_INDEX;
+
+	//create an instance of the render data for all triangles to share
+	element->m_renderData = init_render_data();
+}
+
 int8_t model_load(HgElement* element, const char* filename) {
+	change_to_model(element);
+
 	model_render_data* mrd = (model_render_data*)element->m_renderData;
 	OGLRenderData* rd = &mrd->ogl_render_data;
 
@@ -132,29 +157,7 @@ int8_t model_load(HgElement* element, const char* filename) {
 	return 0;
 }
 
-static void updateClbk(struct HgElement* e, uint32_t tdelta) {
-	//	printf("cube\n");
-}
-
-static void destroy(struct HgElement* e) {
-	free(e->m_renderData);
-	e->m_renderData = NULL;
-	//	printf("cube\n");
-}
-
-static HgElement_vtable vtable = {
-	.destroy = destroy
-//	.updateFunc = updateClbk
-};
-
-void change_to_model(HgElement* element) {
-	HGELEMT_VTABLES[VTABLE_INDEX] = vtable; //how to only do this once?
-	element->vptr_idx = VTABLE_INDEX;
-
-	//create an instance of the render data for all triangles to share
-	element->m_renderData = init_render_data();
-}
-
+/*
 void model_create(HgElement* element) {
 	element->position.components.x = 0.0f;
 	element->position.components.y = 0.0f;
@@ -167,3 +170,4 @@ void model_create(HgElement* element) {
 
 	change_to_model(element);
 }
+*/

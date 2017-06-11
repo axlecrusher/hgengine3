@@ -14,5 +14,5 @@ typedef struct model_data {
 
 int8_t model_load(HgElement* element, const char* filename);
 
-void change_to_model(HgElement* element);
-void model_create(HgElement* element);
+//void change_to_model(HgElement* element);
+//void model_create(HgElement* element);
