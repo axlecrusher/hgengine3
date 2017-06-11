@@ -16,6 +16,7 @@ static uint16_t struct_size(VBO_TYPE type) {
 
 	fprintf(stderr, "Unknown vbo type:%d\n", type);
 	assert(!"Unknown vbo type");
+	return 0;
 }
 
 void hgvbo_init(HgVboMemory* vbo_mem, VBO_TYPE type) {
