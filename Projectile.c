@@ -8,8 +8,7 @@
 
 #include <stdlib.h>
 
-//FIXME: must automate this number generation
-#define VTABLE_INDEX 3
+static uint8_t VTABLE_INDEX;
 
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 
@@ -64,3 +63,6 @@ void projectile_create(HgElement* element) {
 	element->extraData = calloc(1,sizeof(ProjectileData));
 	change_to_projectile(element);
 }
+
+
+REGISTER_LINKTIME(basic_projectile);

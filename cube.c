@@ -12,8 +12,11 @@
 #include <memory.h>
 
 #include <HgVbo.h>
+#include <HgElement.h>
 
-#define VTABLE_INDEX 2
+//TestRegistration("test");
+
+static uint8_t VTABLE_INDEX;
 
 static float cube_verts[] = {
 	0.5f, 0.5, 0.5,		//0
@@ -65,7 +68,7 @@ static void cube_render(RenderData* rd) {
 }
 
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
-//	printf("cube\n");
+	printf("cube\n");
 }
 
 static void destroy(struct HgElement* e) {
@@ -93,7 +96,6 @@ static void SetupRenderData() {
 }
 
 void change_to_cube(HgElement* element) {
-	HGELEMT_VTABLES[VTABLE_INDEX] = vtable; //how to only do this once?
 
 //	element->vptr = &vtable;
 	element->vptr_idx = VTABLE_INDEX;
@@ -114,3 +116,5 @@ void shape_create_cube(HgElement* element) {
 
 	change_to_cube(element);
 }
+
+REGISTER_LINKTIME(cube_thing);

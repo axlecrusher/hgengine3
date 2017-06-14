@@ -4,7 +4,8 @@
 #include <HgVbo.h>
 
 
-#define VTABLE_INDEX 4
+
+static uint8_t VTABLE_INDEX;
 
 typedef struct header {
 	uint32_t vertex_count, index_count;
@@ -164,3 +165,5 @@ void model_create(HgElement* element) {
 	change_to_model(element);
 }
 */
+
+REGISTER_LINKTIME(hgmodel);

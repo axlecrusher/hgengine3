@@ -32,7 +32,10 @@ extern "C" {
 #include <HgInput.h>
 #include <Projectile.h>
 #include <HgModel.h>
+
+#include <symbol_enumerator.h>
 }
+
 
 
 
@@ -204,10 +207,82 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgScene *s
 	rd->renderFunc(rd);
 }
 
+void vertex_print(const vertex* v) {
+	printf("%f %f %f\n", v->array[0], v->array[1], v->array[2]);
+}
+
+void generateVoxelVBO() {
+	static float cube_verts[] = {
+		0.5f, 0.5, -0.5,	//4
+		0.5f, -0.5, -0.5,	//5
+		0.5f, -0.5, 0.5,	//6
+		0.5f, 0.5, 0.5		//7
+	};
+
+	//rgba
+	static color colors[] = {
+		255, 0, 0, 255, //0
+		0, 255, 0, 255, //1
+		0, 0, 255, 255, //2
+		255, 0, 0, 255, //3
+		0, 255, 0, 255, //4
+		0, 0, 255, 255, //5
+		255, 0, 0, 255, //6
+		0, 255, 0, 255 //7
+	};
+
+
+	static uint8_t indices[] = {
+		2,1,0,0,3,2, //front
+		5,6,7,7,4,5, //back
+		6,5,1,1,2,6, //bottom
+		3,0,4,4,7,3, //top
+		6,2,3,3,7,6, //R side
+		1,5,4,4,0,1  //L side
+	};
+
+
+	vertex* vertices = (vertex*)calloc(11, sizeof(cube_verts));
+	vertex* v = vertices;
+	for (uint32_t i = 0; i < 11; ++i) {
+		memcpy(v, cube_verts, sizeof(cube_verts));
+		v+=4;
+	}
+
+	v = (vertex*)vertices;
+	for (uint32_t i = 0; i < 11; ++i) {
+		v[0].components.x += (1 * i);
+		v[1].components.x += (1 * i);
+		v[2].components.x += (1 * i);
+		v[3].components.x += (1 * i);
+		vertex_print(v);
+		vertex_print(v + 1);
+		vertex_print(v + 2);
+		vertex_print(v + 3);
+		v += 4;
+	}
+
+}
+
+int SymnumCheck(const char * path, const char * name, void * location, long size)
+{
+	if (strncmp(name, "REGISTER", 8) == 0)
+	{
+		typedef void(*sf)();
+		sf fn = (sf)location;
+		fn();
+	}
+	return 0;
+}
+
+
 int main()
 {
+	EnumerateSymbols(SymnumCheck);
+
 //	MercuryWindow* w = MercuryWindow::MakeWindow();
-	
+	generateVoxelVBO();
+
 	hgvbo_init(&staticVbo, VBO_VC);
 	hgvbo_init(&staticVboVNU, VBO_VNU);
 
@@ -289,7 +364,7 @@ uint32_t i;
 		}
 
 		scene_newElement(&scene, &element);
-		model_load(element, "test.hgmdl");
+		model_load(element, "invader1.hgmdl");
 		element->scale = 0.5f;
 		element->position.components.z = -4;
 		element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");

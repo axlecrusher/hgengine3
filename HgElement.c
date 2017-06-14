@@ -1,7 +1,15 @@
 #include <HgElement.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 extern HgElement_vtable HGELEMT_VTABLES[255] = { 0 };
+
+uint8_t TestRegistration(const char* c) {
+	static uint8_t ElementTypeCounter = 0;
+	printf("Registering %s, type %d \n", c, ElementTypeCounter);
+	return ElementTypeCounter++;
+//	return 0;
+}
 
 void init_hgelement(HgElement* element) {
 	element->flags = 0;

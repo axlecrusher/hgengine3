@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <oglShaders.h>
 
-#define VTABLE_INDEX 1
+static uint8_t VTABLE_INDEX;
 
 static float vv[9] = {
 	-0.5f, -0.5f, 0.0f,
@@ -76,9 +76,6 @@ OGLRenderData* triangle_init_render_data() {
 }
 
 void change_to_triangle(HgElement* element) {
-//	element->vptr = &vtable;
-	element->vptr_idx = 0;
-
 	//create an instance of the render data for all triangles to share
 	element->m_renderData = (RenderData*)triangle_init_render_data();
 }
@@ -95,3 +92,5 @@ void shape_create_triangle(HgElement* element) {
 
 	change_to_triangle(element);
 }
+
+REGISTER_LINKTIME(triangle)

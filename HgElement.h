@@ -6,6 +6,10 @@
 #include <HgTypes.h>
 #include <HgShader.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define HGE_USED	0x01 //used in scene graph
 #define HGE_ACTIVE	0x02
 #define HGE_HIDDEN	0x04
@@ -47,8 +51,6 @@ void init_hgelement(HgElement* element);
 
 //inline uint16_t is_destroyed(HgElement* e) { return CHECK_FLAG(e, HGE_DESTROY); }
 
-
-
 #define CHECK_FLAG(e,x) ((e)->flags&(x))
 #define CLEAR_FLAG(e,x) ((e)->flags &= ~(x))
 #define SET_FLAG(e,x) ((e)->flags |= (x))
@@ -58,3 +60,23 @@ void init_hgelement(HgElement* element);
 #define VCALL_F(e,function,...) e->vptr->function(e,__VA_ARGS__)
 
 #define VCALL_IDX(e,function,...) if (HGELEMT_VTABLES[e->vptr_idx].function) HGELEMT_VTABLES[e->vptr_idx].function(e,__VA_ARGS__)
+
+
+uint8_t TestRegistration(const char* c);
+
+
+#define REGISTER_ELEMENT_TYPE(str) TestRegistration(str);
+
+#ifdef _MSC_VER
+#define REGISTER_LINKTIME( func ) \
+	__pragma(comment(linker,"/export:_REGISTER"#func)); \
+	void REGISTER##func() { VTABLE_INDEX = TestRegistration(#func); HGELEMT_VTABLES[VTABLE_INDEX] = vtable; }
+#else
+#define REGISTER_LINKTIME( func ) \
+	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }
+#endif
+
+
+#ifdef __cplusplus
+};
+#endif
