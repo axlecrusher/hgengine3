@@ -81,6 +81,9 @@
     <ClCompile Include="HgModel.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="symbol_enumerator.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MercuryWindow.h">
@@ -153,6 +156,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="HgModel.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="symbol_enumerator.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
