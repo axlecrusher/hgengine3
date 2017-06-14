@@ -4,11 +4,10 @@
 
 extern HgElement_vtable HGELEMT_VTABLES[255] = { 0 };
 
-uint8_t TestRegistration(const char* c) {
-	static uint8_t ElementTypeCounter = 0;
+vtable_index RegisterElementType(const char* c) {
+	static vtable_index ElementTypeCounter = 0;
 	printf("Registering %s, type %d \n", c, ElementTypeCounter);
 	return ElementTypeCounter++;
-//	return 0;
 }
 
 void init_hgelement(HgElement* element) {

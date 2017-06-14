@@ -40,9 +40,6 @@ static HgElement_vtable vtable = {
 };
 
 void change_to_projectile(HgElement* element) {
-	HGELEMT_VTABLES[VTABLE_INDEX] = vtable; //how to only do this once?
-
-	//	element->vptr = &vtable;
 	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
 

@@ -68,7 +68,7 @@ static void cube_render(RenderData* rd) {
 }
 
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
-	printf("cube\n");
+//	printf("cube\n");
 }
 
 static void destroy(struct HgElement* e) {
@@ -96,8 +96,6 @@ static void SetupRenderData() {
 }
 
 void change_to_cube(HgElement* element) {
-
-//	element->vptr = &vtable;
 	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
 	if (crd == NULL) SetupRenderData();

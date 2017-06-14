@@ -119,7 +119,6 @@ static HgElement_vtable vtable = {
 };
 
 static void change_to_model(HgElement* element) {
-	HGELEMT_VTABLES[VTABLE_INDEX] = vtable; //how to only do this once?
 	element->vptr_idx = VTABLE_INDEX;
 
 	//create an instance of the render data for all triangles to share

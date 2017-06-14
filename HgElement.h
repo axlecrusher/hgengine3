@@ -28,11 +28,12 @@ typedef struct HgElement_vtable {
 } HgElement_vtable;
 
 extern HgElement_vtable HGELEMT_VTABLES[255];
+typedef uint8_t vtable_index;
 
 //try to avoid pointers, especially on 64 bit
 typedef struct HgElement{
 //	HgElement_vtable* vptr;
-	uint8_t vptr_idx; //1
+	vtable_index vptr_idx; //1
 	uint8_t flags; //1
 //	uint32_t index;
 //	uint32_t parent;
@@ -62,7 +63,7 @@ void init_hgelement(HgElement* element);
 #define VCALL_IDX(e,function,...) if (HGELEMT_VTABLES[e->vptr_idx].function) HGELEMT_VTABLES[e->vptr_idx].function(e,__VA_ARGS__)
 
 
-uint8_t TestRegistration(const char* c);
+vtable_index RegisterElementType(const char* c);
 
 
 #define REGISTER_ELEMENT_TYPE(str) TestRegistration(str);
@@ -70,7 +71,7 @@ uint8_t TestRegistration(const char* c);
 #ifdef _MSC_VER
 #define REGISTER_LINKTIME( func ) \
 	__pragma(comment(linker,"/export:_REGISTER"#func)); \
-	void REGISTER##func() { VTABLE_INDEX = TestRegistration(#func); HGELEMT_VTABLES[VTABLE_INDEX] = vtable; }
+	void REGISTER##func() { VTABLE_INDEX = RegisterElementType(#func); HGELEMT_VTABLES[VTABLE_INDEX] = vtable; }
 #else
 #define REGISTER_LINKTIME( func ) \
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }
