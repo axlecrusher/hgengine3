@@ -34,6 +34,7 @@ extern "C" {
 #include <HgModel.h>
 
 #include <symbol_enumerator.h>
+#include <FileWatch.h>
 }
 
 
@@ -150,6 +151,7 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	while (1) {
 		printf("UPS %u e_count %d %d\n", itrctr, scene.size_used, scene._size);
 		itrctr = 0;
+		CheckFilesForChange();
 		Sleep(1000);
 	}
 }

@@ -84,6 +84,18 @@
     <ClCompile Include="symbol_enumerator.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="square.c">
+      <Filter>Shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="FileWatch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedList.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="str_utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MercuryWindow.h">
@@ -159,6 +171,15 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="symbol_enumerator.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileWatch.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedList.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="str_utils.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

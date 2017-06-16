@@ -5,6 +5,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <FileWatch.h>
+#include <str_utils.h>
+#include <stdio.h>
 
 #pragma warning(disable:4996)
 
@@ -15,20 +18,19 @@ HgShader*(*_create_shader)(const char* vert, const char* frag);
 typedef struct shader_entry {
 	uint32_t use_count;
 	HgShader* shader;
+
+	char* vertex_path;
+	char* frag_path;
 } shader_entry;
 
 /* keep shader_names seperate, we iterate through the list, want it cached*/
 static char* shader_names[MAX_SHADERS] = { NULL }; //replace strings with CRC32?
 shader_entry shader_list[MAX_SHADERS];
 
-static char* str_cat(const char* s1, const char* s2) {
-	uint32_t size = strlen(s1) + strlen(s2);
-	char* str = malloc(size + 1);
-	assert(str != NULL);
-	str[0] = 0;
-	strcat(str, s1);
-	strcat(str, s2);
-	return str;
+static void ShaderFileChanged(void* data) {
+	shader_entry* entry = data;
+	fprintf(stderr, "Shader file changed:%s\n", entry->frag_path);
+	VCALL(entry->shader, load);
 }
 
 HgShader* HGShader_acquire(char* vert, char* frag) {
@@ -51,6 +53,10 @@ HgShader* HGShader_acquire(char* vert, char* frag) {
 	shader_names[i] = name;
 	shader_list[i].use_count = 1;
 	shader_list[i].shader = _create_shader(vert,frag);
+	shader_list[i].frag_path = str_cat(frag, "");
+	shader_list[i].vertex_path = str_cat(vert, "");
+	WatchFileForChange(frag, ShaderFileChanged, shader_list+i);
+	WatchFileForChange(vert, ShaderFileChanged, shader_list + i);
 
 	VCALL(shader_list[i].shader, load);
 

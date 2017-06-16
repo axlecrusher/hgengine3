@@ -31,8 +31,6 @@ typedef struct ogl_vbo {
 
 typedef struct OGLRenderData {
 	RenderData baseRender;
-//	GLuint vao;
-//	ogl_vbo vbo;
 
 	struct HgVboMemory* hgVbo;
 	uint32_t vbo_offset;

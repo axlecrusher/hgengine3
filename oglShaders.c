@@ -5,7 +5,7 @@
 #include <assert.h>
 
 #include <memory.h>
-#include <string.h>
+#include <str_utils.h>
 
 static GLuint _currentShaderProgram = 0;
 
@@ -114,15 +114,27 @@ static void setup_shader(HgShader_ogl* s) {
 
 	if ((vert_id == 0) && (frag_id == 0) && (geom_id == 0)) return;
 
-	GLuint shader_program = glCreateProgram();
+
+	GLuint shader_program = shader->program_id;
+	if (shader_program==0) shader_program = glCreateProgram();
+
 	if (vert_id>0) glAttachShader(shader_program, vert_id);
 	if (frag_id>0) glAttachShader(shader_program, frag_id);
 	if (geom_id>0) glAttachShader(shader_program, geom_id);
 	glLinkProgram(shader_program);
 
-	if (vert_id>0) glDeleteShader(vert_id);
-	if (frag_id>0) glDeleteShader(frag_id);
-	if (geom_id>0) glDeleteShader(geom_id);
+	if (vert_id > 0) {
+		glDetachShader(shader_program, vert_id);
+		glDeleteShader(vert_id);
+	}
+	if (frag_id > 0) {
+		glDetachShader(shader_program, frag_id);
+		glDeleteShader(frag_id);
+	}
+	if (geom_id > 0) {
+		glDetachShader(shader_program, geom_id);
+		glDeleteShader(geom_id);
+	}
 
 	// check if link was successful
 	int params = -1;
@@ -135,15 +147,16 @@ static void setup_shader(HgShader_ogl* s) {
 		return;
 	}
 	shader->program_id = shader_program;
+	shader->source_loaded = 2;
 }
 
 static void load_from_disk(HgShader* s) {
 	HgShader_ogl* shader = (HgShader_ogl*)s;
 	shader_source* source = shader->program_code;
 
-	GLuint vert_id = 0;
-	GLuint frag_id = 0;
-	GLuint geom_id = 0;
+//	GLuint vert_id = 0;
+//	GLuint frag_id = 0;
+//	GLuint geom_id = 0;
 
 	if (source->vert_file_path) source->vert_source = read_from_disk(source->vert_file_path);
 	if (source->frag_file_path) source->frag_source = read_from_disk(source->frag_file_path);
@@ -160,7 +173,7 @@ static void enable_shader(HgShader* s) {
 
 	if (shader->source_loaded == 0) return;
 
-	if (shader->program_id==0) setup_shader(shader);
+	if (shader->program_id==0 || shader->source_loaded==1) setup_shader(shader);
 	if (shader->program_id>0) useShaderProgram(shader->program_id);
 }
 
@@ -170,22 +183,14 @@ static HgShader_vtable vtable = {
 	.enable = enable_shader
 };
 
-static char* copy_str(const char* str) {
-	uint32_t size = strlen(str);
-	char* s = malloc(size + 1);
-	s[size] = 0;
-	memcpy(s, str, size);
-	return s;
-}
-
 HgShader* HGShader_ogl_create(const char* vert, const char* frag) {
 	HgShader_ogl* s = calloc(1, sizeof* s);
 
 	s->_base.vptr = &vtable;
 
 	shader_source* source = calloc(1, sizeof* source);
-	source->vert_file_path = copy_str(vert);
-	source->frag_file_path = copy_str(frag);
+	source->vert_file_path = str_copy(vert);
+	source->frag_file_path = str_copy(frag);
 	s->program_code = source;
 
 	return &s->_base;
