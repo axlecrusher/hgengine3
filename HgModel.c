@@ -91,6 +91,7 @@ static void model_render(RenderData* rd) {
 		free(mrd->indices);
 	}
 
+	setBlendMode(rd->blendMode);
 	hgvbo_use(d->hgVbo);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);

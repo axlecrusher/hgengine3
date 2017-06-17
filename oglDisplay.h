@@ -38,6 +38,7 @@ typedef struct OGLRenderData {
 
 	GLuint idx_id;
 	uint32_t index_count;
+	void* indices;
 } OGLRenderData;
 
 GLuint hgOglVbo(vertices v);
@@ -52,3 +53,4 @@ void ogl_render_renderData(RenderData* rd);
 
 GLuint new_index_buffer8(uint8_t* indices, uint32_t count);
 GLuint new_index_buffer16(uint16_t* indices, uint32_t count);
+void setBlendMode(BlendMode blendMode);

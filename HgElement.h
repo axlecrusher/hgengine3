@@ -16,10 +16,16 @@ extern "C" {
 #define HGE_UPDATED	0x08
 #define HGE_DESTROY	0x10
 
+typedef enum BlendMode {
+	BLEND_NORMAL = 0,
+	BLEND_ADDITIVE
+} BlendMode;
+
 typedef struct RenderData {
 	void (*renderFunc)(struct RenderData* render_data);
 	void (*destroy)(struct RenderData* e);
 	HgShader* shader;
+	uint8_t blendMode;
 } RenderData;
 
 typedef struct HgElement_vtable {

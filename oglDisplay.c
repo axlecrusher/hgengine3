@@ -1,10 +1,12 @@
 #include <oglDisplay.h>
 
 #include <stdlib.h>
+#include <HgElement.h>
 
 viewport view_port[3];
 
 static uint8_t _currenViewPort_idx =  0xFF;
+static uint8_t _currentBlendMode = 0xFF;
 
 HgCamera* _camera;
 float* _projection;
@@ -75,9 +77,10 @@ void setup_viewports(uint16_t width, uint16_t height) {
 void ogl_render_renderData(RenderData* rd) {
 	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->idx_id == 0) {
-//		setup_ogl(d); //do something about this
+		d->idx_id = new_index_buffer8(d->indices, d->index_count);
 	}
 
+	setBlendMode(rd->blendMode);
 	hgvbo_use(&staticVbo);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
@@ -100,4 +103,20 @@ GLuint new_index_buffer16(uint16_t* indices, uint32_t count) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(*indices), indices, GL_STATIC_DRAW);
 
 	return buf_id;
+}
+
+void setBlendMode(BlendMode blendMode) {
+	if (_currentBlendMode == blendMode) return;
+	_currentBlendMode = blendMode;
+
+	if (blendMode == BLEND_NORMAL) {
+//		glDepthMask(GL_TRUE);
+		glDisable(GL_BLEND);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	else if (blendMode == BLEND_ADDITIVE) {
+//		glDepthMask(GL_FALSE);
+		glEnable (GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	}
 }

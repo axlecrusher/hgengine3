@@ -212,8 +212,9 @@ bool Win32Window::SwapBuffers()
 
 //	glEnable(GL_NORMALIZE); //deprecated
 //	glEnable (GL_BLEND); 
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+//	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		
 	return (::SwapBuffers( m_hdc )==TRUE);
 }
 
