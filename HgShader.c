@@ -33,7 +33,7 @@ static void ShaderFileChanged(void* data) {
 	VCALL(entry->shader, load);
 }
 
-HgShader* HGShader_acquire(char* vert, char* frag) {
+HgShader* HGShader_acquire(const char* vert, const char* frag) {
 	uint32_t i = 0;
 	char* name = str_cat(vert, frag);
 	uint32_t funused = 0xFFFFFFFF;
