@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="ConsoleApplication1.cpp" />
     <ClCompile Include="cube.c" />
+    <ClCompile Include="FileWatch.c" />
     <ClCompile Include="GravityTest.c" />
     <ClCompile Include="HgElement.c" />
     <ClCompile Include="HgInput.c" />
@@ -168,12 +169,15 @@
     <ClCompile Include="HgRenderQueue.c" />
     <ClCompile Include="HgScene.c" />
     <ClCompile Include="HgShader.c" />
+    <ClCompile Include="LinkedList.c" />
     <ClCompile Include="MercuryWindow.cpp" />
     <ClCompile Include="oglDisplay.c" />
     <ClCompile Include="OglRenderPackets.c" />
     <ClCompile Include="oglShaders.c" />
     <ClCompile Include="Projectile.c" />
     <ClCompile Include="quaternion.c" />
+    <ClCompile Include="square.c" />
+    <ClCompile Include="str_utils.c" />
     <ClCompile Include="symbol_enumerator.c">
     </ClCompile>
     <ClCompile Include="triangle.c" />
@@ -183,6 +187,7 @@
   <ItemGroup>
     <ClInclude Include="Callback.h" />
     <ClInclude Include="cube.h" />
+    <ClInclude Include="FileWatch.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="Gravity.h" />
     <ClInclude Include="HgElement.h" />
@@ -197,11 +202,13 @@
     <ClInclude Include="include\glcorearb.h" />
     <ClInclude Include="include\glew.h" />
     <ClInclude Include="include\glext.h" />
+    <ClInclude Include="LinkedList.h" />
     <ClInclude Include="MercuryWindow.h" />
     <ClInclude Include="oglDisplay.h" />
     <ClInclude Include="oglShaders.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="quaternion.h" />
+    <ClInclude Include="str_utils.h" />
     <ClInclude Include="symbol_enumerator.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="vertex.h" />
