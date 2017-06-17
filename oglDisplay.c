@@ -120,3 +120,12 @@ void setBlendMode(BlendMode blendMode) {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	}
 }
+
+void* new_renderData_ogl() {
+	OGLRenderData* rd = calloc(1, sizeof(*rd));
+	rd->baseRender.renderFunc = ogl_render_renderData;
+	rd->baseRender.blendMode = BLEND_NORMAL;
+	rd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
+
+	return rd;
+}

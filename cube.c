@@ -69,9 +69,7 @@ static HgElement_vtable vtable = {
 };
 
 static void SetupRenderData() {
-	crd = calloc(1, sizeof(*crd));
-	crd->baseRender.renderFunc = ogl_render_renderData;
-	crd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
+	crd = new_RenderData();
 
 	vertices points;
 	points.points.array = cube_verts;

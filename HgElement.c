@@ -4,6 +4,8 @@
 
 extern HgElement_vtable HGELEMT_VTABLES[255] = { 0 };
 
+void* (*new_RenderData)() = NULL;
+
 vtable_index RegisterElementType(const char* c) {
 	static vtable_index ElementTypeCounter = 0;
 	printf("Registering %s, type %d \n", c, ElementTypeCounter);
@@ -39,3 +41,4 @@ void HgElement_destroy(HgElement* element) {
 	}
 }
 */
+

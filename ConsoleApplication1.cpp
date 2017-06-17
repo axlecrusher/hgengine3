@@ -292,6 +292,7 @@ int main()
 //	hgvbo_add_data_vc(&staticVbo, d.vertices, d.vertices, d.vertex_count);
 
 	_create_shader = HGShader_ogl_create;
+	new_RenderData = new_renderData_ogl;
 
 	if (stereo_view) {
 		setup_viewports(1280, 480);

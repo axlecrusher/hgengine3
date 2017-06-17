@@ -43,9 +43,7 @@ static HgElement_vtable vtable = {
 static OGLRenderData* trd = NULL;
 
 static void SetupRenderData() {
-	trd = calloc(1, sizeof(*trd));
-	trd->baseRender.renderFunc = ogl_render_renderData;
-	trd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
+	trd = new_RenderData();
 
 	vertices points;
 	points.points.array = vv;
