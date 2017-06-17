@@ -52,7 +52,7 @@ static void SetupRenderData() {
 	trd->hgVbo = &staticVbo;
 	trd->vertex_count = points.size;
 	trd->index_count = 3;
-	trd->indices = indices;
+	trd->indices.data = indices;
 	trd->vbo_offset = hgvbo_add_data_vc(&staticVbo, points.points.v, colors, trd->vertex_count);
 }
 

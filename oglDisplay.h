@@ -7,6 +7,7 @@
 #include <HgTypes.h>
 
 #include <HgVbo.h>
+#include <stdlib.h>
 
 #define U_VIEW 4
 #define U_PROJECTION 5
@@ -20,14 +21,16 @@
 #define L_UV		2
 #define L_COLOR		3
 
-extern viewport view_port[];
-extern HgCamera* _camera;
-extern float* _projection;
+typedef struct ArbitraryData {
+	void* data;
+	uint8_t owns_ptr;
+} ArbitraryData;
 
-typedef struct ogl_vbo {
-	GLuint* id;
-	uint8_t count;
-} ogl_vbo;
+inline void free_arbitrary(ArbitraryData* x) {
+	if (x->owns_ptr != 0 && x->data != NULL) free(x->data);
+	x->data = NULL;
+	x->owns_ptr = 0;
+}
 
 typedef struct OGLRenderData {
 	RenderData baseRender;
@@ -38,12 +41,14 @@ typedef struct OGLRenderData {
 
 	GLuint idx_id;
 	uint32_t index_count;
-	void* indices;
+
+	ArbitraryData indices;
 } OGLRenderData;
 
 GLuint hgOglVbo(vertices v);
 
-void ogl_destroy_renderData();
+//void destroy_render_data_ogl(struct RenderData* render_data);
+//void ogl_destroy_renderData();
 void setGlobalUniforms(const HgCamera* camera);
 void setLocalUniforms(const quaternion* rotation, const point* position, float scale);
 void hgViewport(uint8_t vp);

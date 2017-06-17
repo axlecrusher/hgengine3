@@ -81,9 +81,8 @@ static void model_render(RenderData* rd) {
 	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
 	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer16(d->indices, d->index_count);
-		free(d->indices);
-		d->indices = NULL;
+		d->idx_id = new_index_buffer16(d->indices.data, d->index_count);
+		free_arbitrary(&d->indices);
 	}
 
 	setBlendMode(rd->blendMode);
@@ -138,7 +137,8 @@ int8_t model_load(HgElement* element, const char* filename) {
 	free(mdl.vertices);
 
 //	mrd->index_count = mdl.index_count;
-	rd->indices = mdl.indices;
+	rd->indices.data = mdl.indices;
+	rd->indices.owns_ptr = 1;
 
 	CLEAR_FLAG(element, HGE_DESTROY);
 

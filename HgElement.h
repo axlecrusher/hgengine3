@@ -16,6 +16,10 @@ extern "C" {
 #define HGE_UPDATED	0x08
 #define HGE_DESTROY	0x10
 
+extern viewport view_port[];
+extern HgCamera* _camera;
+extern float* _projection;
+
 typedef enum BlendMode {
 	BLEND_NORMAL = 0,
 	BLEND_ADDITIVE

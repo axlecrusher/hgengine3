@@ -77,7 +77,8 @@ void setup_viewports(uint16_t width, uint16_t height) {
 void ogl_render_renderData(RenderData* rd) {
 	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer8(d->indices, d->index_count);
+		d->idx_id = new_index_buffer8(d->indices.data, d->index_count);
+		free_arbitrary(&d->indices);
 	}
 
 	setBlendMode(rd->blendMode);
@@ -112,7 +113,7 @@ void setBlendMode(BlendMode blendMode) {
 	if (blendMode == BLEND_NORMAL) {
 //		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	else if (blendMode == BLEND_ADDITIVE) {
 //		glDepthMask(GL_FALSE);
@@ -121,11 +122,18 @@ void setBlendMode(BlendMode blendMode) {
 	}
 }
 
+static void destroy_render_data_ogl(struct RenderData* rd) {
+	OGLRenderData* oglrd = (OGLRenderData*)rd;
+	free_arbitrary(&oglrd->indices);
+	if (oglrd->idx_id>0) glDeleteBuffers(1, &oglrd->idx_id);
+}
+
 void* new_renderData_ogl() {
 	OGLRenderData* rd = calloc(1, sizeof(*rd));
 	rd->baseRender.renderFunc = ogl_render_renderData;
 	rd->baseRender.blendMode = BLEND_NORMAL;
 	rd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
+	rd->baseRender.destroy = destroy_render_data_ogl;
 
 	return rd;
 }

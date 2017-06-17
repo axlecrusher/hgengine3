@@ -44,7 +44,7 @@ static OGLRenderData* trd = NULL;
 
 static void SetupRenderData() {
 	trd = new_RenderData();
-	trd->indices = indices;
+	trd->indices.data = indices;
 
 	vertices points;
 	points.points.array = vv;

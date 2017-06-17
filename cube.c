@@ -76,7 +76,7 @@ static void SetupRenderData() {
 	points.size = 8;
 
 	crd->index_count = 36;
-	crd->indices = indices;
+	crd->indices.data = indices;
 	crd->hgVbo = &staticVbo;
 	crd->vbo_offset = hgvbo_add_data_vc(&staticVbo, points.points.v, colors, 8);
 }
