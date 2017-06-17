@@ -41,23 +41,11 @@ static HgElement_vtable vtable = {
 //instanced render data
 static OGLRenderData* trd = NULL;
 
-static void render(RenderData* rd) {
-	//This can almost be generic, except for setup_ogl function call
-	OGLRenderData *d = (OGLRenderData*)rd;
-	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer8(indices, trd->index_count);
-	}
-
-	hgvbo_use(&staticVbo);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
-	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_BYTE, 0, d->vbo_offset);
-}
-
 static void SetupRenderData() {
 	trd = calloc(1, sizeof(*trd));
-	trd->baseRender.renderFunc = render;
+	trd->baseRender.renderFunc = ogl_render_renderData;
 	trd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
+	trd->indices = indices;
 
 	vertices points;
 	points.points.array = vv;

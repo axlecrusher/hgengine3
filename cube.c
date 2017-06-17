@@ -54,19 +54,6 @@ static uint8_t indices[] = {
 //instanced render data
 static OGLRenderData *crd = NULL;
 
-static void cube_render(RenderData* rd) {
-	//This can almost be generic, except for setup_ogl function call
-	OGLRenderData *d = (OGLRenderData*)rd;
-	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer8(indices, 36);
-	}
-
-	hgvbo_use(&staticVbo);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
-	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_BYTE, 0, d->vbo_offset);
-}
-
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 //	printf("cube\n");
 }
@@ -83,7 +70,7 @@ static HgElement_vtable vtable = {
 
 static void SetupRenderData() {
 	crd = calloc(1, sizeof(*crd));
-	crd->baseRender.renderFunc = cube_render;
+	crd->baseRender.renderFunc = ogl_render_renderData;
 	crd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
 
 	vertices points;
@@ -91,6 +78,7 @@ static void SetupRenderData() {
 	points.size = 8;
 
 	crd->index_count = 36;
+	crd->indices = indices;
 	crd->hgVbo = &staticVbo;
 	crd->vbo_offset = hgvbo_add_data_vc(&staticVbo, points.points.v, colors, 8);
 }
