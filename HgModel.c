@@ -77,18 +77,13 @@ static model_data LoadModel(const char* filename) {
 	return r;
 }
 
-typedef struct model_render_data {
-	OGLRenderData ogl_render_data;
-	uint16_t* indices;
-} model_render_data;
-
 static void model_render(RenderData* rd) {
-	//This can almost be generic, except for setup_ogl function call
-	model_render_data* mrd = (model_render_data*)rd;
-	OGLRenderData *d = &mrd->ogl_render_data;
+	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
+	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer16(mrd->indices, d->index_count);
-		free(mrd->indices);
+		d->idx_id = new_index_buffer16(d->indices, d->index_count);
+		free(d->indices);
+		d->indices = NULL;
 	}
 
 	setBlendMode(rd->blendMode);
@@ -99,8 +94,8 @@ static void model_render(RenderData* rd) {
 }
 
 static RenderData* init_render_data() {
-	model_render_data* rd = calloc(1,sizeof* rd);
-	rd->ogl_render_data.baseRender.renderFunc = model_render;
+	OGLRenderData* rd = new_RenderData();
+	rd->baseRender.renderFunc = model_render;
 	return (void*)rd;
 }
 
@@ -129,8 +124,7 @@ static void change_to_model(HgElement* element) {
 int8_t model_load(HgElement* element, const char* filename) {
 	change_to_model(element);
 
-	model_render_data* mrd = (model_render_data*)element->m_renderData;
-	OGLRenderData* rd = &mrd->ogl_render_data;
+	OGLRenderData* rd = (OGLRenderData*)element->m_renderData;
 
 	SET_FLAG(element, HGE_DESTROY); //clear when we make it to the end
 
@@ -144,7 +138,7 @@ int8_t model_load(HgElement* element, const char* filename) {
 	free(mdl.vertices);
 
 //	mrd->index_count = mdl.index_count;
-	mrd->indices = mdl.indices;
+	rd->indices = mdl.indices;
 
 	CLEAR_FLAG(element, HGE_DESTROY);
 
