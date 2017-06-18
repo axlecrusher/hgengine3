@@ -81,7 +81,6 @@ void StartWindowSystem() {
 	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &d);
 	printf("GL_MAX_VERTEX_UNIFORM_BLOCKS %d\n", d);
 
-	glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void BeginFrame() {
@@ -364,12 +363,15 @@ uint32_t i;
 			element->position.components.x = -10.0f + x;
 			element->position.components.z = -2.0f - z;
 			element->scale = 0.3f;
+			element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
 		}
 
 		scene_newElement(&scene, &element);
-		model_load(element, "invader1.hgmdl");
+		model_load(element, "test.hgmdl");
 		element->scale = 0.5f;
 		element->position.components.z = -4;
+//		element->position.components.y = 2;
+//		toQuaternion2(0, 90, 0, &element->rotation);
 		element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
 		//	model_data d = LoadModel("test.hgmdl");
 	}
