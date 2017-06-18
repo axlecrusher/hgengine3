@@ -82,7 +82,7 @@ void ogl_render_renderData(RenderData* rd) {
 	}
 
 	setBlendMode(rd->blendMode);
-	hgvbo_use(&staticVbo);
+	hgvbo_use(d->hgVbo);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
 	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_BYTE, 0, d->vbo_offset);
@@ -126,6 +126,7 @@ static void destroy_render_data_ogl(struct RenderData* rd) {
 	OGLRenderData* oglrd = (OGLRenderData*)rd;
 	free_arbitrary(&oglrd->indices);
 	if (oglrd->idx_id>0) glDeleteBuffers(1, &oglrd->idx_id);
+	if (rd->shader) HGShader_release(rd->shader);
 }
 
 void* new_renderData_ogl() {

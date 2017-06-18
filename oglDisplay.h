@@ -27,7 +27,8 @@ typedef struct ArbitraryData {
 } ArbitraryData;
 
 inline void free_arbitrary(ArbitraryData* x) {
-	if (x->owns_ptr != 0 && x->data != NULL) free(x->data);
+	if (x->owns_ptr == 0 || x->data == NULL) return;
+	free(x->data);
 	x->data = NULL;
 	x->owns_ptr = 0;
 }
