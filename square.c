@@ -34,7 +34,7 @@ static void destroy(struct HgElement* e) {
 }
 
 static HgElement_vtable vtable = {
-	.destroy = NULL,
+	.destroy = HgElement_destroy,
 	.updateFunc = NULL
 };
 
