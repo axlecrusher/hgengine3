@@ -29,13 +29,8 @@ static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 	//	printf("cube\n");
 }
 
-static void destroy(struct HgElement* e) {
-
-	//	printf("cube\n");
-}
-
 static HgElement_vtable vtable = {
-	.destroy = NULL,
+	.destroy = HgElement_destroy,
 	.updateFunc = NULL
 };
 
@@ -54,6 +49,8 @@ static void SetupRenderData() {
 	trd->index_count = 3;
 	trd->indices.data = indices;
 	trd->vbo_offset = hgvbo_add_data_vc(&staticVbo, points.points.v, colors, trd->vertex_count);
+
+	trd->baseRender.destroy = NULL; //render data is shared by all triangles so we don't really want to do anything
 }
 
 OGLRenderData* triangle_init_render_data() {
