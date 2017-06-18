@@ -363,7 +363,8 @@ uint32_t i;
 			element->position.components.x = -10.0f + x;
 			element->position.components.z = -2.0f - z;
 			element->scale = 0.3f;
-			element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
+//			element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
+			element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 		}
 
 		scene_newElement(&scene, &element);
@@ -372,7 +373,10 @@ uint32_t i;
 		element->position.components.z = -4;
 //		element->position.components.y = 2;
 //		toQuaternion2(0, 90, 0, &element->rotation);
-		element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
+//		element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
+		element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+		//	model_data d = LoadModel("test.hgmdl");
+
 		//	model_data d = LoadModel("test.hgmdl");
 	}
 	
