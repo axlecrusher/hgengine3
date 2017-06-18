@@ -102,14 +102,8 @@ static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 	//	printf("cube\n");
 }
 
-static void destroy(struct HgElement* e) {
-	free(e->m_renderData);
-	e->m_renderData = NULL;
-	//	printf("cube\n");
-}
-
 static HgElement_vtable vtable = {
-	.destroy = destroy
+	.destroy = HgElement_destroy,
 //	.updateFunc = updateClbk
 };
 

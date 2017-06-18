@@ -49,12 +49,12 @@ typedef struct HgElement{
 //	uint32_t parent;
 	point position; float scale; //16
 	quaternion rotation; //16
-	RenderData* m_renderData; //4
+	RenderData* m_renderData; //can be shared //4
 	void* extraData;
 } HgElement;
 
 void init_hgelement(HgElement* element);
-//void HgElement_destroy(HgElement* element);
+void HgElement_destroy(HgElement* element);
 
 //inline uint16_t check_flag(HgElement* element, uint8_t x) { return element->flags & x; }
 //inline void set_flag(HgElement* element, uint16_t f) { element->flags |= f; }
