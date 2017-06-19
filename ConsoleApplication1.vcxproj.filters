@@ -96,6 +96,9 @@
     <ClCompile Include="str_utils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VoxelGrid.c">
+      <Filter>Shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MercuryWindow.h">
@@ -181,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="str_utils.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VoxelGrid.h">
+      <Filter>Shapes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

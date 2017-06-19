@@ -20,7 +20,7 @@ static uint8_t VTABLE_INDEX;
 
 //binary dump from a hgmdl model, VNU format.
 //probably breaks on big endian
-static uint32_t raw_data[] = {
+uint32_t raw_cube_data[] = {
 	0x3F000000,0xBF000000,0x3F000000,0x0,0xBF800000,0x0,0x7FFF7FFF,0xBF000000,0xBF000000,0xBF000000,0x0,0xBF800000,0x0,0x7FFF7FFF,
 	0x3F000000,0xBF000000,0xBF000000,0x0,0xBF800000,0x0,0x7FFF7FFF,0xBF000000,0x3F000000,0xBF000000,0x0,0x3F800000,0x0,0x7FFF7FFF,
 	0x3F000000,0x3F000000,0x3F000000,0x0,0x3F800000,0x0,0x7FFF7FFF,0x3F000000,0x3F000000,0xBF000000,0x0,0x3F800000,0x0,0x7FFF7FFF,
@@ -70,7 +70,7 @@ static void SetupRenderData() {
 
 	crd->vertex_count = 36;
 	crd->hgVbo = &staticVboVNU;
-	crd->vbo_offset = hgvbo_add_data_vnu_raw(crd->hgVbo, (void*)raw_data, crd->vertex_count);
+	crd->vbo_offset = hgvbo_add_data_vnu_raw(crd->hgVbo, (void*)raw_cube_data, crd->vertex_count);
 
 	crd->baseRender.renderFunc = cube_render;
 }
