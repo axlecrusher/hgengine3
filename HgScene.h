@@ -2,6 +2,13 @@
 
 #include <HgElement.h>
 
+/* HgScene could be reworked into a linked list (or array of pointers to list items) with each
+list item containing 512 elements and a used map. We could still index into the linked list
+by using the first 9 least significant bits to represent 512 elements. The last 7 MSB could
+index into the array of list items. This would allow both indexing and valid HgElement
+pointers for the duration of program execution.
+*/
+
 typedef struct HgScene {
 	HgElement* elements;
 	uint8_t* used;
