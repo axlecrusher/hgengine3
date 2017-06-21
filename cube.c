@@ -45,14 +45,21 @@ uint32_t raw_cube_data[] = {
 
 //instanced render data
 static OGLRenderData *crd = NULL;
-
+/*
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 //	printf("cube\n");
 }
+*/
+static void destroy(HgElement* e) {
+//	if (e->m_renderData && e->m_renderData->destroy) e->m_renderData->destroy(e->m_renderData);
+//	free(e->m_renderData);
+	e->m_renderData = NULL;
+}
 
 static HgElement_vtable vtable = {
-	.destroy = HgElement_destroy,
-	.updateFunc = updateClbk
+	.destroy = destroy,
+//	.updateFunc = updateClbk
+	.updateFunc = NULL
 };
 
 //Draw vertices directly. We aren't using indices here,

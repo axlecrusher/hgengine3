@@ -30,7 +30,8 @@ static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 static void destroy(struct HgElement* e) {
 	if (e->extraData) free(e->extraData);
 	e->extraData = NULL;
-	HgElement_destroy(e);
+	e->m_renderData = NULL;
+//	HgElement_destroy(e);
 	//	printf("destroy projectile\n");
 	//	printf("cube\n");
 }

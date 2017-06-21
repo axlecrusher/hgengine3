@@ -26,11 +26,13 @@ void init_hgelement(HgElement* element) {
 	quaternion_init(&element->rotation);
 }
 
+/*
 void HgElement_destroy(HgElement* e) {
-	if (e->m_renderData->destroy) e->m_renderData->destroy(e->m_renderData);
+	if (e->m_renderData && e->m_renderData->destroy) e->m_renderData->destroy(e->m_renderData);
+	free(e->m_renderData);
 	e->m_renderData = NULL;
 }
-
+*/
 /*
 void HgElement_destroy(HgElement* element) {
 	VCALL_IDX(element, destroy);

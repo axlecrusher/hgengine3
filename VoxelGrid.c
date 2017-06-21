@@ -64,8 +64,12 @@ void voxelGrid_create(HgElement* element) {
 	change_to_voxelGrid(element);
 }
 
+static void destroy(HgElement* e) {
+	e->m_renderData = NULL;
+}
+
 static HgElement_vtable vtable = {
-	.destroy = HgElement_destroy,
+	.destroy = destroy,
 	.updateFunc = NULL
 };
 

@@ -40,7 +40,12 @@ typedef struct HgElement_vtable {
 extern HgElement_vtable HGELEMT_VTABLES[255];
 typedef uint8_t vtable_index;
 
-//try to avoid pointers, especially on 64 bit
+/* NOTES: Try to avoid pointers, especially on 64 bit.
+The entity that allocates memory for render data should
+be responsible for destroying it. This is more clear than
+having HgElement free render data by default and then
+handling special cases.
+*/
 typedef struct HgElement{
 //	HgElement_vtable* vptr;
 	vtable_index vptr_idx; //1
@@ -49,12 +54,12 @@ typedef struct HgElement{
 //	uint32_t parent;
 	point position; float scale; //16
 	quaternion rotation; //16
-	RenderData* m_renderData; //can be shared //4
-	void* extraData;
+	RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
+	void* extraData; //whoever whoever populates this must clean it up.
 } HgElement;
 
 void init_hgelement(HgElement* element);
-void HgElement_destroy(HgElement* element);
+//void HgElement_destroy(HgElement* element);
 
 //inline uint16_t check_flag(HgElement* element, uint8_t x) { return element->flags & x; }
 //inline void set_flag(HgElement* element, uint16_t f) { element->flags |= f; }
@@ -71,7 +76,7 @@ extern void* (*new_RenderData)();
 //#define VCALL(e,function,...) if (e && e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
 #define VCALL(e,function,...) if (e->vptr->function) e->vptr->function(e,__VA_ARGS__)
 #define VCALL_F(e,function,...) e->vptr->function(e,__VA_ARGS__)
-
+#define SCALL(x,function,...) x->function(x,__VA_ARGS__)
 #define VCALL_IDX(e,function,...) if (HGELEMT_VTABLES[e->vptr_idx].function) HGELEMT_VTABLES[e->vptr_idx].function(e,__VA_ARGS__)
 
 

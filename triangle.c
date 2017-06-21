@@ -29,8 +29,12 @@ static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 	//	printf("cube\n");
 }
 
+static void destroy(HgElement* e) {
+	e->m_renderData = NULL;
+}
+
 static HgElement_vtable vtable = {
-	.destroy = HgElement_destroy,
+	.destroy = destroy,
 	.updateFunc = NULL
 };
 
