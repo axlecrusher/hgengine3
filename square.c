@@ -26,15 +26,16 @@ static color colors[] = {
 static uint8_t indices[] = {
 	0,1,2,2,3,0
 };
-
+/*
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 }
-
+*/
 static void destroy(struct HgElement* e) {
+	e->m_renderData = NULL;
 }
 
 static HgElement_vtable vtable = {
-	.destroy = HgElement_destroy,
+	.destroy = destroy,
 	.updateFunc = NULL
 };
 
