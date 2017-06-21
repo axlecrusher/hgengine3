@@ -28,6 +28,7 @@ void scene_init(HgScene* scene);
 //void scene_add_element(HgScene* scene, HgElement* element);
 
 
+
 /*	Do not store the pointer for long periods of time. Creating new elements can cause a resize, invalidating pointers.
 	Store the returned index as an alternative. */
 uint32_t scene_newElement(HgScene* scene, HgElement** element);
@@ -36,6 +37,8 @@ void scene_clearUpdate(HgScene* scene);
 
 /*	Returns greater than 0 if the index has a valid element */
 uint8_t is_used(HgScene* s, uint32_t index);
+
+inline HgElement* get_element(HgScene* s, uint32_t index) { return s->elements + index; }
 
 inline void scene_init_iterator(HgScene_iterator* i, HgScene* scene) { i->_current = 0; i->s = scene; }
 HgElement* scene_next_element(HgScene_iterator* i);

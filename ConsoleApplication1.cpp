@@ -183,7 +183,7 @@ void submit_for_render_threaded(uint8_t viewport_idx, HgCamera* camera, HgScene 
 		hgRenderQueue_push(create_render_packet(NULL, 0, NULL, NULL, 0));
 		return;
 	}
-	HgElement* e = s->elements + idx;
+	HgElement* e = get_element(s,idx);
 	hgRenderQueue_push(create_render_packet(e, viewport_idx, camera + 0, s, idx)); //submit to renderer
 }
 
@@ -195,7 +195,7 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgScene *s
 //	printf("serial\n");
 	hgViewport(viewport_idx);
 
-	HgElement* e = s->elements + idx;
+	HgElement* e = get_element(s, idx);
 	RenderData* rd = e->m_renderData;
 	if (rd->shader) VCALL(rd->shader, enable);
 
@@ -208,61 +208,23 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgScene *s
 	rd->renderFunc(rd);
 }
 
-void vertex_print(const vertex* v) {
-	printf("%f %f %f\n", v->array[0], v->array[1], v->array[2]);
+void quick_render(uint8_t viewport_idx, HgCamera* camera, HgScene *s, uint32_t idx) {
+	HgElement* e = get_element(s, idx);
+	RenderData* rd = e->m_renderData;
+//	if (rd->shader) VCALL(rd->shader, enable);
+	hgViewport(viewport_idx);
+
+	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
+	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
+
+	setGlobalUniforms(camera);
+//	setLocalUniforms(&e->rotation, &e->position, e->scale);
+
+	rd->renderFunc(rd);
 }
 
-void generateVoxelVBO() {
-	static float cube_verts[] = {
-		0.5f, 0.5, -0.5,	//4
-		0.5f, -0.5, -0.5,	//5
-		0.5f, -0.5, 0.5,	//6
-		0.5f, 0.5, 0.5		//7
-	};
-
-	//rgba
-	static color colors[] = {
-		255, 0, 0, 255, //0
-		0, 255, 0, 255, //1
-		0, 0, 255, 255, //2
-		255, 0, 0, 255, //3
-		0, 255, 0, 255, //4
-		0, 0, 255, 255, //5
-		255, 0, 0, 255, //6
-		0, 255, 0, 255 //7
-	};
-
-
-	static uint8_t indices[] = {
-		2,1,0,0,3,2, //front
-		5,6,7,7,4,5, //back
-		6,5,1,1,2,6, //bottom
-		3,0,4,4,7,3, //top
-		6,2,3,3,7,6, //R side
-		1,5,4,4,0,1  //L side
-	};
-
-
-	vertex* vertices = (vertex*)calloc(11, sizeof(cube_verts));
-	vertex* v = vertices;
-	for (uint32_t i = 0; i < 11; ++i) {
-		memcpy(v, cube_verts, sizeof(cube_verts));
-		v+=4;
-	}
-
-	v = (vertex*)vertices;
-	for (uint32_t i = 0; i < 11; ++i) {
-		v[0].components.x += (1 * i);
-		v[1].components.x += (1 * i);
-		v[2].components.x += (1 * i);
-		v[3].components.x += (1 * i);
-		vertex_print(v);
-		vertex_print(v + 1);
-		vertex_print(v + 2);
-		vertex_print(v + 3);
-		v += 4;
-	}
-
+void vertex_print(const vertex* v) {
+	printf("%f %f %f\n", v->array[0], v->array[1], v->array[2]);
 }
 
 int SymnumCheck(const char * path, const char * name, void * location, long size)
@@ -503,20 +465,23 @@ uint32_t i;
 //		printf("dtime: %d\n", ddtime);
 
 		{
-			HgElement* element = scene.elements + tris[0];
+			HgElement* element = get_element(&scene, tris[0]);
 			//		y,x,z
-			toQuaternion2((dtime % 1000) / 2.7777777777777777777777777777778, 0, 0, &element->rotation);
+			toQuaternion2((dtime % 10000) / 27.777777777777777777777777777778, 0, 0, &element->rotation);
 
 			for (i = 0; i < ANI_TRIS; i++) {
-				HgElement* e = scene.elements + tris[i];
+				HgElement* e = get_element(&scene, tris[i]);
 				memcpy(&e->rotation, &element->rotation, sizeof element->rotation);
 			}
 		}
 
+		camera[1] = camera[0];
+		camera[1].position.components.x += EYE_DISTANCE;
+
 		for (uint32_t i=0; i<scene._size; ++i) {
 //			if (IS_USED(&scene, i) == 0) continue;
 			if(is_used(&scene, i) == 0) continue;
-			HgElement* e = scene.elements + i;
+			HgElement* e = get_element(&scene,i);
 
 			if (ddtime > 0) {
 				VCALL_IDX(e, updateFunc, ddtime);
@@ -527,15 +492,16 @@ uint32_t i;
 				scene_delete_element(&scene, i);
 				continue;
 			}
-			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) submit_for_render(stereo_view, camera + 0, &scene, i);
+			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) {
+				submit_for_render(stereo_view, camera + 0, &scene, i);
+//				quick_render(2, camera + 1, &scene, i);
+			}
 		}
 
 		if (stereo_view && do_render > 0) {
-			camera[1] = camera[0];
-			camera[1].position.components.x += EYE_DISTANCE;
 			for (uint32_t i = 0; i < scene._size; ++i) {
 				if (is_used(&scene, i) == 0) continue;
-				HgElement* e = scene.elements + i;
+				HgElement* e = get_element(&scene, i);
 				if (CHECK_FLAG(e, HGE_HIDDEN) == 0) submit_for_render(2, camera + 1, &scene, i);
 			}
 		}

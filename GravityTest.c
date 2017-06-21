@@ -22,7 +22,8 @@ void gravity_update(GravityField* gf, uint32_t dTime) {
 //		float d = (dTime / 1000.0) * gf->velocity[i];
 //		printf("gravity update %f %f\n", gf->velocity[i],d);
 
-		gf->scene->elements[gf->indices[i]].position = vector3_add((vector3*)&gf->scene->elements[gf->indices[i]].position, &d);
+		HgElement* e = get_element(gf->scene, gf->indices[i]);
+		e->position = vector3_add((vector3*)&e->position, &d);
 
 
 //		gf->scene->elements[gf->indices[i]].position.components.y -= d;
