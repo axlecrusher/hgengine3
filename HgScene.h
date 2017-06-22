@@ -49,7 +49,8 @@ void scene_clearUpdate(HgScene* scene);
 uint8_t is_used(HgScene* s, uint32_t index);
 
 inline void decode_index(uint32_t index, uint16_t* h, uint16_t* l) { *l = index & 0x1FF; *h = (index >> 9) & 0x7F; }
-inline HgElement* get_element(HgScene* s, uint32_t index) { uint16_t h, l; decode_index(index, &h, &l); return &s->chunks[h]->elements[l]; }
+inline HgElement* get_element(HgScene* s, uint32_t index) { return &s->chunks[(index >> 9) & 0x7F]->elements[index & 0x1FF]; }
+//#define get_element(s,index) (&(s)->chunks[(index >> 9) & 0x7F]->elements[index & 0x1FF])
 
 inline void scene_init_iterator(HgScene_iterator* i, HgScene* scene) { i->_current = 0; i->s = scene; }
 HgElement* scene_next_element(HgScene_iterator* i);
