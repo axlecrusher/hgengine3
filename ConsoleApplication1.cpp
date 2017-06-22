@@ -244,7 +244,7 @@ int main()
 	EnumerateSymbols(SymnumCheck);
 
 //	MercuryWindow* w = MercuryWindow::MakeWindow();
-	generateVoxelVBO();
+//	generateVoxelVBO();
 
 	hgvbo_init(&staticVbo, VBO_VC);
 	hgvbo_init(&staticVboVNU, VBO_VNU);
@@ -291,7 +291,8 @@ int main()
 	printf("\n");
 
 	scene_init(&scene);
-	uint32_t tris[ANI_TRIS];
+//	uint32_t tris[ANI_TRIS];
+	HgElement* tris[ANI_TRIS];
 
 	GravityField gravity = { 0 };
 	allocate_space(&gravity, ANI_TRIS);
@@ -315,8 +316,9 @@ uint32_t i;
 
 		
 		for (i = 0; i < ANI_TRIS; i++) {
-			tris[i] = scene_newElement(&scene, &element);
-			gravity.indices[i] = tris[i];
+			scene_newElement(&scene, &element);
+			tris[i] = element;
+//			gravity.indices[i] = tris[i];
 			//		shape_create_triangle(element);
 			shape_create_cube(element);
 			float x = (i % 20)*1.1f;
@@ -465,12 +467,12 @@ uint32_t i;
 //		printf("dtime: %d\n", ddtime);
 
 		{
-			HgElement* element = get_element(&scene, tris[0]);
+			HgElement* element = tris[0];
 			//		y,x,z
 			toQuaternion2((dtime % 10000) / 27.777777777777777777777777777778, 0, 0, &element->rotation);
 
 			for (i = 0; i < ANI_TRIS; i++) {
-				HgElement* e = get_element(&scene, tris[i]);
+				HgElement* e = tris[i];
 				memcpy(&e->rotation, &element->rotation, sizeof element->rotation);
 			}
 		}
