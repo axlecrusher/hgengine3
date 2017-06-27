@@ -24,9 +24,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ConsoleApplication1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MercuryWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
