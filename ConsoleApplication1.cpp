@@ -176,26 +176,25 @@ void fire(HgScene* scene) {
 	element->position = camera->position;
 }
 
-void(*submit_for_render)(uint8_t viewport_idx, HgCamera* camera, HgScene *s, uint32_t idx);
+void(*submit_for_render)(uint8_t viewport_idx, HgCamera* camera, HgElement* e);
 
 void submit_for_render_threaded(uint8_t viewport_idx, HgCamera* camera, HgScene *s, uint32_t idx) {
 	if (s == NULL) {
 		hgRenderQueue_push(create_render_packet(NULL, 0, NULL, NULL, 0));
 		return;
 	}
-	HgElement* e = get_element(s,idx);
+	HgElement* e = get_element(s, idx);
 	hgRenderQueue_push(create_render_packet(e, viewport_idx, camera + 0, s, idx)); //submit to renderer
 }
 
-void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgScene *s, uint32_t idx) {
-	if (s == NULL) {
+void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
+	if (e == NULL) {
 		window->SwapBuffers();
 		return;
 	}
 //	printf("serial\n");
 	hgViewport(viewport_idx);
 
-	HgElement* e = get_element(s, idx);
 	RenderData* rd = e->m_renderData;
 	if (rd->shader) VCALL(rd->shader, enable);
 
@@ -208,8 +207,7 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgScene *s
 	rd->renderFunc(rd);
 }
 
-void quick_render(uint8_t viewport_idx, HgCamera* camera, HgScene *s, uint32_t idx) {
-	HgElement* e = get_element(s, idx);
+void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
 	RenderData* rd = e->m_renderData;
 //	if (rd->shader) VCALL(rd->shader, enable);
 	hgViewport(viewport_idx);
@@ -495,7 +493,7 @@ uint32_t i;
 				continue;
 			}
 			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) {
-				submit_for_render(stereo_view, camera + 0, &scene, i);
+				submit_for_render(stereo_view, camera + 0, e);
 //				quick_render(2, camera + 1, &scene, i);
 			}
 		}
@@ -504,7 +502,7 @@ uint32_t i;
 			for (uint32_t i = 0; i < scene._size; ++i) {
 				if (is_used(&scene, i) == 0) continue;
 				HgElement* e = get_element(&scene, i);
-				if (CHECK_FLAG(e, HGE_HIDDEN) == 0) submit_for_render(2, camera + 1, &scene, i);
+				if (CHECK_FLAG(e, HGE_HIDDEN) == 0) submit_for_render(2, camera + 1, e);
 			}
 		}
 
@@ -513,7 +511,7 @@ uint32_t i;
 		InterlockedAdd(&itrctr,1);
 
 
-		if ((do_render > 0)) submit_for_render(2, camera + 1, NULL, 0);
+		if ((do_render > 0)) submit_for_render(2, camera + 1, NULL);
 //			hgRenderQueue_push(create_render_packet(NULL, 2, camera + 1, NULL, 0)); //null element to indicate end of frame
 
 		do_render = 0;

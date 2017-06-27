@@ -9,9 +9,11 @@ index into the array of list items. This would allow both indexing and valid HgE
 pointers for the duration of program execution.
 */
 
+#define SCENE_CHUNK_SIZE		512
+
 typedef struct SceneChunk {
-	HgElement elements[512];
-	uint8_t used[512/8];
+	HgElement elements[SCENE_CHUNK_SIZE];
+	uint8_t used[SCENE_CHUNK_SIZE / 8];
 } SceneChunk;
 
 typedef struct HgScene {
@@ -48,7 +50,6 @@ void scene_clearUpdate(HgScene* scene);
 /*	Returns greater than 0 if the index has a valid element */
 uint8_t is_used(HgScene* s, uint32_t index);
 
-inline void decode_index(uint32_t index, uint16_t* h, uint16_t* l) { *l = index & 0x1FF; *h = (index >> 9) & 0x7F; }
 inline HgElement* get_element(HgScene* s, uint32_t index) { return &s->chunks[(index >> 9) & 0x7F]->elements[index & 0x1FF]; }
 //#define get_element(s,index) (&(s)->chunks[(index >> 9) & 0x7F]->elements[index & 0x1FF])
 
