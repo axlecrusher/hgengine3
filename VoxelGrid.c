@@ -12,11 +12,12 @@ static void generateVoxelVBO() {
 	vbo_layout_vnu* cube_verts = (vbo_layout_vnu*)raw_cube_data;
 	vbo_layout_vnu* vertices = (vbo_layout_vnu*)malloc(36 * 100 * sizeof(*vertices));
 	uint16_t vert_counter = 0;
-	for (uint8_t i = 0; i < 100; i++) {
+	for (uint16_t i = 0; i < 100; i++) {
 		for (uint8_t x = 0; x < 36; ++x) {
 			vbo_layout_vnu vert = cube_verts[x];
 			vert.v.components.x += i % 10;
-			vert.v.components.y += i / 10;
+			vert.v.components.y += (i / 10)%10;
+//			vert.v.components.z += i / 100;
 			vertices[vert_counter++] = vert;
 		}
 	}

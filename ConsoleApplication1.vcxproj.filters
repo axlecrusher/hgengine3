@@ -116,9 +116,6 @@
     <ClInclude Include="quaternion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HgScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -184,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="VoxelGrid.h">
       <Filter>Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="HgScene.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

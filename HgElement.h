@@ -50,6 +50,7 @@ typedef struct HgElement{
 //	HgElement_vtable* vptr;
 	vtable_index vptr_idx; //1
 	uint8_t flags; //1
+	uint16_t padding;
 //	uint32_t index;
 //	uint32_t parent;
 	point position; float scale; //16
