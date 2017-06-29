@@ -20,13 +20,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ConsoleApplication1\include\glcorearb.h">
+    <ClInclude Include="..\Mercury3\include\glcorearb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\ConsoleApplication1\include\glew.h">
+    <ClInclude Include="..\Mercury3\include\glew.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\ConsoleApplication1\include\glext.h">
+    <ClInclude Include="..\Mercury3\include\glext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

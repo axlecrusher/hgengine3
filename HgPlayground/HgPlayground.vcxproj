@@ -152,14 +152,14 @@
     <ClCompile Include="HgPlayground.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ConsoleApplication1\include\glcorearb.h" />
-    <ClInclude Include="..\ConsoleApplication1\include\glew.h" />
-    <ClInclude Include="..\ConsoleApplication1\include\glext.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Mercury3\Mercury3.vcxproj">
       <Project>{3e23a8b1-93aa-4b29-9ba7-c76b1918a025}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Mercury3\include\glcorearb.h" />
+    <ClInclude Include="..\Mercury3\include\glew.h" />
+    <ClInclude Include="..\Mercury3\include\glext.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
