@@ -3,8 +3,11 @@
 #include <stdio.h>
 
 #include <string.h>
+#include <assert.h>
 
-extern char HGELEMT_TYPE_NAMES[255][16] = { 0 };
+#define MAX_ELEMENT_TYPE_LEN 16
+
+extern char HGELEMT_TYPE_NAMES[255][MAX_ELEMENT_TYPE_LEN] = { 0 };
 extern HgElement_vtable HGELEMT_VTABLES[255] = { 0 };
 
 void* (*new_RenderData)() = NULL;
@@ -12,7 +15,7 @@ void* (*new_RenderData)() = NULL;
 vtable_index RegisterElementType(const char* c) {
 	static vtable_index ElementTypeCounter = 0;
 	printf("Registering %s, type %d \n", c, ElementTypeCounter);
-	strcpy(HGELEMT_TYPE_NAMES[ElementTypeCounter], c);
+	strncpy(HGELEMT_TYPE_NAMES[ElementTypeCounter], c, MAX_ELEMENT_TYPE_LEN);
 	return ElementTypeCounter++;
 }
 
@@ -32,12 +35,14 @@ void init_hgelement(HgElement* element) {
 
 void create_element(char* type, HgElement* e) {
 	for (uint16_t i = 0; i < 255; ++i) {
-		if (strcmp(type, HGELEMT_TYPE_NAMES[i]) == 0) {
+		if (strncmp(type, HGELEMT_TYPE_NAMES[i], MAX_ELEMENT_TYPE_LEN) == 0) {
 			e->vptr_idx = i;
 			VCALL_IDX(e, create);
 			return;
 		}
 	}
+	fprintf(stderr, "Unable to find element type \"%s\"\n", type);
+	assert(type==0);
 }
 
 /*

@@ -61,7 +61,7 @@ static void change_to_square(HgElement* element) {
 	//create an instance of the render data for all triangles to share
 	element->m_renderData = (RenderData*)init_render_data();
 }
-
+/*
 void shape_create_square(HgElement* element) {
 	element->position.components.x = 0.0f;
 	element->position.components.y = 0.0f;
@@ -74,9 +74,9 @@ void shape_create_square(HgElement* element) {
 
 	change_to_square(element);
 }
-
+*/
 static HgElement_vtable vtable = {
-	.create = shape_create_square,
+	.create = change_to_square,
 	.destroy = destroy,
 	.updateFunc = NULL
 };

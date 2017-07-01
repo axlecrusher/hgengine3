@@ -159,7 +159,7 @@ void fire(HgScene* scene) {
 	HgElement* element = NULL;
 
 	scene_newElement(scene, &element);
-	projectile_create(element);
+	create_element("basic_projectile", element);
 
 	vector3 v = { 0 };
 	v.components.z = -1; //into screen from camera seems to be -1

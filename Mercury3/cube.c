@@ -83,7 +83,7 @@ void change_to_cube(HgElement* element) {
 
 	element->m_renderData = (RenderData*)crd;
 }
-
+/*
 void shape_create_cube(HgElement* element) {
 	element->position.components.x = 0.0f;
 	element->position.components.y = 0.0f;
@@ -95,9 +95,9 @@ void shape_create_cube(HgElement* element) {
 
 	change_to_cube(element);
 }
-
+*/
 static HgElement_vtable vtable = {
-	.create = shape_create_cube,
+	.create = change_to_cube,
 	.destroy = destroy,
 	//	.updateFunc = updateClbk
 	.updateFunc = NULL

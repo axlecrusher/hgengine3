@@ -36,14 +36,15 @@ static void destroy(struct HgElement* e) {
 	//	printf("cube\n");
 }
 
-void change_to_projectile(HgElement* element) {
+static void change_to_projectile(HgElement* element) {
 	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
 
 	//create an instance of the render data for all triangles to share
 	element->m_renderData = (RenderData*)triangle_init_render_data();
+	element->extraData = calloc(1, sizeof(ProjectileData));
 }
-
+/*
 void projectile_create(HgElement* element) {
 	element->position.components.x = 0.0f;
 	element->position.components.y = 0.0f;
@@ -54,12 +55,12 @@ void projectile_create(HgElement* element) {
 
 	element->scale = 1;
 
-	element->extraData = calloc(1,sizeof(ProjectileData));
 	change_to_projectile(element);
 }
+*/
 
 static HgElement_vtable vtable = {
-	.create = projectile_create,
+	.create = change_to_projectile,
 	.destroy = destroy,
 	.updateFunc = updateClbk
 };

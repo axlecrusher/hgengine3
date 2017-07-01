@@ -38,7 +38,6 @@ typedef struct HgElement_vtable {
 	void(*updateFunc)(struct HgElement* e, uint32_t tdelta);
 } HgElement_vtable;
 
-extern char HGELEMT_TYPE_NAMES[255][16];
 extern HgElement_vtable HGELEMT_VTABLES[255];
 
 typedef uint8_t vtable_index;
