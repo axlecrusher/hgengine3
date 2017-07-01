@@ -1,7 +1,7 @@
 // ConsoleApplication1.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
+//#include "stdafx.h"
 
 #include <Win32Window.h>
 //#define GL_GLEXT_PROTOTYPES
@@ -18,9 +18,6 @@ extern "C" {
 #include <shapes.h>
 #include <oglDisplay.h>
 
-#include <triangle.h>
-#include <cube.h>
-
 #include <oglShaders.h>
 #include <HgMath.h>
 #include <HgTypes.h>
@@ -35,8 +32,6 @@ extern "C" {
 
 #include <symbol_enumerator.h>
 #include <FileWatch.h>
-
-#include <VoxelGrid.h>
 }
 
 
@@ -303,13 +298,13 @@ int main()
 		HgElement* element = NULL;
 
 		scene_newElement(&scene, &element);
-		shape_create_triangle(element);
+		create_element("triangle", element);
 		element->position.components.x = 1.5f;
 		element->position.components.z = -1.0f;
 		//	toQuaternion2(0, 0, 90, &element->rotation);
 
 		scene_newElement(&scene, &element);
-		shape_create_triangle(element);
+		create_element("triangle", element);
 		element->position.components.x = -0.0f;
 		element->position.components.z = -2.0f;
 		//	toQuaternion2(45,0,0,&element->rotation);
@@ -320,7 +315,7 @@ int main()
 			tris[i] = element;
 			//			gravity.indices[i] = tris[i];
 			//		shape_create_triangle(element);
-			shape_create_cube(element);
+			create_element("cube", element);
 			float x = (i % 20)*1.1f;
 			float z = (i / 20)*1.1f;
 			element->position.components.y = 5.0f;
@@ -342,14 +337,14 @@ int main()
 		//	model_data d = LoadModel("test.hgmdl");
 
 		scene_newElement(&scene, &element);
-		voxelGrid_create(element);
+		create_element("voxelGrid", element);
 		//		element->scale = 100.0f;
 		element->position.components.z = -10;
 		//		toQuaternion2(0, -90, 0, &element->rotation);
 		element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 
 		scene_newElement(&scene, &element);
-		shape_create_square(element);
+		create_element("square", element);
 		element->scale = 100.0f;
 		element->position.components.z = -4;
 		toQuaternion2(0, -90, 0, &element->rotation);

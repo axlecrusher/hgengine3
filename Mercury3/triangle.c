@@ -57,11 +57,11 @@ OGLRenderData* triangle_init_render_data() {
 	return trd;
 }
 
-void change_to_triangle(HgElement* element) {
+static void change_to_triangle(HgElement* element) {
 	//create an instance of the render data for all triangles to share
 	element->m_renderData = (RenderData*)triangle_init_render_data();
 }
-
+/*
 void shape_create_triangle(HgElement* element) {
 	element->position.components.x = 0.0f;
 	element->position.components.y = 0.0f;
@@ -74,10 +74,10 @@ void shape_create_triangle(HgElement* element) {
 
 	change_to_triangle(element);
 }
-
+*/
 
 static HgElement_vtable vtable = {
-	.create = shape_create_triangle,
+	.create = change_to_triangle,
 	.destroy = destroy,
 	.updateFunc = NULL
 };

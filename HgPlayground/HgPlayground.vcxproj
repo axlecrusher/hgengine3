@@ -113,7 +113,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>opengl32.lib;Dbghelp.lib;..\$(Platform)\$(Configuration)\Mercury3.lib;%(AdditionalDependencies);lib/glew32.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Dbghelp.lib;%(AdditionalDependencies);lib/glew32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -127,7 +127,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>opengl32.lib;Dbghelp.lib;..\$(Platform)\$(Configuration)\Mercury3.lib;%(AdditionalDependencies);lib/glew32.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Dbghelp.lib;%(AdditionalDependencies);lib/glew32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
