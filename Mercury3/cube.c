@@ -16,7 +16,7 @@
 
 //TestRegistration("test");
 
-static uint8_t VTABLE_INDEX;
+static vtable_index VTABLE_INDEX;
 
 //binary dump from a hgmdl model, VNU format.
 //probably breaks on big endian
@@ -55,12 +55,6 @@ static void destroy(HgElement* e) {
 //	free(e->m_renderData);
 	e->m_renderData = NULL;
 }
-
-static HgElement_vtable vtable = {
-	.destroy = destroy,
-//	.updateFunc = updateClbk
-	.updateFunc = NULL
-};
 
 //Draw vertices directly. We aren't using indices here,
 static void cube_render(RenderData* rd) {
@@ -102,4 +96,11 @@ void shape_create_cube(HgElement* element) {
 	change_to_cube(element);
 }
 
-REGISTER_LINKTIME(cube_thing);
+static HgElement_vtable vtable = {
+	.create = shape_create_cube,
+	.destroy = destroy,
+	//	.updateFunc = updateClbk
+	.updateFunc = NULL
+};
+
+REGISTER_LINKTIME(cube)

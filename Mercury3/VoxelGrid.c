@@ -2,7 +2,7 @@
 #include <cube.h>
 #include <HgVbo.h>
 
-static uint8_t VTABLE_INDEX;
+static vtable_index VTABLE_INDEX;
 
 //instanced render data
 static OGLRenderData *crd = NULL;
@@ -70,6 +70,7 @@ static void destroy(HgElement* e) {
 }
 
 static HgElement_vtable vtable = {
+	.create = voxelGrid_create,
 	.destroy = destroy,
 	.updateFunc = NULL
 };

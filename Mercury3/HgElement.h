@@ -33,11 +33,14 @@ typedef struct RenderData {
 } RenderData;
 
 typedef struct HgElement_vtable {
+	void(*create)(struct HgElement* e);
 	void(*destroy)(struct HgElement* e);
 	void(*updateFunc)(struct HgElement* e, uint32_t tdelta);
 } HgElement_vtable;
 
+extern char HGELEMT_TYPE_NAMES[255][16];
 extern HgElement_vtable HGELEMT_VTABLES[255];
+
 typedef uint8_t vtable_index;
 
 /* NOTES: Try to avoid pointers, especially on 64 bit.
@@ -83,13 +86,15 @@ extern void* (*new_RenderData)();
 
 vtable_index RegisterElementType(const char* c);
 
+void create_element(char* type, HgElement* e);
+
 
 #define REGISTER_ELEMENT_TYPE(str) TestRegistration(str);
 
 #ifdef _MSC_VER
 #define REGISTER_LINKTIME( func ) \
-	__pragma(comment(linker,"/export:_REGISTER"#func)); \
-	void REGISTER##func() { VTABLE_INDEX = RegisterElementType(#func); HGELEMT_VTABLES[VTABLE_INDEX] = vtable; }
+	__pragma(comment(linker,"/export:_REGISTER_ELEMENT"#func)); \
+	void REGISTER_ELEMENT##func() { VTABLE_INDEX = RegisterElementType(#func); HGELEMT_VTABLES[VTABLE_INDEX] = vtable; }
 #else
 #define REGISTER_LINKTIME( func ) \
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }

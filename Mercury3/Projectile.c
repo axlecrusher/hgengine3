@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 
-static uint8_t VTABLE_INDEX;
+static vtable_index VTABLE_INDEX;
 
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 
@@ -36,11 +36,6 @@ static void destroy(struct HgElement* e) {
 	//	printf("cube\n");
 }
 
-static HgElement_vtable vtable = {
-	.destroy = destroy,
-	.updateFunc = updateClbk
-};
-
 void change_to_projectile(HgElement* element) {
 	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
@@ -63,5 +58,10 @@ void projectile_create(HgElement* element) {
 	change_to_projectile(element);
 }
 
+static HgElement_vtable vtable = {
+	.create = projectile_create,
+	.destroy = destroy,
+	.updateFunc = updateClbk
+};
 
 REGISTER_LINKTIME(basic_projectile);

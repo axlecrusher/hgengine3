@@ -5,7 +5,7 @@
 
 
 
-static uint8_t VTABLE_INDEX;
+static vtable_index VTABLE_INDEX;
 
 typedef struct header {
 	uint32_t vertex_count, index_count;

@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <string.h>
+
+extern char HGELEMT_TYPE_NAMES[255][16] = { 0 };
 extern HgElement_vtable HGELEMT_VTABLES[255] = { 0 };
 
 void* (*new_RenderData)() = NULL;
@@ -9,6 +12,7 @@ void* (*new_RenderData)() = NULL;
 vtable_index RegisterElementType(const char* c) {
 	static vtable_index ElementTypeCounter = 0;
 	printf("Registering %s, type %d \n", c, ElementTypeCounter);
+	strcpy(HGELEMT_TYPE_NAMES[ElementTypeCounter], c);
 	return ElementTypeCounter++;
 }
 
@@ -24,6 +28,16 @@ void init_hgelement(HgElement* element) {
 	element->scale = 1;
 
 	quaternion_init(&element->rotation);
+}
+
+void create_element(char* type, HgElement* e) {
+	for (uint16_t i = 0; i < 255; ++i) {
+		if (strcmp(type, HGELEMT_TYPE_NAMES[i]) == 0) {
+			e->vptr_idx = i;
+			VCALL_IDX(e, create);
+			return;
+		}
+	}
 }
 
 /*
