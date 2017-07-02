@@ -12,6 +12,8 @@ class vertex:
 	def hex(self,file):
 		data = struct.pack("<3f",self.x,self.y,self.z)
 		file.write(",".join('0x%X'%x for x in struct.iter_unpack("I",data))+ ',')
+	def text(self,file):
+		file.write(', '.join((str(self.x),str(self.y),str(self.z))) + ', ' )
 
 class uv:
 	def __init__(self,x,y):
@@ -27,6 +29,11 @@ class uv:
 		b = int( ((self.v+1)*0.5) * 65535 )
 		data = struct.pack("<2H",a,b)
 		file.write(",".join('0x%X'%x for x in struct.iter_unpack("I",data))+ ',')
+	def text(self,file):
+		a = int( ((self.u+1)*0.5) * 65535 )
+		b = int( ((self.v+1)*0.5) * 65535 )
+		file.write(', '.join((str(a),str(b))) + ', ' )
+
 
 class normal:
 	def __init__(self,x,y,z):
@@ -39,6 +46,8 @@ class normal:
 	def hex(self,file):
 		data=struct.pack("<3f",self.x,self.y,self.z)
 		file.write(",".join('0x%X'%x for x in struct.iter_unpack("I",data))+ ',')
+	def text(self,file):
+		file.write(', '.join((str(self.x),str(self.y),str(self.z))) + ', ' )
 
 class packed_vertex:
 	def __init__(self,v,uv,n):
@@ -61,6 +70,14 @@ class packed_vertex:
 			self.normal.hex(file)
 		if (self.uv != None):
 			self.uv.hex(file)
+
+	def text(self,file):
+#		print(self.vertex)
+		self.vertex.text(file)
+		if (self.normal != None):
+			self.normal.text(file)
+		if (self.uv != None):
+			self.uv.text(file)
 
 vertices = []
 uv_coord = []
@@ -129,8 +146,24 @@ def output_hex():
 		packed_vertices[i].hex(output);
 	output.close()
 
+def output_text():
+	output = open( sys.argv[1]+'.txt', 'w')
+	for pv in packed_vertices:
+		pv.text(output);
+		output.write("\n")
+
+	output.write("\n")
+	for pv in packed_vertices:
+		pv.hex(output);
+
+	output.write("\n")
+	output.write(', '.join(str(x) for x in indices) + ', ' )
+#	output.text(struct.pack('<'+'H'*len(indices),*indices))
+	output.close()
+
 output_binary()
 output_hex()
+output_text()
 
 print ('vertices:', len(packed_vertices))
 print ('indices:', len(indices))
