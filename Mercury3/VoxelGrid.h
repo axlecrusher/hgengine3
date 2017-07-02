@@ -1,7 +1,5 @@
 #pragma once
 #include <HgElement.h>
+#include <HgModel.h>
 
-//void voxelGrid_create(HgElement* element);
-//void change_to_voxelGrid(HgElement* element);
-
-//void generateVoxelVBO();
+model_data generateVoxelVBO(uint8_t x, uint8_t y);

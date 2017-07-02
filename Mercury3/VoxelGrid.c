@@ -7,12 +7,17 @@ static vtable_index VTABLE_INDEX;
 //instanced render data
 static OGLRenderData *crd = NULL;
 static vbo_layout_vnu* voxelGridVertices = NULL;
-uint16_t* indices = NULL;
+static uint16_t* indices = NULL;
 
-static uint32_t generateVoxelVBO(uint8_t x, uint8_t y) {
+model_data generateVoxelVBO(uint8_t x, uint8_t y) {
+	model_data data;
 	uint32_t cube_count = x*y;
-	vbo_layout_vnu* vertices = (vbo_layout_vnu*)malloc(24 * cube_count * sizeof(*vertices));
-	indices = malloc(36 * cube_count * sizeof(*indices));
+
+	data.vertices = malloc(24 * cube_count * sizeof(*data.vertices));
+	data.vertex_count = 24 * cube_count;
+
+	data.indices = malloc(36 * cube_count * sizeof(*data.indices));
+	data.index_count = 36 * cube_count;
 
 	uint16_t vert_counter = 0;
 	uint16_t idx_counter = 0;
@@ -22,15 +27,15 @@ static uint32_t generateVoxelVBO(uint8_t x, uint8_t y) {
 			vert.v.components.x += i % x;
 			vert.v.components.y += (i / x)%y;
 //			vert.v.components.z += i / 100;
-			vertices[vert_counter++] = vert;
+			data.vertices[vert_counter++] = vert;
 		}
 
 		for (uint32_t ix = 0; ix < 36; ++ix) {
-			indices[idx_counter++] = cube_indices[ix] + (24 * i);
+			data.indices[idx_counter++] = cube_indices[ix] + (24 * i);
 		}
 	}
-	voxelGridVertices = vertices;
-	return 24 * cube_count;
+//	voxelGridVertices = vertices;
+	return data;
 }
 
 //Draw vertices directly. We aren't using indices here,
@@ -50,16 +55,21 @@ static void render(RenderData* rd) {
 }
 
 static void SetupRenderData() {
-	uint32_t vertex_count = 0;
-	if (voxelGridVertices == NULL) vertex_count=generateVoxelVBO(10,10);
+	model_data data;
+	if (voxelGridVertices == NULL) {
+		data = generateVoxelVBO(10, 10);
+		voxelGridVertices = data.vertices;
+		indices = data.indices;
+	}
+
 	crd = new_RenderData();
 
-	crd->vertex_count = vertex_count;
+	crd->vertex_count = data.vertex_count;
 	crd->hgVbo = &staticVboVNU;
 	crd->vbo_offset = hgvbo_add_data_vnu_raw(crd->hgVbo, voxelGridVertices, crd->vertex_count);
 
 	crd->indices.data = indices;
-	crd->index_count = 36*100;
+	crd->index_count = data.index_count;
 //	rd->indices.owns_ptr = 1;
 
 	crd->baseRender.renderFunc = render;
