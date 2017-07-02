@@ -1,10 +1,7 @@
 #pragma once
 
 #include <HgElement.h>
+#include <HgVbo.h>
 
-//void shape_create_cube(HgElement* element);
-//void change_to_cube(HgElement* element);
-
-//void shape_create_square(HgElement* element);
-
-extern uint32_t raw_cube_data[];
+extern vbo_layout_vnu raw_cube_data[];
+extern uint8_t cube_indices[];
