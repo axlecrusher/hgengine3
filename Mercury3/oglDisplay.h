@@ -63,3 +63,5 @@ GLuint new_index_buffer8(uint8_t* indices, uint32_t count);
 GLuint new_index_buffer16(uint16_t* indices, uint32_t count);
 void setBlendMode(BlendMode blendMode);
 void* new_renderData_ogl();
+
+void draw_index_vbo(struct HgVboMemory* vbo, uint32_t offset);

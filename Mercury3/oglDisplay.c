@@ -138,3 +138,11 @@ void* new_renderData_ogl() {
 
 	return rd;
 }
+
+void draw_index_vbo(HgVboMemory* vbo, uint32_t offset) {
+	if (vbo->type == VBO_INDEX8 || vbo->type == VBO_INDEX16) {
+		uint32_t glType = GL_UNSIGNED_BYTE;
+		if (vbo->type == VBO_INDEX16) glType = GL_UNSIGNED_SHORT;
+		glDrawElementsBaseVertex(GL_TRIANGLES, vbo->count, glType, 0, offset);
+	}
+}

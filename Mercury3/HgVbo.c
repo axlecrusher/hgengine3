@@ -142,7 +142,7 @@ void hgvbo_use(HgVboMemory* vbo) {
 	glBindVertexArray(vbo->vao_id);
 }
 
-void use_index16vbo(HgVboMemory* vbo) {
+void use_index_vbo(HgVboMemory* vbo) {
 	if (vbo->vbo_id == 0) {
 		GLuint buf_id;
 		glGenBuffers(1, &buf_id);

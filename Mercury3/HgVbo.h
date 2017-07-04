@@ -59,6 +59,7 @@ typedef struct HgVboMemory{
 
 	uint16_t size; //size of the structure pointed to by buffer, stride
 	uint8_t type;
+
 //	void(*send_to_ogl)(struct HgVboMemory* vbo);
 } HgVboMemory;
 
@@ -76,7 +77,9 @@ void hgvbo_destroy(HgVboMemory* vbo);
 //	Clear data from RAM. Will not upload new data to GPU until new data is added.
 void hgvbo_clear(HgVboMemory* vbo_mem);
 
-void use_index16vbo(HgVboMemory* vbo);
+void use_index_vbo(HgVboMemory* vbo);
+
+void draw_vbo(HgVboMemory* vbo);
 
 extern HgVboMemory staticVbo;
 
