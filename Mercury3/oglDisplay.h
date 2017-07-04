@@ -37,6 +37,8 @@ typedef struct OGLRenderData {
 	RenderData baseRender;
 
 	struct HgVboMemory* hgVbo;
+	struct HgVboMemory* indexVbo;
+
 	uint32_t vbo_offset;
 	uint16_t vertex_count;
 

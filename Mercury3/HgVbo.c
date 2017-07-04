@@ -13,6 +13,8 @@ static HgVboMemory* _currentVbo;
 static uint16_t struct_size(VBO_TYPE type) {
 	if (type == VBO_VC) return sizeof(vbo_layout_vc);
 	if (type == VBO_VNU) return sizeof(vbo_layout_vnu);
+	if (type == VBO_INDEX8) return sizeof(uint8_t);
+	if (type == VBO_INDEX16) return sizeof(uint16_t);
 
 	fprintf(stderr, "Unknown vbo type:%d\n", type);
 	assert(!"Unknown vbo type");
@@ -36,6 +38,14 @@ void hgvbo_clear(HgVboMemory* vbo_mem) {
 	free(vbo_mem->buffer);
 	vbo_mem->buffer = NULL;
 	vbo_mem->count = 0;
+}
+
+void hgvbo_destroy(HgVboMemory* vbo) {
+	glDeleteBuffers(1, vbo->vbo_id);
+	glDeleteBuffers(1, vbo->vao_id);
+	free(vbo->buffer);
+	vbo->buffer = NULL;
+	vbo->count = 0;
 }
 
 uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color, uint16_t count) {
@@ -130,4 +140,19 @@ void hgvbo_use(HgVboMemory* vbo) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo->vbo_id); //is this needed or does the vao_id do this for us?
 	glBindVertexArray(vbo->vao_id);
+}
+
+void use_index16vbo(HgVboMemory* vbo) {
+	if (vbo->vbo_id == 0) {
+		GLuint buf_id;
+		glGenBuffers(1, &buf_id);
+		vbo->vbo_id = buf_id;
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo->vbo_id);
+
+	if (vbo->needsUpdate > 0) {
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vbo->count * vbo->size, vbo->buffer, GL_STATIC_DRAW);
+		vbo->needsUpdate = 0;
+	}
 }

@@ -26,6 +26,8 @@ typedef enum VBO_TYPE {
 	VBO_VC = 0,
 	VBO_VN,
 	VBO_VNU,
+	VBO_INDEX8,
+	VBO_INDEX16,
 	VBO_TYPE_COUNT
 } VBO_TYPE;
 
@@ -69,9 +71,12 @@ uint32_t hgvbo_add_data_raw(HgVboMemory* vbo_mem, void* data, uint16_t count);
 //void hgvbo_sendToOGL(HgVboMemory* vbo_mem);
 void hgvbo_use(HgVboMemory* vbo_mem);
 void hgvbo_init(HgVboMemory* vbo_mem, VBO_TYPE vbo_type);
+void hgvbo_destroy(HgVboMemory* vbo);
 
 //	Clear data from RAM. Will not upload new data to GPU until new data is added.
 void hgvbo_clear(HgVboMemory* vbo_mem);
+
+void use_index16vbo(HgVboMemory* vbo);
 
 extern HgVboMemory staticVbo;
 
