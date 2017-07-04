@@ -80,8 +80,8 @@ uint32_t hgvbo_add_data_vnu_raw(HgVboMemory* vbo_mem, vbo_layout_vnu* data, uint
 }
 
 uint32_t hgvbo_add_data_raw(HgVboMemory* vbo_mem, void* data, uint16_t count) {
-	vbo_layout_vnu* buf = resize(vbo_mem, vbo_mem->count + count, vbo_mem->size);
-	buf = buf + vbo_mem->count;
+	uint8_t* buf = resize(vbo_mem, vbo_mem->count + count, vbo_mem->size);
+	buf = buf + (vbo_mem->count * vbo_mem->size);
 
 	memcpy(buf, data, count*vbo_mem->size);
 
