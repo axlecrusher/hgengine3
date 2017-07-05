@@ -120,6 +120,10 @@ void setBlendMode(BlendMode blendMode) {
 		glEnable (GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	}
+	else if (blendMode == BLEND_ALPHA) {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
 }
 
 static void destroy_render_data_ogl(struct RenderData* rd) {

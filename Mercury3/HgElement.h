@@ -22,7 +22,8 @@ extern float* _projection;
 
 typedef enum BlendMode {
 	BLEND_NORMAL = 0,
-	BLEND_ADDITIVE
+	BLEND_ADDITIVE,
+	BLEND_ALPHA
 } BlendMode;
 
 typedef struct RenderData {

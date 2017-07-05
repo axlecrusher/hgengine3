@@ -28,6 +28,7 @@ typedef enum VBO_TYPE {
 	VBO_VNU,
 	VBO_INDEX8,
 	VBO_INDEX16,
+	VBO_COLOR8,
 	VBO_TYPE_COUNT
 } VBO_TYPE;
 
@@ -80,6 +81,8 @@ void hgvbo_clear(HgVboMemory* vbo_mem);
 void use_index_vbo(HgVboMemory* vbo);
 
 void draw_vbo(HgVboMemory* vbo);
+
+void hgvbo_use_colorvbo(HgVboMemory* vbo);
 
 extern HgVboMemory staticVbo;
 

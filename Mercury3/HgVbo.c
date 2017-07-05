@@ -15,6 +15,7 @@ static uint16_t struct_size(VBO_TYPE type) {
 	if (type == VBO_VNU) return sizeof(vbo_layout_vnu);
 	if (type == VBO_INDEX8) return sizeof(uint8_t);
 	if (type == VBO_INDEX16) return sizeof(uint16_t);
+	if (type == VBO_COLOR8) return sizeof(color);
 
 	fprintf(stderr, "Unknown vbo type:%d\n", type);
 	assert(!"Unknown vbo type");
@@ -155,4 +156,29 @@ void use_index_vbo(HgVboMemory* vbo) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, vbo->count * vbo->size, vbo->buffer, GL_STATIC_DRAW);
 		vbo->needsUpdate = 0;
 	}
+}
+
+void hgvbo_use_colorvbo(HgVboMemory* vbo) {
+	if (vbo->vbo_id == 0) {
+		GLuint buf_id;
+		glGenBuffers(1, &buf_id);
+		vbo->vbo_id = buf_id;
+/*
+		glGenVertexArrays(1, &vbo->vao_id);
+		glBindVertexArray(vbo->vao_id);
+		glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)0);
+		glEnableVertexAttribArray(L_COLOR);
+		*/
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo->vbo_id);
+
+	if (vbo->needsUpdate > 0) {
+		color* c = vbo->buffer;
+		glBufferData(GL_ARRAY_BUFFER, vbo->count * vbo->size, vbo->buffer, GL_STATIC_DRAW);
+		vbo->needsUpdate = 0;
+	}
+
+	glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
+	glEnableVertexAttribArray(L_COLOR);
 }

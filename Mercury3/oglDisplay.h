@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdlib.h>
 #include <glew.h>
 #include <vertex.h>
 #include <HgElement.h>
@@ -7,7 +8,6 @@
 #include <HgTypes.h>
 
 #include <HgVbo.h>
-#include <stdlib.h>
 
 #define U_VIEW 4
 #define U_PROJECTION 5
@@ -38,6 +38,7 @@ typedef struct OGLRenderData {
 
 	struct HgVboMemory* hgVbo;
 	struct HgVboMemory* indexVbo;
+	struct HgVboMemory* colorVbo;
 
 	uint32_t vbo_offset;
 	uint16_t vertex_count;
