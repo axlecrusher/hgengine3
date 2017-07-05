@@ -112,6 +112,14 @@ vector3 vector3_add(const vector3* v, const vector3* v2) {
 	return r;
 }
 
+vector3 vector3_sub(const vector3* v, const vector3* v2) {
+	vector3 r = *v;
+	r.array[0] -= v2->array[0];
+	r.array[1] -= v2->array[1];
+	r.array[2] -= v2->array[2];
+	return r;
+}
+
 #define SQUARE(x) (x*x)
 
 float vector3_length(const vector3* v) {

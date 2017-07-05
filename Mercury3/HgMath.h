@@ -22,6 +22,8 @@ void Perspective2(
 
 vector3 vector3_scale(const vector3* v, float scale);
 vector3 vector3_add(const vector3* v, const vector3* v2);
+vector3 vector3_sub(const vector3* v, const vector3* v2);
+
 float vector3_length(const vector3* v);
 vector3 vector3_normalize(const vector3* v);
 inline void vector3_zero(vector3* v) { v->array[0] = v->array[1] = v->array[2] = 0.0f; }
