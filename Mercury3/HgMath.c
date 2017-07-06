@@ -104,6 +104,14 @@ vector3 vector3_scale(const vector3* v, float scale) {
 	return r;
 }
 
+vector3 vector3_div(const vector3* v, const vector3* v2) {
+	vector3 r = *v;
+	r.array[0] /= v2->array[0];
+	r.array[1] /= v2->array[1];
+	r.array[2] /= v2->array[2];
+	return r;
+}
+
 vector3 vector3_add(const vector3* v, const vector3* v2) {
 	vector3 r = *v;
 	r.array[0] += v2->array[0];
@@ -113,6 +121,16 @@ vector3 vector3_add(const vector3* v, const vector3* v2) {
 }
 
 vector3 vector3_sub(const vector3* v, const vector3* v2) {
+	/*
+	float result[4];
+
+	__m128 rx = _mm_loadu_ps(v->array);
+	__m128 xx = _mm_loadu_ps(v2->array);
+	rx = _mm_sub_ps(rx, xx);
+	_mm_store_ps(result, rx);
+
+	return *(vector3*)result;
+	*/
 	vector3 r = *v;
 	r.array[0] -= v2->array[0];
 	r.array[1] -= v2->array[1];
