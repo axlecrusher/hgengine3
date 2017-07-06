@@ -34,7 +34,7 @@ void init_hgelement(HgElement* element) {
 }
 
 void create_element(char* type, HgElement* e) {
-	for (uint16_t i = 0; i < 255; ++i) {
+	for (vtable_index i = 0; i < 255; ++i) {
 		if (strncmp(type, HGELEMT_TYPE_NAMES[i], MAX_ELEMENT_TYPE_LEN) == 0) {
 			e->vptr_idx = i;
 			VCALL_IDX(e, create);
