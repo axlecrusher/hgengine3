@@ -6,11 +6,6 @@
 typedef vertex point;
 typedef vertex vector3;
 
-typedef struct HgCamera {
-	point position;
-	quaternion rotation;
-} HgCamera;
-
 typedef struct viewport {
 	uint16_t x, y, width, height;
 } viewport;

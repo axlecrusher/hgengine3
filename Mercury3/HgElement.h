@@ -6,6 +6,8 @@
 #include <HgTypes.h>
 #include <HgShader.h>
 
+#include <HgCamera.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
