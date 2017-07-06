@@ -166,6 +166,7 @@
     <ClCompile Include="cube.c" />
     <ClCompile Include="FileWatch.c" />
     <ClCompile Include="GravityTest.c" />
+    <ClCompile Include="HgCamera.c" />
     <ClCompile Include="HgElement.c" />
     <ClCompile Include="HgInput.c" />
     <ClCompile Include="HgMath.c" />
@@ -195,6 +196,7 @@
     <ClInclude Include="FileWatch.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="Gravity.h" />
+    <ClInclude Include="HgCamera.h" />
     <ClInclude Include="HgElement.h" />
     <ClInclude Include="HgInput.h" />
     <ClInclude Include="HgMath.h" />
