@@ -23,6 +23,7 @@ void Perspective2(
 vector3 vector3_scale(const vector3* v, float scale);
 vector3 vector3_add(const vector3* v, const vector3* v2);
 vector3 vector3_sub(const vector3* v, const vector3* v2);
+vector3 vector3_mul(const vector3* v, const vector3* x);
 vector3 vector3_div(const vector3* v, const vector3* x);
 
 float vector3_length(const vector3* v);
