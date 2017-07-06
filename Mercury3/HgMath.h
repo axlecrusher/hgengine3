@@ -20,11 +20,11 @@ void Perspective2(
 	const double znear,
 	const double zfar, float* M);
 
-vector3 vector3_scale(const vector3* v, float scale);
-vector3 vector3_add(const vector3* v, const vector3* v2);
-vector3 vector3_sub(const vector3* v, const vector3* v2);
-vector3 vector3_mul(const vector3* v, const vector3* x);
-vector3 vector3_div(const vector3* v, const vector3* x);
+vector3 vector3_scale(const vector3* lhs, float scale);
+vector3 vector3_add(const vector3* lhs, const vector3* rhs);
+vector3 vector3_sub(const vector3* lhs, const vector3* rhs);
+vector3 vector3_mul(const vector3* lhs, const vector3* rhs);
+vector3 vector3_div(const vector3* lhs, const vector3* rhs);
 
 float vector3_length(const vector3* v);
 vector3 vector3_normalize(const vector3* v);

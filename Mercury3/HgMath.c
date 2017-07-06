@@ -112,23 +112,23 @@ vector3 vector3_mul(const vector3* v, const vector3* v2) {
 	return r;
 }
 
-vector3 vector3_div(const vector3* v, const vector3* v2) {
-	vector3 r = *v;
-	r.array[0] /= v2->array[0];
-	r.array[1] /= v2->array[1];
-	r.array[2] /= v2->array[2];
+vector3 vector3_div(const vector3* lhs, const vector3* rhs) {
+	vector3 r = *lhs;
+	r.array[0] /= rhs->array[0];
+	r.array[1] /= rhs->array[1];
+	r.array[2] /= rhs->array[2];
 	return r;
 }
 
-vector3 vector3_add(const vector3* v, const vector3* v2) {
-	vector3 r = *v;
-	r.array[0] += v2->array[0];
-	r.array[1] += v2->array[1];
-	r.array[2] += v2->array[2];
+vector3 vector3_add(const vector3* lhs, const vector3* rhs) {
+	vector3 r = *lhs;
+	r.array[0] += rhs->array[0];
+	r.array[1] += rhs->array[1];
+	r.array[2] += rhs->array[2];
 	return r;
 }
 
-vector3 vector3_sub(const vector3* v, const vector3* v2) {
+vector3 vector3_sub(const vector3* lhs, const vector3* rhs) {
 	/*
 	float result[4];
 
@@ -139,10 +139,10 @@ vector3 vector3_sub(const vector3* v, const vector3* v2) {
 
 	return *(vector3*)result;
 	*/
-	vector3 r = *v;
-	r.array[0] -= v2->array[0];
-	r.array[1] -= v2->array[1];
-	r.array[2] -= v2->array[2];
+	vector3 r = *lhs;
+	r.array[0] -= rhs->array[0];
+	r.array[1] -= rhs->array[1];
+	r.array[2] -= rhs->array[2];
 	return r;
 }
 
