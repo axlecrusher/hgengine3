@@ -163,6 +163,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="aabb.c" />
     <ClCompile Include="cube.c" />
     <ClCompile Include="FileWatch.c" />
     <ClCompile Include="GravityTest.c" />
@@ -191,6 +192,7 @@
     <ClCompile Include="Win32Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aabb.h" />
     <ClInclude Include="Callback.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="FileWatch.h" />
