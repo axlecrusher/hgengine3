@@ -157,8 +157,7 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 void fire(HgScene* scene) {
 	HgElement* element = NULL;
 
-	scene_newElement(scene, &element);
-	create_element("basic_projectile", element);
+	create_element("basic_projectile", scene, &element);
 
 	vector3 v = { 0 };
 	v.components.z = -1; //into screen from camera seems to be -1
@@ -297,33 +296,33 @@ int main()
 	{
 		HgElement* element = NULL;
 
-		scene_newElement(&scene, &element);
-		create_element("triangle", element);
-		element->position.components.x = 1.5f;
-		element->position.components.z = -1.0f;
-		//	toQuaternion2(0, 0, 90, &element->rotation);
+		if (create_element("triangle", &scene, &element) > 0) {
+			element->position.components.x = 1.5f;
+			element->position.components.z = -1.0f;
+			//	toQuaternion2(0, 0, 90, &element->rotation);
+		}
 
-		scene_newElement(&scene, &element);
-		create_element("triangle", element);
-		element->position.components.x = -0.0f;
-		element->position.components.z = -2.0f;
-		//	toQuaternion2(45,0,0,&element->rotation);
+		if (create_element("triangle", &scene, &element) > 0) {
+			element->position.components.x = -0.0f;
+			element->position.components.z = -2.0f;
+			//	toQuaternion2(45,0,0,&element->rotation);
+		}
 
 
 		for (i = 0; i < ANI_TRIS; i++) {
-			scene_newElement(&scene, &element);
-			tris[i] = element;
-			//			gravity.indices[i] = tris[i];
-			//		shape_create_triangle(element);
-			create_element("cube", element);
-			float x = (i % 20)*1.1f;
-			float z = (i / 20)*1.1f;
-			element->position.components.y = 5.0f;
-			element->position.components.x = -10.0f + x;
-			element->position.components.z = -2.0f - z;
-			element->scale = 0.3f;
-			//			element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
-			element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+			if (create_element("cube", &scene, &element) > 0) {
+				tris[i] = element;
+				//			gravity.indices[i] = tris[i];
+				//		shape_create_triangle(element);
+				float x = (i % 20)*1.1f;
+				float z = (i / 20)*1.1f;
+				element->position.components.y = 5.0f;
+				element->position.components.x = -10.0f + x;
+				element->position.components.z = -2.0f - z;
+				element->scale = 0.3f;
+				//			element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
+				element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+			}
 		}
 
 		scene_newElement(&scene, &element);
@@ -336,21 +335,21 @@ int main()
 		element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 		//	model_data d = LoadModel("test.hgmdl");
 
-		scene_newElement(&scene, &element);
-		create_element("voxelGrid", element);
-		//		element->scale = 100.0f;
-		element->position.components.z = -10;
-		//		toQuaternion2(0, -90, 0, &element->rotation);
-		element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+		if (create_element("voxelGrid", &scene, &element) > 0) {
+			//		element->scale = 100.0f;
+			element->position.components.z = -10;
+			//		toQuaternion2(0, -90, 0, &element->rotation);
+			element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+		}
 
-		scene_newElement(&scene, &element);
-		create_element("square", element);
-		element->scale = 100.0f;
-		element->position.components.z = -4;
-		toQuaternion2(0, -90, 0, &element->rotation);
-		element->m_renderData->shader = HGShader_acquire("grid_vertex.glsl", "grid_frag.glsl");
-		element->m_renderData->blendMode = BLEND_ADDITIVE;
-		//	model_data d = LoadModel("test.hgmdl");
+		if (create_element("square", &scene, &element) > 0) {
+			element->scale = 100.0f;
+			element->position.components.z = -4;
+			toQuaternion2(0, -90, 0, &element->rotation);
+			element->m_renderData->shader = HGShader_acquire("grid_vertex.glsl", "grid_frag.glsl");
+			element->m_renderData->blendMode = BLEND_ADDITIVE;
+			//	model_data d = LoadModel("test.hgmdl");
+		}
 	}
 
 	HANDLE thread1 = CreateThread(NULL, 0, &PrintCtr, NULL, 0, NULL);
