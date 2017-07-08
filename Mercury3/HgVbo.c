@@ -42,8 +42,8 @@ void hgvbo_clear(HgVboMemory* vbo_mem) {
 }
 
 void hgvbo_destroy(HgVboMemory* vbo) {
-	glDeleteBuffers(1, vbo->vbo_id);
-	glDeleteBuffers(1, vbo->vao_id);
+	glDeleteBuffers(1, &vbo->vbo_id);
+	glDeleteBuffers(1, &vbo->vao_id);
 	free(vbo->buffer);
 	vbo->buffer = NULL;
 	vbo->count = 0;
