@@ -19,8 +19,10 @@ int EnumerateSymbols( SymEnumeratorCallback cb )
 {
 	HANDLE proc = GetCurrentProcess();
 	if( SymInitialize( proc, 0, 1 ) == FALSE ) return -1;
-	if( !SymEnumSymbols( proc, 0, "*!*", &mycb, (void*)cb ) )
+	if( SymEnumSymbols( proc, 0, "*!*", &mycb, (void*)cb ) == FALSE )
 	{
+		DWORD errCode = GetLastError();
+		fprintf(stderr, "SymEnumSymbols FALSE %d\n", errCode);
 		SymCleanup(proc);
 		return -2;
 	}
