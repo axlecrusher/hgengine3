@@ -7,6 +7,7 @@
 #include <HgShader.h>
 
 #include <HgCamera.h>
+#include <str_utils.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +47,8 @@ typedef struct HgElement_vtable {
 #define MAX_ELEMENT_TYPES 255
 typedef uint8_t vtable_index;
 extern HgElement_vtable HGELEMT_VTABLES[MAX_ELEMENT_TYPES];
+extern hgstring HGELEMENT_TYPE_NAMES;
+extern uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES];
 
 /* NOTES: Try to avoid pointers, especially on 64 bit.
 The entity that allocates memory for render data should
@@ -74,7 +77,8 @@ void init_hgelement(HgElement* element);
 //inline void clear_flag(HgElement* element, uint16_t f) { element->flags |= ~f; }
 
 //inline uint16_t is_destroyed(HgElement* e) { return CHECK_FLAG(e, HGE_DESTROY); }
-//inline const char* hgelement_type_to_str(vtable_index x) { return HGELEMT_TYPE_NAMES[x]; }
+
+inline const char* hgelement_get_type_str(HgElement* e) { return HGELEMENT_TYPE_NAMES.str + HGELEMENT_TYPE_NAME_OFFSETS[e->vptr_idx]; }
 
 extern void* (*new_RenderData)();
 

@@ -9,8 +9,8 @@
 
 #define MAX_ELEMENT_TYPE_LEN 16
 
-static hgstring HGELEMENT_TYPE_NAMES = { 0, 0 };
-static uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES] = { 0 };
+hgstring HGELEMENT_TYPE_NAMES = { 0, 0 };
+uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES] = { 0 };
 
 extern HgElement_vtable HGELEMT_VTABLES[MAX_ELEMENT_TYPES] = { 0 };
 

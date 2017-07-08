@@ -91,6 +91,7 @@ void scene_delete_element(HgScene* scene, uint32_t idx) {
 	decode_index(idx, &h, &l);
 	if (_is_used(scene->chunks[h],l) > 0) {
 		HgElement* e = get_element(scene, idx);
+		printf("Destroying element of type: %s\n", hgelement_get_type_str(e));
 		VCALL_IDX(e, destroy);
 		init_hgelement(e);
 		clear_used(scene->chunks[h], l);
