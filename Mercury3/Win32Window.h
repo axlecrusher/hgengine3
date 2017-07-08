@@ -5,6 +5,8 @@
 #include <MercuryWindow.h>
 //#include <MScopedArray.h>
 
+extern uint8_t stereo_view;
+
 ///Win32 Window Driver
 class Win32Window : public MercuryWindow
 {

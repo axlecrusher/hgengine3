@@ -49,7 +49,6 @@ HANDLE endOfRenderFrame = NULL;
 volatile int8_t needRender = 1;
 
 #define EYE_DISTANCE -0.07f
-uint8_t stereo_view = 0;
 
 //uint8_t KeyDownMap[512];
 
@@ -237,6 +236,7 @@ int SymnumCheck(const char * path, const char * name, void * location, long size
 int main()
 {
 	EnumerateSymbols(SymnumCheck);
+	stereo_view = 0;
 
 	//	MercuryWindow* w = MercuryWindow::MakeWindow();
 	//	generateVoxelVBO();
