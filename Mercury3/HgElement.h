@@ -12,11 +12,13 @@
 extern "C" {
 #endif
 
-#define HGE_USED	0x01 //used in scene graph
-#define HGE_ACTIVE	0x02
-#define HGE_HIDDEN	0x04
-#define HGE_UPDATED	0x08
-#define HGE_DESTROY	0x10
+	enum HgElementFlag {
+		HGE_USED = 0x01, //used in scene graph
+		HGE_ACTIVE = 0x02,
+		HGE_HIDDEN = 0x04,
+		HGE_UPDATED = 0x08,
+		HGE_DESTROY = 0x10
+	};
 
 extern viewport view_port[];
 extern HgCamera* _camera;
@@ -41,9 +43,9 @@ typedef struct HgElement_vtable {
 	void(*updateFunc)(struct HgElement* e, uint32_t tdelta);
 } HgElement_vtable;
 
-extern HgElement_vtable HGELEMT_VTABLES[255];
-
+#define MAX_ELEMENT_TYPES 255
 typedef uint8_t vtable_index;
+extern HgElement_vtable HGELEMT_VTABLES[MAX_ELEMENT_TYPES];
 
 /* NOTES: Try to avoid pointers, especially on 64 bit.
 The entity that allocates memory for render data should
@@ -72,6 +74,7 @@ void init_hgelement(HgElement* element);
 //inline void clear_flag(HgElement* element, uint16_t f) { element->flags |= ~f; }
 
 //inline uint16_t is_destroyed(HgElement* e) { return CHECK_FLAG(e, HGE_DESTROY); }
+//inline const char* hgelement_type_to_str(vtable_index x) { return HGELEMT_TYPE_NAMES[x]; }
 
 extern void* (*new_RenderData)();
 

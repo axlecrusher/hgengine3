@@ -5,17 +5,25 @@
 #include <string.h>
 #include <assert.h>
 
+#include <str_utils.h>
+
 #define MAX_ELEMENT_TYPE_LEN 16
 
-extern char HGELEMT_TYPE_NAMES[255][MAX_ELEMENT_TYPE_LEN] = { 0 };
-extern HgElement_vtable HGELEMT_VTABLES[255] = { 0 };
+static hgstring HGELEMENT_TYPE_NAMES = { 0, 0 };
+static uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES] = { 0 };
+
+extern HgElement_vtable HGELEMT_VTABLES[MAX_ELEMENT_TYPES] = { 0 };
 
 void* (*new_RenderData)() = NULL;
 
 vtable_index RegisterElementType(const char* c) {
-	static vtable_index ElementTypeCounter = 0;
+	static vtable_index ElementTypeCounter = 1; //0 is reserved for undefined
+	if (ElementTypeCounter==1) {
+		HGELEMENT_TYPE_NAME_OFFSETS[0] = hgstring_append(&HGELEMENT_TYPE_NAMES, "UndefinedType");
+	}
+
 	printf("Registering %s, type %d \n", c, ElementTypeCounter);
-	strncpy(HGELEMT_TYPE_NAMES[ElementTypeCounter], c, MAX_ELEMENT_TYPE_LEN);
+	HGELEMENT_TYPE_NAME_OFFSETS[ElementTypeCounter] = hgstring_append(&HGELEMENT_TYPE_NAMES, c);
 	return ElementTypeCounter++;
 }
 
@@ -34,8 +42,9 @@ void init_hgelement(HgElement* element) {
 }
 
 void create_element(char* type, HgElement* e) {
-	for (vtable_index i = 0; i < 255; ++i) {
-		if (strncmp(type, HGELEMT_TYPE_NAMES[i], MAX_ELEMENT_TYPE_LEN) == 0) {
+	for (vtable_index i = 0; i < MAX_ELEMENT_TYPES; ++i) {
+		char* str = HGELEMENT_TYPE_NAMES.str + HGELEMENT_TYPE_NAME_OFFSETS[i];
+		if (strncmp(type, str, MAX_ELEMENT_TYPE_LEN) == 0) {
 			e->vptr_idx = i;
 			VCALL_IDX(e, create);
 			return;
