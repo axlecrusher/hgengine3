@@ -39,17 +39,12 @@ void init_hgelement(HgElement* element) {
 	quaternion_init(&element->rotation);
 }
 
-uint8_t create_element(char* type, HgElement* e) {
+vtable_index hgelement_get_type_index(char* type) {
 	for (vtable_index i = 0; i < MAX_ELEMENT_TYPES; ++i) {
 		char* str = HGELEMENT_TYPE_NAMES.str + HGELEMENT_TYPE_NAME_OFFSETS[i];
-		if (strcmp(type, str) == 0) {
-			e->vptr_idx = i;
-			VCALL_IDX(e, create);
-			return 1;
-		}
+		if (strcmp(type, str) == 0) return i;
 	}
 
-	fprintf(stderr, "Unable to find element type \"%s\"\n", type);
 	return 0;
 }
 

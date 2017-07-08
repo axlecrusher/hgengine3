@@ -38,9 +38,12 @@ typedef struct RenderData {
 	uint8_t blendMode;
 } RenderData;
 
+//typedef void(*SignalHandler)(int signum);
+typedef void(*hgelement_function)(struct HgElement* e);
+
 typedef struct HgElement_vtable {
-	void(*create)(struct HgElement* e);
-	void(*destroy)(struct HgElement* e);
+	hgelement_function create;
+	hgelement_function destroy;
 	void(*updateFunc)(struct HgElement* e, uint32_t tdelta);
 } HgElement_vtable;
 
@@ -78,8 +81,8 @@ void init_hgelement(HgElement* element);
 
 //inline uint16_t is_destroyed(HgElement* e) { return CHECK_FLAG(e, HGE_DESTROY); }
 
-uint8_t create_element(char* type, HgElement* e);
 inline const char* hgelement_get_type_str(HgElement* e) { return HGELEMENT_TYPE_NAMES.str + HGELEMENT_TYPE_NAME_OFFSETS[e->vptr_idx]; }
+vtable_index hgelement_get_type_index(char* type);
 
 extern void* (*new_RenderData)();
 

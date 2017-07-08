@@ -44,6 +44,7 @@ void scene_init(HgScene* scene);
 /*	Do not store the pointer for long periods of time. Creating new elements can cause a resize, invalidating pointers.
 	Store the returned index as an alternative. */
 uint32_t scene_newElement(HgScene* scene, HgElement** element);
+uint8_t create_element(char* type, HgScene* scene, HgElement** element);
 
 void scene_clearUpdate(HgScene* scene);
 

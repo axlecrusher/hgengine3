@@ -5,6 +5,8 @@
 
 #include <HgScene.h>
 
+#include <stdio.h>
+
 //Must be a multiple of 8
 //#define CHUNK_SIZE		128
 
@@ -62,6 +64,22 @@ uint32_t scene_newElement(HgScene* scene,HgElement** element) {
 //	scene_resize(scene, scene->_size + CHUNK_SIZE);
 	allocate_new_chunk(scene);
 	return scene_newElement(scene, element);
+}
+
+uint8_t create_element(char* type, HgScene* scene, HgElement** element) {
+	uint32_t idx = hgelement_get_type_index(type);
+
+	if (0 == idx) {
+		fprintf(stderr, "Unable to find element type \"%s\"\n", type);
+		return 0;
+	}
+
+	scene_newElement(scene, element);
+
+	(*element)->vptr_idx = idx;
+	VCALL_IDX((*element), create);
+
+	return 1;
 }
 
 void scene_clearUpdate(HgScene* scene) {
