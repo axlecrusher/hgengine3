@@ -66,3 +66,5 @@ void setBlendMode(BlendMode blendMode);
 void* new_renderData_ogl();
 
 void draw_index_vbo(struct HgVboMemory* vbo, uint32_t offset);
+
+inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->m_renderData; }
