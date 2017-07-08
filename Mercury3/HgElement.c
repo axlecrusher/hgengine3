@@ -7,8 +7,6 @@
 
 #include <str_utils.h>
 
-#define MAX_ELEMENT_TYPE_LEN 16
-
 hgstring HGELEMENT_TYPE_NAMES = { 0, 0 };
 uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES] = { 0 };
 
@@ -41,17 +39,18 @@ void init_hgelement(HgElement* element) {
 	quaternion_init(&element->rotation);
 }
 
-void create_element(char* type, HgElement* e) {
+uint8_t create_element(char* type, HgElement* e) {
 	for (vtable_index i = 0; i < MAX_ELEMENT_TYPES; ++i) {
 		char* str = HGELEMENT_TYPE_NAMES.str + HGELEMENT_TYPE_NAME_OFFSETS[i];
-		if (strncmp(type, str, MAX_ELEMENT_TYPE_LEN) == 0) {
+		if (strcmp(type, str) == 0) {
 			e->vptr_idx = i;
 			VCALL_IDX(e, create);
-			return;
+			return 1;
 		}
 	}
+
 	fprintf(stderr, "Unable to find element type \"%s\"\n", type);
-	assert(type==0);
+	return 0;
 }
 
 /*

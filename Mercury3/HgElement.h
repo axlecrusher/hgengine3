@@ -78,6 +78,7 @@ void init_hgelement(HgElement* element);
 
 //inline uint16_t is_destroyed(HgElement* e) { return CHECK_FLAG(e, HGE_DESTROY); }
 
+uint8_t create_element(char* type, HgElement* e);
 inline const char* hgelement_get_type_str(HgElement* e) { return HGELEMENT_TYPE_NAMES.str + HGELEMENT_TYPE_NAME_OFFSETS[e->vptr_idx]; }
 
 extern void* (*new_RenderData)();
@@ -94,9 +95,6 @@ extern void* (*new_RenderData)();
 
 
 vtable_index RegisterElementType(const char* c);
-
-void create_element(char* type, HgElement* e);
-
 
 #define REGISTER_ELEMENT_TYPE(str) TestRegistration(str);
 
