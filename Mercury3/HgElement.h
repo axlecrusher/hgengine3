@@ -91,6 +91,7 @@ extern void* (*new_RenderData)();
 #define SET_FLAG(e,x) ((e)->flags |= (x))
 
 //#define VCALL(e,function,...) if (e && e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
+
 #define VCALL(e,function,...) if (e->vptr->function) e->vptr->function(e,__VA_ARGS__)
 #define VCALL_F(e,function,...) e->vptr->function(e,__VA_ARGS__)
 #define SCALL(x,function,...) x->function(x,__VA_ARGS__)
@@ -110,6 +111,8 @@ vtable_index RegisterElementType(const char* c);
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }
 #endif
 
+#define SAFE_FREE(ptr) if (NULL != ptr) { free(ptr); ptr=NULL; }
+#define SAFE_DESTROY(func,ptr) if (NULL != ptr) { func(ptr); free(ptr); ptr=NULL; }
 
 #ifdef __cplusplus
 };
