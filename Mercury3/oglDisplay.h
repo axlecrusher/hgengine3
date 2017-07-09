@@ -15,6 +15,7 @@
 #define U_POSITION		3
 #define U_CAMERA_ROT 6
 #define U_CAMERA_POS 7
+#define U_ORIGIN 8
 
 #define L_VERTEX	0
 #define L_NORMAL	1
@@ -54,7 +55,7 @@ GLuint hgOglVbo(vertices v);
 //void destroy_render_data_ogl(struct RenderData* render_data);
 //void ogl_destroy_renderData();
 void setGlobalUniforms(const HgCamera* camera);
-void setLocalUniforms(const quaternion* rotation, const point* position, float scale);
+void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin);
 void hgViewport(uint8_t vp);
 
 void setup_viewports(uint16_t width, uint16_t height);

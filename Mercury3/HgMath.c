@@ -146,6 +146,22 @@ vector3 vector3_sub(const vector3* lhs, const vector3* rhs) {
 	return r;
 }
 
+float vector3_dot(const vector3* a, const vector3* b) {
+	float r = a->array[0] * b->array[0] +
+		a->array[1] * b->array[1] +
+		a->array[2] * b->array[2];
+	return r;
+}
+
+quaternion vector3_to_quat(const vector3* a) {
+	quaternion q;
+	q.x = a->components.x;
+	q.y = a->components.y;
+	q.z = a->components.z;
+	return q;
+}
+
+
 #define SQUARE(x) (x*x)
 
 float vector3_length(const vector3* v) {

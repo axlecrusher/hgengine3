@@ -25,10 +25,13 @@ vector3 vector3_add(const vector3* lhs, const vector3* rhs);
 vector3 vector3_sub(const vector3* lhs, const vector3* rhs);
 vector3 vector3_mul(const vector3* lhs, const vector3* rhs);
 vector3 vector3_div(const vector3* lhs, const vector3* rhs);
+float vector3_dot(const vector3* lhs, const vector3* rhs);
+
+quaternion vector3_to_quat(const vector3* a);
 
 float vector3_length(const vector3* v);
 vector3 vector3_normalize(const vector3* v);
-inline void vector3_zero(vector3* v) { v->array[0] = v->array[1] = v->array[2] = 0.0f; }
+inline vector3 vector3_zero() { vector3 a = { 0,0,0 }; return a; }
 
 vector3 vector3_cross(const vector3* v1, const vector3* v3);
 vector3 vector3_quat_rotate(const vector3* v, const quaternion* q);

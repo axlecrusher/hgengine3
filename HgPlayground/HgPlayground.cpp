@@ -198,7 +198,7 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgElement*
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
 	setGlobalUniforms(camera);
-	setLocalUniforms(&e->rotation, &e->position, e->scale);
+	setLocalUniforms(&e->rotation, &e->position, e->scale, &e->origin);
 
 	rd->renderFunc(rd);
 }
@@ -408,8 +408,7 @@ int main()
 #endif
 
 		if (ddtime > 0) {
-			vector3 v;
-			vector3_zero(&v);
+			vector3 v = vector3_zero();
 
 			if (KeyDownMap['w']) v.components.z -= 1.0f;
 			if (KeyDownMap['s']) v.components.z += 1.0f;

@@ -40,11 +40,12 @@ typedef struct RenderData {
 
 //typedef void(*SignalHandler)(int signum);
 typedef void(*hgelement_function)(struct HgElement* e);
+//typedef void (*hgelement_update_function)(struct HgElement* e, uint32_t tdelta); //strange warnings with this....
 
 typedef struct HgElement_vtable {
 	hgelement_function create;
 	hgelement_function destroy;
-	void(*updateFunc)(struct HgElement* e, uint32_t tdelta);
+	void (*updateFunc)(struct HgElement* e, uint32_t tdelta);
 } HgElement_vtable;
 
 #define MAX_ELEMENT_TYPES 255
@@ -63,10 +64,8 @@ typedef struct HgElement{
 //	HgElement_vtable* vptr;
 	vtable_index vptr_idx; //1
 	uint8_t flags; //1
-	uint16_t padding;
-//	uint32_t index;
-//	uint32_t parent;
 	point position; float scale; //16
+	point origin; //origin (0,0,0) in local space
 	quaternion rotation; //16
 	RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
 	void* extraData; //whoever whoever populates this must clean it up.

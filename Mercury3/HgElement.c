@@ -6,6 +6,7 @@
 #include <assert.h>
 
 #include <str_utils.h>
+#include <HgMath.h>
 
 hgstring HGELEMENT_TYPE_NAMES = { 0, 0 };
 uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES] = { 0 };
@@ -29,12 +30,11 @@ void init_hgelement(HgElement* element) {
 	element->flags = 0;
 	element->vptr_idx = 0;
 	element->m_renderData = NULL;
-	element->position.components.x = 0;
-	element->position.components.y = 0;
-	element->position.components.z = 0;
+	element->position = vector3_zero();
 	element->extraData = NULL;
 	element->m_renderData = NULL;
 	element->scale = 1;
+	element->origin = vector3_zero();
 
 	quaternion_init(&element->rotation);
 }
