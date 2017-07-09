@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <HgElement.h>
+#include <oglShaders.h>
 
 viewport view_port[3];
 
@@ -10,6 +11,17 @@ static uint8_t _currentBlendMode = 0xFF;
 
 HgCamera* _camera;
 float* _projection;
+
+char *UniformString[] = {
+	"rotation",
+	"translation",
+	"view",
+	"projection",
+	"cam_rot",
+	"cam_position",
+	"origin",
+	NULL
+};
 
 void hgViewport(uint8_t idx) {
 	if (idx == _currenViewPort_idx) return;
@@ -21,16 +33,17 @@ void hgViewport(uint8_t idx) {
 	glEnable(GL_SCISSOR_TEST);
 }
 
-void setGlobalUniforms(const HgCamera* c) {
-	glUniformMatrix4fv(U_PROJECTION, 1, GL_TRUE, _projection);
-	glUniform4f(U_CAMERA_ROT, c->rotation.x, c->rotation.y, c->rotation.z, c->rotation.w);
-	glUniform3f(U_CAMERA_POS, c->position.components.x, c->position.components.y, c->position.components.z);
+void setGlobalUniforms(HgShader* shader, const HgCamera* c) {
+	HgShader_ogl* s = (HgShader_ogl*)shader;
+	if (s->uniform_locations[U_PROJECTION] > -1) glUniformMatrix4fv(s->uniform_locations[U_PROJECTION], 1, GL_TRUE, _projection);
+	if (s->uniform_locations[U_CAMERA_ROT] > -1) glUniform4f(s->uniform_locations[U_CAMERA_ROT], c->rotation.x, c->rotation.y, c->rotation.z, c->rotation.w);
+	if (s->uniform_locations[U_CAMERA_POS] > -1) glUniform3f(s->uniform_locations[U_CAMERA_POS], c->position.components.x, c->position.components.y, c->position.components.z);
 }
-
-void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin) {
-	glUniform4f(U_ROTATION, rotation->x, rotation->y, rotation->z, rotation->w);
-	glUniform4f(U_POSITION, position->components.x, position->components.y, position->components.z, scale);
-	glUniform3f(U_ORIGIN, origin->components.x, origin->components.y, origin->components.z);
+void setLocalUniforms(HgShader* shader, const quaternion* rotation, const point* position, float scale, const point* origin) {
+	HgShader_ogl* s = (HgShader_ogl*)shader;
+	if (s->uniform_locations[U_ROTATION] > -1) glUniform4f(s->uniform_locations[U_ROTATION], rotation->x, rotation->y, rotation->z, rotation->w);
+	if (s->uniform_locations[U_POSITION] > -1) glUniform4f(s->uniform_locations[U_POSITION], position->components.x, position->components.y, position->components.z, scale);
+	if (s->uniform_locations[U_ORIGIN] > -1) glUniform3f(s->uniform_locations[U_ORIGIN], origin->components.x, origin->components.y, origin->components.z);
 }
 
 GLuint hgOglVbo(vertices v) {

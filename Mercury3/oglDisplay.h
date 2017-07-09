@@ -9,13 +9,18 @@
 
 #include <HgVbo.h>
 
-#define U_VIEW 4
-#define U_PROJECTION 5
-#define U_ROTATION		1
-#define U_POSITION		3
-#define U_CAMERA_ROT 6
-#define U_CAMERA_POS 7
-#define U_ORIGIN 8
+enum UniformLocations {
+	U_ROTATION=0,
+	U_POSITION=1,
+	U_VIEW=2,
+	U_PROJECTION=3,
+	U_CAMERA_ROT=4,
+	U_CAMERA_POS=5,
+	U_ORIGIN=6,
+	U_UNIFORM_COUNT=7
+};
+
+extern char *UniformString[];
 
 #define L_VERTEX	0
 #define L_NORMAL	1
@@ -54,8 +59,8 @@ GLuint hgOglVbo(vertices v);
 
 //void destroy_render_data_ogl(struct RenderData* render_data);
 //void ogl_destroy_renderData();
-void setGlobalUniforms(const HgCamera* camera);
-void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin);
+void setGlobalUniforms(HgShader* shader, const HgCamera* camera);
+void setLocalUniforms(HgShader*, const quaternion* rotation, const point* position, float scale, const point* origin); 
 void hgViewport(uint8_t vp);
 
 void setup_viewports(uint16_t width, uint16_t height);

@@ -6,6 +6,7 @@
 
 #include <memory.h>
 #include <str_utils.h>
+#include <string.h>
 
 static GLuint _currentShaderProgram = 0;
 
@@ -148,6 +149,32 @@ static void setup_shader(HgShader_ogl* s) {
 	}
 	shader->program_id = shader_program;
 	shader->source_loaded = 2;
+
+
+	GLint size; // size of the variable
+	GLenum type; // type of the variable (float, vec3 or mat4, etc)
+
+	GLchar name[64]; // variable name in GLSL
+	GLsizei length; // name length
+
+	//create list of uniforms
+	GLint uniform_count = 0;
+	glGetProgramiv(shader_program, GL_ACTIVE_UNIFORMS, &uniform_count);
+
+	memset(shader->uniform_locations, -1, sizeof(*shader->uniform_locations)*U_UNIFORM_COUNT);
+
+	for (int32_t i = 0; i < uniform_count; i++)
+	{
+		glGetActiveUniform(shader_program, (GLuint)i, 64, &length, &size, &type, name);
+//		printf("Uniform #%d Type: %u Name: %s\n", i, type, name);
+		for (uint8_t j = 0; j < U_UNIFORM_COUNT; j++) {
+			if (strcmp(name, UniformString[j]) == 0) {
+				shader->uniform_locations[j] = glGetUniformLocation(shader_program, name);
+				break;
+			}
+			if (j == (U_UNIFORM_COUNT - 1)) fprintf(stderr, "Unknown uniform %s", name);
+		}
+	}
 }
 
 static void load_from_disk(HgShader* s) {

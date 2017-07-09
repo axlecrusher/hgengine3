@@ -4,12 +4,14 @@
 #include <stdint.h>
 
 #include <HgShader.h>
+#include <oglDisplay.h>
 
 typedef struct HgShader_ogl {
 	HgShader _base;
 	GLuint program_id;
 	uint8_t source_loaded;
 
+	int8_t uniform_locations[U_UNIFORM_COUNT];
 	//other things not needed often
 	void* program_code;
 } HgShader_ogl;

@@ -197,8 +197,8 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgElement*
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
-	setGlobalUniforms(camera);
-	setLocalUniforms(&e->rotation, &e->position, e->scale, &e->origin);
+	setGlobalUniforms(rd->shader, camera);
+	setLocalUniforms(rd->shader, &e->rotation, &e->position, e->scale, &e->origin);
 
 	rd->renderFunc(rd);
 }
@@ -211,7 +211,7 @@ void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
-	setGlobalUniforms(camera);
+	setGlobalUniforms(rd->shader, camera);
 	//	setLocalUniforms(&e->rotation, &e->position, e->scale);
 
 	rd->renderFunc(rd);
