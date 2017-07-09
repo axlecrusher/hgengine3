@@ -11,7 +11,7 @@ void aabb_allocate_cubes(BoundingCubes* bc, uint32_t count) {
 	bc->cube_count = count;
 }
 
-void cast_ray_to_aabb(BoundingCubes* aabb, vector3* ray, const vector3* pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) {
+void cast_ray_to_aabb(const BoundingCubes* aabb, const vector3* ray, const vector3* pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) {
 	vector3 one = { 1.0,1.0,1.0 };
 	vector3 dirfrac = vector3_div(&one, ray);
 	aabb_result r;

@@ -25,7 +25,7 @@ typedef struct BoundingCubes {
 } BoundingCubes;
 
 void aabb_allocate_cubes(BoundingCubes* bc, uint32_t count);
-void cast_ray_to_aabb(BoundingCubes* aabb, vector3* ray, const vector3* pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData);
+void cast_ray_to_aabb(const BoundingCubes* aabb, const vector3* ray, const vector3* pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData);
 
 #ifdef __cplusplus
 }
