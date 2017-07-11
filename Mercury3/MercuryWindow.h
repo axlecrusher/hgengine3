@@ -35,6 +35,7 @@ public:
 
 	inline bool InFocus() const { return m_inFocus; }
 
+	bool m_close;
 protected:
 //	static MercuryWindow* (*genWindowClbk)(void);
 	static Callback0R< MercuryWindow* > genWindowClbk;
@@ -49,6 +50,7 @@ protected:
 	int m_iLastMouseY;
 
 	bool m_inFocus;
+
 };
 
 #endif

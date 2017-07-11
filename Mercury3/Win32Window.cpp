@@ -20,7 +20,7 @@ uint8_t GlobalMouseGrabbed_Set = 1;
 
 uint8_t stereo_view;
 
-LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //Window callback
+//LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //Window callback
 Callback0R< MercuryWindow* > MercuryWindow::genWindowClbk(Win32Window::GenWin32Window); //Register window generation callback
 //MercuryWindow* MercuryWindow::genWindowClbk = (void*)Win32Window::GenWin32Window;
 bool ACTIVE = false;
@@ -82,7 +82,7 @@ void Win32Window::GenWinClass()
 	m_wndclass.cbSize = sizeof(WNDCLASSEX);
 	m_wndclass.hIconSm = NULL;
 	m_wndclass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	m_wndclass.lpfnWndProc = (WNDPROC)WindowCallback;
+	m_wndclass.lpfnWndProc = (WNDPROC)Win32Window::WindowCallback;
 	m_wndclass.cbClsExtra = 0;
 	m_wndclass.cbWndExtra = 0;
 	m_wndclass.hInstance = m_hInstance;
@@ -92,6 +92,8 @@ void Win32Window::GenWinClass()
 	m_wndclass.lpszMenuName = NULL;
 	m_wndclass.lpszClassName = m_className;
 }
+
+static Win32Window* windowInstances[1] = { 0 };
 
 void Win32Window::GenWindow()
 {
@@ -129,6 +131,8 @@ void Win32Window::GenWindow()
 		NULL,
 		m_hInstance,
 		NULL);
+
+	windowInstances[0] = this;
 
 	if (m_hwnd == NULL)
 	{
@@ -481,12 +485,22 @@ uint16_t Win32Window::ConvertScancode( uint32_t scanin )
 	}
 }
 
-LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Win32Window::WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	Win32Window* window = NULL;
+
+	for (uint8_t i = 0; i < 1; i++) {
+
+		if (windowInstances[i]!=NULL && windowInstances[i]->m_hwnd == hWnd) {
+			window = windowInstances[i];
+			break;
+		}
+	}
+
 	switch (uMsg)
 	{
 	case WM_CLOSE:
-		exit(1);
+		if (window) window->m_close = true;
 		break;
 	case WM_ACTIVATE:
 		ACTIVE = LOWORD(wParam)!=WA_INACTIVE;

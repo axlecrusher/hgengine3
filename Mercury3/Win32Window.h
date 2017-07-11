@@ -23,6 +23,7 @@ public:
 
 private:
 	bool IsKeyRepeat(uint32_t c);
+	static LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void GenWindow();
 	void GenWinClass();

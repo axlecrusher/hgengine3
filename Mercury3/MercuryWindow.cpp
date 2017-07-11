@@ -3,7 +3,7 @@
 
 MercuryWindow::MercuryWindow(const MString& title, int width, int height, int bits, int depthBits, bool fullscreen)
 	:m_title(title), m_width(width), m_height(height), m_bits(bits), m_depthBits(depthBits), m_fullscreen(fullscreen),
-	m_iLastMouseX(0),m_iLastMouseY(0),m_inFocus(false)
+	m_iLastMouseX(0),m_iLastMouseY(0),m_inFocus(false), m_close(false)
 {
 //	MESSAGEMAN.GetValue( "Input.CursorGrabbed" )->SetBool( true );
 }
