@@ -60,4 +60,6 @@ HgElement* scene_next_element(HgScene_iterator* i);
 void scene_delete_element(HgScene* scene, uint32_t index);
 inline void scene_delete_element_itr(HgScene_iterator* i) { scene_delete_element(i->s, i->_current); }
 
+void hgscene_destroy(HgScene* scene);
+
 #define IS_USED(scene,index) is_used(scene,index)

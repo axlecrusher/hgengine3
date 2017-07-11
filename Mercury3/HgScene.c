@@ -117,6 +117,18 @@ void scene_delete_element(HgScene* scene, uint32_t idx) {
 	}
 }
 
+void hgscene_destroy(HgScene* scene) {
+	for (uint32_t i = 0; i < scene->_size; ++i) {
+		if (is_used(scene, i) > 0) {
+			scene_delete_element(&scene, i);
+		}
+	}
+	for (uint32_t i = 0; i < 128; ++i) {
+		SAFE_FREE(scene->chunks[i]);
+	}
+}
+
+
 uint8_t is_used(HgScene* s, uint32_t index)
 {
 //	uint16_t h, l;

@@ -110,8 +110,8 @@ vtable_index RegisterElementType(const char* c);
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }
 #endif
 
-#define SAFE_FREE(ptr) if (NULL != ptr) { free(ptr); ptr=NULL; }
-#define SAFE_DESTROY(func,ptr) if (NULL != ptr) { func(ptr); free(ptr); ptr=NULL; }
+#define SAFE_FREE(ptr) if (NULL != (ptr)) { free(ptr); ptr=NULL; }
+#define SAFE_DESTROY(func,ptr) if (NULL != (ptr)) { func(ptr); free(ptr); ptr=NULL; }
 
 #ifdef __cplusplus
 };
