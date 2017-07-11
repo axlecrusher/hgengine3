@@ -105,6 +105,17 @@ vtable_index RegisterElementType(const char* c);
 #define REGISTER_LINKTIME( func ) \
 	__pragma(comment(linker,"/export:_REGISTER_ELEMENT"#func)); \
 	void REGISTER_ELEMENT##func() { VTABLE_INDEX = RegisterElementType(#func); HGELEMT_VTABLES[VTABLE_INDEX] = vtable; }
+//	__pragma(comment(linker, "/export:_GLOBAL_DESTROY"#func)); \
+//	void GLOBAL_DESTROY##func() { }
+#else
+#define REGISTER_LINKTIME( func ) \
+	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }
+#endif
+
+#ifdef _MSC_VER
+#define REGISTER_GLOBAL_DESTROY( func ) \
+	__pragma(comment(linker, "/export:_GLOBAL_DESTROY"#func)); \
+	void GLOBAL_DESTROY##func() { ##func(); }
 #else
 #define REGISTER_LINKTIME( func ) \
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }
