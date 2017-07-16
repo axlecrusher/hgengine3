@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 static vtable_index VTABLE_INDEX;
+float projectileMsecSpeed = 1.0f / 50.0f;
 
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 
@@ -20,7 +21,7 @@ static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 			SET_FLAG(e, HGE_DESTROY);
 		}
 
-		vector3 r = vector3_scale(&pd->direction, (tdelta / 50.0f));
+		vector3 r = vector3_scale(&pd->direction, (tdelta * projectileMsecSpeed));
 		e->position = vector3_add(&e->position, &r);
 
 //		printf("projectile %d\n", pd->total_time);

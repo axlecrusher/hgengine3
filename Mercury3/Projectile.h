@@ -2,6 +2,8 @@
 
 #include <HgElement.h>
 
+extern float projectileMsecSpeed;
+
 typedef struct ProjectileData {
 	vector3 direction;
 	uint32_t total_time;
