@@ -8,6 +8,8 @@
 #include <oglShaders.h>
 
 static vtable_index VTABLE_INDEX;
+//instanced render data
+static OGLRenderData* trd = NULL;
 
 static float vv[9] = {
 	-0.5f, -0.5f, 0.0f,
@@ -33,9 +35,6 @@ static void destroy(HgElement* e) {
 	e->m_renderData = NULL;
 }
 
-//instanced render data
-static OGLRenderData* trd = NULL;
-
 static void SetupRenderData() {
 	trd = new_RenderData();
 
@@ -49,7 +48,7 @@ static void SetupRenderData() {
 	trd->indices.data = indices;
 	trd->vbo_offset = hgvbo_add_data_vc(&staticVbo, points.points.v, colors, trd->vertex_count);
 
-	trd->baseRender.destroy = NULL; //render data is shared by all triangles so we don't really want to do anything
+//	trd->baseRender.destroy = NULL; //render data is shared by all triangles so we don't really want to do anything
 }
 
 OGLRenderData* triangle_init_render_data() {
@@ -81,5 +80,13 @@ static HgElement_vtable vtable = {
 	.destroy = destroy,
 	.updateFunc = NULL
 };
+
+static void global_destroy() {
+	if (trd) {
+		SAFE_DESTROY(trd->baseRender.destroy, trd);
+	}
+}
+
+REGISTER_GLOBAL_DESTROY(global_destroy);
 
 REGISTER_LINKTIME(triangle)
