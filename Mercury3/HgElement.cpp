@@ -26,19 +26,24 @@ vtable_index RegisterElementType(const char* c) {
 	return ElementTypeCounter++;
 }
 
-void init_hgelement(HgElement* element) {
-	element->flags = 0;
-	element->vptr_idx = 0;
-	element->m_renderData = NULL;
-	element->position = vector3_zero();
-	element->extraData = NULL;
-	element->m_renderData = NULL;
-	element->scale = 1;
-	element->origin = vector3_zero();
+void HgElement::init()
+{
+	flags = 0;
+	m_renderData = NULL;
+	position = vector3_zero();
+	extraData = NULL;
+	m_renderData = NULL;
+	scale = 1;
+	origin = vector3_zero();
 
-	quaternion_init(&element->rotation);
+	quaternion_init(&rotation);
 }
 
+void HgElement::destroy()
+{
+}
+
+/*
 vtable_index hgelement_get_type_index(char* type) {
 	for (vtable_index i = 0; i < MAX_ELEMENT_TYPES; ++i) {
 		char* str = HGELEMENT_TYPE_NAMES.str + HGELEMENT_TYPE_NAME_OFFSETS[i];
@@ -47,7 +52,7 @@ vtable_index hgelement_get_type_index(char* type) {
 
 	return 0;
 }
-
+*/
 /*
 void HgElement_destroy(HgElement* e) {
 	if (e->m_renderData && e->m_renderData->destroy) e->m_renderData->destroy(e->m_renderData);

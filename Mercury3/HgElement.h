@@ -9,10 +9,6 @@
 #include <HgCamera.h>
 #include <str_utils.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 	enum HgElementFlag {
 		HGE_USED = 0x01, //used in scene graph
 		HGE_ACTIVE = 0x02,
@@ -60,28 +56,19 @@ be responsible for destroying it. This is more clear than
 having HgElement free render data by default and then
 handling special cases.
 */
-typedef struct HgElement{
-//	HgElement_vtable* vptr;
-	vtable_index vptr_idx; //1
-	uint8_t flags; //1
+class HgElement {
+public:
 	point position; float scale; //16
 	point origin; //origin (0,0,0) in local space
 	quaternion rotation; //16
+	uint8_t flags; //1
+
 	RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
 	void* extraData; //whoever whoever populates this must clean it up.
-} HgElement;
 
-void init_hgelement(HgElement* element);
-//void HgElement_destroy(HgElement* element);
-
-//inline uint16_t check_flag(HgElement* element, uint8_t x) { return element->flags & x; }
-//inline void set_flag(HgElement* element, uint16_t f) { element->flags |= f; }
-//inline void clear_flag(HgElement* element, uint16_t f) { element->flags |= ~f; }
-
-//inline uint16_t is_destroyed(HgElement* e) { return CHECK_FLAG(e, HGE_DESTROY); }
-
-inline const char* hgelement_get_type_str(HgElement* e) { return HGELEMENT_TYPE_NAMES.str + HGELEMENT_TYPE_NAME_OFFSETS[e->vptr_idx]; }
-vtable_index hgelement_get_type_index(char* type);
+	void init();
+	void destroy();
+};
 
 extern void* (*new_RenderData)();
 
@@ -91,11 +78,12 @@ extern void* (*new_RenderData)();
 
 //#define VCALL(e,function,...) if (e && e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
 
+/*
 #define VCALL(e,function,...) if (e->vptr->function) e->vptr->function(e,__VA_ARGS__)
 #define VCALL_F(e,function,...) e->vptr->function(e,__VA_ARGS__)
 #define SCALL(x,function,...) x->function(x,__VA_ARGS__)
 #define VCALL_IDX(e,function,...) if (HGELEMT_VTABLES[e->vptr_idx].function) HGELEMT_VTABLES[e->vptr_idx].function(e,__VA_ARGS__)
-
+*/
 
 vtable_index RegisterElementType(const char* c);
 
@@ -123,7 +111,3 @@ vtable_index RegisterElementType(const char* c);
 
 #define SAFE_FREE(ptr) if (NULL != (ptr)) { free(ptr); ptr=NULL; }
 #define SAFE_DESTROY(func,ptr) if (NULL != (ptr)) { func(ptr); free(ptr); ptr=NULL; }
-
-#ifdef __cplusplus
-};
-#endif
