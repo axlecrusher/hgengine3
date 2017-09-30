@@ -1,6 +1,9 @@
 #pragma once
 
-#include <HgElement.h>
+#include <memory>
+#include <vector>
+
+//#include <HgElement.h>
 
 /* HgScene could be reworked into a linked list (or array of pointers to list items) with each
 list item containing 512 elements and a used map. We could still index into the linked list
@@ -11,55 +14,45 @@ pointers for the duration of program execution.
 
 #define SCENE_CHUNK_SIZE		512
 
-typedef struct SceneChunk {
-	HgElement elements[SCENE_CHUNK_SIZE];
-	uint8_t used[SCENE_CHUNK_SIZE / 8];
-} SceneChunk;
+class HgElement {
+public:
+	void init() {}
+	void destroy() {}
+};
 
-typedef struct HgScene {
-	SceneChunk* chunks[128];
-	uint16_t chunk_count;
-	/*
-	HgElement* elements;
-	uint8_t* used;
-	uint32_t _size;
-	uint32_t _next_empty;
+#define CHUNK_SIZE		512
+class SceneChunk {
+	public:
+		SceneChunk();
+		bool isUsed(uint16_t i);
+		void set_used(uint16_t i);
+		void clear_used(uint16_t idx);
 
-	*/
-	uint32_t _size;
-	uint32_t size_used;
-} HgScene;
+		HgElement elements[CHUNK_SIZE];
+		uint8_t used[CHUNK_SIZE / 8];
+};
 
+class HgScene {
+	public:
+		HgScene();
+		void init();
+
+		uint32_t getNewElement(HgElement* element);
+		void removeElement(uint32_t i);
+
+		bool isUsed(uint32_t idx);
+		inline HgElement* get_element(uint32_t index) { return &chunks[(index >> 9) & 0x7F]->elements[index & 0x1FF]; }
+
+	private:
+		void allocate_chunk();
+		std::vector< std::unique_ptr<SceneChunk> > chunks;
+		uint32_t used_count;
+};
+
+/*
 typedef struct HgScene_iterator {
 	uint32_t _current;
 	HgScene* s;
 } HgScene_iterator;
 
-//void scene_resize(HgScene* scene);
-void scene_init(HgScene* scene);
-//void scene_add_element(HgScene* scene, HgElement* element);
-
-
-
-/*	Do not store the pointer for long periods of time. Creating new elements can cause a resize, invalidating pointers.
-	Store the returned index as an alternative. */
-uint32_t scene_newElement(HgScene* scene, HgElement** element);
-uint8_t create_element(char* type, HgScene* scene, HgElement** element);
-
-void scene_clearUpdate(HgScene* scene);
-
-/*	Returns greater than 0 if the index has a valid element */
-uint8_t is_used(HgScene* s, uint32_t index);
-
-inline HgElement* get_element(HgScene* s, uint32_t index) { return &s->chunks[(index >> 9) & 0x7F]->elements[index & 0x1FF]; }
-//#define get_element(s,index) (&(s)->chunks[(index >> 9) & 0x7F]->elements[index & 0x1FF])
-
-inline void scene_init_iterator(HgScene_iterator* i, HgScene* scene) { i->_current = 0; i->s = scene; }
-HgElement* scene_next_element(HgScene_iterator* i);
-
-void scene_delete_element(HgScene* scene, uint32_t index);
-inline void scene_delete_element_itr(HgScene_iterator* i) { scene_delete_element(i->s, i->_current); }
-
-void hgscene_destroy(HgScene* scene);
-
-#define IS_USED(scene,index) is_used(scene,index)
+*/
