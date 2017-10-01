@@ -155,16 +155,10 @@ void fire(HgScene* scene) {
 
 	create_element("basic_projectile", scene, &element);
 
-	vector3 v = { 0 };
-	v.components.z = -1; //into screen from camera seems to be -1
-
-	camera->rotation.w = -camera->rotation.w;
-	v = vector3_quat_rotate(&v, &camera->rotation);
-	element->rotation = camera->rotation;
-	camera->rotation.w = -camera->rotation.w;
-
 	Projectile *pd = dynamic_cast<Projectile*>(element->logic());
-	pd->direction = v;
+	pd->direction = camera->projectRay();
+	element->rotation = camera->rotation;
+	element->rotation.w = -element->rotation.w;
 	element->position = camera->position;
 }
 

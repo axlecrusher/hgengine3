@@ -10,5 +10,6 @@ class HgCamera {
 		vector3 direction;
 		float speedMsec;
 
+		// Project a ray in the direction of the camera's view
 		vector3 projectRay();
 };
