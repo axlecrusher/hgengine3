@@ -24,8 +24,8 @@ char* str_cat(const char* s1, const char* s2) {
 	char* str = malloc(size + 1);
 	assert(str != NULL);
 	str[0] = 0;
-	strcat(str, s1);
-	strcat(str, s2);
+	strcat_s(str, size+1, s1);
+	strcat_s(str, size+1, s2);
 	return str;
 }
 

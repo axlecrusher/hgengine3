@@ -50,7 +50,7 @@ void hgvbo_destroy(HgVboMemory* vbo) {
 }
 
 uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color, uint16_t count) {
-	vbo_layout_vc* buf = resize(vbo_mem, vbo_mem->count + count, sizeof(*buf));
+	vbo_layout_vc* buf = (vbo_layout_vc*)resize(vbo_mem, vbo_mem->count + count, sizeof(*buf));
 	buf = buf + vbo_mem->count;
 
 	for (uint16_t i = 0; i < count; ++i) {
@@ -66,7 +66,7 @@ uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color,
 }
 
 uint32_t hgvbo_add_data_vnu_raw(HgVboMemory* vbo_mem, vbo_layout_vnu* data, uint16_t count) {
-	vbo_layout_vnu* buf = resize(vbo_mem, vbo_mem->count + count, sizeof(*buf));
+	vbo_layout_vnu* buf = (vbo_layout_vnu*)resize(vbo_mem, vbo_mem->count + count, sizeof(*buf));
 	buf = buf + vbo_mem->count;
 
 	for (uint16_t i = 0; i < count; ++i) {
@@ -81,7 +81,7 @@ uint32_t hgvbo_add_data_vnu_raw(HgVboMemory* vbo_mem, vbo_layout_vnu* data, uint
 }
 
 uint32_t hgvbo_add_data_raw(HgVboMemory* vbo_mem, void* data, uint16_t count) {
-	uint8_t* buf = resize(vbo_mem, vbo_mem->count + count, vbo_mem->size);
+	uint8_t* buf = (uint8_t*)resize(vbo_mem, vbo_mem->count + count, vbo_mem->size);
 	buf = buf + (vbo_mem->count * vbo_mem->size);
 
 	memcpy(buf, data, count*vbo_mem->size);
@@ -174,7 +174,7 @@ void hgvbo_use_colorvbo(HgVboMemory* vbo) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo->vbo_id);
 
 	if (vbo->needsUpdate > 0) {
-		color* c = vbo->buffer;
+		color* c = (color*)vbo->buffer;
 		glBufferData(GL_ARRAY_BUFFER, vbo->count * vbo->size, vbo->buffer, GL_STATIC_DRAW);
 		vbo->needsUpdate = 0;
 	}

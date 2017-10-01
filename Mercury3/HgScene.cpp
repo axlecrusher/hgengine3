@@ -10,6 +10,7 @@
 //Must be a multiple of 8
 //#define CHUNK_SIZE		128
 
+//static uint16_t SceneChunk::CHUNK_SIZE = 512;
 SceneChunk::SceneChunk() {
 	memset(used, 0, sizeof(used));
 }
@@ -46,7 +47,7 @@ void HgScene::init()
 	allocate_chunk();
 }
 
-uint32_t HgScene::getNewElement(HgElement* element) {
+uint32_t HgScene::getNewElement(HgElement** element) {
 	uint16_t h, l;
 	for (uint32_t i = 0;; ++i) {
 		decode_index(i, &h, &l);
@@ -56,7 +57,8 @@ uint32_t HgScene::getNewElement(HgElement* element) {
 			HgElement* e = &chunk->elements[l];
 			chunk->set_used(l);
 			e->init();
-			element = e;
+			used_count++;
+			*element = e;
 			return i;
 		}
 	}
@@ -88,23 +90,29 @@ bool HgScene::isUsed(uint32_t index)
 	return chunks[(index >> 9) & 0x7F]->isUsed(index & 0x1FF);
 }
 
-/*
-uint8_t create_element(char* type, HgScene* scene, HgElement** element) {
-	uint32_t idx = hgelement_get_type_index(type);
+#include <map>
+extern std::map<std::string, factory_clbk> element_factories;
 
-	if (0 == idx) {
+uint8_t create_element(char* type, HgScene* scene, HgElement** element) {
+//	uint32_t idx = hgelement_get_type_index(type);
+
+	auto factory = element_factories.find(type);
+
+	if (factory == element_factories.end()) {
 		fprintf(stderr, "Unable to find element type \"%s\"\n", type);
 		return 0;
 	}
+	factory_clbk clbk = factory->second;
+	scene->getNewElement(element);
+	clbk(*element);
 
-	scene_newElement(scene, element);
-
-	(*element)->vptr_idx = idx;
-	VCALL_IDX((*element), create);
+	//find element type creator
+//	(*element)->vptr_idx = idx;
+//	VCALL_IDX((*element), create);
 
 	return 1;
 }
-
+/*
 void scene_clearUpdate(HgScene* scene) {
 	uint32_t i = 0;
 	for (i = 0; i < scene->_size; ++i) {

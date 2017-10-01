@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern "C" {
 #include <HgElement.h>
 #include <HgScene.h>
 #include <shapes.h>
@@ -32,9 +31,6 @@ extern "C" {
 
 #include <symbol_enumerator.h>
 #include <FileWatch.h>
-}
-
-
 
 
 #define M_PI 3.14159265358979323846
@@ -145,7 +141,7 @@ HgScene scene;
 
 DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	while (1) {
-		printf("UPS %u e_count %d %d\n", itrctr, scene.size_used, scene._size);
+		printf("UPS %u e_count %d %d\n", itrctr, scene.usedCount(), scene.chunkCount());
 		itrctr = 0;
 		CheckFilesForChange();
 		Sleep(1000);
@@ -167,7 +163,7 @@ void fire(HgScene* scene) {
 	element->rotation = camera->rotation;
 	camera->rotation.w = -camera->rotation.w;
 
-	ProjectileData *pd = (ProjectileData*)element->extraData;
+	Projectile *pd = dynamic_cast<Projectile*>(element->logic());
 	pd->direction = v;
 	element->position = camera->position;
 }
@@ -179,7 +175,7 @@ void submit_for_render_threaded(uint8_t viewport_idx, HgCamera* camera, HgScene 
 		hgRenderQueue_push(create_render_packet(NULL, 0, NULL, NULL, 0));
 		return;
 	}
-	HgElement* e = get_element(s, idx);
+	HgElement* e = s->get_element(idx);
 	hgRenderQueue_push(create_render_packet(e, viewport_idx, camera + 0, s, idx)); //submit to renderer
 }
 
@@ -192,15 +188,16 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgElement*
 	hgViewport(viewport_idx);
 
 	RenderData* rd = e->m_renderData;
-	if (rd->shader) VCALL(rd->shader, enable);
+
+	if (rd->shader) rd->shader->enable();
 
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
-	setGlobalUniforms(rd->shader, camera);
+	setGlobalUniforms(rd->shader, *camera);
 	setLocalUniforms(rd->shader, &e->rotation, &e->position, e->scale, &e->origin);
 
-	rd->renderFunc(rd);
+	rd->render();
 }
 
 void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
@@ -211,10 +208,10 @@ void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
-	setGlobalUniforms(rd->shader, camera);
+	setGlobalUniforms(rd->shader, *camera);
 	//	setLocalUniforms(&e->rotation, &e->position, e->scale);
 
-	rd->renderFunc(rd);
+	rd->render();
 }
 
 void vertex_print(const vertex* v) {
@@ -247,7 +244,7 @@ int main()
 	//	hgvbo_add_data_vc(&staticVbo, d.vertices, d.vertices, d.vertex_count);
 
 	_create_shader = HGShader_ogl_create;
-	new_RenderData = new_renderData_ogl;
+//	new_RenderData = new_renderData_ogl;
 
 	if (stereo_view) {
 		setup_viewports(1280, 480);
@@ -284,7 +281,7 @@ int main()
 	print_matrix(projection);
 	printf("\n");
 
-	scene_init(&scene);
+	scene.init();
 	//	uint32_t tris[ANI_TRIS];
 	HgElement* tris[ANI_TRIS];
 
@@ -321,32 +318,32 @@ int main()
 				element->position.components.z = -2.0f - z;
 				element->scale = 0.3f;
 				//			element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
-				element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+				element->m_renderData->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 			}
 		}
 
-		scene_newElement(&scene, &element);
+		scene.getNewElement(&element);
 		model_load(element, "test.hgmdl");
 		element->scale = 0.5f;
 		element->position.components.z = -4;
 		//		element->position.components.y = 2;
 		//		toQuaternion2(0, 90, 0, &element->rotation);
 		//		element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
-		element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+		element->m_renderData->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 		//	model_data d = LoadModel("test.hgmdl");
 
 		if (create_element("voxelGrid", &scene, &element) > 0) {
 			//		element->scale = 100.0f;
 			element->position.components.z = -10;
 			//		toQuaternion2(0, -90, 0, &element->rotation);
-			element->m_renderData->shader = HGShader_acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+			element->m_renderData->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 		}
 
 		if (create_element("square", &scene, &element) > 0) {
 			element->scale = 100.0f;
 			element->position.components.z = -4;
 			toQuaternion2(0, -90, 0, &element->rotation);
-			element->m_renderData->shader = HGShader_acquire("grid_vertex.glsl", "grid_frag.glsl");
+			element->m_renderData->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
 			element->m_renderData->blendMode = BLEND_ADDITIVE;
 			//	model_data d = LoadModel("test.hgmdl");
 		}
@@ -398,7 +395,7 @@ int main()
 
 	int16_t mouse_x, mouse_y;
 	mouse_x = mouse_y = 0;
-	while (1) {
+	while (1 && !window->m_close) {
 		dtime = GetTickCount() - stime;
 		ddtime = dtime - ltime;
 		ltime = dtime;
@@ -408,7 +405,7 @@ int main()
 #endif
 
 		if (ddtime > 0) {
-			vector3 v = vector3_zero();
+			vector3 v = vector3_zero;
 
 			if (KeyDownMap['w']) v.components.z -= 1.0f;
 			if (KeyDownMap['s']) v.components.z += 1.0f;
@@ -487,18 +484,19 @@ int main()
 		camera[1] = camera[0];
 		camera[1].position.components.x += EYE_DISTANCE;
 
-		for (uint32_t i = 0; i<scene._size; ++i) {
+		uint32_t maxCount = scene.maxItems();
+		for (uint32_t i = 0; i<maxCount; ++i) {
 			//			if (IS_USED(&scene, i) == 0) continue;
-			if (is_used(&scene, i) == 0) continue;
-			HgElement* e = get_element(&scene, i);
+			if (!scene.isUsed(i)) continue;
+			HgElement* e = scene.get_element(i);
 
 			if (ddtime > 0) {
-				VCALL_IDX(e, updateFunc, ddtime);
+				e->update(ddtime);
 			}
 
 			/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash!*/
 			if (CHECK_FLAG(e, HGE_DESTROY) > 0) {
-				scene_delete_element(&scene, i);
+				scene.removeElement(i);
 				continue;
 			}
 			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) {
@@ -508,9 +506,9 @@ int main()
 		}
 
 		if (stereo_view && do_render > 0) {
-			for (uint32_t i = 0; i < scene._size; ++i) {
-				if (is_used(&scene, i) == 0) continue;
-				HgElement* e = get_element(&scene, i);
+			for (uint32_t i = 0; i < maxCount; ++i) {
+				if (!scene.isUsed(i)) continue;
+				HgElement* e = scene.get_element(i);
 				if (CHECK_FLAG(e, HGE_HIDDEN) == 0) submit_for_render(2, camera + 1, e);
 			}
 		}

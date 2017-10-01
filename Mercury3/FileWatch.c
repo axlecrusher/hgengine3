@@ -6,13 +6,14 @@
 
 #include <LinkedList.h>
 #include <str_utils.h>
+#include <FileWatch.h>
 
 static ListItem* listHead = NULL;
 
 typedef struct FileInfo {
 	char* path;
 	uint64_t mod_time;
-	void (*changed)(const char* path);
+	fileChangedCallback changed;
 	void* clbkData;
 } FileInfo;
 
@@ -39,13 +40,13 @@ static uint64_t _GetFileTime(const char* path) {
 	return 0;
 }
 
-void WatchFileForChange(const char* path, void(*changed)(void *data), void *clbkData) {
+void WatchFileForChange(const char* path, fileChangedCallback clbk, void *clbkData) {
 	uint64_t time = _GetFileTime(path);
 
 	FileInfo* info = malloc(sizeof *info);
 	info->path = str_copy(path);
 	info->mod_time = time;
-	info->changed = changed;
+	info->changed = clbk;
 	info->clbkData = clbkData;
 
 	push(&listHead, info);

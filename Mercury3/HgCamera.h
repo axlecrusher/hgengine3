@@ -3,11 +3,12 @@
 #include <HgTypes.h>
 
 class HgCamera {
-	point position;
-	quaternion rotation;
+	public:
+		point position;
+		quaternion rotation;
 
-	vector3 direction;
-	float speedMsec;
+		vector3 direction;
+		float speedMsec;
 
-	vector3 projectRay();
+		vector3 projectRay();
 };

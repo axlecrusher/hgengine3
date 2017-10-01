@@ -7,8 +7,6 @@
 #include <stdio.h>
 #include <oglShaders.h>
 
-static vtable_index VTABLE_INDEX;
-
 static float vv[12] = {
 	-0.5f, -0.5f, 0.0f,
 	0.5f, -0.5f, 0.0f,
@@ -30,7 +28,7 @@ static uint8_t indices[] = {
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 }
 */
-static void destroy(struct HgElement* e) {
+static void destroy(HgElement* e) {
 	e->m_renderData = NULL;
 }
 
@@ -39,7 +37,7 @@ static OGLRenderData* trd = NULL;
 
 
 static void SetupRenderData() {
-	trd = new_RenderData();
+	trd = new OGLRenderData();
 	trd->indices.data = indices;
 
 	vertices points;
@@ -75,10 +73,5 @@ void shape_create_square(HgElement* element) {
 	change_to_square(element);
 }
 */
-static HgElement_vtable vtable = {
-	.create = change_to_square,
-	.destroy = destroy,
-	.updateFunc = NULL
-};
 
-REGISTER_LINKTIME(square)
+REGISTER_LINKTIME(square,change_to_square)

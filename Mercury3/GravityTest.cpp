@@ -1,12 +1,13 @@
 #include <Gravity.h>
 #include <stdlib.h>
-
 #include <HgMath.h>
+#include <stdint.h>
+
 #define G_ACCEL 9.807f
 
 void allocate_space(GravityField* gf, uint16_t count) {
-	gf->indices = calloc(count, sizeof(*gf->indices));
-	gf->velocity = calloc(count, sizeof(*gf->velocity));
+	gf->indices = (uint16_t*)calloc(count, sizeof(*gf->indices));
+	gf->velocity = (vector3*)calloc(count, sizeof(*gf->velocity));
 	gf->count = count;
 }
 
@@ -22,7 +23,7 @@ void gravity_update(GravityField* gf, uint32_t dTime) {
 //		float d = (dTime / 1000.0) * gf->velocity[i];
 //		printf("gravity update %f %f\n", gf->velocity[i],d);
 
-		HgElement* e = get_element(gf->scene, gf->indices[i]);
+		HgElement* e = gf->scene->get_element(gf->indices[i]);
 		e->position = vector3_add((vector3*)&e->position, &d);
 
 

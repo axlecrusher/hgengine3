@@ -164,31 +164,30 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aabb.c" />
-    <ClCompile Include="cube.c" />
+    <ClCompile Include="cube.cpp" />
     <ClCompile Include="FileWatch.c" />
-    <ClCompile Include="GravityTest.c" />
-    <ClCompile Include="HgCamera.c" />
-    <ClCompile Include="HgElement.c" />
-    <ClCompile Include="HgInput.c" />
+    <ClCompile Include="GravityTest.cpp" />
+    <ClCompile Include="HgCamera.cpp" />
+    <ClCompile Include="HgElement.cpp" />
+    <ClCompile Include="HgInput.cpp" />
     <ClCompile Include="HgMath.c" />
-    <ClCompile Include="HgModel.c" />
-    <ClCompile Include="HgRenderQueue.c" />
-    <ClCompile Include="HgScene.c" />
-    <ClCompile Include="HgShader.c" />
+    <ClCompile Include="HgModel.cpp" />
+    <ClCompile Include="HgRenderQueue.cpp" />
+    <ClCompile Include="HgScene.cpp" />
+    <ClCompile Include="HgShader.cpp" />
     <ClCompile Include="LinkedList.c" />
     <ClCompile Include="MercuryWindow.cpp" />
-    <ClCompile Include="oglDisplay.c" />
-    <ClCompile Include="OglRenderPackets.c" />
-    <ClCompile Include="oglShaders.c" />
-    <ClCompile Include="Projectile.c" />
+    <ClCompile Include="oglDisplay.cpp" />
+    <ClCompile Include="OglRenderPackets.cpp" />
+    <ClCompile Include="oglShaders.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="quaternion.c" />
-    <ClCompile Include="square.c" />
+    <ClCompile Include="square.cpp" />
     <ClCompile Include="str_utils.c" />
     <ClCompile Include="symbol_enumerator.c">
     </ClCompile>
-    <ClCompile Include="triangle.c" />
-    <ClCompile Include="HgVbo.c" />
-    <ClCompile Include="VoxelGrid.c" />
+    <ClCompile Include="triangle.cpp" />
+    <ClCompile Include="HgVbo.cpp" />
     <ClCompile Include="Win32Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -221,7 +220,6 @@
     <ClInclude Include="symbol_enumerator.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="vertex.h" />
-    <ClInclude Include="VoxelGrid.h" />
     <ClInclude Include="Win32Window.h" />
   </ItemGroup>
   <ItemGroup>

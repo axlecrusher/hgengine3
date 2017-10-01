@@ -15,12 +15,13 @@ int8_t draw_render_packet(const render_packet* p) {
 
 //	HgElement* e = p->scene->elements + p->element_idx;
 	RenderData* rd = p->renderData;
-	VCALL(rd->shader, enable);
+	rd->shader->enable();
+//	VCALL(rd->shader, enable);
 
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
-	setGlobalUniforms(rd->shader, &p->camera);
+	setGlobalUniforms(rd->shader, p->camera);
 
 
 	//FIX ME:setLocalUniforms
@@ -28,6 +29,7 @@ int8_t draw_render_packet(const render_packet* p) {
 	assert(0);
 //	setLocalUniforms(&p->rotation, &p->position, p->scale);
 
-	rd->renderFunc(rd);
+	rd->render();
+//	rd->renderFunc(rd);
 	return 0;
 }

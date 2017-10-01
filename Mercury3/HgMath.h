@@ -5,6 +5,11 @@
 
 #include <HgTypes.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 void MatrixMultiply4f(const float* in1, const float* in2, float* outa);
 void print_matrix(const float* m);
 
@@ -31,7 +36,13 @@ quaternion vector3_to_quat(const vector3* a);
 
 float vector3_length(const vector3* v);
 vector3 vector3_normalize(const vector3* v);
-inline vector3 vector3_zero() { vector3 a = { 0,0,0 }; return a; }
+
+extern vector3 vector3_zero;
+//inline vector3 vector3_zero() { vector3 a = { 0,0,0 }; return a; }
 
 vector3 vector3_cross(const vector3* v1, const vector3* v3);
 vector3 vector3_quat_rotate(const vector3* v, const quaternion* q);
+
+#ifdef __cplusplus
+}
+#endif

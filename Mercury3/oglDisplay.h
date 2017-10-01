@@ -8,6 +8,7 @@
 #include <HgTypes.h>
 
 #include <HgVbo.h>
+#include <memory>
 
 enum UniformLocations {
 	U_ROTATION=0,
@@ -39,27 +40,34 @@ inline void free_arbitrary(ArbitraryData* x) {
 	x->owns_ptr = 0;
 }
 
-typedef struct OGLRenderData {
-	RenderData baseRender;
+class OGLRenderData : public RenderData {
+public:
+	typedef void (*indiceRenderFunc)(OGLRenderData* rd);
+	OGLRenderData();
+	virtual void init();
+	virtual void destroy();
+	virtual void render();
 
 	struct HgVboMemory* hgVbo;
-	struct HgVboMemory* indexVbo;
-	struct HgVboMemory* colorVbo;
+//	struct HgVboMemory* indexVbo; //not used, what was this for?
+//	struct HgVboMemory* colorVbo; //not used, what was this for?
 
 	uint32_t vbo_offset;
 	uint16_t vertex_count;
-
+//private:
 	GLuint idx_id;
 	uint32_t index_count;
 
-	ArbitraryData indices;
-} OGLRenderData;
+//	std::shared_ptr<char*> indices;
+	ArbitraryData indices; //can be in different formats, requiring different renderers
+	indiceRenderFunc renderFunction;
+};
 
 GLuint hgOglVbo(vertices v);
 
 //void destroy_render_data_ogl(struct RenderData* render_data);
 //void ogl_destroy_renderData();
-void setGlobalUniforms(HgShader* shader, const HgCamera* camera);
+void setGlobalUniforms(HgShader* shader, const HgCamera& camera);
 void setLocalUniforms(HgShader*, const quaternion* rotation, const point* position, float scale, const point* origin); 
 void hgViewport(uint8_t vp);
 

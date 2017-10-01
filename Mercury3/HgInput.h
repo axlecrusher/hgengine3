@@ -1,6 +1,11 @@
 #pragma once
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 extern uint8_t KeyDownMap[];
 
 typedef struct HgMouseInput {
@@ -8,3 +13,7 @@ typedef struct HgMouseInput {
 } HgMouseInput;
 
 extern HgMouseInput MOUSE_INPUT;
+
+#ifdef __cplusplus
+}
+#endif

@@ -28,12 +28,12 @@ static char* shader_names[MAX_SHADERS] = { NULL }; //replace strings with CRC32?
 shader_entry shader_list[MAX_SHADERS];
 
 static void ShaderFileChanged(void* data) {
-	shader_entry* entry = data;
+	shader_entry* entry = (shader_entry*)data;
 	fprintf(stderr, "Shader file changed:%s\n", entry->frag_path);
-	VCALL(entry->shader, load);
+	entry->shader->load();
 }
 
-HgShader* HGShader_acquire(const char* vert, const char* frag) {
+HgShader* HgShader::acquire(const char* vert, const char* frag) {
 	uint32_t i = 0;
 	char* name = str_cat(vert, frag);
 	uint32_t funused = 0xFFFFFFFF;
@@ -58,12 +58,12 @@ HgShader* HGShader_acquire(const char* vert, const char* frag) {
 	WatchFileForChange(frag, ShaderFileChanged, shader_list+i);
 	WatchFileForChange(vert, ShaderFileChanged, shader_list + i);
 
-	VCALL(shader_list[i].shader, load);
+	shader_list[i].shader->load();
 
 	return shader_list[i].shader;
 }
 
-void HGShader_release(HgShader* s) {
+void HgShader::release(HgShader* s) {
 	uint32_t i = 0;
 	for (i = 0; i < MAX_SHADERS; ++i) {
 		if (s == shader_list[i].shader) {

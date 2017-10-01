@@ -3,10 +3,6 @@
 #include <stdlib.h>
 #include <HgVbo.h>
 
-
-
-static vtable_index VTABLE_INDEX;
-
 typedef struct header {
 	uint32_t vertex_count, index_count;
 } header;
@@ -21,8 +17,9 @@ static model_data LoadModel(const char* filename) {
 	vbo_layout_vnu* buffer1 = NULL;
 	uint16_t* buffer2 = NULL;
 
-	FILE* f = fopen(filename, "rb");
-	if (f == NULL) {
+	FILE* f = NULL;
+	errno_t err = fopen_s(&f, filename, "rb");
+	if (err != 0) {
 		fprintf(stderr, "Unable to open file \"%s\"\n", filename);
 		return r;
 	}
@@ -46,8 +43,8 @@ static model_data LoadModel(const char* filename) {
 		return r;
 	}
 
-	buffer1 = malloc(sizeof(*buffer1)*head.vertex_count);
-	buffer2 = malloc(sizeof(*buffer2)*head.index_count);
+	buffer1 = (vbo_layout_vnu*)malloc(sizeof(*buffer1)*head.vertex_count);
+	buffer2 = (uint16_t*)malloc(sizeof(*buffer2)*head.index_count);
 
 	read = fread(buffer1, sizeof(*buffer1), head.vertex_count, f);
 	if (read != head.vertex_count) {
@@ -77,15 +74,15 @@ static model_data LoadModel(const char* filename) {
 	return r;
 }
 
-static void model_render(RenderData* rd) {
+static void model_render(OGLRenderData* rd) {
 	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
 	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer16(d->indices.data, d->index_count);
+		d->idx_id = new_index_buffer16((uint16_t*)d->indices.data, d->index_count);
 		free_arbitrary(&d->indices);
 	}
 
-	setBlendMode(rd->blendMode);
+	setBlendMode((BlendMode)rd->blendMode);
 	hgvbo_use(d->hgVbo);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
@@ -93,28 +90,31 @@ static void model_render(RenderData* rd) {
 }
 
 static RenderData* init_render_data() {
-	OGLRenderData* rd = new_RenderData();
-	rd->baseRender.renderFunc = model_render;
-	return (void*)rd;
+	OGLRenderData* rd = new OGLRenderData();
+//	rd->baseRender.renderFunc = model_render;
+	return rd;
 }
 
-static void updateClbk(struct HgElement* e, uint32_t tdelta) {
+static void updateClbk(HgElement* e, uint32_t tdelta) {
 	//	printf("cube\n");
 }
 
+model_data::model_data()
+	:vertices(nullptr), indices(nullptr)
+{
+
+}
+model_data::~model_data() {
+}
+
 static void destroy(HgElement* e) {
-	SCALL(e->m_renderData, destroy);
+//	SCALL(e->m_renderData, destroy);
 	free(e->m_renderData);
 	e->m_renderData = NULL;
 }
 
-static HgElement_vtable vtable = {
-	.destroy = destroy
-//	.updateFunc = updateClbk
-};
-
 static void change_to_model(HgElement* element) {
-	element->vptr_idx = VTABLE_INDEX;
+//	element->vptr_idx = VTABLE_INDEX;
 
 	//create an instance of the render data for all triangles to share
 	element->m_renderData = init_render_data();
@@ -139,6 +139,7 @@ int8_t model_load(HgElement* element, const char* filename) {
 //	mrd->index_count = mdl.index_count;
 	rd->indices.data = mdl.indices;
 	rd->indices.owns_ptr = 1;
+	rd->renderFunction = model_render;
 
 	CLEAR_FLAG(element, HGE_DESTROY);
 
@@ -160,4 +161,4 @@ void model_create(HgElement* element) {
 }
 */
 
-REGISTER_LINKTIME(hgmodel);
+REGISTER_LINKTIME(hgmodel,change_to_model);

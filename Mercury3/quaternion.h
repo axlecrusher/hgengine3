@@ -2,6 +2,11 @@
 
 #include <math.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef struct quaternion {
 	float w;
 	float x;
@@ -17,3 +22,7 @@ void toQuaternion2(double pitch, double roll, double yaw, quaternion* q);
 quaternion quat_mult(const quaternion* q1, const quaternion* q2);
 void quaternion_normalize(quaternion* q);
 float quat_length(quaternion* q);
+
+#ifdef __cplusplus
+}
+#endif

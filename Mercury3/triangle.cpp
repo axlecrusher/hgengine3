@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <oglShaders.h>
 
-static vtable_index VTABLE_INDEX;
+//static vtable_index VTABLE_INDEX;
 //instanced render data
 static OGLRenderData* trd = NULL;
 
@@ -27,16 +27,8 @@ static uint8_t indices[] = {
 	0,1,2
 };
 
-static void updateClbk(struct HgElement* e, uint32_t tdelta) {
-	//	printf("cube\n");
-}
-
-static void destroy(HgElement* e) {
-	e->m_renderData = NULL;
-}
-
 static void SetupRenderData() {
-	trd = new_RenderData();
+	trd = new OGLRenderData();
 
 	vertices points;
 	points.points.array = vv;
@@ -56,9 +48,9 @@ OGLRenderData* triangle_init_render_data() {
 	return trd;
 }
 
-static void change_to_triangle(HgElement* element) {
+void change_to_triangle(HgElement* element) {
 	//create an instance of the render data for all triangles to share
-	element->m_renderData = (RenderData*)triangle_init_render_data();
+	element->m_renderData = triangle_init_render_data();
 }
 /*
 void shape_create_triangle(HgElement* element) {
@@ -75,12 +67,7 @@ void shape_create_triangle(HgElement* element) {
 }
 */
 
-static HgElement_vtable vtable = {
-	.create = change_to_triangle,
-	.destroy = destroy,
-	.updateFunc = NULL
-};
-
+/*
 static void global_destroy() {
 	if (trd) {
 		SAFE_DESTROY(trd->baseRender.destroy, trd);
@@ -88,5 +75,9 @@ static void global_destroy() {
 }
 
 REGISTER_GLOBAL_DESTROY(global_destroy);
+*/
+static void triangle_factory(HgElement* e) {
+	change_to_triangle(e);
+}
 
-REGISTER_LINKTIME(triangle)
+REGISTER_LINKTIME(triangle, triangle_factory)

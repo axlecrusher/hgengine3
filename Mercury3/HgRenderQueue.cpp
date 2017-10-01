@@ -80,7 +80,7 @@ void hgRenderQueue_push(render_packet* p) {
 	HgRenderQueue* x = _pop(&unused);
 	if (x == NULL) {
 //		printf("ALLOCATE\n");
-		x = calloc(1, sizeof *x);
+		x = new HgRenderQueue();
 	}
 
 	x->next = NULL;
@@ -102,7 +102,7 @@ render_packet* hgRenderQueue_pop() {
 }
 
 render_packet* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera* camera, HgScene* scene, uint16_t idx) {
-	render_packet* rp = calloc(1, sizeof* rp);
+	render_packet* rp = new render_packet();
 //	RenderElement* rp = new RenderElement();
 
 	rp->renderData = NULL;

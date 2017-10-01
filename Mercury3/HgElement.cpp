@@ -7,14 +7,20 @@
 
 #include <str_utils.h>
 #include <HgMath.h>
-
+#include <map>
+/*
 hgstring HGELEMENT_TYPE_NAMES = { 0, 0 };
 uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES] = { 0 };
 
 extern HgElement_vtable HGELEMT_VTABLES[MAX_ELEMENT_TYPES] = { 0 };
+*/
 
-void* (*new_RenderData)() = NULL;
-
+/*
+hgstring HGELEMENT_TYPE_NAMES = { 0, 0 };
+uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES] = { 0 };
+*/
+RenderData* (*new_RenderData)() = NULL;
+/*
 vtable_index RegisterElementType(const char* c) {
 	static vtable_index ElementTypeCounter = 1; //0 is reserved for undefined
 	if (ElementTypeCounter==1) {
@@ -25,16 +31,50 @@ vtable_index RegisterElementType(const char* c) {
 	HGELEMENT_TYPE_NAME_OFFSETS[ElementTypeCounter] = hgstring_append(&HGELEMENT_TYPE_NAMES, c);
 	return ElementTypeCounter++;
 }
+*/
+
+std::map<std::string, factory_clbk> element_factories;
+/*
+vtable_index RegisterElementType(const char* c) {
+	static vtable_index ElementTypeCounter = 1; //0 is reserved for undefined
+	if (ElementTypeCounter == 1) {
+		HGELEMENT_TYPE_NAME_OFFSETS[0] = hgstring_append(&HGELEMENT_TYPE_NAMES, "UndefinedType");
+	}
+
+	printf("Registering %s, type %d \n", c, ElementTypeCounter);
+	HGELEMENT_TYPE_NAME_OFFSETS[ElementTypeCounter] = hgstring_append(&HGELEMENT_TYPE_NAMES, c);
+	return ElementTypeCounter++;
+}
+*/
+void RegisterElementType(const char* c, factory_clbk factory) {
+	element_factories[c] = factory;
+}
+
+RenderData::RenderData()
+	:blendMode(BlendMode::BLEND_NORMAL)
+{
+
+}
+
+RenderData::~RenderData()
+{
+	destroy();
+}
+
+void RenderData::destroy() {
+	if (shader) HgShader::release(shader);
+	shader = nullptr;
+}
 
 void HgElement::init()
 {
 	flags = 0;
 	m_renderData = NULL;
-	position = vector3_zero();
-	extraData = NULL;
-	m_renderData = NULL;
+	position = vector3_zero;
+	m_logic = nullptr;
+	m_renderData = nullptr;
 	scale = 1;
-	origin = vector3_zero();
+	origin = vector3_zero;
 
 	quaternion_init(&rotation);
 }
@@ -42,6 +82,11 @@ void HgElement::init()
 void HgElement::destroy()
 {
 }
+
+void HgElement::render() {
+
+}
+
 
 /*
 vtable_index hgelement_get_type_index(char* type) {

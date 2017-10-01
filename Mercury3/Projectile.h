@@ -2,12 +2,14 @@
 
 #include <HgElement.h>
 
-extern float projectileMsecSpeed;
-
-typedef struct ProjectileData {
+class Projectile : public HgElementLogic {
+public:
+	Projectile();
+	virtual void update(uint32_t tdelta);
 	vector3 direction;
 	uint32_t total_time;
-} ProjectileData;
+//	float projectileMsecSpeed;
+};
 
 /*
 void projectile_create(HgElement* element);

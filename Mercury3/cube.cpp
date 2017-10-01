@@ -16,7 +16,7 @@
 
 //TestRegistration("test");
 
-static vtable_index VTABLE_INDEX;
+//static vtable_index VTABLE_INDEX;
 
 //dump from a hgmdl model, VNU format.
 vbo_layout_vnu raw_cube_data[] = {
@@ -74,18 +74,18 @@ static void destroy(HgElement* e) {
 static void cube_render(RenderData* rd) {
 	OGLRenderData *d = (OGLRenderData*)rd;
 
-	setBlendMode(rd->blendMode);
+	setBlendMode((BlendMode)rd->blendMode);
 	hgvbo_use(d->hgVbo);
 
 	glDrawArrays(GL_TRIANGLES, d->vbo_offset, d->vertex_count);
 }
 
 static void SetupRenderData() {
-	crd = new_RenderData();
+	crd = new OGLRenderData();
 
 	crd->vertex_count = 24;
 	crd->hgVbo = &staticVboVNU;
-	crd->vbo_offset = hgvbo_add_data_vnu_raw(crd->hgVbo, (void*)raw_cube_data, crd->vertex_count);
+	crd->vbo_offset = hgvbo_add_data_vnu_raw(crd->hgVbo, raw_cube_data, crd->vertex_count);
 	crd->index_count = 36;
 	crd->indices.data = cube_indices;
 
@@ -95,7 +95,7 @@ static void SetupRenderData() {
 }
 
 void change_to_cube(HgElement* element) {
-	element->vptr_idx = VTABLE_INDEX;
+//	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
 	if (crd == NULL) SetupRenderData();
 
@@ -114,11 +114,5 @@ void shape_create_cube(HgElement* element) {
 	change_to_cube(element);
 }
 */
-static HgElement_vtable vtable = {
-	.create = change_to_cube,
-	.destroy = destroy,
-	//	.updateFunc = updateClbk
-	.updateFunc = NULL
-};
 
-REGISTER_LINKTIME(cube)
+REGISTER_LINKTIME(cube, change_to_cube)

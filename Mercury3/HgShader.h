@@ -1,16 +1,16 @@
 #pragma once
 
-typedef struct HgShader_vtable{
-	void(*load)(struct HgShader* shader);
-	void(*destroy)(struct HgShader* shader);
-	void(*enable)(struct HgShader* shader);
-} HgShader_vtable;
+class HgShader {
+	public:
+		virtual void load() = 0;
+		virtual void destroy() = 0;
+		virtual void enable() = 0;
 
-typedef struct HgShader {
-	HgShader_vtable* vptr;
-} HgShader;
+		static HgShader* acquire(const char* vert, const char* frag);
+		static void release(HgShader* shader);
+};
 
-HgShader* HGShader_acquire(const char* vert, const char* frag);
-void HGShader_release(HgShader* shader);
+//HgShader* HGShader_acquire(const char* vert, const char* frag);
+//void HGShader_release(HgShader* shader);
 
 extern HgShader*(*_create_shader)(const char* vert, const char* frag);

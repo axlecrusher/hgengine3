@@ -12,16 +12,6 @@ static GLuint _currentShaderProgram = 0;
 
 #pragma warning(disable:4996)
 
-typedef struct shader_source {
-	char* vert_file_path;
-	char* frag_file_path;
-	char* geom_file_path;
-
-	char* vert_source;
-	char* frag_source;
-	char* geom_source;
-} shader_source;
-
 void _print_shader_info_log(GLuint idx) {
 	int max_length = 2048;
 	int actual_length = 0;
@@ -58,7 +48,7 @@ static char* read_from_disk(const char* path) {
 	uint32_t size = ftell(f);
 	fseek(f, 0, SEEK_SET);
 
-	char *str = malloc(size + 1);
+	char *str = (char*)malloc(size + 1);
 	uint32_t bytes_read = fread(str, 1, size, f);
 	int error = ferror(f);
 	fclose(f);
@@ -71,7 +61,7 @@ static char* read_from_disk(const char* path) {
 	}
 
 	size = bytes_read;
-	char* realloc_ptr = realloc(str, size+1);
+	char* realloc_ptr = (char*)realloc(str, size+1);
 	assert(realloc_ptr != NULL);
 	str = realloc_ptr;
 	str[size] = 0;
@@ -99,8 +89,7 @@ static GLuint compile_shader(char* str, GLuint shader_type) {
 	return f_shader;
 }
 
-static void setup_shader(HgShader_ogl* s) {
-	HgShader_ogl* shader = (HgShader_ogl*)s;
+void HgOglShader::setup_shader(HgOglShader* shader) {
 	shader_source* source = shader->program_code;
 
 	GLuint vert_id = 0;
@@ -177,48 +166,38 @@ static void setup_shader(HgShader_ogl* s) {
 	}
 }
 
-static void load_from_disk(HgShader* s) {
-	HgShader_ogl* shader = (HgShader_ogl*)s;
-	shader_source* source = shader->program_code;
-
-//	GLuint vert_id = 0;
-//	GLuint frag_id = 0;
-//	GLuint geom_id = 0;
-
-	if (source->vert_file_path) source->vert_source = read_from_disk(source->vert_file_path);
-	if (source->frag_file_path) source->frag_source = read_from_disk(source->frag_file_path);
-	if (source->geom_file_path) source->geom_source = read_from_disk(source->geom_file_path);
-
-	shader->source_loaded = 1;
-}
-
-static void destroy_shader(HgShader* s) {
-}
-
-static void enable_shader(HgShader* s) {
-	HgShader_ogl* shader = (HgShader_ogl*)s;
-
-	if (shader->source_loaded == 0) return;
-
-	if (shader->program_id==0 || shader->source_loaded==1) setup_shader(shader);
-	if (shader->program_id>0) useShaderProgram(shader->program_id);
-}
-
-static HgShader_vtable vtable = {
-	.load = load_from_disk,
-	.destroy = destroy_shader,
-	.enable = enable_shader
-};
-
 HgShader* HGShader_ogl_create(const char* vert, const char* frag) {
-	HgShader_ogl* s = calloc(1, sizeof* s);
+	HgOglShader* s = new HgOglShader();
 
-	s->_base.vptr = &vtable;
-
-	shader_source* source = calloc(1, sizeof* source);
+	shader_source* source = new shader_source();
 	source->vert_file_path = str_copy(vert);
 	source->frag_file_path = str_copy(frag);
-	s->program_code = source;
+	s->setProgramCode(source);
 
-	return &s->_base;
+	return s;
+}
+
+HgOglShader::HgOglShader()
+	:program_id(0), source_loaded(false), program_code(nullptr)
+{
+	memset(uniform_locations, 0, sizeof(uniform_locations));
+}
+
+void HgOglShader::load() {
+	if (program_code->vert_file_path) program_code->vert_source = read_from_disk(program_code->vert_file_path);
+	if (program_code->frag_file_path) program_code->frag_source = read_from_disk(program_code->frag_file_path);
+	if (program_code->geom_file_path) program_code->geom_source = read_from_disk(program_code->geom_file_path);
+
+	source_loaded = 1;
+}
+
+void HgOglShader::destroy() {
+
+}
+
+void HgOglShader::enable() {
+	if (source_loaded == 0) return;
+
+	if (program_id == 0 || source_loaded == 1) setup_shader(this);
+	if (program_id>0) useShaderProgram(program_id);
 }

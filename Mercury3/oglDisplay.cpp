@@ -4,6 +4,8 @@
 #include <HgElement.h>
 #include <oglShaders.h>
 
+#include <string.h>
+
 viewport view_port[3];
 
 static uint8_t _currenViewPort_idx =  0xFF;
@@ -33,14 +35,14 @@ void hgViewport(uint8_t idx) {
 	glEnable(GL_SCISSOR_TEST);
 }
 
-void setGlobalUniforms(HgShader* shader, const HgCamera* c) {
-	HgShader_ogl* s = (HgShader_ogl*)shader;
+void setGlobalUniforms(HgShader* shader, const HgCamera& c) {
+	HgOglShader* s = (HgOglShader*)shader;
 	if (s->uniform_locations[U_PROJECTION] > -1) glUniformMatrix4fv(s->uniform_locations[U_PROJECTION], 1, GL_TRUE, _projection);
-	if (s->uniform_locations[U_CAMERA_ROT] > -1) glUniform4f(s->uniform_locations[U_CAMERA_ROT], c->rotation.x, c->rotation.y, c->rotation.z, c->rotation.w);
-	if (s->uniform_locations[U_CAMERA_POS] > -1) glUniform3f(s->uniform_locations[U_CAMERA_POS], c->position.components.x, c->position.components.y, c->position.components.z);
+	if (s->uniform_locations[U_CAMERA_ROT] > -1) glUniform4f(s->uniform_locations[U_CAMERA_ROT], c.rotation.x, c.rotation.y, c.rotation.z, c.rotation.w);
+	if (s->uniform_locations[U_CAMERA_POS] > -1) glUniform3f(s->uniform_locations[U_CAMERA_POS], c.position.components.x, c.position.components.y, c.position.components.z);
 }
 void setLocalUniforms(HgShader* shader, const quaternion* rotation, const point* position, float scale, const point* origin) {
-	HgShader_ogl* s = (HgShader_ogl*)shader;
+	HgOglShader* s = (HgOglShader*)shader;
 	if (s->uniform_locations[U_ROTATION] > -1) glUniform4f(s->uniform_locations[U_ROTATION], rotation->x, rotation->y, rotation->z, rotation->w);
 	if (s->uniform_locations[U_POSITION] > -1) glUniform4f(s->uniform_locations[U_POSITION], position->components.x, position->components.y, position->components.z, scale);
 	if (s->uniform_locations[U_ORIGIN] > -1) glUniform3f(s->uniform_locations[U_ORIGIN], origin->components.x, origin->components.y, origin->components.z);
@@ -57,16 +59,6 @@ GLuint hgOglVbo(vertices v) {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, v.size * sizeof(*(v.points.v)), v.points.array, GL_STATIC_DRAW);
 	return vbo;
-}
-
-void OGLRenderData_destroy(OGLRenderData* d) {
-	//FIXME: Do something to clean up hgVbo
-	//hgvbo_remove(d->hgvbo, d->vbo_offset, d->vertex_count)
-
-	if (d->idx_id > 0) {
-		glDeleteBuffers(1, &d->idx_id);
-		d->idx_id = 0;
-	}
 }
 
 void setup_viewports(uint16_t width, uint16_t height) {
@@ -86,20 +78,6 @@ void setup_viewports(uint16_t width, uint16_t height) {
 	view_port[i].y = 0;
 	view_port[i].width = width/2;
 	view_port[i].height = height;
-}
-
-void ogl_render_renderData(RenderData* rd) {
-	OGLRenderData *d = (OGLRenderData*)rd;
-	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer8(d->indices.data, d->index_count);
-		free_arbitrary(&d->indices);
-	}
-
-	setBlendMode(rd->blendMode);
-	hgvbo_use(d->hgVbo);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
-	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_BYTE, 0, d->vbo_offset);
 }
 
 GLuint new_index_buffer8(uint8_t* indices, uint32_t count) {
@@ -140,27 +118,54 @@ void setBlendMode(BlendMode blendMode) {
 	}
 }
 
-static void destroy_render_data_ogl(struct RenderData* rd) {
-	OGLRenderData* oglrd = (OGLRenderData*)rd;
-	free_arbitrary(&oglrd->indices);
-	if (oglrd->idx_id>0) glDeleteBuffers(1, &oglrd->idx_id);
-	if (rd->shader) HGShader_release(rd->shader);
-}
-
-void* new_renderData_ogl() {
-	OGLRenderData* rd = calloc(1, sizeof(*rd));
-	rd->baseRender.renderFunc = ogl_render_renderData;
-	rd->baseRender.blendMode = BLEND_NORMAL;
-	rd->baseRender.shader = HGShader_acquire("test_vertex.glsl", "test_frag.glsl");
-	rd->baseRender.destroy = destroy_render_data_ogl;
-
-	return rd;
-}
-
 void draw_index_vbo(HgVboMemory* vbo, uint32_t offset) {
 	if (vbo->type == VBO_INDEX8 || vbo->type == VBO_INDEX16) {
 		uint32_t glType = GL_UNSIGNED_BYTE;
 		if (vbo->type == VBO_INDEX16) glType = GL_UNSIGNED_SHORT;
 		glDrawElementsBaseVertex(GL_TRIANGLES, vbo->count, glType, 0, offset);
 	}
+}
+
+static void NormalIndiceRender(OGLRenderData* rd) {
+	if (rd->idx_id == 0) {
+		rd->idx_id = new_index_buffer8((uint8_t*)rd->indices.data, rd->index_count);
+		free_arbitrary(&rd->indices);
+	}
+
+	setBlendMode((BlendMode)rd->blendMode);
+	hgvbo_use(rd->hgVbo);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rd->idx_id);
+	glDrawElementsBaseVertex(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_BYTE, 0, rd->vbo_offset);
+}
+
+OGLRenderData::OGLRenderData()
+	:hgVbo(nullptr),/* indexVbo(nullptr), colorVbo(nullptr),*/ vbo_offset(0), vertex_count(0), idx_id(0), index_count(0), renderFunction(NormalIndiceRender)
+{
+	memset(&indices, 0, sizeof(indices));
+	init();
+}
+
+void OGLRenderData::init() {
+	shader = HgShader::acquire("test_vertex.glsl", "test_frag.glsl");
+}
+
+void OGLRenderData::destroy() {
+//	OGLRenderData* oglrd = (OGLRenderData*)rd;
+	free_arbitrary(&indices);
+//	if (idx_id>0) glDeleteBuffers(1, &idx_id);
+
+	//FIXME: Do something to clean up hgVbo
+	//hgvbo_remove(d->hgvbo, d->vbo_offset, d->vertex_count)
+
+	if (idx_id > 0) {
+		glDeleteBuffers(1, &idx_id);
+		idx_id = 0;
+	}
+
+	RenderData::destroy();
+}
+
+void OGLRenderData::render() {
+	renderFunction(this);
 }

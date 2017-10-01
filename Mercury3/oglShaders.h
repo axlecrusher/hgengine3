@@ -6,16 +6,36 @@
 #include <HgShader.h>
 #include <oglDisplay.h>
 
-typedef struct HgShader_ogl {
-	HgShader _base;
-	GLuint program_id;
-	uint8_t source_loaded;
+struct shader_source {
+	char* vert_file_path;
+	char* frag_file_path;
+	char* geom_file_path;
 
-	int8_t uniform_locations[U_UNIFORM_COUNT];
-	//other things not needed often
-	void* program_code;
-} HgShader_ogl;
+	char* vert_source;
+	char* frag_source;
+	char* geom_source;
+};
 
+class HgOglShader : public HgShader {
+	public:
+		HgOglShader();
+
+		virtual void load();
+		virtual void destroy();
+		virtual void enable();
+
+		void setProgramCode(shader_source* ss) { program_code = ss; }
+
+		int8_t uniform_locations[U_UNIFORM_COUNT];
+	private:
+		static void setup_shader(HgOglShader* s);
+
+		GLuint program_id;
+		uint8_t source_loaded;
+
+		//other things not needed often
+		shader_source* program_code;
+};
 
 //GLuint shaders_load(const char* path, uint32_t shader_type);
 //void useShaderProgram(GLuint id);

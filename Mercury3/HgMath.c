@@ -8,6 +8,8 @@
 
 #include <quaternion.h>
 
+extern vector3 vector3_zero = { 0,0,0 };
+
 void MatrixMultiply4f(const float* in1, const float* in2, float* outa)
 {
 	float* r = outa;
