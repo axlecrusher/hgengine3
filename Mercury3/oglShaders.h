@@ -26,6 +26,9 @@ class HgOglShader : public HgShader {
 
 		void setProgramCode(shader_source* ss) { program_code = ss; }
 
+		virtual void setGlobalUniforms(const HgCamera& c);
+		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin);
+
 		int8_t uniform_locations[U_UNIFORM_COUNT];
 	private:
 		static void setup_shader(HgOglShader* s);

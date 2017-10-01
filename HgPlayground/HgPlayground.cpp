@@ -180,17 +180,17 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgElement*
 	//	printf("serial\n");
 	hgViewport(viewport_idx);
 
-	RenderData* rd = e->m_renderData;
+	HgShader* shader = e->m_renderData->shader;
 
-	if (rd->shader) rd->shader->enable();
+	if (shader) {
+		shader->enable();
+		//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
+		//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
+		shader->setGlobalUniforms(*camera);
+		shader->setLocalUniforms(&e->rotation, &e->position, e->scale, &e->origin);
+	}
 
-	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
-	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
-
-	setGlobalUniforms(rd->shader, *camera);
-	setLocalUniforms(rd->shader, &e->rotation, &e->position, e->scale, &e->origin);
-
-	rd->render();
+	e->m_renderData->render();
 }
 
 void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
@@ -201,7 +201,7 @@ void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
-	setGlobalUniforms(rd->shader, *camera);
+	rd->shader->setGlobalUniforms(*camera);
 	//	setLocalUniforms(&e->rotation, &e->position, e->scale);
 
 	rd->render();

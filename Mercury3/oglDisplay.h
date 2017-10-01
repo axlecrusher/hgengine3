@@ -60,7 +60,7 @@ public:
 	uint32_t index_count;
 
 //	std::shared_ptr<char*> indices;
-	ArbitraryData indices; //can be in different formats, requiring different renderers
+	ArbitraryData indices; //can be in different formats, requiring different renderers, set renderFunction
 	indiceRenderFunc renderFunction;
 };
 
@@ -68,8 +68,6 @@ GLuint hgOglVbo(vertices v);
 
 //void destroy_render_data_ogl(struct RenderData* render_data);
 //void ogl_destroy_renderData();
-void setGlobalUniforms(HgShader* shader, const HgCamera& camera);
-void setLocalUniforms(HgShader*, const quaternion* rotation, const point* position, float scale, const point* origin); 
 void hgViewport(uint8_t vp);
 
 void setup_viewports(uint16_t width, uint16_t height);

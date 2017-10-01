@@ -80,7 +80,7 @@ public:
 		void destroy();
 
 		inline bool isRenderable() const { return m_renderData != nullptr; }
-		void render();
+		inline void render() { if (isRenderable()) m_renderData->render();  }
 
 		inline void update(uint32_t dtime) { if (m_logic != nullptr) m_logic->update(dtime); }
 
