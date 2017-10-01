@@ -30,6 +30,9 @@ typedef enum BlendMode {
 
 class RenderData {
 	public:
+		typedef RenderData*(*newRenderDataCallback)();
+		static newRenderDataCallback Create;
+
 		RenderData();
 		~RenderData();
 

@@ -81,7 +81,7 @@ static void cube_render(RenderData* rd) {
 }
 
 static void SetupRenderData() {
-	crd = new OGLRenderData();
+	crd = OGLRenderData::Create();
 
 	crd->vertex_count = 24;
 	crd->hgVbo = &staticVboVNU;

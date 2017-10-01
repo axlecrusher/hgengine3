@@ -50,6 +50,8 @@ void RegisterElementType(const char* c, factory_clbk factory) {
 	element_factories[c] = factory;
 }
 
+RenderData::newRenderDataCallback RenderData::Create = nullptr;
+
 RenderData::RenderData()
 	:blendMode(BlendMode::BLEND_NORMAL)
 {

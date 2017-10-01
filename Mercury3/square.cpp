@@ -37,7 +37,7 @@ static OGLRenderData* trd = NULL;
 
 
 static void SetupRenderData() {
-	trd = new OGLRenderData();
+	trd = OGLRenderData::Create();
 	trd->indices.data = indices;
 
 	vertices points;

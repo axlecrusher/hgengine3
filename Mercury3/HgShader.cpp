@@ -13,7 +13,7 @@
 
 #define MAX_SHADERS 1000
 
-HgShader*(*_create_shader)(const char* vert, const char* frag);
+HgShader::createShaderCallback HgShader::Create = nullptr;
 
 typedef struct shader_entry {
 	uint32_t use_count;
@@ -52,7 +52,7 @@ HgShader* HgShader::acquire(const char* vert, const char* frag) {
 	i = funused;
 	shader_names[i] = name;
 	shader_list[i].use_count = 1;
-	shader_list[i].shader = _create_shader(vert,frag);
+	shader_list[i].shader = HgShader::Create(vert,frag);
 	shader_list[i].frag_path = str_cat(frag, "");
 	shader_list[i].vertex_path = str_cat(vert, "");
 	WatchFileForChange(frag, ShaderFileChanged, shader_list+i);

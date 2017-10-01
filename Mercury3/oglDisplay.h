@@ -43,6 +43,7 @@ inline void free_arbitrary(ArbitraryData* x) {
 class OGLRenderData : public RenderData {
 public:
 	typedef void (*indiceRenderFunc)(OGLRenderData* rd);
+	inline static OGLRenderData* Create() { return (OGLRenderData*)RenderData::Create(); }
 	OGLRenderData();
 	virtual void init();
 	virtual void destroy();
@@ -77,7 +78,7 @@ void ogl_render_renderData(RenderData* rd);
 GLuint new_index_buffer8(uint8_t* indices, uint32_t count);
 GLuint new_index_buffer16(uint16_t* indices, uint32_t count);
 void setBlendMode(BlendMode blendMode);
-void* new_renderData_ogl();
+inline RenderData* new_renderData_ogl() { return new OGLRenderData(); }
 
 void draw_index_vbo(struct HgVboMemory* vbo, uint32_t offset);
 

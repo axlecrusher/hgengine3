@@ -90,7 +90,7 @@ static void model_render(OGLRenderData* rd) {
 }
 
 static RenderData* init_render_data() {
-	OGLRenderData* rd = new OGLRenderData();
+	OGLRenderData* rd = OGLRenderData::Create();
 //	rd->baseRender.renderFunc = model_render;
 	return rd;
 }
