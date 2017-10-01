@@ -1,6 +1,7 @@
 #pragma once
 
 #include <HgTypes.h>
+#include <quaternion.h>
 
 class HgCamera {
 	public:

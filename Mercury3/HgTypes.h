@@ -1,23 +1,30 @@
 #pragma once
 
 #include <vertex.h>
-#include <quaternion.h>
 
-typedef vertex point;
-typedef vertex vector3;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-typedef struct viewport {
-	uint16_t x, y, width, height;
-} viewport;
+	typedef vertex point;
+	typedef vertex vector3;
 
-typedef struct color {
-	uint8_t r, g, b, a;
-} color;
+	typedef struct viewport {
+		uint16_t x, y, width, height;
+	} viewport;
 
-typedef struct uv_coord {
-	uint16_t u,v;
-} uv_coord;
+	typedef struct color {
+		uint8_t r, g, b, a;
+	} color;
 
-typedef struct normal {
-	float x, y, z;
-} normal;
+	typedef struct uv_coord {
+		uint16_t u, v;
+	} uv_coord;
+
+	typedef struct normal {
+		float x, y, z;
+	} normal;
+
+#ifdef __cplusplus
+}
+#endif

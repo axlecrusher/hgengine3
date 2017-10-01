@@ -157,8 +157,7 @@ void fire(HgScene* scene) {
 
 	Projectile *pd = dynamic_cast<Projectile*>(element->logic());
 	pd->direction = camera->projectRay();
-	element->rotation = camera->rotation;
-	element->rotation.w = -element->rotation.w;
+	element->rotation = camera->rotation.invert();
 	element->position = camera->position;
 }
 
@@ -240,8 +239,6 @@ int main()
 	HgShader::Create = HGShader_ogl_create;
 	RenderData::Create = new_renderData_ogl;
 
-	//	new_RenderData = new_renderData_ogl;
-
 	if (stereo_view) {
 		setup_viewports(1280, 480);
 		//		Perspective2(60, 1280.0 / 480.0, 0.1f, 100.0f, projection);
@@ -263,8 +260,8 @@ int main()
 	//	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
 	//	Perspective2(60, 320.0 / 480.0, 0.1f, 100.0f, projection);
 
-	quaternion_init(&camera[0].rotation);
-	memset(camera[0].position.array, 0, sizeof camera[0].position);
+	camera[0].rotation = quaternion_default;
+	camera[0].position = vertex_zero;
 	camera[0].position.components.z = 1.5f;
 	camera[0].position.components.y = 2.0f;
 	toQuaternion2(0, 15, 0, &camera[0].rotation); //y,x,z
@@ -419,16 +416,14 @@ int main()
 			//			if (v.components.z > 0) DebugBreak();
 
 			float scale = (1.0f / 1000.0f) * ddtime;
-			v = vector3_normalize(&v);
+			v = vector3_normalize(v);
 			//			v = vector3_scale(&v, -1.0f);
 
-			camera->rotation.w = -camera->rotation.w; //invert coordinate system for vector rotation
-			v = vector3_quat_rotate(&v, &camera->rotation);
-			camera->rotation.w = -camera->rotation.w; //restore
+			v = vector3_quat_rotate(v, camera->rotation.invert());
 
 													  //			v = vector3_normalize(&v);
 
-			v = vector3_scale(&v, scale);
+			v = vector3_scale(v, scale);
 			camera->position = vector3_add(&camera->position, &v);
 
 			mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;

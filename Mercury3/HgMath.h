@@ -25,23 +25,21 @@ void Perspective2(
 	const double znear,
 	const double zfar, float* M);
 
-vector3 vector3_scale(const vector3* lhs, float scale);
+vector3 vector3_scale(vector3 lhs, float scale);
 vector3 vector3_add(const vector3* lhs, const vector3* rhs);
 vector3 vector3_sub(const vector3* lhs, const vector3* rhs);
 vector3 vector3_mul(const vector3* lhs, const vector3* rhs);
 vector3 vector3_div(const vector3* lhs, const vector3* rhs);
 float vector3_dot(const vector3* lhs, const vector3* rhs);
 
-quaternion vector3_to_quat(const vector3* a);
+float vector3_length(vector3 v);
+vector3 vector3_normalize(vector3 v);
 
-float vector3_length(const vector3* v);
-vector3 vector3_normalize(const vector3* v);
-
-extern vector3 vector3_zero;
+extern const vertex vertex_zero;
+extern const vector3 vector3_zero;
 //inline vector3 vector3_zero() { vector3 a = { 0,0,0 }; return a; }
 
 vector3 vector3_cross(const vector3* v1, const vector3* v3);
-vector3 vector3_quat_rotate(const vector3* v, const quaternion* q);
 
 #ifdef __cplusplus
 }

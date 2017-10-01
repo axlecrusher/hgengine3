@@ -25,7 +25,7 @@ void Projectile::update(uint32_t tdelta) {
 		}
 
 		float tmp = tdelta * projectileMsecSpeed;
-		vector3 r = vector3_scale(&direction, tmp);
+		vector3 r = vector3_scale(direction, tmp);
 		element->position = vector3_add(&element->position, &r);
 }
 

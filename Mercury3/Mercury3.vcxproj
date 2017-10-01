@@ -130,6 +130,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>include\;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,6 +151,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>include\;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -181,7 +183,7 @@
     <ClCompile Include="OglRenderPackets.cpp" />
     <ClCompile Include="oglShaders.cpp" />
     <ClCompile Include="Projectile.cpp" />
-    <ClCompile Include="quaternion.c" />
+    <ClCompile Include="quaternion.cpp" />
     <ClCompile Include="square.cpp" />
     <ClCompile Include="str_utils.c" />
     <ClCompile Include="symbol_enumerator.c">

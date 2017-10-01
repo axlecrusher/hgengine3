@@ -6,9 +6,8 @@
 #include <memory.h>
 #include <stdlib.h>
 
-#include <quaternion.h>
-
-extern vector3 vector3_zero = { 0,0,0 };
+const vertex vertex_zero = { 0,0,0 };
+const vector3 vector3_zero = { 0,0,0 };
 
 void MatrixMultiply4f(const float* in1, const float* in2, float* outa)
 {
@@ -98,12 +97,11 @@ void Perspective2(
 	M[14] = -1.0f;
 }
 
-vector3 vector3_scale(const vector3* v, float scale) {
-	vector3 r = *v;
-	r.array[0] *= scale;
-	r.array[1] *= scale;
-	r.array[2] *= scale;
-	return r;
+vector3 vector3_scale(vector3 v, float scale) {
+	v.array[0] *= scale;
+	v.array[1] *= scale;
+	v.array[2] *= scale;
+	return v;
 }
 
 vector3 vector3_mul(const vector3* v, const vector3* v2) {
@@ -155,36 +153,26 @@ float vector3_dot(const vector3* a, const vector3* b) {
 	return r;
 }
 
-quaternion vector3_to_quat(const vector3* a) {
-	quaternion q;
-	q.x = a->components.x;
-	q.y = a->components.y;
-	q.z = a->components.z;
-	return q;
-}
-
-
 #define SQUARE(x) (x*x)
 
-float vector3_length(const vector3* v) {
-	float x = SQUARE(v->array[0])
-			+ SQUARE(v->array[1])
-			+ SQUARE(v->array[2]);
+float vector3_length(vector3 v) {
+	float x = SQUARE(v.array[0])
+			+ SQUARE(v.array[1])
+			+ SQUARE(v.array[2]);
 
 	return (float)sqrt(x);
 }
 
-vector3 vector3_normalize(const vector3* v) {
+vector3 vector3_normalize(vector3 v) {
 	float length = vector3_length(v);
 //	if (fabs(length) < 0.000000000001f) return *v;
-	if (length == 0.0) return *v;
+	if (length == 0.0) return v;
 
-	vector3 r = *v;
-	r.array[0] /= length;
-	r.array[1] /= length;
-	r.array[2] /= length;
+	v.array[0] /= length;
+	v.array[1] /= length;
+	v.array[2] /= length;
 
-	return r;
+	return v;
 }
 
 vector3 vector3_cross(const vector3* v1, const vector3* v2) {
@@ -195,16 +183,6 @@ vector3 vector3_cross(const vector3* v1, const vector3* v2) {
 	r.array[1] = (x[2] * y[0]) - (x[0] * y[2]);
 	r.array[2] = (x[0] * y[1]) - (x[1] * y[0]);
 	return r;
-}
-
-vector3 vector3_quat_rotate(const vector3* v, const quaternion* q) {
-	vector3 r1 = vector3_scale(v, q->w);
-	vector3 r2 = vector3_cross((vector3*)&q->x, v);
-	r1 = vector3_add(&r1, &r2);
-	r2 = vector3_cross((vector3*)&q->x, &r1);
-	r1 = vector3_scale(&r2, 2.0);
-	r2 = vector3_add(v, &r1);
-	return r2;
 }
 
 /*
