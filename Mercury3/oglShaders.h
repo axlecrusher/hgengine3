@@ -19,6 +19,7 @@ struct shader_source {
 class HgOglShader : public HgShader {
 	public:
 		HgOglShader();
+		virtual ~HgOglShader();
 
 		virtual void load();
 		virtual void destroy();
@@ -37,6 +38,8 @@ class HgOglShader : public HgShader {
 		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin);
 
 		int8_t uniform_locations[U_UNIFORM_COUNT];
+
+		static std::unique_ptr<HgShader> Create(const char* vert, const char* frag);
 	private:
 		static void setup_shader(HgOglShader* s);
 
@@ -51,5 +54,3 @@ class HgOglShader : public HgShader {
 //void useShaderProgram(GLuint id);
 //void _print_programme_info_log(GLuint programme);
 //void _print_shader_info_log(GLuint idx);
-
-HgShader* HGShader_ogl_create(const char* vert, const char* frag);

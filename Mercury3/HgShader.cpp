@@ -17,7 +17,7 @@ HgShader::createShaderCallback HgShader::Create = nullptr;
 
 typedef struct shader_entry {
 	uint32_t use_count;
-	HgShader* shader;
+	std::unique_ptr<HgShader> shader;
 
 	char* vertex_path;
 	char* frag_path;
@@ -43,7 +43,7 @@ HgShader* HgShader::acquire(const char* vert, const char* frag) {
 		if (strcmp(name, shader_names[i]) == 0) {
 			free(name);
 			shader_list[i].use_count++;
-			return shader_list[i].shader;
+			return shader_list[i].shader.get();
 		}
 	}
 
@@ -52,7 +52,7 @@ HgShader* HgShader::acquire(const char* vert, const char* frag) {
 	i = funused;
 	shader_names[i] = name;
 	shader_list[i].use_count = 1;
-	shader_list[i].shader = HgShader::Create(vert,frag);
+	shader_list[i].shader = HgShader::Create(vert, frag);
 	shader_list[i].frag_path = str_cat(frag, "");
 	shader_list[i].vertex_path = str_cat(vert, "");
 	WatchFileForChange(frag, ShaderFileChanged, shader_list+i);
@@ -60,13 +60,13 @@ HgShader* HgShader::acquire(const char* vert, const char* frag) {
 
 	shader_list[i].shader->load();
 
-	return shader_list[i].shader;
+	return shader_list[i].shader.get();
 }
 
 void HgShader::release(HgShader* s) {
 	uint32_t i = 0;
 	for (i = 0; i < MAX_SHADERS; ++i) {
-		if (s == shader_list[i].shader) {
+		if (s == shader_list[i].shader.get()) {
 			shader_list[i].use_count--;
 			return;
 		}

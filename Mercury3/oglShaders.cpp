@@ -166,8 +166,8 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 	}
 }
 
-HgShader* HGShader_ogl_create(const char* vert, const char* frag) {
-	HgOglShader* s = new HgOglShader();
+std::unique_ptr<HgShader> HgOglShader::Create(const char* vert, const char* frag) {
+	std::unique_ptr<HgOglShader> s = std::make_unique<HgOglShader>();
 
 	shader_source* source = new shader_source();
 	source->vert_file_path = str_copy(vert);
@@ -183,6 +183,10 @@ HgOglShader::HgOglShader()
 	memset(uniform_locations, 0, sizeof(uniform_locations));
 }
 
+HgOglShader::~HgOglShader() {
+	destroy();
+}
+
 void HgOglShader::load() {
 	if (program_code->vert_file_path) program_code->vert_source = read_from_disk(program_code->vert_file_path);
 	if (program_code->frag_file_path) program_code->frag_source = read_from_disk(program_code->frag_file_path);
@@ -192,7 +196,8 @@ void HgOglShader::load() {
 }
 
 void HgOglShader::destroy() {
-
+	if (program_id > 0) glDeleteProgram(program_id);
+	program_id = 0;
 }
 
 void HgOglShader::enable() {

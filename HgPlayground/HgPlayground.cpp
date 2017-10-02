@@ -236,7 +236,7 @@ int main()
 	//	model_data d = LoadModel("test.hgmdl");
 	//	hgvbo_add_data_vc(&staticVbo, d.vertices, d.vertices, d.vertex_count);
 
-	HgShader::Create = HGShader_ogl_create;
+	HgShader::Create = HgOglShader::Create;
 	RenderData::Create = new_renderData_ogl;
 
 	if (stereo_view) {
