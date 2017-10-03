@@ -26,7 +26,7 @@ public:
 
 	union {
 		float wxyz[4];
-//		__m128 sse_data;
+//		__m128 sse_data; //using this and an enhanced instruction set (SSE2) seem to make the compiler do the correct things SOMETIMES rather than never
 	} wxyz;
 };
 
