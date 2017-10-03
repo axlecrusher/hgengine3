@@ -42,12 +42,12 @@ inline void free_arbitrary(ArbitraryData* x) {
 
 class OGLRenderData : public RenderData {
 public:
-	typedef void (*indiceRenderFunc)(OGLRenderData* rd);
 	inline static OGLRenderData* Create() { return (OGLRenderData*)RenderData::Create(); }
 	OGLRenderData();
+	~OGLRenderData();
 	virtual void init();
 	virtual void destroy();
-	virtual void render();
+//	virtual void render();
 
 	struct HgVboMemory* hgVbo;
 //	struct HgVboMemory* indexVbo; //not used, what was this for?
@@ -61,7 +61,7 @@ public:
 
 //	std::shared_ptr<char*> indices;
 	ArbitraryData indices; //can be in different formats, requiring different renderers, set renderFunction
-	indiceRenderFunc renderFunction;
+//	indiceRenderFunc renderFunction;
 };
 
 GLuint hgOglVbo(vertices v);

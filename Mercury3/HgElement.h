@@ -31,16 +31,19 @@ typedef enum BlendMode {
 class RenderData {
 	public:
 		typedef RenderData*(*newRenderDataCallback)();
+		typedef void(*indiceRenderFunc)(RenderData* rd);
 		static newRenderDataCallback Create;
 
 		RenderData();
-		~RenderData();
+		virtual ~RenderData();
 
-		virtual void render() = 0;
+		inline void render() { renderFunction(this); }
 		virtual void destroy();
 
 		HgShader* shader;
 		uint8_t blendMode;
+
+		indiceRenderFunc renderFunction;
 };
 
 

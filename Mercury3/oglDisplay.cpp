@@ -113,7 +113,8 @@ void draw_index_vbo(HgVboMemory* vbo, uint32_t offset) {
 	}
 }
 
-static void NormalIndiceRender(OGLRenderData* rd) {
+static void NormalIndiceRender(RenderData* x) {
+	OGLRenderData *rd((OGLRenderData*)x);
 	if (rd->idx_id == 0) {
 		rd->idx_id = new_index_buffer8((uint8_t*)rd->indices.data, rd->index_count);
 		free_arbitrary(&rd->indices);
@@ -127,10 +128,15 @@ static void NormalIndiceRender(OGLRenderData* rd) {
 }
 
 OGLRenderData::OGLRenderData()
-	:hgVbo(nullptr),/* indexVbo(nullptr), colorVbo(nullptr),*/ vbo_offset(0), vertex_count(0), idx_id(0), index_count(0), renderFunction(NormalIndiceRender)
+	:RenderData(),hgVbo(nullptr),/* indexVbo(nullptr), colorVbo(nullptr),*/ vbo_offset(0), vertex_count(0), idx_id(0), index_count(0)
 {
 	memset(&indices, 0, sizeof(indices));
 	init();
+	renderFunction = NormalIndiceRender;
+}
+
+OGLRenderData::~OGLRenderData() {
+	destroy();
 }
 
 void OGLRenderData::init() {
@@ -151,8 +157,4 @@ void OGLRenderData::destroy() {
 	}
 
 	RenderData::destroy();
-}
-
-void OGLRenderData::render() {
-	renderFunction(this);
 }

@@ -53,14 +53,13 @@ void RegisterElementType(const char* c, factory_clbk factory) {
 RenderData::newRenderDataCallback RenderData::Create = nullptr;
 
 RenderData::RenderData()
-	:blendMode(BlendMode::BLEND_NORMAL)
+	:blendMode(BlendMode::BLEND_NORMAL), renderFunction(nullptr)
 {
 
 }
 
 RenderData::~RenderData()
 {
-	destroy();
 }
 
 void RenderData::destroy() {
@@ -84,11 +83,6 @@ void HgElement::init()
 void HgElement::destroy()
 {
 }
-
-void HgElement::render() {
-
-}
-
 
 /*
 vtable_index hgelement_get_type_index(char* type) {

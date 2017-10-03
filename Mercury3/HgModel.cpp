@@ -74,7 +74,7 @@ static model_data LoadModel(const char* filename) {
 	return r;
 }
 
-static void model_render(OGLRenderData* rd) {
+static void model_render(RenderData* rd) {
 	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
 	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->idx_id == 0) {
