@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <HgVbo.h>
 
+#include "oglDisplay.h"
+
 typedef struct header {
 	uint32_t vertex_count, index_count;
 } header;
@@ -74,21 +76,6 @@ static model_data LoadModel(const char* filename) {
 	return r;
 }
 
-static void model_render(RenderData* rd) {
-	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
-	OGLRenderData *d = (OGLRenderData*)rd;
-	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer16((uint16_t*)d->indices.data, d->index_count);
-		free_arbitrary(&d->indices);
-	}
-
-	setBlendMode((BlendMode)rd->blendMode);
-	hgvbo_use(d->hgVbo);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
-	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_SHORT, 0, d->vbo_offset);
-}
-
 static RenderData* init_render_data() {
 	OGLRenderData* rd = OGLRenderData::Create();
 //	rd->baseRender.renderFunc = model_render;
@@ -117,7 +104,7 @@ static void change_to_model(HgElement* element) {
 //	element->vptr_idx = VTABLE_INDEX;
 
 	//create an instance of the render data for all triangles to share
-	element->m_renderData = init_render_data();
+	element->m_renderData = init_render_data(); //this needs to be per model instance if the model is animated
 }
 
 int8_t model_load(HgElement* element, const char* filename) {
@@ -139,7 +126,7 @@ int8_t model_load(HgElement* element, const char* filename) {
 //	mrd->index_count = mdl.index_count;
 	rd->indices.data = mdl.indices;
 	rd->indices.owns_ptr = 1;
-	rd->renderFunction = model_render;
+	rd->renderFunction = Indice16Render;
 
 	CLEAR_FLAG(element, HGE_DESTROY);
 

@@ -113,7 +113,7 @@ void draw_index_vbo(HgVboMemory* vbo, uint32_t offset) {
 	}
 }
 
-static void NormalIndiceRender(RenderData* x) {
+void Indice8Render(RenderData* x) {
 	OGLRenderData *rd((OGLRenderData*)x);
 	if (rd->idx_id == 0) {
 		rd->idx_id = new_index_buffer8((uint8_t*)rd->indices.data, rd->index_count);
@@ -127,12 +127,27 @@ static void NormalIndiceRender(RenderData* x) {
 	glDrawElementsBaseVertex(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_BYTE, 0, rd->vbo_offset);
 }
 
+void Indice16Render(RenderData* rd) {
+	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
+	OGLRenderData *d = (OGLRenderData*)rd;
+	if (d->idx_id == 0) {
+		d->idx_id = new_index_buffer16((uint16_t*)d->indices.data, d->index_count);
+		free_arbitrary(&d->indices);
+	}
+
+	setBlendMode((BlendMode)rd->blendMode);
+	hgvbo_use(d->hgVbo);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
+	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_SHORT, 0, d->vbo_offset);
+}
+
 OGLRenderData::OGLRenderData()
 	:RenderData(),hgVbo(nullptr),/* indexVbo(nullptr), colorVbo(nullptr),*/ vbo_offset(0), vertex_count(0), idx_id(0), index_count(0)
 {
 	memset(&indices, 0, sizeof(indices));
 	init();
-	renderFunction = NormalIndiceRender;
+	renderFunction = Indice8Render;
 }
 
 OGLRenderData::~OGLRenderData() {

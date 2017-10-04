@@ -50,6 +50,7 @@ public:
 //	virtual void render();
 
 	struct HgVboMemory* hgVbo;
+
 //	struct HgVboMemory* indexVbo; //not used, what was this for?
 //	struct HgVboMemory* colorVbo; //not used, what was this for?
 
@@ -81,3 +82,6 @@ inline RenderData* new_renderData_ogl() { return new OGLRenderData(); }
 void draw_index_vbo(struct HgVboMemory* vbo, uint32_t offset);
 
 inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->m_renderData; }
+
+void Indice8Render(RenderData* rd);
+void Indice16Render(RenderData* rd);
