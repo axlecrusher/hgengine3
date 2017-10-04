@@ -77,11 +77,15 @@ void HgElement::init()
 	scale = 1;
 	origin = vector3_zero;
 
-	quaternion_init(&rotation);
+	rotation = quaternion_default;
 }
 
 void HgElement::destroy()
 {
+	m_logic.reset();
+//	if (m_logic) delete(m_logic);
+//	m_logic = nullptr;
+	m_renderData = nullptr; //need some way to signal release
 }
 
 /*

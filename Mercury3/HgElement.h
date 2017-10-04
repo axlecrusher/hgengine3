@@ -43,7 +43,7 @@ class RenderData {
 		HgShader* shader;
 		uint8_t blendMode;
 
-		indiceRenderFunc renderFunction;
+		indiceRenderFunc renderFunction; // could store VBO_TYPE instead and make a single function do all the rendering?
 };
 
 
@@ -54,7 +54,10 @@ class HgElement;
 class HgElementLogic {
 public:
 	virtual void update(uint32_t tdelta) = 0;
-	HgElement* element;
+
+	inline void setElement(HgElement* x) { element = x; }
+protected:
+	HgElement* element; //just a pointer back to the parent
 };
 
 //#define MAX_ELEMENT_TYPES 255
@@ -76,9 +79,6 @@ public:
 		quaternion rotation; //16
 		uint8_t flags; //1
 
-//		RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
-//		void* extraData; //whoever whoever populates this must clean it up.
-
 		void init();
 		void destroy();
 
@@ -87,12 +87,12 @@ public:
 
 		inline void update(uint32_t dtime) { if (m_logic != nullptr) m_logic->update(dtime); }
 
-		void setLogic(HgElementLogic* logic) { m_logic = logic; m_logic->element = this; }
-		HgElementLogic* logic() { return m_logic; }
+		inline void setLogic(std::unique_ptr<HgElementLogic> logic) { m_logic = std::move(logic); m_logic->setElement(this); }
+		std::unique_ptr<HgElementLogic>& logic() { return m_logic; }
 
 		RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
 private:
-	HgElementLogic* m_logic;
+	std::unique_ptr<HgElementLogic> m_logic;
 };
 
 //typedef void(*SignalHandler)(int signum);

@@ -155,7 +155,7 @@ void fire(HgScene* scene) {
 
 	create_element("basic_projectile", scene, &element);
 
-	Projectile *pd = dynamic_cast<Projectile*>(element->logic());
+	Projectile *pd = dynamic_cast<Projectile*>(element->logic().get());
 	pd->direction = camera->projectRay();
 	element->rotation = camera->rotation.invert();
 	element->position = camera->position;

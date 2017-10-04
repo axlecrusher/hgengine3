@@ -30,7 +30,7 @@ void Projectile::update(uint32_t tdelta) {
 }
 
 static void change_to_projectile(HgElement* element) {
-	element->setLogic(new Projectile());
+	element->setLogic(std::make_unique<Projectile>());
 	change_to_triangle(element);
 }
 /*
