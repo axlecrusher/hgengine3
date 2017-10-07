@@ -39,6 +39,8 @@ template<typename T>
 HgVboMemory<T>::~HgVboMemory() {
 	if (buffer != nullptr) free(buffer);
 	buffer = nullptr;
+
+	destroy();
 }
 
 template<typename T>
@@ -65,8 +67,9 @@ void HgVboMemory<T>::clear() {
 
 template<typename T>
 void HgVboMemory<T>::destroy() {
-	glDeleteBuffers(1, &vbo_id);
-	glDeleteBuffers(1, &vao_id);
+	if (vbo_id>0) glDeleteBuffers(1, &vbo_id);
+	if (vao_id>0) glDeleteBuffers(1, &vao_id);
+	vao_id = vbo_id = 0;
 	clear();
 }
 
@@ -83,51 +86,6 @@ uint32_t HgVboMemory<T>::add_data(void* data, uint16_t vertex_count) {
 
 	return offset;
 }
-/*
-uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color, uint16_t count) {
-	vbo_layout_vc* buf = (vbo_layout_vc*)resize(vbo_mem, vbo_mem->count + count, sizeof(*buf));
-	buf = buf + vbo_mem->count;
-
-	for (uint16_t i = 0; i < count; ++i) {
-		buf[i].v = vertices[i];
-		buf[i].c = color[i];
-	}
-
-	uint32_t offset = vbo_mem->count;
-	vbo_mem->count += count;
-	vbo_mem->needsUpdate = true;
-
-	return offset;
-}
-
-uint32_t hgvbo_add_data_vnu_raw(HgVboMemory* vbo_mem, vbo_layout_vnu* data, uint16_t count) {
-	vbo_layout_vnu* buf = (vbo_layout_vnu*)resize(vbo_mem, vbo_mem->count + count, sizeof(*buf));
-	buf = buf + vbo_mem->count;
-
-	for (uint16_t i = 0; i < count; ++i) {
-		buf[i]= data[i];
-	}
-
-	uint32_t offset = vbo_mem->count;
-	vbo_mem->count += count;
-	vbo_mem->needsUpdate = true;
-
-	return offset;
-}
-
-uint32_t hgvbo_add_data_raw(HgVboMemory* vbo_mem, void* data, uint16_t count) {
-	uint8_t* buf = (uint8_t*)resize(vbo_mem, vbo_mem->count + count, vbo_mem->stride);
-	buf = buf + (vbo_mem->count * vbo_mem->stride);
-
-	memcpy(buf, data, count*vbo_mem->stride);
-
-	uint32_t offset = vbo_mem->count;
-	vbo_mem->count += count;
-	vbo_mem->needsUpdate = true;
-
-	return offset;
-}
-*/
 
 template<typename T>
 void HgVboMemory<T>::hgvbo_sendogl() {
