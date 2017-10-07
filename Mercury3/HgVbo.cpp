@@ -29,6 +29,19 @@ static VBO_TYPE getVboType(const uint16_t& x) { return VBO_INDEX16; }
 static VBO_TYPE getVboType(const color& x) { return VBO_VC; }
 
 template<typename T>
+HgVboMemory<T>::HgVboMemory()
+	:buffer(nullptr)
+{
+
+}
+
+template<typename T>
+HgVboMemory<T>::~HgVboMemory() {
+	if (buffer != nullptr) free(buffer);
+	buffer = nullptr;
+}
+
+template<typename T>
 void HgVboMemory<T>::init() {
 	type = getVboType(*buffer);
 	stride = sizeof(T);
@@ -66,7 +79,7 @@ uint32_t HgVboMemory<T>::add_data(void* data, uint16_t vertex_count) {
 
 	uint32_t offset = count;
 	count += vertex_count;
-	needsUpdate = 1;
+	needsUpdate = true;
 
 	return offset;
 }
@@ -82,7 +95,7 @@ uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color,
 
 	uint32_t offset = vbo_mem->count;
 	vbo_mem->count += count;
-	vbo_mem->needsUpdate = 1;
+	vbo_mem->needsUpdate = true;
 
 	return offset;
 }
@@ -97,7 +110,7 @@ uint32_t hgvbo_add_data_vnu_raw(HgVboMemory* vbo_mem, vbo_layout_vnu* data, uint
 
 	uint32_t offset = vbo_mem->count;
 	vbo_mem->count += count;
-	vbo_mem->needsUpdate = 1;
+	vbo_mem->needsUpdate = true;
 
 	return offset;
 }
@@ -110,7 +123,7 @@ uint32_t hgvbo_add_data_raw(HgVboMemory* vbo_mem, void* data, uint16_t count) {
 
 	uint32_t offset = vbo_mem->count;
 	vbo_mem->count += count;
-	vbo_mem->needsUpdate = 1;
+	vbo_mem->needsUpdate = true;
 
 	return offset;
 }
@@ -151,15 +164,16 @@ void HgVboMemory<T>::hgvbo_sendogl() {
 		assert(!"Unknown vbo type");
 	}
 
-	needsUpdate = 0;
+	needsUpdate = false;
 }
 
 template<typename T>
 void HgVboMemory<T>::use() {
-	if (_currentVbo == this) return;
+	if ((_currentVbo == this) && (needsUpdate == false)) return;
+
 	_currentVbo = this;
 
-	if (needsUpdate > 0) {
+	if (needsUpdate) {
 		hgvbo_sendogl();
 	}
 
@@ -178,9 +192,9 @@ void HgVboMemory<uint8_t>::use() {
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_id);
 
-	if (needsUpdate > 0) {
+	if (needsUpdate) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * stride, buffer, GL_STATIC_DRAW);
-		needsUpdate = 0;
+		needsUpdate = false;
 	}
 }
 
@@ -200,10 +214,10 @@ void HgVboMemory<color>::use() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
 
-	if (needsUpdate > 0) {
+	if (needsUpdate) {
 		color* c = buffer;
 		glBufferData(GL_ARRAY_BUFFER, count * stride, buffer, GL_STATIC_DRAW);
-		needsUpdate = 0;
+		needsUpdate = false;
 	}
 
 	glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);

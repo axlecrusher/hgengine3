@@ -67,12 +67,15 @@ public:
 template<typename T>
 class HgVboMemory : public HgVboBase{
 public:
+	HgVboMemory();
+	virtual ~HgVboMemory();
+
 	T* buffer;
 
 	uint32_t count;
 	GLuint vbo_id;
 	GLuint vao_id;
-	uint8_t needsUpdate;
+	bool needsUpdate;
 
 	uint16_t stride; //stride, size of the structure pointed to by buffer
 	uint8_t type;
