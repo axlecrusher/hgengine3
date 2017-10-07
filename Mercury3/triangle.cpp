@@ -25,7 +25,7 @@ static void SetupRenderData() {
 	trd = OGLRenderData::Create();
 
 	vertices points;
-	points.points.array = vv;
+//	points.points.array = vv;
 	points.size = 3;
 
 	trd->hgVbo = &staticVbo;
