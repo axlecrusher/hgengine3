@@ -57,8 +57,13 @@ class HgVboBase {
 public:
 
 	virtual void init() = 0;
+
+	//	Copy data straight into VBO. Ensure that data, is using the correct vbo layout for your data
 	virtual uint32_t add_data(void* data, uint16_t vertex_count) = 0;
+
+	//	Clear data from RAM. Will not upload new data to GPU until new data is added.
 	virtual void clear() = 0;
+
 	virtual void destroy() = 0;
 
 	virtual void use() = 0;
@@ -70,6 +75,13 @@ public:
 	HgVboMemory();
 	virtual ~HgVboMemory();
 
+	void init();
+	uint32_t add_data(void* data, uint16_t vertex_count);
+	void clear();
+	void destroy();
+
+	void use();
+private:
 	T* buffer;
 
 	uint32_t count;
@@ -82,38 +94,13 @@ public:
 
 //	void(*send_to_ogl)(struct HgVboMemory* vbo);
 
-	void init();
-	uint32_t add_data(void* data, uint16_t vertex_count);
-	void clear();
-	void destroy();
 
-	void use();
 private:
 	T* HgVboMemory::resize(uint32_t count);
 	void hgvbo_sendogl();
 
+	friend void draw_index_vbo(HgVboMemory<T>* vbo, uint32_t offset);
 };
 
-//uint32_t hgvbo_add_data_vc(HgVboMemory* vbo_mem, vertex* vertices, color* color, uint16_t vertex_count);
-//uint32_t hgvbo_add_data_vnu_raw(HgVboMemory* vbo_mem, vbo_layout_vnu* data, uint16_t count);
-
-//	Copy data straight into VBO. Ensure that vbo_mem, is using the correct vbo layout for your data
-//uint32_t hgvbo_add_data_raw(HgVboMemory* vbo_mem, void* data, uint16_t count);
-
-//void hgvbo_sendToOGL(HgVboMemory* vbo_mem);
-//void hgvbo_use(HgVboMemory* vbo_mem);
-//void hgvbo_init(HgVboMemory* vbo_mem, VBO_TYPE vbo_type);
-//void hgvbo_destroy(HgVboMemory* vbo);
-
-//	Clear data from RAM. Will not upload new data to GPU until new data is added.
-//void hgvbo_clear(HgVboMemory* vbo_mem);
-
-//void use_index_vbo(HgVboMemory* vbo);
-
-//void draw_vbo(HgVboMemory* vbo);
-
-//void hgvbo_use_colorvbo(HgVboMemory* vbo);
-
 extern HgVboMemory<vbo_layout_vc> staticVbo;
-
 extern HgVboMemory<vbo_layout_vnu> staticVboVNU;
