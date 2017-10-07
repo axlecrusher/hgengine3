@@ -49,7 +49,7 @@ public:
 	virtual void destroy();
 //	virtual void render();
 
-	struct HgVboMemory* hgVbo;
+	class HgVboBase* hgVbo;
 
 //	struct HgVboMemory* indexVbo; //not used, what was this for?
 //	struct HgVboMemory* colorVbo; //not used, what was this for?
@@ -79,7 +79,8 @@ GLuint new_index_buffer16(uint16_t* indices, uint32_t count);
 void setBlendMode(BlendMode blendMode);
 inline RenderData* new_renderData_ogl() { return new OGLRenderData(); }
 
-void draw_index_vbo(struct HgVboMemory* vbo, uint32_t offset);
+//void draw_index_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset);
+//void draw_index_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset);
 
 inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->m_renderData; }
 

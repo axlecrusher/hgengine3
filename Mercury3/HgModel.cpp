@@ -120,7 +120,7 @@ int8_t model_load(HgElement* element, const char* filename) {
 	rd->hgVbo = &staticVboVNU;
 	rd->vertex_count = mdl.vertex_count;
 	rd->index_count = mdl.index_count;
-	rd->vbo_offset = hgvbo_add_data_raw(rd->hgVbo, mdl.vertices, rd->vertex_count);
+	rd->vbo_offset = staticVboVNU.add_data(mdl.vertices, rd->vertex_count);
 	free(mdl.vertices);
 
 //	mrd->index_count = mdl.index_count;

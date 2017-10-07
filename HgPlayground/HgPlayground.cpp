@@ -230,8 +230,8 @@ int main()
 	//	MercuryWindow* w = MercuryWindow::MakeWindow();
 	//	generateVoxelVBO();
 
-	hgvbo_init(&staticVbo, VBO_VC);
-	hgvbo_init(&staticVboVNU, VBO_VNU);
+	staticVbo.init();
+	staticVboVNU.init();
 
 	//	model_data d = LoadModel("test.hgmdl");
 	//	hgvbo_add_data_vc(&staticVbo, d.vertices, d.vertices, d.vertex_count);

@@ -105,12 +105,12 @@ void setBlendMode(BlendMode blendMode) {
 	}
 }
 
-void draw_index_vbo(HgVboMemory* vbo, uint32_t offset) {
-	if (vbo->type == VBO_INDEX8 || vbo->type == VBO_INDEX16) {
-		uint32_t glType = GL_UNSIGNED_BYTE;
-		if (vbo->type == VBO_INDEX16) glType = GL_UNSIGNED_SHORT;
-		glDrawElementsBaseVertex(GL_TRIANGLES, vbo->count, glType, 0, offset);
-	}
+void draw_index_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset) {
+	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->count, GL_UNSIGNED_BYTE, 0, offset);
+}
+
+void draw_index_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset) {
+	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->count, GL_UNSIGNED_SHORT, 0, offset);
 }
 
 void Indice8Render(RenderData* x) {
@@ -121,7 +121,7 @@ void Indice8Render(RenderData* x) {
 	}
 
 	setBlendMode((BlendMode)rd->blendMode);
-	hgvbo_use(rd->hgVbo);
+	rd->hgVbo->use();
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rd->idx_id);
 	glDrawElementsBaseVertex(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_BYTE, 0, rd->vbo_offset);
@@ -136,7 +136,7 @@ void Indice16Render(RenderData* rd) {
 	}
 
 	setBlendMode((BlendMode)rd->blendMode);
-	hgvbo_use(d->hgVbo);
+	d->hgVbo->use();
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
 	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_SHORT, 0, d->vbo_offset);

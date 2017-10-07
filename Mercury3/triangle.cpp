@@ -11,16 +11,10 @@
 //instanced render data
 static OGLRenderData* trd = NULL;
 
-static float vv[9] = {
-	-0.5f, -0.5f, 0.0f,
-	0.5f, -0.5f, 0.0f,
-	0.0f, 0.5f, 0.0f
-};
-
-static color colors[] = {
-	255, 0, 0, 255,
-	0, 255, 0, 255,
-	0, 0, 255, 255
+static vbo_layout_vc raw_data[] = {
+	-0.5f, -0.5f, 0.0f, 255, 0, 0, 255,
+	0.5f, -0.5f, 0.0f, 0, 255, 0, 255,
+	0.0f, 0.5f, 0.0f, 0, 0, 255, 255
 };
 
 static uint8_t indices[] = {
@@ -38,7 +32,7 @@ static void SetupRenderData() {
 	trd->vertex_count = points.size;
 	trd->index_count = 3;
 	trd->indices.data = indices;
-	trd->vbo_offset = hgvbo_add_data_vc(&staticVbo, points.points.v, colors, trd->vertex_count);
+	trd->vbo_offset = staticVbo.add_data(raw_data, trd->vertex_count);
 
 //	trd->baseRender.destroy = NULL; //render data is shared by all triangles so we don't really want to do anything
 }

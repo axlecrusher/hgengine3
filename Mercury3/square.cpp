@@ -21,6 +21,13 @@ static color colors[] = {
 	255, 0, 0, 255
 };
 
+static vbo_layout_vc raw_data[] = {
+	-0.5f, -0.5f, 0.0f, 255, 0, 0, 255,
+	0.5f, -0.5f, 0.0f, 0, 255, 0, 255,
+	0.5f, 0.5f, 0.0f, 0, 0, 255, 255,
+	-0.5f, 0.5f, 0.0f, 255, 0, 0, 255
+};
+
 static uint8_t indices[] = {
 	0,1,2,2,3,0
 };
@@ -47,7 +54,7 @@ static void SetupRenderData() {
 	trd->hgVbo = &staticVbo;
 	trd->vertex_count = points.size;
 	trd->index_count = 6;
-	trd->vbo_offset = hgvbo_add_data_vc(&staticVbo, points.points.v, colors, trd->vertex_count);
+	trd->vbo_offset = staticVbo.add_data(raw_data, trd->vertex_count);
 }
 
 static OGLRenderData* init_render_data() {
