@@ -30,9 +30,8 @@ static VBO_TYPE getVboType(const color& x) { return VBO_VC; }
 
 template<typename T>
 HgVboMemory<T>::HgVboMemory()
-	:buffer(nullptr)
+	:buffer(nullptr), count(0), vbo_id(0), vao_id(0), needsUpdate(0), stride(0), type(0)
 {
-
 }
 
 template<typename T>
