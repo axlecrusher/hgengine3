@@ -67,6 +67,8 @@ public:
 	virtual void destroy() = 0;
 
 	virtual void use() = 0;
+
+	virtual void draw(uint32_t offset) = 0;
 };
 
 template<typename T>
@@ -81,6 +83,8 @@ public:
 	void destroy();
 
 	void use();
+
+	virtual void draw(uint32_t offset) { ::ogl_draw_vbo<T>(this, offset); }
 private:
 	T* buffer;
 
@@ -99,8 +103,11 @@ private:
 	T* HgVboMemory::resize(uint32_t count);
 	void hgvbo_sendogl();
 
-	friend void draw_index_vbo(HgVboMemory<T>* vbo, uint32_t offset);
+	friend void ogl_draw_vbo(HgVboMemory<T>* vbo, uint32_t offset);
 };
+
+template<typename T>
+void ogl_draw_vbo(HgVboMemory<T>* vbo, uint32_t offset) {}
 
 extern HgVboMemory<vbo_layout_vc> staticVbo;
 extern HgVboMemory<vbo_layout_vnu> staticVboVNU;
