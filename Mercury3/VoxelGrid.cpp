@@ -2,8 +2,6 @@
 #include <cube.h>
 #include <HgVbo.h>
 
-static vtable_index VTABLE_INDEX;
-
 //instanced render data
 static OGLRenderData *crd = NULL;
 static vbo_layout_vnu* voxelGridVertices = NULL;
@@ -13,10 +11,10 @@ model_data generateVoxelVBO(uint8_t x, uint8_t y) {
 	model_data data;
 	uint32_t cube_count = x*y;
 
-	data.vertices = malloc(24 * cube_count * sizeof(*data.vertices));
+	data.vertices = (vbo_layout_vnu*)malloc(24 * cube_count * sizeof(*data.vertices));
 	data.vertex_count = 24 * cube_count;
 
-	data.indices = malloc(36 * cube_count * sizeof(*data.indices));
+	data.indices = (uint16_t*)malloc(36 * cube_count * sizeof(*data.indices));
 	data.index_count = 36 * cube_count;
 
 	uint16_t vert_counter = 0;
@@ -43,12 +41,12 @@ static void render(RenderData* rd) {
 	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
 	OGLRenderData *d = (OGLRenderData*)rd;
 	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer16(d->indices.data, d->index_count);
+		d->idx_id = new_index_buffer16((uint16_t*)d->indices.data, d->index_count);
 //		free_arbitrary(&d->indices);
 	}
 
-	setBlendMode(rd->blendMode);
-	hgvbo_use(d->hgVbo);
+	setBlendMode((BlendMode)rd->blendMode);
+	d->hgVbo->use();
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
 	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_SHORT, 0, d->vbo_offset);
@@ -62,21 +60,20 @@ static void SetupRenderData() {
 		indices = data.indices;
 	}
 
-	crd = new_RenderData();
+	crd = (OGLRenderData*)RenderData::Create();
 
 	crd->vertex_count = data.vertex_count;
 	crd->hgVbo = &staticVboVNU;
-	crd->vbo_offset = hgvbo_add_data_vnu_raw(crd->hgVbo, voxelGridVertices, crd->vertex_count);
+	crd->vbo_offset = staticVboVNU.add_data(voxelGridVertices, crd->vertex_count);
 
 	crd->indices.data = indices;
 	crd->index_count = data.index_count;
 //	rd->indices.owns_ptr = 1;
 
-	crd->baseRender.renderFunc = render;
+	crd->renderFunction = render;
 }
 
 void change_to_voxelGrid(HgElement* element) {
-	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
 	if (crd == NULL) SetupRenderData();
 
@@ -94,7 +91,7 @@ void voxelGrid_create(HgElement* element) {
 
 	change_to_voxelGrid(element);
 }
-
+/*
 static void destroy(HgElement* e) {
 	e->m_renderData = NULL;
 }
@@ -104,5 +101,5 @@ static HgElement_vtable vtable = {
 	.destroy = destroy,
 	.updateFunc = NULL
 };
-
-REGISTER_LINKTIME(voxelGrid);
+*/
+REGISTER_LINKTIME(voxelGrid, voxelGrid_create);
