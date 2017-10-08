@@ -85,6 +85,8 @@ public:
 	void use();
 
 	virtual void draw(uint32_t offset) { ::ogl_draw_vbo<T>(this, offset); }
+	T* getBuffer() { return buffer;  }
+	void setNeedsUpdate(bool x) { needsUpdate = x; }
 private:
 	T* buffer;
 
