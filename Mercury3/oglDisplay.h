@@ -7,7 +7,7 @@
 
 #include <HgTypes.h>
 
-#include <HgVbo.h>
+//#include <HgVbo.h>
 #include <memory>
 
 enum UniformLocations {

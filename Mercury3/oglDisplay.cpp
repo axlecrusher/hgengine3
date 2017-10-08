@@ -5,6 +5,7 @@
 #include <oglShaders.h>
 
 #include <string.h>
+#include <HgVbo.h>
 
 viewport view_port[3];
 

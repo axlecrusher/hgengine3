@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <oglShaders.h>
 
+#include <HgVbo.h>
 //static vtable_index VTABLE_INDEX;
 //instanced render data
 static OGLRenderData* trd = NULL;

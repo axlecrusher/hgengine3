@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <oglShaders.h>
 
+#include <HgVbo.h>
+
 static float vv[12] = {
 	-0.5f, -0.5f, 0.0f,
 	0.5f, -0.5f, 0.0f,

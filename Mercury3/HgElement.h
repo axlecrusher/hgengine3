@@ -57,7 +57,7 @@ public:
 
 	inline void setElement(HgElement* x) { element = x; }
 protected:
-	HgElement* element; //just a pointer back to the parent
+	HgElement* element; //just a weak pointer back to the parent
 };
 
 //#define MAX_ELEMENT_TYPES 255
@@ -93,6 +93,8 @@ public:
 		RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
 private:
 	std::unique_ptr<HgElementLogic> m_logic;
+
+	friend HgElementLogic;
 };
 
 //typedef void(*SignalHandler)(int signum);
