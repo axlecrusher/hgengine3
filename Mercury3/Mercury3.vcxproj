@@ -190,6 +190,7 @@
     </ClCompile>
     <ClCompile Include="triangle.cpp" />
     <ClCompile Include="HgVbo.cpp" />
+    <ClCompile Include="VoxelGrid.cpp" />
     <ClCompile Include="Win32Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -222,6 +223,7 @@
     <ClInclude Include="symbol_enumerator.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="vertex.h" />
+    <ClInclude Include="VoxelGrid.h" />
     <ClInclude Include="Win32Window.h" />
   </ItemGroup>
   <ItemGroup>

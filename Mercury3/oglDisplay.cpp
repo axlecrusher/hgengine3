@@ -106,6 +106,7 @@ void setBlendMode(BlendMode blendMode) {
 	}
 }
 
+/*
 void ogl_draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset) {
 	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->count, GL_UNSIGNED_BYTE, 0, offset);
 }
@@ -113,6 +114,7 @@ void ogl_draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset) {
 void ogl_draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset) {
 	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->count, GL_UNSIGNED_SHORT, 0, offset);
 }
+*/
 
 void Indice8Render(RenderData* x) {
 	OGLRenderData *rd((OGLRenderData*)x);

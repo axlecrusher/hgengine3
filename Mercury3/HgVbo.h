@@ -92,6 +92,8 @@ public:
 	virtual void draw(uint32_t offset) { ::ogl_draw_vbo<T>(this, offset); }
 	T* getBuffer() { return buffer;  }
 	void setNeedsUpdate(bool x) { needsUpdate = x; }
+
+	inline uint32_t getCount() const { return count; }
 private:
 	static VBO_TYPE getVboType(const vbo_layout_vc& x) { return VBO_VC; }
 	static VBO_TYPE getVboType(const vbo_layout_vnu& x) { return VBO_VNU; }
@@ -111,12 +113,9 @@ private:
 
 //	void(*send_to_ogl)(struct HgVboMemory* vbo);
 
-
 private:
 	T* HgVboMemory::resize(uint32_t count);
 	void hgvbo_sendogl();
-
-	friend void ogl_draw_vbo(HgVboMemory<T>* vbo, uint32_t offset);
 };
 
 
@@ -219,6 +218,18 @@ void HgVboMemory<T>::hgvbo_sendogl() {
 
 template<typename T>
 void ogl_draw_vbo(HgVboMemory<T>* vbo, uint32_t offset) {}
+
+template<>
+inline void ogl_draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset) {
+	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_BYTE, 0, offset);
+}
+
+template<>
+inline void ogl_draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset) {
+	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_SHORT, 0, offset);
+}
+
+
 
 extern HgVboMemory<vbo_layout_vc> staticVbo;
 extern HgVboMemory<vbo_layout_vnu> staticVboVNU;

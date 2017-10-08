@@ -496,6 +496,7 @@ int main()
 			}
 		}
 
+		maxCount = scene.maxItems();
 		if (stereo_view && do_render > 0) {
 			for (uint32_t i = 0; i < maxCount; ++i) {
 				if (!scene.isUsed(i)) continue;
