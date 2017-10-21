@@ -177,6 +177,7 @@
     <ClCompile Include="HgRenderQueue.cpp" />
     <ClCompile Include="HgScene.cpp" />
     <ClCompile Include="HgShader.cpp" />
+    <ClCompile Include="ini.c" />
     <ClCompile Include="LinkedList.c" />
     <ClCompile Include="MercuryWindow.cpp" />
     <ClCompile Include="oglDisplay.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="include\glcorearb.h" />
     <ClInclude Include="include\glew.h" />
     <ClInclude Include="include\glext.h" />
+    <ClInclude Include="ini.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="MercuryWindow.h" />
     <ClInclude Include="oglDisplay.h" />
