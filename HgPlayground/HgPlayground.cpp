@@ -316,14 +316,7 @@ int main()
 		}
 
 		scene.getNewElement(&element);
-		model_load(element, "test.hgmdl");
-		element->scale = 0.5f;
-		element->position.components.z = -4;
-		//		element->position.components.y = 2;
-		//		toQuaternion2(0, 90, 0, &element->rotation);
-		//		element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
-		element->m_renderData->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
-		//	model_data d = LoadModel("test.hgmdl");
+		model_load_ini(element, "teapot.ini");
 
 		if (create_element("voxelGrid", &scene, &element) > 0) {
 			//		element->scale = 100.0f;
