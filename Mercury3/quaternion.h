@@ -34,10 +34,10 @@ extern const quaternion quaternion_default;
 inline void quaternion_init(quaternion* q) { *q = quaternion_default;  }
 
 void toQuaternion(double x, double y, double z, double deg, quaternion* q);
-void toQuaternion2(double pitch, double roll, double yaw, quaternion* q);
+quaternion toQuaternion2(double pitch, double roll, double yaw);
 
 quaternion quat_mult(const quaternion* q1, const quaternion* q2);
-void quaternion_normalize(quaternion* q);
+quaternion quaternion_normalize(quaternion q);
 float quat_length(quaternion* q);
 
 quaternion vector3_to_quat(vector3 a);

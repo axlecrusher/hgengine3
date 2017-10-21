@@ -264,7 +264,7 @@ int main()
 	camera[0].position = vertex_zero;
 	camera[0].position.components.z = 1.5f;
 	camera[0].position.components.y = 2.0f;
-	toQuaternion2(0, 15, 0, &camera[0].rotation); //y,x,z
+	camera[0].rotation = toQuaternion2(0, 15, 0); //y,x,z
 
 	camera[1] = camera[0];
 	camera[1].position.components.x += EYE_DISTANCE;
@@ -335,7 +335,7 @@ int main()
 		if (create_element("square", &scene, &element) > 0) {
 			element->scale = 100.0f;
 			element->position.components.z = -4;
-			toQuaternion2(0, -90, 0, &element->rotation);
+			element->rotation = toQuaternion2(0, -90, 0);
 			element->m_renderData->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
 			element->m_renderData->blendMode = BLEND_ADDITIVE;
 			//	model_data d = LoadModel("test.hgmdl");
@@ -432,8 +432,8 @@ int main()
 
 			//seperate quaternions keep the camera from rolling when yawing and pitching
 			quaternion yaw, pitch;
-			toQuaternion2((-MOUSE_INPUT.dx / 2000.0f) * 360, 0, 0, &yaw);
-			toQuaternion2(0, (-MOUSE_INPUT.dy / 2000.0f) * 360, 0, &pitch);
+			yaw = toQuaternion2((-MOUSE_INPUT.dx / 2000.0f) * 360, 0, 0);
+			pitch = toQuaternion2(0, (-MOUSE_INPUT.dy / 2000.0f) * 360, 0);
 
 			camera->rotation = quat_mult(&pitch, &camera->rotation);
 			camera->rotation = quat_mult(&camera->rotation, &yaw);
@@ -464,7 +464,7 @@ int main()
 		{
 			HgElement* element = tris[0];
 			//		y,x,z
-			toQuaternion2((dtime % 10000) / 27.777777777777777777777777777778, 0, 0, &element->rotation);
+			element->rotation = toQuaternion2((dtime % 10000) / 27.777777777777777777777777777778, 0, 0);
 
 			for (i = 0; i < ANI_TRIS; i++) {
 				HgElement* e = tris[i];

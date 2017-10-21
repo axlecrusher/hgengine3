@@ -37,7 +37,7 @@ void toQuaternion(double x, double y, double z, double deg, quaternion* q)
 	q->z(  (float)(s_rad * cos(z)));
 }
 
-void toQuaternion2(double pitch, double roll, double yaw, quaternion* q) {
+quaternion toQuaternion2(double pitch, double roll, double yaw) {
 
 	double y = yaw * RADIANS;
 	double r = roll * RADIANS;
@@ -50,12 +50,13 @@ void toQuaternion2(double pitch, double roll, double yaw, quaternion* q) {
 	double t4 = cos(p * 0.5);
 	double t5 = sin(p * 0.5);
 
-	q->w ( (float)(t0 * t2 * t4 + t1 * t3 * t5) );
-	q->x ( (float)(t0 * t3 * t4 - t1 * t2 * t5) );
-	q->y ( (float)(t0 * t2 * t5 + t1 * t3 * t4) );
-	q->z ( (float)(t1 * t2 * t4 - t0 * t3 * t5) );
+	quaternion tmp;
+	tmp.w ( (float)(t0 * t2 * t4 + t1 * t3 * t5) );
+	tmp.x ( (float)(t0 * t3 * t4 - t1 * t2 * t5) );
+	tmp.y ( (float)(t0 * t2 * t5 + t1 * t3 * t4) );
+	tmp.z ( (float)(t1 * t2 * t4 - t0 * t3 * t5) );
 
-	quaternion_normalize(q);
+	return quaternion_normalize(tmp);
 }
 
 #define SQUARE(x) (x*x)
@@ -64,12 +65,14 @@ float quat_length(quaternion* q) {
 	return (float)sqrt(SQUARE(q->x()) + SQUARE(q->y()) + SQUARE(q->z()) + SQUARE(q->w()));
 }
 
-void quaternion_normalize(quaternion* q) {
-	float l = (float)sqrt( SQUARE(q->x()) + SQUARE(q->y()) + SQUARE(q->z()) + SQUARE(q->w()) );
-	q->w ( q->w() / l );
-	q->x ( q->x() / l );
-	q->y ( q->y() / l );
-	q->z ( q->z() / l );
+quaternion quaternion_normalize(quaternion q) {
+	quaternion r = q;
+	float l = (float)sqrt( SQUARE(q.x()) + SQUARE(q.y()) + SQUARE(q.z()) + SQUARE(q.w()) );
+	r.w ( q.w() / l );
+	r.x ( q.x() / l );
+	r.y ( q.y() / l );
+	r.z ( q.z() / l );
+	return r;
 }
 
 quaternion quat_mult(const quaternion* q, const quaternion* r) {
