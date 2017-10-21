@@ -24,13 +24,13 @@ public:
 		TEXTURE_TYPE_COUNT
 	};
 
-	HgTexture();
 	~HgTexture();
 
 	typedef void(*shared_ptr_delete)(HgTexture* t);
 	typedef std::shared_ptr<HgTexture> TexturePtr;
+
+	//used to obtain an image.
 	static TexturePtr acquire(const std::string& path);
-	static void release(HgTexture* t);
 
 	bool load(const std::string& path);
 	channels getChannels() const { return m_channels;  }
@@ -47,6 +47,12 @@ public:
 	typedef uint32_t(*gpu_update_texture)(uint16_t x, uint16_t y, HgTexture::channels, unsigned char* data);
 	static gpu_update_texture updateTextureFunc;
 private:
+	//use HgTexture::acquire to instantiate a texture
+	HgTexture();
+
+	//used when an image is no longer used. Called by TexturePtr, not user callible.
+	static void release(HgTexture* t);
+
 	std::string m_path;
 	unsigned char* data;
 	channels m_channels;

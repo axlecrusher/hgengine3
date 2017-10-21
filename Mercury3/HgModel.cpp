@@ -290,7 +290,7 @@ bool model_data::load_ini(HgElement* element, std::string filename) {
 		if (tmp != nullptr) {
 			tmp->setType(HgTexture::NORMAL);
 			tmp->setNeedsUpdate(true);
-//			element->m_extendedData->textures.push_back(tmp);
+			element->m_extendedData->textures.push_back(tmp);
 			SET_FLAG(element, HGE_UPDATE_TEXTURES);
 		}
 		else {
