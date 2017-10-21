@@ -136,9 +136,14 @@ int8_t model_load(HgElement* element, const char* filename) {
 }
 
 typedef struct iniData{
+	iniData() {
+		scale = 1.0f;
+		origin = position = { 0,0,0 };
+	}
 	std::string modeFilename;
 	float scale;
 	vector3 origin;
+	vector3 position;
 	quaternion orientation;
 	std::string vertexShader;
 	std::string fragmentShader;
@@ -160,6 +165,16 @@ static int iniHandler(void* user, const char* section, const char* name, const c
 		int r = sscanf(value, "%f,%f,%f", &x, &y, &z);
 		if (r == 3) {
 			data->origin = { x,y,z };
+		}
+		else {
+			//warn
+		}
+	}
+	else if (MATCH("Model", "position")) {
+		float x, y, z;
+		int r = sscanf(value, "%f,%f,%f", &x, &y, &z);
+		if (r == 3) {
+			data->position = { x,y,z };
 		}
 		else {
 			//warn
@@ -196,6 +211,7 @@ bool model_load_ini(HgElement* element, std::string filename) {
 	element->origin.components.z = data.origin.components.z / element->scale;
 	element->origin.components.y = data.origin.components.y / element->scale;
 	element->origin.components.x = data.origin.components.x / element->scale;
+	element->position = data.position;
 	element->rotation = data.orientation;
 
 	if (!data.vertexShader.empty() && !data.fragmentShader.empty())
