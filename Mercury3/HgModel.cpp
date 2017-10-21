@@ -5,6 +5,8 @@
 
 #include "oglDisplay.h"
 
+#include <ini.h>
+
 typedef struct header {
 	uint32_t vertex_count, index_count;
 } header;
@@ -131,6 +133,75 @@ int8_t model_load(HgElement* element, const char* filename) {
 	CLEAR_FLAG(element, HGE_DESTROY);
 
 	return 0;
+}
+
+typedef struct iniData{
+	std::string modeFilename;
+	float scale;
+	vector3 origin;
+	quaternion orientation;
+	std::string vertexShader;
+	std::string fragmentShader;
+} iniData;
+
+static int iniHandler(void* user, const char* section, const char* name, const char* value) {
+	iniData* data = (iniData*)user;
+	
+	#define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+
+	if (MATCH("Model", "file")) {
+		data->modeFilename = value;
+	}
+	else if (MATCH("Model", "scale")) {
+		data->scale = ::atof(value);
+	}
+	else if (MATCH("Model", "origin")) {
+		float x, y, z;
+		int r = sscanf(value, "%f,%f,%f", &x, &y, &z);
+		if (r == 3) {
+			data->origin = { x,y,z };
+		}
+		else {
+			//warn
+		}
+	}
+	else if (MATCH("Model", "orientation")) {
+		float x, y, z;
+		int r = sscanf(value, "%f,%f,%f", &x, &y, &z);
+		if (r == 3) {
+			data->orientation = toQuaternion2(y, x, z); //y,x,z
+		}
+		else {
+			//warn
+		}
+	}
+	else if (MATCH("Model", "vertexShader")) {
+		data->vertexShader = value;
+	}
+	else if (MATCH("Model", "fragmentShader")) {
+		data->fragmentShader = value;
+	}
+	return 0;
+}
+
+bool model_load_ini(HgElement* element, std::string filename) {
+	change_to_model(element);
+	iniData data;
+
+	ini_parse(filename.c_str(), iniHandler, &data);
+
+	if (model_load(element, data.modeFilename.c_str()) < 0) return false;
+
+	element->scale = data.scale;
+	element->origin.components.z = data.origin.components.z / element->scale;
+	element->origin.components.y = data.origin.components.y / element->scale;
+	element->origin.components.x = data.origin.components.x / element->scale;
+	element->rotation = data.orientation;
+
+	if (!data.vertexShader.empty() && !data.fragmentShader.empty())
+		element->m_renderData->shader = HgShader::acquire(data.vertexShader.c_str(), data.fragmentShader.c_str());
+
+	return true;
 }
 
 /*
