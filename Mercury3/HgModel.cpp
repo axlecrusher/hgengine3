@@ -18,7 +18,7 @@ static model_data LoadModel(const char* filename) {
 	r.vertices = NULL;
 	r.indices = NULL;
 
-	vbo_layout_vnu* buffer1 = NULL;
+	vbo_layout_vnut* buffer1 = NULL;
 	uint16_t* buffer2 = NULL;
 
 	FILE* f = NULL;
@@ -47,7 +47,7 @@ static model_data LoadModel(const char* filename) {
 		return r;
 	}
 
-	buffer1 = (vbo_layout_vnu*)malloc(sizeof(*buffer1)*head.vertex_count);
+	buffer1 = (vbo_layout_vnut*)malloc(sizeof(*buffer1)*head.vertex_count);
 	buffer2 = (uint16_t*)malloc(sizeof(*buffer2)*head.index_count);
 
 	read = fread(buffer1, sizeof(*buffer1), head.vertex_count, f);
@@ -109,7 +109,7 @@ static void change_to_model(HgElement* element) {
 	element->m_renderData = init_render_data(); //this needs to be per model instance if the model is animated
 }
 
-int8_t model_load(HgElement* element, const char* filename) {
+int8_t model_data::load(HgElement* element, const char* filename) {
 	change_to_model(element);
 
 	OGLRenderData* rd = (OGLRenderData*)element->m_renderData;
@@ -119,10 +119,19 @@ int8_t model_load(HgElement* element, const char* filename) {
 	model_data mdl = LoadModel(filename);
 	if (mdl.vertices == NULL || mdl.indices == NULL) return -1;
 
-	rd->hgVbo = &staticVboVNU;
+	/*
+	for (int i = 0; i < mdl.vertex_count; i++) {
+		float x = mdl.vertices[i].tan.x;
+		float y = mdl.vertices[i].tan.y;
+		float z = mdl.vertices[i].tan.z;
+		float w = mdl.vertices[i].tan.w;
+		printf("%f %f %f %f\n",x, y, z, w);
+	}
+*/
+	rd->hgVbo = &staticVboVNUT;
 	rd->vertex_count = mdl.vertex_count;
 	rd->index_count = mdl.index_count;
-	rd->vbo_offset = staticVboVNU.add_data(mdl.vertices, rd->vertex_count);
+	rd->vbo_offset = staticVboVNUT.add_data(mdl.vertices, rd->vertex_count);
 	free(mdl.vertices);
 
 //	mrd->index_count = mdl.index_count;
@@ -140,22 +149,42 @@ typedef struct iniData{
 		scale = 1.0f;
 		origin = position = { 0,0,0 };
 	}
-	std::string modeFilename;
+	std::string modelFilename;
 	float scale;
 	vector3 origin;
 	vector3 position;
 	quaternion orientation;
 	std::string vertexShader;
 	std::string fragmentShader;
+
+	//material data
+	std::string diffuseTexture;
+	std::string specularTexture;
+	std::string normalTexture;
 } iniData;
 
-static int iniHandler(void* user, const char* section, const char* name, const char* value) {
+#define MATCH(s, n) strcmp(name, n) == 0
+
+static int material_iniHandler(void* user, const char* name, const char* value) {
 	iniData* data = (iniData*)user;
-	
-	#define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+
+	if (MATCH("Material", "diffuseTexture")) {
+		data->diffuseTexture = value;
+	}
+	else if (MATCH("Material", "specularTexture")) {
+		data->specularTexture = value;
+	}
+	else if (MATCH("Material", "normalTexture")) {
+		data->normalTexture = value;
+	}
+	return 0;
+}
+
+static int model_iniHandler(void* user, const char* name, const char* value) {
+	iniData* data = (iniData*)user;
 
 	if (MATCH("Model", "file")) {
-		data->modeFilename = value;
+		data->modelFilename = value;
 	}
 	else if (MATCH("Model", "scale")) {
 		data->scale = ::atof(value);
@@ -196,16 +225,26 @@ static int iniHandler(void* user, const char* section, const char* name, const c
 	else if (MATCH("Model", "fragmentShader")) {
 		data->fragmentShader = value;
 	}
+
 	return 0;
 }
 
-bool model_load_ini(HgElement* element, std::string filename) {
+static int iniHandler(void* user, const char* section, const char* name, const char* value) {
+	#define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+
+	if (strcmp(section, "Model") == 0) return model_iniHandler(user, name, value);
+	if (strcmp(section, "Material") == 0) return material_iniHandler(user, name, value);
+
+	return 0;
+}
+
+bool model_data::load_ini(HgElement* element, std::string filename) {
 	change_to_model(element);
 	iniData data;
 
 	ini_parse(filename.c_str(), iniHandler, &data);
 
-	if (model_load(element, data.modeFilename.c_str()) < 0) return false;
+	if (model_data::load(element, data.modelFilename.c_str()) < 0) return false;
 
 	element->scale = data.scale;
 	element->origin.components.z = data.origin.components.z / element->scale;
@@ -216,6 +255,48 @@ bool model_load_ini(HgElement* element, std::string filename) {
 
 	if (!data.vertexShader.empty() && !data.fragmentShader.empty())
 		element->m_renderData->shader = HgShader::acquire(data.vertexShader.c_str(), data.fragmentShader.c_str());
+
+	if (!data.diffuseTexture.empty())
+	{
+		auto tmp = HgTexture::acquire(data.diffuseTexture);
+		if (tmp != nullptr) {
+			tmp->setType(HgTexture::DIFFUSE);
+			tmp->setNeedsUpdate(true);
+			element->m_extendedData->textures.push_back(tmp);
+			SET_FLAG(element, HGE_UPDATE_TEXTURES);
+		}
+		else {
+			//warn
+		}
+	}
+
+	if (!data.specularTexture.empty())
+	{
+		auto tmp = HgTexture::acquire(data.specularTexture);
+		if (tmp != nullptr) {
+			tmp->setType(HgTexture::SPECULAR);
+			tmp->setNeedsUpdate(true);
+			element->m_extendedData->textures.push_back(tmp);
+			SET_FLAG(element, HGE_UPDATE_TEXTURES);
+		}
+		else {
+			//warn
+		}
+	}
+
+	if (!data.normalTexture.empty())
+	{
+		auto tmp = HgTexture::acquire(data.normalTexture);
+		if (tmp != nullptr) {
+			tmp->setType(HgTexture::NORMAL);
+			tmp->setNeedsUpdate(true);
+//			element->m_extendedData->textures.push_back(tmp);
+			SET_FLAG(element, HGE_UPDATE_TEXTURES);
+		}
+		else {
+			//warn
+		}
+	}
 
 	return true;
 }

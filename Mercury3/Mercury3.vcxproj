@@ -177,6 +177,7 @@
     <ClCompile Include="HgRenderQueue.cpp" />
     <ClCompile Include="HgScene.cpp" />
     <ClCompile Include="HgShader.cpp" />
+    <ClCompile Include="HgTexture.cpp" />
     <ClCompile Include="ini.c" />
     <ClCompile Include="LinkedList.c" />
     <ClCompile Include="MercuryWindow.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="HgRenderQueue.h" />
     <ClInclude Include="HgScene.h" />
     <ClInclude Include="HgShader.h" />
+    <ClInclude Include="HgTexture.h" />
     <ClInclude Include="HgTypes.h" />
     <ClInclude Include="HgVbo.h" />
     <ClInclude Include="include\glcorearb.h" />
@@ -221,6 +223,8 @@
     <ClInclude Include="oglShaders.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="quaternion.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="stb_image_resize.h" />
     <ClInclude Include="str_utils.h" />
     <ClInclude Include="symbol_enumerator.h" />
     <ClInclude Include="triangle.h" />

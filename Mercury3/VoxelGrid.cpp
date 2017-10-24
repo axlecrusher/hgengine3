@@ -4,14 +4,14 @@
 
 //instanced render data
 static OGLRenderData *crd = NULL;
-static vbo_layout_vnu* voxelGridVertices = NULL;
+static vbo_layout_vnut* voxelGridVertices = NULL;
 static uint16_t* indices = NULL;
 
 model_data generateVoxelVBO(uint8_t x, uint8_t y) {
 	model_data data;
 	uint32_t cube_count = x*y;
 
-	data.vertices = (vbo_layout_vnu*)malloc(24 * cube_count * sizeof(*data.vertices));
+	data.vertices = (vbo_layout_vnut*)malloc(24 * cube_count * sizeof(*data.vertices));
 	data.vertex_count = 24 * cube_count;
 
 	data.indices = (uint16_t*)malloc(36 * cube_count * sizeof(*data.indices));
@@ -21,7 +21,7 @@ model_data generateVoxelVBO(uint8_t x, uint8_t y) {
 	uint16_t idx_counter = 0;
 	for (uint16_t i = 0; i < cube_count; i++) {
 		for (uint8_t ix = 0; ix < 24; ++ix) {
-			vbo_layout_vnu vert = raw_cube_data[ix];
+			vbo_layout_vnut vert = raw_cube_data[ix];
 			vert.v.components.x += i % x;
 			vert.v.components.y -= (i / x)%y;
 //			vert.v.components.z += i / 100;

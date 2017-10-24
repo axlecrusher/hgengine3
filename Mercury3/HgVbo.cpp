@@ -7,6 +7,7 @@
 
 HgVboMemory<vbo_layout_vc> staticVbo;
 HgVboMemory<vbo_layout_vnu> staticVboVNU;
+HgVboMemory<vbo_layout_vnut> staticVboVNUT;
 
 //static void* _currentVbo;
 

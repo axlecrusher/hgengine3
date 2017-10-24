@@ -187,7 +187,7 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgElement*
 		//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 		//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 		shader->setGlobalUniforms(*camera);
-		shader->setLocalUniforms(&e->rotation, &e->position, e->scale, &e->origin);
+		shader->setLocalUniforms(&e->rotation, &e->position, e->scale, &e->origin, e->m_renderData);
 	}
 
 	e->m_renderData->render();
@@ -316,7 +316,7 @@ int main()
 		}
 
 		scene.getNewElement(&element);
-		model_load_ini(element, "teapot.ini");
+		model_data::load_ini(element, "teapot.ini");
 
 		if (create_element("voxelGrid", &scene, &element) > 0) {
 			//		element->scale = 100.0f;

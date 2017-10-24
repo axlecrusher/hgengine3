@@ -25,6 +25,9 @@ extern "C" {
 		float x, y, z;
 	} normal;
 
+	typedef struct tangent {
+		float x, y, z, w;
+	} tangent;
 #ifdef __cplusplus
 }
 #endif

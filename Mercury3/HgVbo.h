@@ -31,6 +31,7 @@ typedef enum VBO_TYPE {
 	VBO_VC = 0,
 	VBO_VN,
 	VBO_VNU,
+	VBO_VNUT,
 	VBO_INDEX8,
 	VBO_INDEX16,
 	VBO_COLOR8,
@@ -57,6 +58,13 @@ typedef struct vbo_layout_vnu {
 	normal n;
 	uv_coord uv;
 } vbo_layout_vnu;
+
+typedef struct vbo_layout_vnut {
+	vertex v;
+	normal n;
+	tangent tan;
+	uv_coord uv;
+} vbo_layout_vnut;
 
 class HgVboBase {
 public:
@@ -97,6 +105,7 @@ public:
 private:
 	static VBO_TYPE getVboType(const vbo_layout_vc& x) { return VBO_VC; }
 	static VBO_TYPE getVboType(const vbo_layout_vnu& x) { return VBO_VNU; }
+	static VBO_TYPE getVboType(const vbo_layout_vnut& x) { return VBO_VNUT; }
 	static VBO_TYPE getVboType(const uint8_t& x) { return VBO_INDEX8; }
 	static VBO_TYPE getVboType(const uint16_t& x) { return VBO_INDEX16; }
 	static VBO_TYPE getVboType(const color& x) { return VBO_VC; }
@@ -199,13 +208,24 @@ void HgVboMemory<T>::hgvbo_sendogl() {
 		glEnableVertexAttribArray(L_COLOR);
 	}
 	else if (type == VBO_VN) {
-		glVertexAttribPointer(L_NORMAL, 4, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(vertex));
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(vertex));
 		glEnableVertexAttribArray(L_NORMAL);
 	}
 	else if (type == VBO_VNU) {
-		glVertexAttribPointer(L_NORMAL, 4, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(vertex));
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(vertex));
 		glEnableVertexAttribArray(L_NORMAL);
-		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_FALSE, stride, (void*)(sizeof(vertex) + sizeof(normal)));
+		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, stride, (void*)(sizeof(vertex) + sizeof(normal)));
+		glEnableVertexAttribArray(L_UV);
+	}
+	else if (type == VBO_VNUT) {
+		int offset = sizeof(vertex);
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, stride, (void*)offset);
+		glEnableVertexAttribArray(L_NORMAL);
+		offset += sizeof(normal);
+		glVertexAttribPointer(L_TANGENT, 4, GL_FLOAT, GL_FALSE, stride, (void*)offset);
+		glEnableVertexAttribArray(L_TANGENT);
+		offset += sizeof(tangent); //tangent normals
+		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, stride, (void*)offset);
 		glEnableVertexAttribArray(L_UV);
 	}
 	else {
@@ -233,3 +253,4 @@ inline void ogl_draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset) {
 
 extern HgVboMemory<vbo_layout_vc> staticVbo;
 extern HgVboMemory<vbo_layout_vnu> staticVboVNU;
+extern HgVboMemory<vbo_layout_vnut> staticVboVNUT;
