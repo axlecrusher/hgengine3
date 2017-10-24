@@ -3,8 +3,9 @@
 #include "quaternion.h"
 #include <HgTypes.h>
 #include <HgCamera.h>
-
 #include <memory>
+
+class RenderData;
 
 class HgShader {
 	public:
@@ -15,7 +16,7 @@ class HgShader {
 		virtual void enable() = 0;
 
 		virtual void setGlobalUniforms(const HgCamera& c) = 0;
-		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin) = 0;
+		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData*) = 0;
 
 		static HgShader* acquire(const char* vert, const char* frag);
 		static void release(HgShader* shader);

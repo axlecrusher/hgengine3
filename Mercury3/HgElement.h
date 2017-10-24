@@ -9,13 +9,16 @@
 #include <HgCamera.h>
 #include <str_utils.h>
 #include <memory>
+#include <HgTexture.h>
+#include <vector>
 
 	enum HgElementFlag {
 		HGE_USED = 0x01, //used in scene graph
 		HGE_ACTIVE = 0x02,
 		HGE_HIDDEN = 0x04,
 		HGE_UPDATED = 0x08,
-		HGE_DESTROY = 0x10
+		HGE_DESTROY = 0x10,
+		HGE_UPDATE_TEXTURES = 0x20
 	};
 
 extern viewport view_port[];
@@ -39,6 +42,7 @@ class RenderData {
 
 		inline void render() { renderFunction(this); }
 		virtual void destroy();
+		virtual void setTexture(const HgTexture* t) = 0;
 
 		HgShader* shader;
 		uint8_t blendMode;
@@ -50,6 +54,7 @@ class RenderData {
 //typedef uint8_t vtable_index;
 
 class HgElement;
+class model_data;
 
 class HgElementLogic {
 public:
@@ -58,6 +63,12 @@ public:
 	inline void setElement(HgElement* x) { element = x; }
 protected:
 	HgElement* element; //just a weak pointer back to the parent
+};
+
+class HgElementExtended {
+public:
+	HgElement* parent;
+	std::vector< HgTexture::TexturePtr > textures;
 };
 
 //#define MAX_ELEMENT_TYPES 255
@@ -90,11 +101,19 @@ public:
 		inline void setLogic(std::unique_ptr<HgElementLogic> logic) { m_logic = std::move(logic); m_logic->setElement(this); }
 		std::unique_ptr<HgElementLogic>& logic() { return m_logic; }
 
+		//Send texture data to GPU
+		void updateGpuTextures();
+
 		RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
 private:
 	std::unique_ptr<HgElementLogic> m_logic;
 
+	/*	Storage for data that we don't need to access frequently and thus may not be cached.
+		This should not be accessed on every update or render. */
+	std::unique_ptr<HgElementExtended> m_extendedData;
+
 	friend HgElementLogic;
+	friend model_data;
 };
 
 //typedef void(*SignalHandler)(int signum);
@@ -150,5 +169,4 @@ void RegisterElementType(const char* c, factory_clbk);
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }
 #endif
 
-#define SAFE_FREE(ptr) if (NULL != (ptr)) { free(ptr); ptr=NULL; }
 #define SAFE_DESTROY(func,ptr) if (NULL != (ptr)) { func(ptr); free(ptr); ptr=NULL; }

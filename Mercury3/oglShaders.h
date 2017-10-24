@@ -35,7 +35,7 @@ class HgOglShader : public HgShader {
 		*/
 
 		virtual void setGlobalUniforms(const HgCamera& c);
-		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin);
+		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd);
 
 		int8_t uniform_locations[U_UNIFORM_COUNT];
 

@@ -23,6 +23,9 @@ char *UniformString[] = {
 	"cam_rot",
 	"cam_position",
 	"origin",
+	"diffuseTex",
+	"specularTex",
+	"normalTex",
 	NULL
 };
 
@@ -149,8 +152,9 @@ OGLRenderData::OGLRenderData()
 	:RenderData(),hgVbo(nullptr),/* indexVbo(nullptr), colorVbo(nullptr),*/ vbo_offset(0), vertex_count(0), idx_id(0), index_count(0)
 {
 	memset(&indices, 0, sizeof(indices));
-	init();
 	renderFunction = Indice8Render;
+	memset(textureID, 0, sizeof(textureID));
+	init();
 }
 
 OGLRenderData::~OGLRenderData() {
@@ -175,4 +179,61 @@ void OGLRenderData::destroy() {
 	}
 
 	RenderData::destroy();
+}
+
+static GLint colorDepth(HgTexture::channels c) {
+	switch (c) {
+	case HgTexture::channels::GRAY:
+		return 0;
+	case HgTexture::channels::GRAY_ALPHA:
+		return 0;
+	case HgTexture::channels::RGB:
+		return GL_RGB8;
+	case HgTexture::channels::RGBA:
+		return GL_RGBA8;
+	}
+	return 0; //crash
+}
+
+uint32_t ogl_updateTextureData(uint16_t x, uint16_t y, HgTexture::channels c, unsigned char* data) {
+	GLuint id;
+	glGenTextures(1, &id);
+	glBindTexture(GL_TEXTURE_2D, id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	GLint internal, format;
+	
+	switch (c) {
+		case HgTexture::channels::GRAY:
+			internal = 0;
+			format = 0;
+			break;
+		case HgTexture::channels::GRAY_ALPHA:
+			internal = 0;
+			format = 0;
+			break;
+		case HgTexture::channels::RGB:
+//			internal = GL_RGB8;
+			internal = GL_RGB;
+			format = GL_RGB;
+			break;
+		case HgTexture::channels::RGBA:
+//			internal = GL_RGBA8;
+			internal = GL_RGBA;
+			format = GL_RGBA;
+			break;
+		}
+
+	glTexImage2D(GL_TEXTURE_2D, 0, internal, x, y, 0, format, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	return id;
+}
+
+void OGLRenderData::setTexture(const HgTexture* t) {
+	HgTexture::TextureType type = t->getType();
+	textureID[type] = t->getGPUId();
 }

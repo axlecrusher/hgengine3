@@ -8,44 +8,11 @@
 #include <str_utils.h>
 #include <HgMath.h>
 #include <map>
-/*
-hgstring HGELEMENT_TYPE_NAMES = { 0, 0 };
-uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES] = { 0 };
 
-extern HgElement_vtable HGELEMT_VTABLES[MAX_ELEMENT_TYPES] = { 0 };
-*/
-
-/*
-hgstring HGELEMENT_TYPE_NAMES = { 0, 0 };
-uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES] = { 0 };
-*/
 RenderData* (*new_RenderData)() = NULL;
-/*
-vtable_index RegisterElementType(const char* c) {
-	static vtable_index ElementTypeCounter = 1; //0 is reserved for undefined
-	if (ElementTypeCounter==1) {
-		HGELEMENT_TYPE_NAME_OFFSETS[0] = hgstring_append(&HGELEMENT_TYPE_NAMES, "UndefinedType");
-	}
-
-	printf("Registering %s, type %d \n", c, ElementTypeCounter);
-	HGELEMENT_TYPE_NAME_OFFSETS[ElementTypeCounter] = hgstring_append(&HGELEMENT_TYPE_NAMES, c);
-	return ElementTypeCounter++;
-}
-*/
 
 std::map<std::string, factory_clbk> element_factories;
-/*
-vtable_index RegisterElementType(const char* c) {
-	static vtable_index ElementTypeCounter = 1; //0 is reserved for undefined
-	if (ElementTypeCounter == 1) {
-		HGELEMENT_TYPE_NAME_OFFSETS[0] = hgstring_append(&HGELEMENT_TYPE_NAMES, "UndefinedType");
-	}
 
-	printf("Registering %s, type %d \n", c, ElementTypeCounter);
-	HGELEMENT_TYPE_NAME_OFFSETS[ElementTypeCounter] = hgstring_append(&HGELEMENT_TYPE_NAMES, c);
-	return ElementTypeCounter++;
-}
-*/
 void RegisterElementType(const char* c, factory_clbk factory) {
 	element_factories[c] = factory;
 }
@@ -78,6 +45,8 @@ void HgElement::init()
 	origin = vector3_zero;
 
 	rotation = quaternion_default;
+	m_extendedData = std::make_unique<HgElementExtended>();
+	m_extendedData->parent = this;
 }
 
 void HgElement::destroy()
@@ -86,6 +55,22 @@ void HgElement::destroy()
 //	if (m_logic) delete(m_logic);
 //	m_logic = nullptr;
 	m_renderData = nullptr; //need some way to signal release
+}
+
+void HgElement::updateGpuTextures() {
+	//FIXME: Share texture pointers can cause a problem here. Texture may be updated by another HgElement.
+	//We would still need tor un setTexture to get the GPU id numbers;
+
+	//There is still some toher problem with textures. Maybe because the same shader could have different textures. It needs to disable old textures its not using.
+	for (auto itr = m_extendedData->textures.begin(); itr != m_extendedData->textures.end(); itr++) {
+		auto texture = *itr;
+		if (texture->getNeedsUpdate()) {
+			texture->sendToGPU();
+			texture->setNeedsUpdate(false);
+			HgTexture::TextureType type = texture->getType();
+		}
+		m_renderData->setTexture(texture.get());
+	}
 }
 
 /*

@@ -19,6 +19,8 @@ uint32_t hgstring_append(hgstring* hg, const char* str);
 char* str_cat(const char* s1, const char* s2);
 char* str_copy(const char* str);
 
+#define SAFE_FREE(ptr) { if (NULL != (ptr)) free(ptr); } ptr=NULL;
+
 #ifdef __cplusplus
 }
 #endif

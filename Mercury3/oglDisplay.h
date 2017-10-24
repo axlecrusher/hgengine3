@@ -9,6 +9,7 @@
 
 //#include <HgVbo.h>
 #include <memory>
+#include <HgTexture.h>
 
 enum UniformLocations {
 	U_ROTATION=0,
@@ -18,7 +19,10 @@ enum UniformLocations {
 	U_CAMERA_ROT=4,
 	U_CAMERA_POS=5,
 	U_ORIGIN=6,
-	U_UNIFORM_COUNT=7
+	U_DIFFUSE_TEXTURE=7,
+	U_SPECULAR_TEXTURE = 8,
+	U_NORMAL_TEXTURE = 9,
+	U_UNIFORM_COUNT=10
 };
 
 extern char *UniformString[];
@@ -27,6 +31,7 @@ extern char *UniformString[];
 #define L_NORMAL	1
 #define L_UV		2
 #define L_COLOR		3
+#define L_TANGENT	4
 
 typedef struct ArbitraryData {
 	void* data;
@@ -49,6 +54,8 @@ public:
 	virtual void destroy();
 //	virtual void render();
 
+	virtual void setTexture(const HgTexture* t);
+
 	class HgVboBase* hgVbo;
 
 	//We need to be able to support multiple VBOs without hardcoding more here.
@@ -64,6 +71,8 @@ public:
 //	std::shared_ptr<char*> indices;
 	ArbitraryData indices; //can be in different formats, requiring different renderers, set renderFunction
 //	indiceRenderFunc renderFunction;
+
+	GLuint textureID[HgTexture::TEXTURE_TYPE_COUNT];
 };
 
 GLuint hgOglVbo(vertices v);
@@ -87,3 +96,5 @@ inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e-
 
 void Indice8Render(RenderData* rd);
 void Indice16Render(RenderData* rd);
+
+uint32_t ogl_updateTextureData(uint16_t x, uint16_t y, HgTexture::channels c, unsigned char* data);
