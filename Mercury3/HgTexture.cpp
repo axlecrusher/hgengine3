@@ -1,4 +1,5 @@
 #include "HgTexture.h"
+#include <glew.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -38,6 +39,7 @@ HgTexture::HgTexture()
 
 HgTexture::~HgTexture()
 {
+	if (gpuId > 0) glDeleteTextures(1,&gpuId); //FIXME abstract this
 	SAFE_FREE(data);
 }
 
