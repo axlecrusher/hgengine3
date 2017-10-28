@@ -64,7 +64,7 @@ void BoundingBoxes::cast_ray(const vector3* ray, const vector3* pos, void(*inter
 	vector3 a, b;
 	float dmin, dmax;
 
-	if (!::cast_ray(&dirfrac, pos, boundingVolume)) return; //quickly eliminate entire volume
+//	if (!::cast_ray(&dirfrac, pos, boundingVolume)) return; //broken.....
 
 	for (uint32_t i = 0; i < cube_count; i++) {
 		a = vector3_sub(&cubes[i].lb, pos);
