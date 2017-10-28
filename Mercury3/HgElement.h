@@ -6,7 +6,6 @@
 #include <HgTypes.h>
 #include <HgShader.h>
 
-#include <HgCamera.h>
 #include <str_utils.h>
 #include <memory>
 #include <HgTexture.h>
@@ -22,7 +21,6 @@
 	};
 
 extern viewport view_port[];
-extern HgCamera* _camera;
 extern float* _projection;
 
 typedef enum BlendMode {
