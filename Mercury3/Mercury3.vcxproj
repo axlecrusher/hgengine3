@@ -223,6 +223,7 @@
     <ClInclude Include="MercuryWindow.h" />
     <ClInclude Include="oglDisplay.h" />
     <ClInclude Include="oglShaders.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="quaternion.h" />
     <ClInclude Include="stb_image.h" />
