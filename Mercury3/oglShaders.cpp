@@ -237,21 +237,24 @@ void HgOglShader::setLocalUniforms(const quaternion* rotation, const point* posi
 	if (uniform_locations[U_POSITION] > -1) glUniform4f(uniform_locations[U_POSITION], position->components.x, position->components.y, position->components.z, scale);
 	if (uniform_locations[U_ORIGIN] > -1) glUniform3f(uniform_locations[U_ORIGIN], origin->components.x, origin->components.y, origin->components.z);
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);
 	if ((uniform_locations[U_DIFFUSE_TEXTURE] > -1) && (oglrd->textureID[HgTexture::DIFFUSE] > 0)) {
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);
+//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);
 		glUniform1i(uniform_locations[U_DIFFUSE_TEXTURE], 0);
 	}
 
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
 	if ((uniform_locations[U_SPECULAR_TEXTURE] > -1) && (oglrd->textureID[HgTexture::SPECULAR] > 0)) {
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
+//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
 		glUniform1i(uniform_locations[U_SPECULAR_TEXTURE], 1);
 	}
 
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::NORMAL]);
 	if ((uniform_locations[U_NORMAL_TEXTURE] > -1) && (oglrd->textureID[HgTexture::NORMAL] > 0)) {
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::NORMAL]);
+		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
 		glUniform1i(uniform_locations[U_NORMAL_TEXTURE], 2);
 	}
 

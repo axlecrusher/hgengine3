@@ -131,6 +131,7 @@
       <AdditionalIncludeDirectories>include\;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
       <FloatingPointModel>Precise</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,6 +153,7 @@
       <AdditionalIncludeDirectories>include\;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
       <FloatingPointModel>Precise</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -165,7 +167,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="aabb.c" />
+    <ClCompile Include="aabb.cpp" />
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="FileWatch.c" />
     <ClCompile Include="GravityTest.cpp" />

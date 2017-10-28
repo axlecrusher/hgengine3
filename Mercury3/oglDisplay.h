@@ -54,6 +54,7 @@ public:
 	virtual void destroy();
 //	virtual void render();
 
+	virtual void clearTextureIDs();
 	virtual void setTexture(const HgTexture* t);
 
 	class HgVboBase* hgVbo;
@@ -72,7 +73,7 @@ public:
 	ArbitraryData indices; //can be in different formats, requiring different renderers, set renderFunction
 //	indiceRenderFunc renderFunction;
 
-	GLuint textureID[HgTexture::TEXTURE_TYPE_COUNT];
+	GLuint textureID[HgTexture::TEXTURE_TYPE_COUNT]; //zero ID to stop rendering
 };
 
 GLuint hgOglVbo(vertices v);
@@ -97,4 +98,5 @@ inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e-
 void Indice8Render(RenderData* rd);
 void Indice16Render(RenderData* rd);
 
-uint32_t ogl_updateTextureData(uint16_t x, uint16_t y, HgTexture::channels c, unsigned char* data);
+//uint32_t ogl_updateTextureData(uint16_t x, uint16_t y, HgTexture::channels c, unsigned char* data);
+uint32_t ogl_updateTextureData(HgTexture* tex);

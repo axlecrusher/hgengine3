@@ -58,10 +58,8 @@ void HgElement::destroy()
 }
 
 void HgElement::updateGpuTextures() {
-	//FIXME: Share texture pointers can cause a problem here. Texture may be updated by another HgElement.
-	//We would still need tor un setTexture to get the GPU id numbers;
+	m_renderData->clearTextureIDs();
 
-	//There is still some toher problem with textures. Maybe because the same shader could have different textures. It needs to disable old textures its not using.
 	for (auto itr = m_extendedData->textures.begin(); itr != m_extendedData->textures.end(); itr++) {
 		auto texture = *itr;
 		if (texture->getNeedsUpdate()) {
@@ -69,7 +67,10 @@ void HgElement::updateGpuTextures() {
 			texture->setNeedsUpdate(false);
 			HgTexture::TextureType type = texture->getType();
 		}
-		m_renderData->setTexture(texture.get());
+
+		//FIXME: Share texture pointers can cause a problem here. Texture may be updated by another HgElement.
+		//refactor into HgTexture making callback into renderData to set texture IDs. don't forget to invalidate stored ids if textures change types.
+		m_renderData->setTexture(texture.get()); 
 	}
 }
 
