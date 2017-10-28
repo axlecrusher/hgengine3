@@ -101,7 +101,7 @@ public:
 		inline void update(uint32_t dtime) { if (m_logic != nullptr) m_logic->update(dtime); }
 
 		inline void setLogic(std::unique_ptr<HgElementLogic> logic) { m_logic = std::move(logic); m_logic->setElement(this); }
-		std::unique_ptr<HgElementLogic>& logic() { return m_logic; }
+		inline HgElementLogic& logic() { return *(m_logic.get()); }
 
 		//Send texture data to GPU
 		void updateGpuTextures();
