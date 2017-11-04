@@ -61,6 +61,7 @@ public:
 	virtual void update(uint32_t tdelta) = 0;
 
 	inline void setElement(HgElement* x) { element = x; }
+	inline HgElement& getElement() { return *element; }
 protected:
 	HgElement* element; //just a weak pointer back to the parent
 };
