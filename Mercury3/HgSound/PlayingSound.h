@@ -10,6 +10,9 @@ namespace HgSound {
 		PlayingSound(SoundAsset::ptr SoundAsset);
 
 		void getSamples(uint32_t samples, float* buffer);
+		bool isFinished() const { return m_nextSample >= m_sound->totalSamples(); }
+
+		void stop();
 
 	private:
 		SoundAsset::ptr m_sound;

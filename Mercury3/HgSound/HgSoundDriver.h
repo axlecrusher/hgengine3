@@ -17,8 +17,9 @@ namespace HgSound {
 		virtual void start() = 0;
 
 		PlayingSound::ptr play(SoundAsset::ptr asset);
+		void stop(PlayingSound::ptr playingAsset);
 	protected:
-		std::map<PlayingSound*, PlayingSound::ptr> m_playingSounds;
+		std::map<const PlayingSound*, PlayingSound::ptr> m_playingSounds;
 		static uint32_t samples;
 
 		void mixAudio();
