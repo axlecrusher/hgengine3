@@ -21,14 +21,21 @@ public:
 			if (t != nullptr) return std::move(t);
 		}
 
-		auto asset = AssetPtr(new T(), T::release);
+		auto asset = AssetPtr(new T(), [this](T* asset) {this->release(asset); });
 		asset->load(path);
 		map.insert(std::make_pair(path, asset));
 		return std::move(asset);
 	}
 
-	void remove(const std::string& path) { map.erase(path); }
+//	void remove(const std::string& path) { map.erase(path); }
 private:
+	void release(T* asset) {
+		if (isValid()) { //make sure map hasn't been destroyed (when program exiting)
+			map.erase(asset->m_path);
+		}
+		delete asset;
+	}
+
 	bool is_valid;
 	std::map< const std::string, std::weak_ptr<T> > map;
 };

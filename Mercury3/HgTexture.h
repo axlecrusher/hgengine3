@@ -57,7 +57,7 @@ private:
 	HgTexture();
 
 	//used when an image is no longer used. Called by TexturePtr, not user callible.
-	static void release(HgTexture* t);
+//	static void release(HgTexture* t);
 
 	bool HgTexture::stb_load(FILE* f);
 	bool HgTexture::dds_load(FILE* f);

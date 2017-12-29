@@ -12,14 +12,14 @@ AssetManager<HgTexture> HgTexture::imageMap;
 HgTexture::TexturePtr HgTexture::acquire(const std::string& path) {
 	return imageMap.get(path);
 }
-
+/*
 void HgTexture::release(HgTexture* t) {
 	if (imageMap.isValid()) { //make sure map hasn't been destroyed (when program exiting)
 		imageMap.remove(t->m_path);
 	}
 	delete t;
 }
-
+*/
 HgTexture::HgTexture()
 {
 	data = nullptr;
