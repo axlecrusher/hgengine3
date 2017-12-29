@@ -179,6 +179,10 @@
     <ClCompile Include="HgRenderQueue.cpp" />
     <ClCompile Include="HgScene.cpp" />
     <ClCompile Include="HgShader.cpp" />
+    <ClCompile Include="HgSound\Emitter.cpp" />
+    <ClCompile Include="HgSound\HgSoundDriver.cpp" />
+    <ClCompile Include="HgSound\PlayingSound.cpp" />
+    <ClCompile Include="HgSound\SoundAsset.cpp" />
     <ClCompile Include="HgTexture.cpp" />
     <ClCompile Include="ini.c" />
     <ClCompile Include="LinkedList.c" />
@@ -213,6 +217,11 @@
     <ClInclude Include="HgRenderQueue.h" />
     <ClInclude Include="HgScene.h" />
     <ClInclude Include="HgShader.h" />
+    <ClInclude Include="HgSound\dr_wav.h" />
+    <ClInclude Include="HgSound\Emitter.h" />
+    <ClInclude Include="HgSound\HgSoundDriver.h" />
+    <ClInclude Include="HgSound\PlayingSound.h" />
+    <ClInclude Include="HgSound\SoundAsset.h" />
     <ClInclude Include="HgTexture.h" />
     <ClInclude Include="HgTypes.h" />
     <ClInclude Include="HgVbo.h" />
@@ -220,6 +229,8 @@
     <ClInclude Include="include\glew.h" />
     <ClInclude Include="include\glext.h" />
     <ClInclude Include="ini.h" />
+    <ClInclude Include="lib\libsoundio-1.1.0\soundio\endian.h" />
+    <ClInclude Include="lib\libsoundio-1.1.0\soundio\soundio.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="MercuryWindow.h" />
     <ClInclude Include="oglDisplay.h" />
