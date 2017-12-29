@@ -5,6 +5,7 @@
 #include <map>
 
 #include "str_utils.h"
+#include <AssetManager.h>
 
 class HgTexture
 {
@@ -72,15 +73,9 @@ private:
 	unsigned char m_mipMapCount;
 	uint32_t m_linearSize;
 
-	typedef struct mapContainer{
-		mapContainer() :is_valid(true) {}
-		~mapContainer() { is_valid=false; }
-		bool is_valid;
-		std::map< const std::string, std::weak_ptr<HgTexture> > map;
+	static AssetManager<HgTexture> imageMap;
+	friend AssetManager<HgTexture>;
 
-	} mapContainer;
-
-	static mapContainer imageMap;
 	friend uint32_t ogl_updateTextureData(HgTexture* tex);
 };
 

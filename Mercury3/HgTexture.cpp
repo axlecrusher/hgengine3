@@ -7,23 +7,15 @@
 #include <vector>
 
 HgTexture::gpu_update_texture HgTexture::updateTextureFunc = NULL;
-HgTexture::mapContainer HgTexture::imageMap;
+AssetManager<HgTexture> HgTexture::imageMap;
 
 HgTexture::TexturePtr HgTexture::acquire(const std::string& path) {
-	auto itr = imageMap.map.find(path);
-	if (itr != imageMap.map.end()) {
-		auto t = itr->second.lock();
-		if (t != nullptr) return std::move(t);
-	}
-	auto texture = TexturePtr(new HgTexture(), HgTexture::release);
-	texture->load(path);
-	imageMap.map.insert(std::make_pair(path, texture));
-	return std::move(texture);
+	return imageMap.get(path);
 }
 
 void HgTexture::release(HgTexture* t) {
-	if (imageMap.is_valid) { //make sure map hasn't been destroyed (when program exiting)
-		imageMap.map.erase(t->m_path);
+	if (imageMap.isValid()) { //make sure map hasn't been destroyed (when program exiting)
+		imageMap.remove(t->m_path);
 	}
 	delete t;
 }
