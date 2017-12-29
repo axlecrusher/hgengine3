@@ -209,5 +209,9 @@ namespace HgSound {
 			playing->getSamples(total_samples, m_buffer);
 			if (playing->isFinished()) m_playingSounds.erase(this_iter);
 		}
+
+		for (uint32_t i = 0; i < total_samples; ++i) {
+			m_buffer[i] *= 0.1f;
+		}
 	}
 }
