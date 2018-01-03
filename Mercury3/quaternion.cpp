@@ -1,6 +1,8 @@
 #include <quaternion.h>
 #include <HgMath.h>
 
+#include <memory>
+
 const quaternion quaternion_default = { 1.0f,0,0,0 };
 
 quaternion::quaternion()
@@ -72,7 +74,7 @@ quaternion quaternion_normalize(quaternion q) {
 	r.x ( q.x() / l );
 	r.y ( q.y() / l );
 	r.z ( q.z() / l );
-	return r;
+	return std::move(r);
 }
 
 quaternion quat_mult(const quaternion* q, const quaternion* r) {
@@ -82,7 +84,7 @@ quaternion quat_mult(const quaternion* q, const quaternion* r) {
 	t.y ( (r->w()*q->y()) + (r->x()*q->z()) + (r->y()*q->w()) - (r->z()*q->x()) );
 	t.z ( (r->w()*q->z()) - (r->x()*q->y()) + (r->y()*q->x()) + (r->z()*q->w()) );
 //	quaternion_normal(&t);
-	return t;
+	return std::move(t);
 }
 
 quaternion vector3_to_quat(vector3 a) {

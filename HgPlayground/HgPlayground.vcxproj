@@ -117,7 +117,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>opengl32.lib;Dbghelp.lib;%(AdditionalDependencies);lib/glew32.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Dbghelp.lib;%(AdditionalDependencies);lib/glew32.lib;$(SolutionDir)..\Mercury3\lib\libsoundio-1.1.0\i686\libsoundio.dll.a</AdditionalDependencies>
       <AdditionalOptions>/WHOLEARCHIVE:Mercury3.lib %(AdditionalOptions)</AdditionalOptions>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
@@ -133,7 +133,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>opengl32.lib;Dbghelp.lib;%(AdditionalDependencies);lib/glew32.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;Dbghelp.lib;%(AdditionalDependencies);lib/glew32.lib;$(SolutionDir)..\Mercury3\lib\libsoundio-1.1.0\i686\libsoundio.dll.a</AdditionalDependencies>
       <AdditionalOptions>/WHOLEARCHIVE:Mercury3.lib %(AdditionalOptions)</AdditionalOptions>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
