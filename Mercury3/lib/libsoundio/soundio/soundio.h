@@ -275,6 +275,10 @@ enum SoundIoFormat {
 
 #elif defined(SOUNDIO_OS_LITTLE_ENDIAN)
 
+/// Note that we build the documentation in Little Endian mode,
+/// so all the "NE" macros in the docs point to "LE" and
+/// "FE" macros point to "BE". On a Big Endian system it is the
+/// other way around.
 #define SoundIoFormatS16NE SoundIoFormatS16LE
 #define SoundIoFormatU16NE SoundIoFormatU16LE
 #define SoundIoFormatS24NE SoundIoFormatS24LE
@@ -532,7 +536,8 @@ struct SoundIoOutStream {
     /// For JACK, this value is always equal to
     /// SoundIoDevice::software_latency_current of the device.
     double software_latency;
-
+    /// Core Audio and WASAPI only: current output Audio Unit volume. Float, 0.0-1.0.
+    float volume;
     /// Defaults to NULL. Put whatever you want here.
     void *userdata;
     /// In this callback, you call ::soundio_outstream_begin_write and
@@ -928,7 +933,7 @@ SOUNDIO_EXPORT void soundio_outstream_destroy(struct SoundIoOutStream *outstream
 /// After you call this function, SoundIoOutStream::software_latency is set to
 /// the correct value.
 ///
-/// The next thing to do is call ::soundio_instream_start.
+/// The next thing to do is call ::soundio_outstream_start.
 /// If this function returns an error, the outstream is in an invalid state and
 /// you must call ::soundio_outstream_destroy on it.
 ///
@@ -942,7 +947,6 @@ SOUNDIO_EXPORT void soundio_outstream_destroy(struct SoundIoOutStream *outstream
 /// * #SoundIoErrorBackendDisconnected
 /// * #SoundIoErrorSystemResources
 /// * #SoundIoErrorNoSuchClient - when JACK returns `JackNoSuchClient`
-/// * #SoundIoErrorOpeningDevice
 /// * #SoundIoErrorIncompatibleBackend - SoundIoOutStream::channel_count is
 ///   greater than the number of channels the backend can handle.
 /// * #SoundIoErrorIncompatibleDevice - stream parameters requested are not
@@ -1054,6 +1058,9 @@ SOUNDIO_EXPORT int soundio_outstream_pause(struct SoundIoOutStream *outstream, b
 SOUNDIO_EXPORT int soundio_outstream_get_latency(struct SoundIoOutStream *outstream,
         double *out_latency);
 
+SOUNDIO_EXPORT int soundio_outstream_set_volume(struct SoundIoOutStream *outstream,
+        double volume);
+
 
 
 // Input Streams
@@ -1160,11 +1167,12 @@ SOUNDIO_EXPORT int soundio_instream_get_latency(struct SoundIoInStream *instream
         double *out_latency);
 
 
+struct SoundIoRingBuffer;
+
 /// A ring buffer is a single-reader single-writer lock-free fixed-size queue.
 /// libsoundio ring buffers use memory mapping techniques to enable a
 /// contiguous buffer when reading or writing across the boundary of the ring
 /// buffer's capacity.
-struct SoundIoRingBuffer;
 /// `requested_capacity` in bytes.
 /// Returns `NULL` if and only if memory could not be allocated.
 /// Use ::soundio_ring_buffer_capacity to get the actual capacity, which might

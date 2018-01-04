@@ -8,11 +8,17 @@
 #include <Windows.h>
 
 extern "C" {
-#include "lib\libsoundio-1.1.0\soundio\endian.h"
-#include "lib\libsoundio-1.1.0\soundio\soundio.h"
+#include <soundio\endian.h>
+#include <soundio\soundio.h>
 }
 
+
+#include <HgSound\HgSoundDriver_libsoundio.h>
+
 namespace HgSound {
+
+	std::unique_ptr<HgSound::Driver> Driver::Create() { return std::make_unique<HgSound::LibSoundIoDriver>(); }
+	
 	static void underflow_callback(struct SoundIoOutStream *outstream) {
 		static int count = 0;
 		fprintf(stderr, "underflow %d\n", count++);
@@ -105,7 +111,8 @@ namespace HgSound {
 			return;
 		}
 
-		int err = soundio_connect_backend(soundio.get(), SoundIoBackendWasapi); //windows
+		auto sound_ptr = soundio.get();
+		int err = soundio_connect_backend(sound_ptr, SoundIoBackendWasapi); //windows
 
 		if (err) {
 			fprintf(stderr, "Unable to connect to sound backend: %s\n", soundio_strerror(err));
@@ -113,15 +120,16 @@ namespace HgSound {
 		}
 
 		fprintf(stderr, "Sound backend: %s\n", soundio_backend_name(soundio->current_backend));
-		soundio_flush_events(soundio.get());
+		fprintf(stderr, "errorcheck: %s\n", soundio_strerror(err));
+		soundio_flush_events(sound_ptr);
 
-		int selected_device_index = soundio_default_output_device_index(soundio.get());
+		int selected_device_index = soundio_default_output_device_index(sound_ptr);
 		if (selected_device_index < 0) {
 			fprintf(stderr, "Output device not found\n");
 			return;
 		}
 
-		auto device = device_ptr(soundio_get_output_device(soundio.get(), selected_device_index), soundio_device_unref);
+		auto device = device_ptr(soundio_get_output_device(sound_ptr, selected_device_index), soundio_device_unref);
 		if (!device) {
 			fprintf(stderr, "out of memory\n");
 			return;
