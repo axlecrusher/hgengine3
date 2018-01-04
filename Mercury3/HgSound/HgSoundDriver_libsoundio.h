@@ -1,8 +1,11 @@
 #pragma once
 
 #include <HgSound\HgSoundDriver.h>
-#include <soundio\soundio.h>
 
+extern "C" {
+#include <soundio\endian.h>
+#include <soundio\soundio.h>
+}
 namespace HgSound {
 
 	class LibSoundIoDriver : public Driver {
