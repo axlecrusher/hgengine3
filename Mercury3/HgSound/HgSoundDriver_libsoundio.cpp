@@ -76,7 +76,7 @@ namespace HgSound {
 		device = nullptr;
 		soundio = nullptr;
 
-		if (m_buffer != nullptr) free(m_buffer);
+		if (m_buffer != nullptr) delete m_buffer;
 		m_buffer = nullptr;
 	}
 
