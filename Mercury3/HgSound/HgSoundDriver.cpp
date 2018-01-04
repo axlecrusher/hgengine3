@@ -120,7 +120,6 @@ namespace HgSound {
 		}
 
 		fprintf(stderr, "Sound backend: %s\n", soundio_backend_name(soundio->current_backend));
-		fprintf(stderr, "errorcheck: %s\n", soundio_strerror(err));
 		soundio_flush_events(sound_ptr);
 
 		int selected_device_index = soundio_default_output_device_index(sound_ptr);

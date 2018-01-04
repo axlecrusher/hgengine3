@@ -231,8 +231,8 @@
     <ClInclude Include="include\glew.h" />
     <ClInclude Include="include\glext.h" />
     <ClInclude Include="ini.h" />
-    <ClInclude Include="lib\libsoundio-1.1.0\soundio\endian.h" />
-    <ClInclude Include="lib\libsoundio-1.1.0\soundio\soundio.h" />
+    <ClInclude Include="lib\libsoundio\soundio\endian.h" />
+    <ClInclude Include="lib\libsoundio\soundio\soundio.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="MercuryWindow.h" />
     <ClInclude Include="oglDisplay.h" />
