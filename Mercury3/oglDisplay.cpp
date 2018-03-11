@@ -10,7 +10,7 @@
 viewport view_port[3];
 
 static uint8_t _currenViewPort_idx =  0xFF;
-static uint8_t _currentBlendMode = 0xFF;
+static BlendMode _currentBlendMode = BLEND_INVALID;
 
 HgCamera* _camera;
 float* _projection;
@@ -126,7 +126,7 @@ void Indice8Render(RenderData* x) {
 		free_arbitrary(&rd->indices);
 	}
 
-	setBlendMode((BlendMode)rd->blendMode);
+	setBlendMode(rd->blendMode);
 	rd->hgVbo->use();
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rd->idx_id);
@@ -141,7 +141,7 @@ void Indice16Render(RenderData* rd) {
 		free_arbitrary(&d->indices);
 	}
 
-	setBlendMode((BlendMode)rd->blendMode);
+	setBlendMode(rd->blendMode);
 	d->hgVbo->use();
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);

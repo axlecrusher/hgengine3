@@ -23,11 +23,12 @@
 extern viewport view_port[];
 extern float* _projection;
 
-typedef enum BlendMode {
+enum BlendMode : uint8_t {
 	BLEND_NORMAL = 0,
 	BLEND_ADDITIVE,
-	BLEND_ALPHA
-} BlendMode;
+	BLEND_ALPHA,
+	BLEND_INVALID = 0xFF
+};
 
 class RenderData {
 	public:
@@ -45,7 +46,7 @@ class RenderData {
 		virtual void setTexture(const HgTexture* t) = 0;
 
 		HgShader* shader;
-		uint8_t blendMode;
+		BlendMode blendMode;
 
 		indiceRenderFunc renderFunction; // could store VBO_TYPE instead and make a single function do all the rendering?
 };

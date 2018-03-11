@@ -187,7 +187,7 @@ static int model_iniHandler(void* user, const char* name, const char* value) {
 		data->modelFilename = value;
 	}
 	else if (MATCH("Model", "scale")) {
-		data->scale = ::atof(value);
+		data->scale = (float)::atof(value);
 	}
 	else if (MATCH("Model", "origin")) {
 		float x, y, z;
@@ -230,7 +230,7 @@ static int model_iniHandler(void* user, const char* name, const char* value) {
 }
 
 static int iniHandler(void* user, const char* section, const char* name, const char* value) {
-	#define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+//	#define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
 
 	if (strcmp(section, "Model") == 0) return model_iniHandler(user, name, value);
 	if (strcmp(section, "Material") == 0) return material_iniHandler(user, name, value);

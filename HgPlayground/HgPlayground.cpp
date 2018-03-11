@@ -230,8 +230,9 @@ int main()
 	//	MercuryWindow* w = MercuryWindow::MakeWindow();
 	//	generateVoxelVBO();
 
-	staticVbo.init();
-	staticVboVNU.init();
+	//staticVbo.init();
+	//staticVboVNU.init();
+	//staticVboVNUT.init();
 
 	//	model_data d = LoadModel("test.hgmdl");
 	//	hgvbo_add_data_vc(&staticVbo, d.vertices, d.vertices, d.vertex_count);
@@ -478,7 +479,7 @@ int main()
 				e->update(ddtime);
 			}
 
-			/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash!*/
+			/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash! rendering from previous update loop*/
 			if (CHECK_FLAG(e, HGE_DESTROY) > 0) {
 				scene.removeElement(i);
 				continue;

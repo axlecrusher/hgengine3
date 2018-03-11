@@ -74,7 +74,7 @@ static void destroy(HgElement* e) {
 static void cube_render(RenderData* rd) {
 	OGLRenderData *d = (OGLRenderData*)rd;
 
-	setBlendMode((BlendMode)rd->blendMode);
+	setBlendMode(rd->blendMode);
 	d->hgVbo->use();
 
 	glDrawArrays(GL_TRIANGLES, d->vbo_offset, d->vertex_count);
@@ -84,8 +84,8 @@ static void SetupRenderData() {
 	crd = OGLRenderData::Create();
 
 	crd->vertex_count = 24;
-	crd->hgVbo = &staticVboVNU;
-	crd->vbo_offset = staticVboVNU.add_data(raw_cube_data, crd->vertex_count);
+	crd->hgVbo = &staticVboVNUT;
+	crd->vbo_offset = staticVboVNUT.add_data(raw_cube_data, crd->vertex_count);
 	crd->index_count = 36;
 	crd->indices.data = cube_indices;
 

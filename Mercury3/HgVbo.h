@@ -133,6 +133,7 @@ template<typename T>
 HgVboMemory<T>::HgVboMemory()
 	:buffer(nullptr), count(0), vbo_id(0), vao_id(0), needsUpdate(0), stride(0), type(0)
 {
+	init();
 }
 
 template<typename T>

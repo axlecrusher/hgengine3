@@ -45,7 +45,7 @@ static void render(RenderData* rd) {
 //		free_arbitrary(&d->indices);
 	}
 
-	setBlendMode((BlendMode)rd->blendMode);
+	setBlendMode(rd->blendMode);
 	d->hgVbo->use();
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
