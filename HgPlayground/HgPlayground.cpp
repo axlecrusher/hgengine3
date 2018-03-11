@@ -32,9 +32,6 @@
 #include <symbol_enumerator.h>
 #include <FileWatch.h>
 
-
-#define M_PI 3.14159265358979323846
-
 float projection[16];
 
 extern viewport view_port[];
