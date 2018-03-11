@@ -469,14 +469,16 @@ int main()
 		camera[1] = camera[0];
 		camera[1].position.components.x += EYE_DISTANCE;
 
+		uint32_t updateNumber = scene.nextUpdateNumber();
+
 		uint32_t maxCount = scene.maxItems();
 		for (uint32_t i = 0; i<maxCount; ++i) {
 			//			if (IS_USED(&scene, i) == 0) continue;
 			if (!scene.isUsed(i)) continue;
 			HgElement* e = scene.get_element(i);
 
-			if (ddtime > 0) {
-				e->update(ddtime);
+			if ((ddtime > 0) && e->needsUpdate(updateNumber)) {
+				e->update(ddtime, updateNumber);
 			}
 
 			/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash! rendering from previous update loop*/

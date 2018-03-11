@@ -37,10 +37,18 @@ class HgScene {
 		inline uint32_t usedCount() const { return used_count; }
 		inline uint32_t chunkCount() const { return chunks.size(); }
 		inline uint32_t maxItems() const { return chunks.size() * 512; }
+
+		inline uint32_t nextUpdateNumber() { return ++m_updateCount; }
+
+		void update(uint32_t dtime);
+
+		void(*submit_for_render)(HgElement* e);
 private:
 		void allocate_chunk();
 		std::vector< std::unique_ptr<SceneChunk> > chunks;
 		uint32_t used_count;
+
+		uint32_t m_updateCount;
 };
 
 

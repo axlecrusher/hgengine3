@@ -37,7 +37,7 @@ void SceneChunk::clear_used(uint16_t idx) {
 static void decode_index(uint32_t index, uint16_t* h, uint16_t* l) { *l = index & 0x1FF; *h = (index >> 9) & 0x7F; }
 
 HgScene::HgScene()
-	:used_count(0) 
+	:used_count(0), m_updateCount(0)
 {
 
 }
@@ -88,6 +88,29 @@ void HgScene::allocate_chunk() {
 bool HgScene::isUsed(uint32_t index)
 {
 	return chunks[(index >> 9) & 0x7F]->isUsed(index & 0x1FF);
+}
+
+void HgScene::update(uint32_t dtime) {
+	uint32_t updateNumber = nextUpdateNumber();
+	uint32_t maxCount = maxItems();
+	for (uint32_t i = 0; i<maxCount; ++i) {
+		if (!isUsed(i)) continue;
+		HgElement* e = get_element(i);
+
+		if ((dtime > 0) && e->needsUpdate(updateNumber)) {
+			e->update(dtime, updateNumber);
+		}
+
+		/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash!*/
+		//shared_ptr my way out of this?
+		if (CHECK_FLAG(e, HGE_DESTROY) > 0) {
+			removeElement(i);
+			continue;
+		}
+		if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (submit_for_render != nullptr)) {
+			submit_for_render(e);
+		}
+	}
 }
 
 #include <map>

@@ -46,7 +46,10 @@ void HgElement::init()
 
 	rotation = quaternion_default;
 	m_extendedData = std::make_unique<HgElementExtended>();
-	m_extendedData->parent = this;
+	m_extendedData->owner = this;
+
+	m_parent = nullptr;
+	m_updateNumber = 0;
 }
 
 void HgElement::destroy()

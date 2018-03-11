@@ -69,7 +69,7 @@ protected:
 
 class HgElementExtended {
 public:
-	HgElement* parent;
+	HgElement* owner;
 	std::vector< HgTexture::TexturePtr > textures;
 };
 
@@ -98,7 +98,13 @@ public:
 		inline bool isRenderable() const { return m_renderData != nullptr; }
 		inline void render() { if (isRenderable()) m_renderData->render();  }
 
-		inline void update(uint32_t dtime) { if (m_logic != nullptr) m_logic->update(dtime); }
+		inline bool needsUpdate(uint32_t updateNumber) const { return (hasLogic() && (m_updateNumber != updateNumber)); }
+		inline void update(uint32_t dtime, uint32_t updateNumber) { 
+			m_updateNumber = updateNumber;
+			//require parents to be updated first
+			if ((m_parent != nullptr) && m_parent->needsUpdate(updateNumber)) m_parent->update(dtime, updateNumber);
+			m_logic->update(dtime);
+		}
 
 		inline void setLogic(std::unique_ptr<HgElementLogic> logic) { m_logic = std::move(logic); m_logic->setElement(this); }
 		inline HgElementLogic& logic() { return *(m_logic.get()); }
@@ -108,7 +114,12 @@ public:
 
 		RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
 private:
+	inline bool hasLogic() const { return m_logic != nullptr; }
+
+	uint32_t m_updateNumber;
 	std::unique_ptr<HgElementLogic> m_logic;
+	//std::weak_ptr<HgElement> m_parent;
+	HgElement* m_parent;
 
 	/*	Storage for data that we don't need to access frequently and thus may not be cached.
 		This should not be accessed on every update or render. */
