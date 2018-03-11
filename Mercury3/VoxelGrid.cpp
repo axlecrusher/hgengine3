@@ -63,8 +63,8 @@ static void SetupRenderData() {
 	crd = (OGLRenderData*)RenderData::Create();
 
 	crd->vertex_count = data.vertex_count;
-	crd->hgVbo = &staticVboVNU;
-	crd->vbo_offset = staticVboVNU.add_data(voxelGridVertices, crd->vertex_count);
+	crd->hgVbo = &staticVboVNUT;
+	crd->vbo_offset = staticVboVNUT.add_data(voxelGridVertices, crd->vertex_count);
 
 	crd->indices.data = indices;
 	crd->index_count = data.index_count;
