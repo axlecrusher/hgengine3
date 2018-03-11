@@ -11,18 +11,6 @@ HgVboMemory<vbo_layout_vnut> staticVboVNUT;
 
 //static void* _currentVbo;
 
-static uint16_t struct_size(VBO_TYPE type) {
-	if (type == VBO_VC) return sizeof(vbo_layout_vc);
-	if (type == VBO_VNU) return sizeof(vbo_layout_vnu);
-	if (type == VBO_INDEX8) return sizeof(uint8_t);
-	if (type == VBO_INDEX16) return sizeof(uint16_t);
-	if (type == VBO_COLOR8) return sizeof(color);
-
-	fprintf(stderr, "Unknown vbo type:%d\n", type);
-	assert(!"Unknown vbo type");
-	return 0;
-}
-
 template<typename T>
 void HgVboMemory<T>::use() {
 	if ((_currentVbo == this) && (needsUpdate == false)) return;
@@ -96,4 +84,14 @@ void HgVboMemory<color>::use() {
 
 	glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
 	glEnableVertexAttribArray(L_COLOR);
+}
+
+template<>
+inline void ogl_draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset) {
+	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_BYTE, 0, offset);
+}
+
+template<>
+inline void ogl_draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset) {
+	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_SHORT, 0, offset);
 }

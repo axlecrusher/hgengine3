@@ -28,14 +28,14 @@
 static void* _currentVbo;
 
 typedef enum VBO_TYPE {
-	VBO_VC = 0,
+	VBO_TYPE_INVALID = 0,
+	VBO_VC,
 	VBO_VN,
 	VBO_VNU,
 	VBO_VNUT,
 	VBO_INDEX8,
 	VBO_INDEX16,
-	VBO_COLOR8,
-	VBO_TYPE_COUNT
+	VBO_COLOR8
 } VBO_TYPE;
 
 
@@ -69,8 +69,6 @@ typedef struct vbo_layout_vnut {
 class HgVboBase {
 public:
 
-	virtual void init() = 0;
-
 	//	Copy data straight into VBO. Ensure that data, is using the correct vbo layout for your data
 	virtual uint32_t add_data(void* data, uint16_t vertex_count) = 0;
 
@@ -90,7 +88,6 @@ public:
 	HgVboMemory();
 	virtual ~HgVboMemory();
 
-	void init();
 	uint32_t add_data(void* data, uint16_t vertex_count);
 	void clear();
 	void destroy();
@@ -103,12 +100,17 @@ public:
 
 	inline uint32_t getCount() const { return count; }
 private:
-	static VBO_TYPE getVboType(const vbo_layout_vc& x) { return VBO_VC; }
-	static VBO_TYPE getVboType(const vbo_layout_vnu& x) { return VBO_VNU; }
-	static VBO_TYPE getVboType(const vbo_layout_vnut& x) { return VBO_VNUT; }
-	static VBO_TYPE getVboType(const uint8_t& x) { return VBO_INDEX8; }
-	static VBO_TYPE getVboType(const uint16_t& x) { return VBO_INDEX16; }
-	static VBO_TYPE getVboType(const color& x) { return VBO_VC; }
+	static constexpr VBO_TYPE getVboType() {
+		//looks stupid but is compile time evaluated
+		if (std::is_same<T, vbo_layout_vc>::value) { return VBO_VC; }
+		if (std::is_same<T, vbo_layout_vn>::value) { return VBO_VN; }
+		if (std::is_same<T, vbo_layout_vnu>::value) { return VBO_VNU; }
+		if (std::is_same<T, vbo_layout_vnut>::value) { return VBO_VNUT; }
+		if (std::is_same<T, uint8_t>::value) { return VBO_INDEX8; }
+		if (std::is_same<T, uint16_t>::value) { return VBO_INDEX16; }
+		if (std::is_same<T, color>::value) { return VBO_COLOR8; }
+		return VBO_TYPE_INVALID;
+	}
 
 	T* buffer;
 
@@ -131,9 +133,9 @@ private:
 
 template<typename T>
 HgVboMemory<T>::HgVboMemory()
-	:buffer(nullptr), count(0), vbo_id(0), vao_id(0), needsUpdate(0), stride(0), type(0)
+	:buffer(nullptr), count(0), vbo_id(0), vao_id(0), needsUpdate(0), stride(sizeof(T)), type(getVboType())
 {
-	init();
+	static_assert(getVboType() != VBO_TYPE_INVALID, "Invalid VBO Type");
 }
 
 template<typename T>
@@ -142,12 +144,6 @@ HgVboMemory<T>::~HgVboMemory() {
 	buffer = nullptr;
 
 	destroy();
-}
-
-template<typename T>
-void HgVboMemory<T>::init() {
-	type = getVboType(*buffer);
-	stride = sizeof(T);
 }
 
 template<typename T>
@@ -239,17 +235,6 @@ void HgVboMemory<T>::hgvbo_sendogl() {
 
 template<typename T>
 void ogl_draw_vbo(HgVboMemory<T>* vbo, uint32_t offset) {}
-
-template<>
-inline void ogl_draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset) {
-	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_BYTE, 0, offset);
-}
-
-template<>
-inline void ogl_draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset) {
-	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_SHORT, 0, offset);
-}
-
 
 
 extern HgVboMemory<vbo_layout_vc> staticVbo;
