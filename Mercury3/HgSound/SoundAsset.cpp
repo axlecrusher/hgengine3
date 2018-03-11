@@ -15,7 +15,7 @@ namespace HgSound {
 
 	SoundAsset::~SoundAsset()
 	{
-		if (m_data) free(m_data);
+		if (m_data) delete[] m_data;
 		m_data = nullptr;
 	}
 
@@ -41,8 +41,8 @@ namespace HgSound {
 		m_totalSamples = totalSampleCount; //includes all channels
 		m_sampleCount = totalSampleCount / channels;
 
-		if (m_data) free(m_data);
-		m_data = new float[totalSampleCount];
+		if (m_data) delete[] m_data;
+		m_data = new float[totalSampleCount]; //new respects float alignment requirements
 		memcpy(m_data, pSampleData, sizeof(float)*totalSampleCount);
 		drwav_free(pSampleData);
 
