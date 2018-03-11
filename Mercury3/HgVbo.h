@@ -27,7 +27,7 @@
 
 static void* _currentVbo;
 
-typedef enum VBO_TYPE {
+enum VBO_TYPE : uint8_t {
 	VBO_TYPE_INVALID = 0,
 	VBO_VC,
 	VBO_VN,
@@ -36,7 +36,7 @@ typedef enum VBO_TYPE {
 	VBO_INDEX8,
 	VBO_INDEX16,
 	VBO_COLOR8
-} VBO_TYPE;
+};
 
 
 //Vertex,Color
@@ -108,7 +108,7 @@ private:
 		if (std::is_same<T, vbo_layout_vnut>::value) { return VBO_VNUT; }
 		if (std::is_same<T, uint8_t>::value) { return VBO_INDEX8; }
 		if (std::is_same<T, uint16_t>::value) { return VBO_INDEX16; }
-		if (std::is_same<T, color>::value) { return VBO_COLOR8; }
+		if (std::is_same<T, color>::value) { return VBO_VC; } //VBO_VC is correct. Look into this... and think about making VBO_COLOR8 work again
 		return VBO_TYPE_INVALID;
 	}
 
@@ -120,7 +120,7 @@ private:
 	bool needsUpdate;
 
 	uint16_t stride; //stride, size of the structure pointed to by buffer
-	uint8_t type;
+	VBO_TYPE type;
 
 //	void(*send_to_ogl)(struct HgVboMemory* vbo);
 
