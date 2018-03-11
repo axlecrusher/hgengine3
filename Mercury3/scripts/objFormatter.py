@@ -27,7 +27,8 @@ class vertex:
 	def write(self,file):
 		file.write(struct.pack("<3f",self.x,self.y,self.z))
 	def write4(self,file):
-		file.write(struct.pack("<4f",self.x,self.y,self.z,self.w))
+		file.write(struct.pack("<4f",self.x,self.y,self.z,0))
+#		file.write(struct.pack("<4f",self.x,self.y,self.z,self.w))
 	def hex(self,file):
 		data = struct.pack("<3f",self.x,self.y,self.z)
 		file.write(",".join('0x%X'%x for x in struct.iter_unpack("I",data))+ ',')
@@ -100,7 +101,7 @@ class packed_vertex:
 		self.vertex = v
 		self.normal = n
 		self.uv = uv
-		self.tangent = vertex(0,0,0)
+		self.tangent = vertex(0,0,0) #tangent needs to be its own data type
 
 	def write(self,file):
 #		print(self.vertex)
@@ -108,7 +109,6 @@ class packed_vertex:
 		if (self.normal != None):
 			self.normal.write(file)
 			self.tangent.write4(file)
-			print(self.tangent.x,self.tangent.y,self.tangent.z)
 		if (self.uv != None):
 			self.uv.write(file)
 
@@ -210,13 +210,13 @@ def CalculateTangentArray():
 			packed_vertices[a].tangent.w = -1.0;
 
 def push_index(token):
+	token = token.replace("//","/")
 	if token in face_map:
 		indices.append( face_map[token] )
 	else:
 		idx = len(packed_vertices);
 		face_map[token] = idx
 		indices.append(idx)
-		token = token.replace("//","/")
 		i = list(map(lambda x: int(x)-1,token.split("/")));
 		pv = ''
 
@@ -236,8 +236,10 @@ def push_index(token):
 	return face_map[token]
 
 f = open( sys.argv[1], 'r')
-
+currenLineNumber = 1
 for line in f:
+	print("Processing Line {}".format(currenLineNumber))
+	currenLineNumber+=1
 	tokens = line.split();
 	if (tokens[0] == "v"):
 		vertices.append( vertex(tokens[1],tokens[2],tokens[3]) )
@@ -289,7 +291,7 @@ def output_text():
 #	output.text(struct.pack('<'+'H'*len(indices),*indices))
 	output.close()
 
-CalculateTangentArray()
+#CalculateTangentArray()
 
 output_binary()
 output_hex()
