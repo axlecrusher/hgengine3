@@ -100,7 +100,7 @@ public:
 
 	inline uint32_t getCount() const { return count; }
 private:
-	static constexpr VBO_TYPE getVboType() {
+	static constexpr VBO_TYPE Type() {
 		//looks stupid but is compile time evaluated
 		if (std::is_same<T, vbo_layout_vc>::value) { return VBO_VC; }
 		if (std::is_same<T, vbo_layout_vn>::value) { return VBO_VN; }
@@ -108,9 +108,11 @@ private:
 		if (std::is_same<T, vbo_layout_vnut>::value) { return VBO_VNUT; }
 		if (std::is_same<T, uint8_t>::value) { return VBO_INDEX8; }
 		if (std::is_same<T, uint16_t>::value) { return VBO_INDEX16; }
-		if (std::is_same<T, color>::value) { return VBO_VC; } //VBO_VC is correct. Look into this... and think about making VBO_COLOR8 work again
+		if (std::is_same<T, color>::value) { return VBO_COLOR8; }
 		return VBO_TYPE_INVALID;
 	}
+
+	static constexpr uint8_t Stride() { return sizeof(T); }
 
 	T* buffer;
 
@@ -118,9 +120,6 @@ private:
 	GLuint vbo_id;
 	GLuint vao_id;
 	bool needsUpdate;
-
-	uint16_t stride; //stride, size of the structure pointed to by buffer
-	VBO_TYPE type;
 
 //	void(*send_to_ogl)(struct HgVboMemory* vbo);
 
@@ -133,9 +132,9 @@ private:
 
 template<typename T>
 HgVboMemory<T>::HgVboMemory()
-	:buffer(nullptr), count(0), vbo_id(0), vao_id(0), needsUpdate(0), stride(sizeof(T)), type(getVboType())
+	:buffer(nullptr), count(0), vbo_id(0), vao_id(0), needsUpdate(0)
 {
-	static_assert(getVboType() != VBO_TYPE_INVALID, "Invalid VBO Type");
+	static_assert(Type() != VBO_TYPE_INVALID, "Invalid VBO Type");
 }
 
 template<typename T>
@@ -190,43 +189,44 @@ void HgVboMemory<T>::hgvbo_sendogl() {
 	if (vao_id == 0) glGenVertexArrays(1, &vao_id);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, count * stride, buffer, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * Stride(), buffer, GL_STATIC_DRAW);
 
 	glBindVertexArray(vao_id);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
 	//minimize calls to glVertexAttribPointer, use same format for all meshes in a VBO
 
-	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, stride, NULL);
+	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, Stride(), NULL);
 	glEnableVertexAttribArray(L_VERTEX); //enable access to attribute
 
-	if (type == VBO_VC) {
-		glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (void*)sizeof(vertex));
+	//Type() is a constexpr so maybe the compiler will optimize away these if statements... (test it sometime)
+	if ((Type() == VBO_VC) || (Type() == VBO_COLOR8)) {
+		glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, Stride(), (void*)sizeof(vertex));
 		glEnableVertexAttribArray(L_COLOR);
 	}
-	else if (type == VBO_VN) {
-		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(vertex));
+	else if (Type() == VBO_VN) {
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, Stride(), (void*)sizeof(vertex));
 		glEnableVertexAttribArray(L_NORMAL);
 	}
-	else if (type == VBO_VNU) {
-		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, stride, (void*)sizeof(vertex));
+	else if (Type() == VBO_VNU) {
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, Stride(), (void*)sizeof(vertex));
 		glEnableVertexAttribArray(L_NORMAL);
-		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, stride, (void*)(sizeof(vertex) + sizeof(normal)));
+		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, Stride(), (void*)(sizeof(vertex) + sizeof(normal)));
 		glEnableVertexAttribArray(L_UV);
 	}
-	else if (type == VBO_VNUT) {
+	else if (Type() == VBO_VNUT) {
 		int offset = sizeof(vertex);
-		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, stride, (void*)offset);
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, Stride(), (void*)offset);
 		glEnableVertexAttribArray(L_NORMAL);
 		offset += sizeof(normal);
-		glVertexAttribPointer(L_TANGENT, 4, GL_FLOAT, GL_FALSE, stride, (void*)offset);
+		glVertexAttribPointer(L_TANGENT, 4, GL_FLOAT, GL_FALSE, Stride(), (void*)offset);
 		glEnableVertexAttribArray(L_TANGENT);
 		offset += sizeof(tangent); //tangent normals
-		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, stride, (void*)offset);
+		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, Stride(), (void*)offset);
 		glEnableVertexAttribArray(L_UV);
 	}
 	else {
-		fprintf(stderr, "Unknown vbo type:%d\n", type);
+		fprintf(stderr, "Unknown vbo type:%d\n", Type());
 		assert(!"Unknown vbo type");
 	}
 

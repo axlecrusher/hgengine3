@@ -38,7 +38,7 @@ void HgVboMemory<uint8_t>::use() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_id);
 
 	if (needsUpdate) {
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * stride, buffer, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * Stride(), buffer, GL_STATIC_DRAW);
 		needsUpdate = false;
 	}
 }
@@ -55,7 +55,7 @@ void HgVboMemory<uint16_t>::use() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_id);
 
 	if (needsUpdate) {
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * stride, buffer, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * Stride(), buffer, GL_STATIC_DRAW);
 		needsUpdate = false;
 	}
 }
@@ -78,7 +78,7 @@ void HgVboMemory<color>::use() {
 
 	if (needsUpdate) {
 		color* c = buffer;
-		glBufferData(GL_ARRAY_BUFFER, count * stride, buffer, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, count * Stride(), buffer, GL_STATIC_DRAW);
 		needsUpdate = false;
 	}
 
