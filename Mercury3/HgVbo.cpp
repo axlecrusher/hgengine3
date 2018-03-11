@@ -86,12 +86,3 @@ void HgVboMemory<color>::use() {
 	glEnableVertexAttribArray(L_COLOR);
 }
 
-template<>
-inline void ogl_draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset) {
-	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_BYTE, 0, offset);
-}
-
-template<>
-inline void ogl_draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset) {
-	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_SHORT, 0, offset);
-}
