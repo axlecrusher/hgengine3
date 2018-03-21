@@ -23,7 +23,7 @@ public:
 		DXT5 = 0x35545844
 	};
 
-	enum TextureType {
+	enum TextureType : uint8_t {
 		DIFFUSE = 0,
 		NORMAL = 1,
 		SPECULAR = 2,
@@ -56,6 +56,8 @@ private:
 	//use HgTexture::acquire to instantiate a texture
 	HgTexture();
 
+	bool load_internal(const std::string& path);
+
 	//used when an image is no longer used. Called by TexturePtr, not user callible.
 //	static void release(HgTexture* t);
 
@@ -78,5 +80,3 @@ private:
 
 	friend uint32_t ogl_updateTextureData(HgTexture* tex);
 };
-
-typedef std::shared_ptr<HgTexture> TexturePtr;

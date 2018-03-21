@@ -258,11 +258,9 @@ int main()
 	//	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
 	//	Perspective2(60, 320.0 / 480.0, 0.1f, 100.0f, projection);
 
-	camera[0].rotation = quaternion_default;
-	camera[0].position = vertex_zero;
 	camera[0].position.components.z = 1.5f;
 	camera[0].position.components.y = 2.0f;
-	camera[0].rotation = toQuaternion2(0, 15, 0); //y,x,z
+	camera[0].SetRotation( toQuaternion2(0, 15, 0) ); //y,x,z
 
 	camera[1] = camera[0];
 	camera[1].position.components.x += EYE_DISTANCE;
@@ -415,20 +413,13 @@ int main()
 													  //			v = vector3_normalize(&v);
 
 			v = vector3_scale(v, scale);
-			camera->position = vector3_add(&camera->position, &v);
+			camera->Move(v);
 
 			mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
 			mouse_y = (MOUSE_INPUT.dy + mouse_y) % 2000;
 
 
-			//seperate quaternions keep the camera from rolling when yawing and pitching
-			quaternion yaw, pitch;
-			yaw = toQuaternion2((-MOUSE_INPUT.dx / 2000.0f) * 360, 0, 0);
-			pitch = toQuaternion2(0, (-MOUSE_INPUT.dy / 2000.0f) * 360, 0);
-
-			camera->rotation = quat_mult(&pitch, &camera->rotation);
-			camera->rotation = quat_mult(&camera->rotation, &yaw);
-			//normalize quaternion?
+			camera->FreeRotate((-MOUSE_INPUT.dx / 2000.0f) * 360, (-MOUSE_INPUT.dy / 2000.0f) * 360);
 
 			MOUSE_INPUT.dx = 0;
 			MOUSE_INPUT.dy = 0;

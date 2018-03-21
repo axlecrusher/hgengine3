@@ -22,7 +22,7 @@ namespace HgSound {
 	SoundAsset::ptr SoundAsset::acquire(const std::string& path) {
 		ptr tmp = soundAssets.get(path);
 		tmp->selfPtr = tmp;
-		return tmp;
+		return std::move(tmp);
 	}
 
 	bool SoundAsset::load(const std::string& path) {
@@ -51,7 +51,7 @@ namespace HgSound {
 
 	PlayingSound::ptr SoundAsset::play() {
 		ptr tmp = selfPtr.lock();
-		if (tmp) return std::make_shared<PlayingSound>(tmp);
+		if (tmp) return std::move( std::make_shared<PlayingSound>(std::move(tmp)) );
 		return nullptr;
 	}
 }
