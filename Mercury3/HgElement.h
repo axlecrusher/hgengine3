@@ -56,6 +56,7 @@ class RenderData {
 
 class HgElement;
 class model_data;
+class HgScene;
 
 class HgElementLogic {
 public:
@@ -69,8 +70,10 @@ protected:
 
 class HgElementExtended {
 public:
-	HgElement* owner;
+	HgElement* owner; //what is this for?
 	std::vector< HgTexture::TexturePtr > textures;
+
+	HgScene* m_scene; //Scene that element is a member of
 };
 
 //#define MAX_ELEMENT_TYPES 255
@@ -120,10 +123,12 @@ public:
 		inline void setRenderData(RenderData* rd) { m_renderData = rd; }
 		RenderData* renderData() { return m_renderData; }
 
+		inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
+
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }
 
-	RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
+	RenderData* m_renderData; //can be shared //4, whoever populates this must clean it up.
 
 	uint32_t m_updateNumber;
 	std::unique_ptr<HgElementLogic> m_logic;
