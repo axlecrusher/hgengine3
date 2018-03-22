@@ -67,7 +67,7 @@ float quat_length(quaternion* q) {
 	return (float)sqrt(SQUARE(q->x()) + SQUARE(q->y()) + SQUARE(q->z()) + SQUARE(q->w()));
 }
 
-quaternion quaternion_normalize(quaternion q) {
+quaternion quaternion_normalize(const quaternion& q) {
 	quaternion r = q;
 	float l = (float)sqrt( SQUARE(q.x()) + SQUARE(q.y()) + SQUARE(q.z()) + SQUARE(q.w()) );
 	r.w ( q.w() / l );

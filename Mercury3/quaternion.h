@@ -37,7 +37,9 @@ void toQuaternion(double x, double y, double z, double deg, quaternion* q);
 quaternion toQuaternion2(double pitch, double roll, double yaw);
 
 quaternion quat_mult(const quaternion* q1, const quaternion* q2);
-quaternion quaternion_normalize(quaternion q);
+inline quaternion quat_mult(const quaternion& q, const quaternion& r) { return quat_mult(&q, &r); }
+
+quaternion quaternion_normalize(const quaternion& q);
 float quat_length(quaternion* q);
 
 quaternion vector3_to_quat(vector3 a);
