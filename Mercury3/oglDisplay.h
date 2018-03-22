@@ -93,7 +93,7 @@ inline RenderData* new_renderData_ogl() { return new OGLRenderData(); }
 //void ogl_draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset);
 //void ogl_draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset);
 
-inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->m_renderData; }
+inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->renderData(); }
 
 void Indice8Render(RenderData* rd);
 void Indice16Render(RenderData* rd);

@@ -112,9 +112,18 @@ public:
 		//Send texture data to GPU
 		void updateGpuTextures();
 
-		RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
+		inline void setParent(HgElement* parent) { m_parent = parent; }
+		HgElement* getParent() const { return m_parent; }
+
+		inline void setChild(HgElement* child) { child->setParent(this); }
+
+		inline void setRenderData(RenderData* rd) { m_renderData = rd; }
+		RenderData* renderData() { return m_renderData; }
+
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }
+
+	RenderData* m_renderData; //can be shared //4, whoever whoever populates this must clean it up.
 
 	uint32_t m_updateNumber;
 	std::unique_ptr<HgElementLogic> m_logic;

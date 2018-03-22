@@ -77,7 +77,7 @@ void change_to_voxelGrid(HgElement* element) {
 	//create an instance of the render data for all triangles to share
 	if (crd == NULL) SetupRenderData();
 
-	element->m_renderData = (RenderData*)crd;
+	element->setRenderData( (RenderData*)crd );
 }
 
 void voxelGrid_create(HgElement* element) {
