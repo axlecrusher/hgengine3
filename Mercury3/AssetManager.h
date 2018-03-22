@@ -14,14 +14,14 @@ public:
 
 	inline bool isValid() const { return is_valid; }
 
-	inline AssetPtr get(const std::string& path) { bool t; return get(path, t); }
+	inline AssetPtr get(const std::string& path) { return get(path, nullptr); }
 
-	AssetPtr get(const std::string& path, bool& isNew) {
+	AssetPtr get(const std::string& path, bool* isNew) {
 		auto itr = map.find(path);
 		if (itr != map.end()) {
 			auto t = itr->second.lock();
 			if (t != nullptr) {
-				isNew = false;
+				if (isNew != nullptr) *isNew = false;
 				return std::move(t);
 			}
 		}
@@ -29,7 +29,7 @@ public:
 		auto asset = AssetPtr(new T(), [this](T* asset) {this->release(asset); });
 		asset->load(path);
 		map.insert(std::make_pair(path, asset));
-		isNew = true;
+		if (isNew != nullptr) *isNew = true;
 		return std::move(asset);
 	}
 
