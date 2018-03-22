@@ -258,9 +258,8 @@ bool model_data::load_ini(HgElement* element, std::string filename) {
 
 	if (!data.diffuseTexture.empty())
 	{
-		auto tmp = HgTexture::acquire(data.diffuseTexture);
+		auto tmp = HgTexture::acquire(data.diffuseTexture, HgTexture::DIFFUSE);
 		if (tmp != nullptr) {
-			tmp->setType(HgTexture::DIFFUSE);
 			element->m_extendedData->textures.push_back(std::move(tmp));
 			SET_FLAG(element, HGE_UPDATE_TEXTURES);
 		}
@@ -268,9 +267,8 @@ bool model_data::load_ini(HgElement* element, std::string filename) {
 
 	if (!data.specularTexture.empty())
 	{
-		auto tmp = HgTexture::acquire(data.specularTexture);
+		auto tmp = HgTexture::acquire(data.specularTexture, HgTexture::SPECULAR);
 		if (tmp != nullptr) {
-			tmp->setType(HgTexture::SPECULAR);
 			element->m_extendedData->textures.push_back(std::move(tmp));
 			SET_FLAG(element, HGE_UPDATE_TEXTURES);
 		}
@@ -278,9 +276,8 @@ bool model_data::load_ini(HgElement* element, std::string filename) {
 
 	if (!data.normalTexture.empty())
 	{
-		auto tmp = HgTexture::acquire(data.normalTexture);
+		auto tmp = HgTexture::acquire(data.normalTexture, HgTexture::NORMAL);
 		if (tmp != nullptr) {
-			tmp->setType(HgTexture::NORMAL);
 			element->m_extendedData->textures.push_back(std::move(tmp));
 			SET_FLAG(element, HGE_UPDATE_TEXTURES);
 		}

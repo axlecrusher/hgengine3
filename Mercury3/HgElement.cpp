@@ -65,14 +65,14 @@ void HgElement::updateGpuTextures() {
 
 	for (auto itr = m_extendedData->textures.begin(); itr != m_extendedData->textures.end(); itr++) {
 		auto texture = *itr;
-		if (texture->getNeedsUpdate()) {
+		if (texture->NeedsGPUUpdate()) {
 			texture->sendToGPU();
-			texture->setNeedsUpdate(false);
 			HgTexture::TextureType type = texture->getType();
 		}
 
 		//FIXME: Share texture pointers can cause a problem here. Texture may be updated by another HgElement.
-		//refactor into HgTexture making callback into renderData to set texture IDs. don't forget to invalidate stored ids if textures change types.
+		//refactor into HgTexture making callback into renderData to set texture IDs.
+		//NOTE: Not sure this applies anymore. HgTexture is pretty immutable after creation.
 		m_renderData->setTexture(texture.get()); 
 	}
 }

@@ -36,16 +36,14 @@ public:
 	typedef std::shared_ptr<HgTexture> TexturePtr;
 
 	//used to obtain an image.
-	static TexturePtr acquire(const std::string& path);
+	static TexturePtr acquire(const std::string& path, TextureType type);
 
-	bool load(const std::string& path);
 //	channels getChannels() const { return m_channels;  }
 
 	inline TextureType getType() const { return m_type; }
-	inline void setType(TextureType texType) { m_type = texType; }
 
-	bool getNeedsUpdate() const { return needsUpdate; }
-	void setNeedsUpdate(bool update) { needsUpdate = update; }
+	//Indicates that texture needs to be sent to gpu
+	bool NeedsGPUUpdate() const { return needsUpdate; }
 
 	void sendToGPU();
 	inline uint32_t getGPUId() const { return gpuId; }
@@ -56,7 +54,13 @@ private:
 	//use HgTexture::acquire to instantiate a texture
 	HgTexture();
 
+	bool load(const std::string& path);
 	bool load_internal(const std::string& path);
+
+	inline void setType(TextureType texType) { m_type = texType; }
+
+	//Indicates that texture needs to be sent to gpu
+	void setNeedsGPUUpdate(bool update) { needsUpdate = update; }
 
 	//used when an image is no longer used. Called by TexturePtr, not user callible.
 //	static void release(HgTexture* t);

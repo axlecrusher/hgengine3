@@ -9,10 +9,14 @@
 HgTexture::gpu_update_texture HgTexture::updateTextureFunc = NULL;
 AssetManager<HgTexture> HgTexture::imageMap;
 
-HgTexture::TexturePtr HgTexture::acquire(const std::string& path) {
-	HgTexture::TexturePtr ptr = imageMap.get(path);
+HgTexture::TexturePtr HgTexture::acquire(const std::string& path, TextureType type) {
+	bool isNew = false;
+	HgTexture::TexturePtr ptr = imageMap.get(path, isNew);
 	if (ptr == nullptr) {
 		fprintf(stderr, "Could not open image \"%s\"", path.c_str());
+	}
+	if (isNew) {
+		ptr->setType(type);
 	}
 	return std::move( ptr );
 }
@@ -103,7 +107,7 @@ bool HgTexture::dds_load(FILE* f) {
 bool HgTexture::load(const std::string& path) {
 	bool r = load_internal(path);
 	if (r) {
-		setNeedsUpdate(true);
+		setNeedsGPUUpdate(true);
 	}
 	return r;
 }
@@ -127,4 +131,5 @@ void HgTexture::sendToGPU()
 //	gpuId = updateTextureFunc(m_width, m_height, m_channels, data);
 	gpuId = updateTextureFunc(this);
 	SAFE_FREE(data);
+	setNeedsGPUUpdate(false);
 }

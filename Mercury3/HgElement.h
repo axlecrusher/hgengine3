@@ -112,7 +112,7 @@ public:
 		inline void setLogic(std::unique_ptr<HgElementLogic> logic) { m_logic = std::move(logic); m_logic->setElement(this); }
 		inline HgElementLogic& logic() { return *(m_logic.get()); }
 
-		//Send texture data to GPU
+		//Send texture data to GPU. I don't like this here and it pulls in extended data.
 		void updateGpuTextures();
 
 		inline void setParent(HgElement* parent) { m_parent = parent; }
@@ -133,7 +133,7 @@ private:
 	uint32_t m_updateNumber;
 	std::unique_ptr<HgElementLogic> m_logic;
 	//std::weak_ptr<HgElement> m_parent;
-	HgElement* m_parent;
+	HgElement* m_parent; //checked every update.
 
 	/*	Storage for data that we don't need to access frequently and thus may not be cached.
 		This should not be accessed on every update or render. */
