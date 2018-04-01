@@ -32,6 +32,8 @@
 #include <symbol_enumerator.h>
 #include <FileWatch.h>
 
+#include <HgTimer.h>
+
 float projection[16];
 
 extern viewport view_port[];
@@ -365,22 +367,21 @@ int main()
 	//	SetupOGLExtensions();
 #endif
 
-	uint32_t stime = GetTickCount();
-	uint32_t time = stime;
-	uint32_t dtime = time - stime;
-
-	uint32_t ltime = 0;
-	uint32_t ddtime = time - stime;
+	HgTimer gameTimer;
+	uint32_t last_time = 0;
+	uint32_t dtime = 0;
 
 	int8_t do_render = 1;
 	uint8_t did_change = 0;
 
 	int16_t mouse_x, mouse_y;
 	mouse_x = mouse_y = 0;
+
+	gameTimer.start();
 	while (1 && !window->m_close) {
-		dtime = GetTickCount() - stime;
-		ddtime = dtime - ltime;
-		ltime = dtime;
+		dtime = gameTimer.millisecondsElasped();
+		uint32_t ddtime = dtime - last_time;
+		last_time = dtime;
 
 #if (!USE_RENDER_THREAD)
 		BeginFrame();
@@ -430,16 +431,16 @@ int main()
 			needRender = 0;
 		}
 
-		if (dtime > 10000) { // && did_change==0) {
-			did_change = 1;
+		//if (dtime > 10000) { // && did_change==0) {
+		//	did_change = 1;
 
-			//			if (ddtime>0) gravity_update(&gravity, ddtime);
-			/*
-			for (i = 0; i < ANI_TRIS; i++) {
-			change_to_triangle(tris[i]);
-			}
-			*/
-		}
+		//	//			if (ddtime>0) gravity_update(&gravity, ddtime);
+		//	/*
+		//	for (i = 0; i < ANI_TRIS; i++) {
+		//	change_to_triangle(tris[i]);
+		//	}
+		//	*/
+		//}
 
 		//		printf("dtime: %d\n", ddtime);
 
