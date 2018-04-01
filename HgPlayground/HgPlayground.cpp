@@ -177,21 +177,21 @@ void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgElement*
 	//	printf("serial\n");
 	hgViewport(viewport_idx);
 
-	HgShader* shader = e->m_renderData->shader;
+	HgShader* shader = e->renderData()->shader;
 
 	if (shader) {
 		shader->enable();
 		//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 		//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 		shader->setGlobalUniforms(*camera);
-		shader->setLocalUniforms(&e->rotation, &e->position, e->scale, &e->origin, e->m_renderData);
+		shader->setLocalUniforms(&e->rotation, &e->position, e->scale, &e->origin, e->renderData());
 	}
 
-	e->m_renderData->render();
+	e->renderData()->render();
 }
 
 void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
-	RenderData* rd = e->m_renderData;
+	RenderData* rd = e->renderData();
 	//	if (rd->shader) VCALL(rd->shader, enable);
 	hgViewport(viewport_idx);
 
@@ -307,7 +307,7 @@ int main()
 				element->position.components.z = -2.0f - z;
 				element->scale = 0.3f;
 				//			element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
-				element->m_renderData->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+				element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 			}
 		}
 
@@ -318,15 +318,15 @@ int main()
 			//		element->scale = 100.0f;
 			element->position.components.z = -10;
 			//		toQuaternion2(0, -90, 0, &element->rotation);
-			element->m_renderData->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+			element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 		}
 
 		if (create_element("square", &scene, &element) > 0) {
 			element->scale = 100.0f;
 			element->position.components.z = -4;
 			element->rotation = toQuaternion2(0, -90, 0);
-			element->m_renderData->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
-			element->m_renderData->blendMode = BLEND_ADDITIVE;
+			element->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
+			element->renderData()->blendMode = BLEND_ADDITIVE;
 			//	model_data d = LoadModel("test.hgmdl");
 		}
 	}
