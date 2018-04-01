@@ -33,6 +33,9 @@ namespace HgSound {
 		uint32_t counterx = 0;
 
 		LibSoundIoDriver* driver = (LibSoundIoDriver*)outstream->userdata;
+		if (!driver->m_initialized) return;
+
+
 		int frame_count = frames_left;
 
 		const struct SoundIoChannelLayout *layout = &outstream->layout;
@@ -138,6 +141,9 @@ namespace HgSound {
 			fprintf(stderr, "No suitable device format available.\n");
 			return;
 		}
+
+
+		//Move to after buffer init?
 		if ((err = soundio_outstream_open(outstream.get()))) {
 			fprintf(stderr, "unable to open device: %s", soundio_strerror(err));
 			return;
@@ -158,6 +164,8 @@ namespace HgSound {
 		this->soundio = std::move(soundio);
 		this->device = std::move(device);
 		this->outstream = std::move(outstream);
+
+		m_initialized = true;
 	}
 
 }

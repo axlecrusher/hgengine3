@@ -27,5 +27,7 @@ namespace HgSound {
 
 		float* m_buffer;
 		uint32_t m_bufferSize;
+
+		bool m_initialized;
 	};
 }

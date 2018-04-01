@@ -22,7 +22,7 @@ namespace HgSound {
 		if (it != m_playingSounds.end()) m_playingSounds.erase(it);
 	}
 
-	Driver::Driver() : m_buffer(nullptr), m_bufferSize(0)
+	Driver::Driver() : m_buffer(nullptr), m_bufferSize(0), m_initialized(false)
 	{
 	}
 
@@ -32,6 +32,8 @@ namespace HgSound {
 	}
 
 	void Driver::mixAudio() {
+		if (!m_initialized) return;
+
 		uint32_t total_samples = samples * 2; //stereo
 
 		for (uint32_t i = 0; i < total_samples; ++i) {
