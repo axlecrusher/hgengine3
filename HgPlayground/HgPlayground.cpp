@@ -407,15 +407,9 @@ int main()
 
 			//			if (v.components.z > 0) DebugBreak();
 
-			float scale = (1.0f / 1000.0f) * ddtime;
-			v = vector3_normalize(v);
-			//			v = vector3_scale(&v, -1.0f);
-
-			v = vector3_quat_rotate(v, camera->rotation.invert());
-
-													  //			v = vector3_normalize(&v);
-
-			v = vector3_scale(v, scale);
+			v = vector3_quat_rotate(vector3_normalize(v), camera->rotation.invert());
+			float scale = (1.0 / 1000.0) * dtime;
+			v = vector3_scale(vector3_normalize(v), scale);
 			camera->Move(v);
 
 			mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
