@@ -368,8 +368,7 @@ int main()
 #endif
 
 	HgTimer gameTimer;
-	uint32_t last_time = 0;
-	uint32_t dtime = 0;
+	HgDeltaTime last_time;
 
 	int8_t do_render = 1;
 	uint8_t did_change = 0;
@@ -379,15 +378,18 @@ int main()
 
 	gameTimer.start();
 	while (1 && !window->m_close) {
-		dtime = gameTimer.millisecondsElasped();
-		uint32_t ddtime = dtime - last_time;
-		last_time = dtime;
+		HgDeltaTime time = gameTimer.getElasped();
+		uint32_t dtime = time.milliseconds() - last_time.milliseconds();
+		last_time = time;
 
+//		if (dtime > 17) {
+//			printf("time %d\n", dtime);
+//		}
 #if (!USE_RENDER_THREAD)
 		BeginFrame();
 #endif
 
-		if (ddtime > 0) {
+		if (dtime > 0) {
 			vector3 v = vector3_zero;
 
 			if (KeyDownMap['w']) v.components.z -= 1.0f;
@@ -431,10 +433,10 @@ int main()
 			needRender = 0;
 		}
 
-		//if (dtime > 10000) { // && did_change==0) {
+		//if (time > 10000) { // && did_change==0) {
 		//	did_change = 1;
 
-		//	//			if (ddtime>0) gravity_update(&gravity, ddtime);
+		//	//			if (dtime>0) gravity_update(&gravity, dtime);
 		//	/*
 		//	for (i = 0; i < ANI_TRIS; i++) {
 		//	change_to_triangle(tris[i]);
@@ -442,12 +444,12 @@ int main()
 		//	*/
 		//}
 
-		//		printf("dtime: %d\n", ddtime);
+		//		printf("dtime: %d\n", dtime);
 
 		{
 			HgElement* element = tris[0];
 			//		y,x,z
-			element->rotation = toQuaternion2((dtime % 10000) / 27.777777777777777777777777777778, 0, 0);
+			element->rotation = toQuaternion2((time.milliseconds() % 10000) / 27.777777777777777777777777777778, 0, 0);
 
 			for (i = 0; i < ANI_TRIS; i++) {
 				HgElement* e = tris[i];
@@ -466,8 +468,8 @@ int main()
 			if (!scene.isUsed(i)) continue;
 			HgElement* e = scene.get_element(i);
 
-			if ((ddtime > 0) && e->needsUpdate(updateNumber)) {
-				e->update(ddtime, updateNumber);
+			if ((dtime > 0) && e->needsUpdate(updateNumber)) {
+				e->update(dtime, updateNumber);
 			}
 
 			/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash! rendering from previous update loop*/

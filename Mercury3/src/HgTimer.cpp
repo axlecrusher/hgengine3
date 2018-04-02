@@ -15,5 +15,10 @@ uint64_t HgTimer::currentTime() const {
 	//	return GetTickCount64();
 	//use QueryUnbiasedInterruptTime in place of GetTickCount64 as GetTickCount64 has a resolution between 10 and 16 milliseconds
 	QueryUnbiasedInterruptTime((PULONGLONG)&m_wtime); //
-	return (m_wtime / 10000); //milliseconds
+	return (m_wtime / 10); //usec
+}
+
+HgDeltaTime::HgDeltaTime(uint64_t begin, uint64_t end) {
+	uint64_t dt = begin - end;
+	m_msec = (uint64_t)dt; //shouold not overflow unless dt is greater than 49 days
 }
