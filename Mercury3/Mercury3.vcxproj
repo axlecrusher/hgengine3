@@ -194,7 +194,10 @@
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="quaternion.cpp" />
     <ClCompile Include="square.cpp" />
+    <ClCompile Include="src\HgUtils.cpp" />
+    <ClCompile Include="src\RenderBackend.cpp" />
     <ClCompile Include="src\HgTimer.cpp" />
+    <ClCompile Include="src\OGLBackend.cpp" />
     <ClCompile Include="str_utils.c" />
     <ClCompile Include="symbol_enumerator.c">
     </ClCompile>
@@ -242,6 +245,9 @@
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="quaternion.h" />
     <ClInclude Include="src\HgTimer.h" />
+    <ClInclude Include="src\HgUtils.h" />
+    <ClInclude Include="src\OGLBackend.h" />
+    <ClInclude Include="src\RenderBackend.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stb_image_resize.h" />
     <ClInclude Include="str_utils.h" />

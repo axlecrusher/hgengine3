@@ -28,8 +28,6 @@ public:
 	
 	virtual void* GetProcAddress(const MString& x) = 0;
 	
-	virtual void Clear() = 0;
-	
 	inline int Width() const { return m_width; }
 	inline int Height() const { return m_height; }
 

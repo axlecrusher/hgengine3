@@ -210,15 +210,12 @@ void Win32Window::GenPixelType()
 
 bool Win32Window::SwapBuffers()
 {
-	
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-
 //	glEnable(GL_NORMALIZE); //deprecated
 //	glEnable (GL_BLEND); 
 //	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		
+	glFinish();
+
 	return (::SwapBuffers( m_hdc )==TRUE);
 }
 
@@ -362,14 +359,6 @@ bool Win32Window::PumpMessages()
 void* Win32Window::GetProcAddress(const MString& x)
 {
 	return wglGetProcAddress( x.c_str() );
-}
-
-void Win32Window::Clear()
-{
-	glDisable(GL_SCISSOR_TEST);
-
-	glClearColor( .1f, .1f, .1f, 0.0f );
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
 bool Win32Window::IsKeyRepeat(uint32_t c)

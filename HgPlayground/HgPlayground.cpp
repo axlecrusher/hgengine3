@@ -4,10 +4,6 @@
 //#include "stdafx.h"
 
 #include <Win32Window.h>
-//#define GL_GLEXT_PROTOTYPES
-//#include <glcorearb.h>
-//#include <glext.h>
-#include <glew.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,9 +11,7 @@
 #include <HgElement.h>
 #include <HgScene.h>
 #include <shapes.h>
-#include <oglDisplay.h>
 
-#include <oglShaders.h>
 #include <HgMath.h>
 #include <HgTypes.h>
 #include <HgRenderQueue.h>
@@ -29,10 +23,11 @@
 #include <Projectile.h>
 #include <HgModel.h>
 
-#include <symbol_enumerator.h>
 #include <FileWatch.h>
 
 #include <HgTimer.h>
+#include <RenderBackend.h>
+#include <HgUtils.h>
 
 float projection[16];
 
@@ -53,31 +48,13 @@ MercuryWindow* window = NULL;
 
 void StartWindowSystem() {
 	window = MercuryWindow::MakeWindow();
-
-	GLenum err = glewInit();
-
-	printf("%s\n", glGetString(GL_VERSION));
-	printf("%s\n", glGetString(GL_VENDOR));
-
-	GLint d;
-	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &d);
-	printf("GL_MAX_VERTEX_ATTRIBS %d\n", d);
-
-	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &d);
-	printf("GL_MAX_VERTEX_UNIFORM_COMPONENTS %d\n", d);
-
-	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS, &d);
-	printf("GL_MAX_VERTEX_UNIFORM_VECTORS %d\n", d);
-
-	glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &d);
-	printf("GL_MAX_VERTEX_UNIFORM_BLOCKS %d\n", d);
-
-	//	glEnable(GL_MULTISAMPLE);
+	Renderer::InitOpenGL();
 }
 
 void BeginFrame() {
 	window->PumpMessages();
-	window->Clear();
+	RENDERER->Clear();
+	RENDERER->BeginFrame();
 	_projection = projection;
 }
 
@@ -106,9 +83,6 @@ int32_t RenderThreadLoop() {
 		}
 
 		needRender = 1;
-
-		//		glFlush();
-		//		glFinish();
 
 		//		w->SwapBuffers();
 
@@ -210,34 +184,13 @@ void vertex_print(const vertex* v) {
 	printf("%f %f %f\n", v->array[0], v->array[1], v->array[2]);
 }
 
-int SymnumCheck(const char * path, const char * name, void * location, long size)
-{
-	if (strncmp(name, "REGISTER", 8) == 0)
-	{
-		typedef void(*sf)();
-		sf fn = (sf)location;
-		fn();
-	}
-	return 0;
-}
-
 int main()
 {
-	EnumerateSymbols(SymnumCheck);
+	ENGINE::EnumberateSymbols();
+
 	stereo_view = 0;
 
-	//	MercuryWindow* w = MercuryWindow::MakeWindow();
-	//	generateVoxelVBO();
-
-	//staticVbo.init();
-	//staticVboVNU.init();
-	//staticVboVNUT.init();
-
-	//	model_data d = LoadModel("test.hgmdl");
-	//	hgvbo_add_data_vc(&staticVbo, d.vertices, d.vertices, d.vertex_count);
-
-	HgShader::Create = HgOglShader::Create;
-	RenderData::Create = new_renderData_ogl;
+	StartWindowSystem();
 
 	if (stereo_view) {
 		setup_viewports(1280, 480);
@@ -346,7 +299,6 @@ int main()
 	HANDLE thread = CreateThread(NULL, 0, &StartRenderThread, NULL, 0, NULL);
 	submit_for_render = submit_for_render_threaded;
 #else
-	StartWindowSystem();
 	submit_for_render = submit_for_render_serial;
 #endif
 
