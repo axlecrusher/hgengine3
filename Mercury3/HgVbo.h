@@ -10,7 +10,7 @@
 	more mesh data. New mesh data can just be appened to the end. If it
 	were stored VVVNNNCCC, it would be much more difficult to add new
 	mesh data as all other mesh data would need to be shifted around. I'm
-	unsure of the impact taht interleaved data has on rendering performance.
+	unsure of the impact that interleaved data has on rendering performance.
 	It doesn't seem any slower than separate VBO buffers for each type.
 
 	We do gain performance from calling glVertexAttribPointer, glBindBuffer
@@ -80,6 +80,13 @@ public:
 	virtual void use() = 0;
 
 	virtual void draw(uint32_t offset) = 0;
+
+	virtual VBO_TYPE VboType() = 0;
+};
+
+struct OGLVboId {
+	GLuint vbo_id;
+	GLuint vao_id;
 };
 
 template<typename T>
@@ -94,11 +101,13 @@ public:
 
 	void use();
 
-	virtual void draw(uint32_t offset) { ::ogl_draw_vbo<T>(this, offset); }
+	virtual void draw(uint32_t offset) { ::draw_vbo<T>(this, offset); }
 	T* getBuffer() { return buffer;  }
 	void setNeedsUpdate(bool x) { needsUpdate = x; }
 
 	inline uint32_t getCount() const { return count; }
+
+	virtual VBO_TYPE VboType() { return HgVboMemory<T>::Type(); }
 private:
 	static constexpr VBO_TYPE Type() {
 		//looks stupid but is compile time evaluated
@@ -117,23 +126,23 @@ private:
 	T* buffer;
 
 	uint32_t count;
-	GLuint vbo_id;
-	GLuint vao_id;
 	bool needsUpdate;
 
-//	void(*send_to_ogl)(struct HgVboMemory* vbo);
+	union {
+		struct OGLVboId ogl;
+	} handle;
 
-private:
 	T* HgVboMemory::resize(uint32_t count);
-	void hgvbo_sendogl();
+	void sendToGPU();
 };
 
 
 
 template<typename T>
 HgVboMemory<T>::HgVboMemory()
-	:buffer(nullptr), count(0), vbo_id(0), vao_id(0), needsUpdate(0)
+	:buffer(nullptr), count(0), needsUpdate(0)
 {
+	memset(&handle, 0, sizeof(handle));
 	static_assert(Type() != VBO_TYPE_INVALID, "Invalid VBO Type");
 }
 
@@ -163,9 +172,9 @@ void HgVboMemory<T>::clear() {
 
 template<typename T>
 void HgVboMemory<T>::destroy() {
-	if (vbo_id>0) glDeleteBuffers(1, &vbo_id);
-	if (vao_id>0) glDeleteBuffers(1, &vao_id);
-	vao_id = vbo_id = 0;
+	if (handle.ogl.vbo_id>0) glDeleteBuffers(1, &handle.ogl.vbo_id);
+	if (handle.ogl.vao_id>0) glDeleteBuffers(1, &handle.ogl.vao_id);
+	handle.ogl.vao_id = handle.ogl.vbo_id = 0;
 	clear();
 }
 
@@ -184,16 +193,16 @@ uint32_t HgVboMemory<T>::add_data(void* data, uint16_t vertex_count) {
 }
 
 template<typename T>
-void HgVboMemory<T>::hgvbo_sendogl() {
-	if (vbo_id == 0) glGenBuffers(1, &vbo_id);
-	if (vao_id == 0) glGenVertexArrays(1, &vao_id);
+void HgVboMemory<T>::sendToGPU() {
+	if (handle.ogl.vbo_id == 0) glGenBuffers(1, &handle.ogl.vbo_id);
+	if (handle.ogl.vao_id == 0) glGenVertexArrays(1, &handle.ogl.vao_id);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+	glBindBuffer(GL_ARRAY_BUFFER, handle.ogl.vbo_id);
 	glBufferData(GL_ARRAY_BUFFER, count * Stride(), buffer, GL_STATIC_DRAW);
 
-	glBindVertexArray(vao_id);
+	glBindVertexArray(handle.ogl.vao_id);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+	glBindBuffer(GL_ARRAY_BUFFER, handle.ogl.vbo_id);
 	//minimize calls to glVertexAttribPointer, use same format for all meshes in a VBO
 
 	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, Stride(), NULL);
@@ -234,16 +243,16 @@ void HgVboMemory<T>::hgvbo_sendogl() {
 }
 
 template<typename T>
-void ogl_draw_vbo(HgVboMemory<T>* vbo, uint32_t offset) {}
+inline void draw_vbo(HgVboMemory<T>* vbo, uint32_t offset) {}
 
 //NOTE: THESE ARE INLINE. THEY NEED TO BE IN THE HEADER, NOT CPP
 template<>
-inline void ogl_draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset) {
+inline void draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset) {
 	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_BYTE, 0, offset);
 }
 
 template<>
-inline void ogl_draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset) {
+inline void draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset) {
 	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_SHORT, 0, offset);
 }
 
