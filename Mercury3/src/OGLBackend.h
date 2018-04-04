@@ -9,4 +9,6 @@ public:
 	void Clear();
 	void BeginFrame();
 	void EndFrame();
+
+	void sendToGPU(HgVboBase* vbo);
 };

@@ -81,7 +81,9 @@ public:
 
 	virtual void draw(uint32_t offset) = 0;
 
-	virtual VBO_TYPE VboType() = 0;
+	inline VBO_TYPE VboType() const { return m_type;  }
+protected:
+	VBO_TYPE m_type;
 };
 
 struct OGLVboId {
@@ -113,7 +115,7 @@ public:
 	inline uint32_t getCount() const { return count; }
 
 	virtual VBO_TYPE VboType() { return HgVboMemory<T>::Type(); }
-	static constexpr uint8_t Stride() { return sizeof(T); }
+	static constexpr inline uint8_t Stride() { return sizeof(T); }
 
 	static constexpr VBO_TYPE Type() {
 		//looks stupid but is compile time evaluated
@@ -140,12 +142,12 @@ private:
 //	void sendToGPU();
 };
 
-
-
 template<typename T>
 HgVboMemory<T>::HgVboMemory()
 	:buffer(nullptr), count(0), needsUpdate(0)
 {
+	constexpr VBO_TYPE type = Type();
+	m_type = type;
 	memset(&handle, 0, sizeof(handle));
 	static_assert(Type() != VBO_TYPE_INVALID, "Invalid VBO Type");
 }

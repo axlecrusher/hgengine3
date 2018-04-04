@@ -1,5 +1,7 @@
 #pragma once
 
+class HgVboBase;
+
 class RenderBackend {
 public:
 
@@ -7,6 +9,9 @@ public:
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
 
+	virtual void DrawVBO() {};
+
+	virtual void sendToGPU(HgVboBase* vbo) = 0;
 };
 
 namespace Renderer {

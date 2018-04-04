@@ -20,6 +20,7 @@ void HgVboMemory<T>::use() {
 
 	if (needsUpdate) {
 		RENDERER->sendToGPU(this);
+		needsUpdate = false;
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle.ogl.vbo_id); //is this needed or does the vao_id do this for us?
@@ -30,59 +31,31 @@ void HgVboMemory<T>::use() {
 //8 bit index
 template<>
 void HgVboMemory<uint8_t>::use() {
-	if (handle.ogl.vbo_id == 0) {
-		GLuint buf_id;
-		glGenBuffers(1, &buf_id);
-		handle.ogl.vbo_id = buf_id;
-	}
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.ogl.vbo_id);
-
 	if (needsUpdate) {
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * Stride(), buffer, GL_STATIC_DRAW);
+		RENDERER->sendToGPU(this);
 		needsUpdate = false;
 	}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.ogl.vbo_id);
 }
 
 //16 bit index
 template<>
 void HgVboMemory<uint16_t>::use() {
-	if (handle.ogl.vbo_id == 0) {
-		GLuint buf_id;
-		glGenBuffers(1, &buf_id);
-		handle.ogl.vbo_id = buf_id;
-	}
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.ogl.vbo_id);
-
 	if (needsUpdate) {
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * Stride(), buffer, GL_STATIC_DRAW);
+		RENDERER->sendToGPU(this);
 		needsUpdate = false;
 	}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.ogl.vbo_id);
 }
 
 template<>
 void HgVboMemory<color>::use() {
-	if (handle.ogl.vbo_id == 0) {
-		GLuint buf_id;
-		glGenBuffers(1, &buf_id);
-		handle.ogl.vbo_id = buf_id;
-		/*
-		glGenVertexArrays(1, &vbo->vao_id);
-		glBindVertexArray(vbo->vao_id);
-		glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)0);
-		glEnableVertexAttribArray(L_COLOR);
-		*/
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, handle.ogl.vbo_id);
-
 	if (needsUpdate) {
-		color* c = buffer;
-		glBufferData(GL_ARRAY_BUFFER, count * Stride(), buffer, GL_STATIC_DRAW);
+		RENDERER->sendToGPU(this);
 		needsUpdate = false;
 	}
 
+	glBindBuffer(GL_ARRAY_BUFFER, handle.ogl.vbo_id);
 	glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
 	glEnableVertexAttribArray(L_COLOR);
 }
