@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include <string.h>
+#include <RenderBackend.h>
 
 HgVboMemory<vbo_layout_vc> staticVbo;
 HgVboMemory<vbo_layout_vnu> staticVboVNU;
@@ -18,7 +19,7 @@ void HgVboMemory<T>::use() {
 	_currentVbo = this;
 
 	if (needsUpdate) {
-		sendToGPU();
+		RENDERER->sendToGPU(this);
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle.ogl.vbo_id); //is this needed or does the vao_id do this for us?
