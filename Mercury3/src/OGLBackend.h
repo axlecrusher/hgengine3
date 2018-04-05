@@ -12,4 +12,5 @@ public:
 
 	void sendToGPU(HgVboBase* vbo);
 	void bind(HgVboBase* vbo);
+	void destroy(HgVboBase* vbo);
 };

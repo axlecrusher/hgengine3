@@ -47,9 +47,9 @@ static void render(RenderData* rd) {
 
 	setBlendMode(rd->blendMode);
 	d->hgVbo->use();
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
-	glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_SHORT, 0, d->vbo_offset);
+	d->hgVbo->draw(d->index_count, d->vbo_offset);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
+	//glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_SHORT, 0, d->vbo_offset);
 }
 
 static void SetupRenderData() {
@@ -69,6 +69,8 @@ static void SetupRenderData() {
 	crd->indices.data = indices;
 	crd->index_count = data.index_count;
 //	rd->indices.owns_ptr = 1;
+	crd->indexVbo = new HgVboMemory<uint16_t>();
+	crd->indexVbo->add_data(indices, data.index_count);
 
 	crd->renderFunction = render;
 }
@@ -77,7 +79,7 @@ void change_to_voxelGrid(HgElement* element) {
 	//create an instance of the render data for all triangles to share
 	if (crd == NULL) SetupRenderData();
 
-	element->setRenderData( (RenderData*)crd );
+	element->setRenderData( crd, false );
 }
 
 void voxelGrid_create(HgElement* element) {

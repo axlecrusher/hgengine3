@@ -3,6 +3,7 @@
 #include <HgTypes.h>
 #include <oglDisplay.h>
 #include <assert.h>
+#include <RenderBackend.h>
 
 /*	Interleaved vertex layout because it is faster to resize when adding
 	more mesh data. New mesh data can just be appened to the end. If it
@@ -64,6 +65,15 @@ typedef struct vbo_layout_vnut {
 	uv_coord uv;
 } vbo_layout_vnut;
 
+struct OGLVboId {
+	GLuint vbo_id;
+	GLuint vao_id;
+};
+
+union gpuHandles {
+	struct OGLVboId ogl;
+};
+
 class HgVboBase {
 public:
 
@@ -77,20 +87,14 @@ public:
 
 	virtual void use() = 0;
 
-	virtual void draw(uint32_t offset) = 0;
+	virtual void draw(uint32_t count, uint32_t offset) = 0;
 
 	inline VBO_TYPE VboType() const { return m_type;  }
+	inline auto& getHandle() { return handle; }
+
 protected:
 	VBO_TYPE m_type;
-};
-
-struct OGLVboId {
-	GLuint vbo_id;
-	GLuint vao_id;
-};
-
-union gpuHandles {
-	struct OGLVboId ogl;
+	gpuHandles handle;
 };
 
 template<typename T>
@@ -104,9 +108,8 @@ public:
 	void destroy();
 
 	void use();
-	inline auto& getHandle() { return handle; }
 
-	virtual void draw(uint32_t offset) { ::draw_vbo<T>(this, offset); }
+	virtual void draw(uint32_t count, uint32_t offset) { ::draw_vbo<T>(this, count, offset); }
 	T* getBuffer() { return buffer;  }
 	void setNeedsUpdate(bool x) { needsUpdate = x; }
 
@@ -142,7 +145,6 @@ private:
 
 	uint32_t count;
 	bool needsUpdate;
-	gpuHandles handle;
 
 	T* HgVboMemory::resize(uint32_t count);
 //	void sendToGPU();
@@ -167,6 +169,13 @@ HgVboMemory<T>::~HgVboMemory() {
 }
 
 template<typename T>
+void HgVboMemory<T>::destroy() {
+	RENDERER->destroy(this);
+	handle.ogl.vao_id = handle.ogl.vbo_id = 0;
+	clear();
+}
+
+template<typename T>
 T* HgVboMemory<T>::resize(uint32_t count) {
 	T* buf = (T*)realloc(buffer, count * sizeof(*buf));
 	assert(buf != NULL);
@@ -180,14 +189,6 @@ void HgVboMemory<T>::clear() {
 	if (buffer != nullptr) free(buffer);
 	buffer = NULL;
 	count = 0;
-}
-
-template<typename T>
-void HgVboMemory<T>::destroy() {
-	if (handle.ogl.vbo_id>0) glDeleteBuffers(1, &handle.ogl.vbo_id);
-	if (handle.ogl.vao_id>0) glDeleteBuffers(1, &handle.ogl.vao_id);
-	handle.ogl.vao_id = handle.ogl.vbo_id = 0;
-	clear();
 }
 
 template<typename T>
@@ -205,17 +206,19 @@ uint32_t HgVboMemory<T>::add_data(void* data, uint16_t vertex_count) {
 }
 
 template<typename T>
-inline void draw_vbo(HgVboMemory<T>* vbo, uint32_t offset) {}
+inline void draw_vbo(HgVboMemory<T>* vbo, uint32_t count, uint32_t offset) {}
 
 //NOTE: THESE ARE INLINE. THEY NEED TO BE IN THE HEADER, NOT CPP
 template<>
-inline void draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset) {
-	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_BYTE, 0, offset);
+inline void draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t count, uint32_t offset) {
+	//count is indice count
+	glDrawElementsBaseVertex(GL_TRIANGLES, count, GL_UNSIGNED_BYTE, 0, offset);
 }
 
 template<>
-inline void draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset) {
-	glDrawElementsBaseVertex(GL_TRIANGLES, vbo->getCount(), GL_UNSIGNED_SHORT, 0, offset);
+inline void draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t count, uint32_t offset) {
+	//count is indice count
+	glDrawElementsBaseVertex(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, 0, offset);
 }
 
 

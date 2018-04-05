@@ -13,6 +13,8 @@ public:
 
 	virtual void sendToGPU(HgVboBase* vbo) = 0;
 	virtual void bind(HgVboBase* vbo) = 0;
+
+	virtual void destroy(HgVboBase* vbo) = 0;
 };
 
 namespace Renderer {

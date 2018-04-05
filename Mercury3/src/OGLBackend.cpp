@@ -266,3 +266,9 @@ void OGLBackend::bind(HgVboBase* vbo) {
 		break;
 	}
 }
+
+void OGLBackend::destroy(HgVboBase* vbo) {
+	auto& handle = vbo->getHandle();
+	if (handle.ogl.vbo_id>0) glDeleteBuffers(1, &handle.ogl.vbo_id);
+	if (handle.ogl.vao_id>0) glDeleteBuffers(1, &handle.ogl.vao_id);
+}

@@ -109,6 +109,21 @@ static void change_to_model(HgElement* element) {
 	element->setRenderData( init_render_data() ); //this needs to be per model instance if the model is animated
 }
 
+static void render(RenderData* rd) {
+	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
+	OGLRenderData *d = (OGLRenderData*)rd;
+
+	d->hgVbo->use();
+//	d->colorVbo->use();
+
+	d->indexVbo->use();
+
+	setBlendMode((BlendMode)rd->blendMode);
+
+	d->indexVbo->draw(d->index_count, d->vbo_offset);
+	//	draw_index_vbo(d->indexVbo, d->vbo_offset);
+}
+
 int8_t model_data::load(HgElement* element, const char* filename) {
 	change_to_model(element);
 
@@ -137,7 +152,10 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 //	mrd->index_count = mdl.index_count;
 	rd->indices.data = mdl.indices;
 	rd->indices.owns_ptr = 1;
-	rd->renderFunction = Indice16Render;
+	rd->indexVbo = new HgVboMemory<uint16_t>();
+	rd->indexVbo->add_data(mdl.indices, mdl.index_count);
+
+	rd->renderFunction = render;
 
 	CLEAR_FLAG(element, HGE_DESTROY);
 
