@@ -122,8 +122,6 @@ static void sendToGPU(HgVboMemory<T>* vbo) {
 		fprintf(stderr, "Unknown vbo type:%d\n", vbo_type);
 		assert(!"Unknown vbo type");
 	}
-
-	vbo->setNeedsUpdate(false);
 }
 
 //8 bit index
@@ -200,6 +198,69 @@ void OGLBackend::sendToGPU(HgVboBase* vbo) {
 		break;
 	case VBO_COLOR8:
 		::sendToGPU(static_cast<HgVboMemory<color>*>(vbo));
+		break;
+	default:
+		break;
+	}
+}
+
+
+template<typename T>
+inline void bind(HgVboMemory<T>* vbo) {
+	auto& handle = vbo->getHandle();
+	glBindBuffer(GL_ARRAY_BUFFER, handle.ogl.vbo_id); //is this needed or does the vao_id do this for us?
+	glBindVertexArray(handle.ogl.vao_id);
+}
+
+
+//8 bit index
+template<>
+inline void bind(HgVboMemory<uint8_t>* vbo) {
+	auto& handle = vbo->getHandle();
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.ogl.vbo_id);
+}
+
+//16 bit index
+template<>
+inline void bind(HgVboMemory<uint16_t>* vbo) {
+	auto& handle = vbo->getHandle();
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.ogl.vbo_id);
+}
+
+template<>
+inline void bind(HgVboMemory<color>* vbo) {
+	auto& handle = vbo->getHandle();
+	glBindBuffer(GL_ARRAY_BUFFER, handle.ogl.vbo_id);
+	glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
+	glEnableVertexAttribArray(L_COLOR);
+}
+
+void OGLBackend::bind(HgVboBase* vbo) {
+	//I don't like this step.
+	switch (vbo->VboType())
+	{
+	case VBO_TYPE_INVALID:
+		break;
+	case VBO_VC:
+		::bind(static_cast<HgVboMemory<vbo_layout_vc>*>(vbo));
+		break;
+	case VBO_VN:
+		::bind(static_cast<HgVboMemory<vbo_layout_vn>*>(vbo));
+		break;
+	case VBO_VNU:
+		::bind(static_cast<HgVboMemory<vbo_layout_vnu>*>(vbo));
+		break;
+	case VBO_VNUT:
+		::bind(static_cast<HgVboMemory<vbo_layout_vnut>*>(vbo));
+		break;
+	case VBO_INDEX8:
+		::bind(static_cast<HgVboMemory<uint8_t>*>(vbo));
+		break;
+	case VBO_INDEX16:
+		::bind(static_cast<HgVboMemory<uint16_t>*>(vbo));
+		break;
+	case VBO_COLOR8:
+		::bind(static_cast<HgVboMemory<color>*>(vbo));
 		break;
 	default:
 		break;

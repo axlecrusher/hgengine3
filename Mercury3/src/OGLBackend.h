@@ -11,4 +11,5 @@ public:
 	void EndFrame();
 
 	void sendToGPU(HgVboBase* vbo);
+	void bind(HgVboBase* vbo);
 };

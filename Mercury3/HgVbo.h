@@ -4,8 +4,6 @@
 #include <oglDisplay.h>
 #include <assert.h>
 
-#include <oglDisplay.h>
-
 /*	Interleaved vertex layout because it is faster to resize when adding
 	more mesh data. New mesh data can just be appened to the end. If it
 	were stored VVVNNNCCC, it would be much more difficult to add new
@@ -131,11 +129,19 @@ public:
 
 private:
 
+	inline void use_common() {
+		if (needsUpdate) {
+			RENDERER->sendToGPU(this);
+			needsUpdate = false;
+		}
+
+		RENDERER->bind(this);
+	}
+
 	T* buffer;
 
 	uint32_t count;
 	bool needsUpdate;
-
 	gpuHandles handle;
 
 	T* HgVboMemory::resize(uint32_t count);
