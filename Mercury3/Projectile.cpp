@@ -20,7 +20,7 @@ void Projectile::update(uint32_t tdelta) {
 		total_time += tdelta;
 
 		if (total_time >= 3000) {
-			printf("set destroy\n");
+//			printf("set destroy\n");
 			SET_FLAG(element, HGE_DESTROY);
 		}
 
