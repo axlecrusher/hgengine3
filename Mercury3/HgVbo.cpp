@@ -60,3 +60,5 @@ static IHgVbo* vbo_from_api_type() {
 IHgVbo* staticVbo = new_vbo<vbo_layout_vc>();
 IHgVbo* staticVboVNU = new_vbo<vbo_layout_vnu>();
 IHgVbo* staticVboVNUT = new_vbo<vbo_layout_vnut>();
+IHgVbo* staticIndice8 = new_vbo<uint8_t>();
+IHgVbo* staticIndice16 = new_vbo<uint16_t>();

@@ -16,7 +16,7 @@ public:
 
 	virtual void use() { use_common(); }
 
-	virtual void draw(uint32_t count, uint32_t offset) { ::draw_vbo<T>(&m_mem, count, offset); }
+	virtual void draw(uint32_t count, uint32_t vertex_offset, uint32_t idx_offset) { ::draw_vbo<T>(&m_mem, count, vertex_offset, idx_offset); }
 	virtual void* getBuffer() { return m_mem.getBuffer(); }
 	virtual void clear() { return m_mem.clear(); }
 	virtual void setNeedsUpdate(bool x) { needsUpdate = x; }
@@ -154,19 +154,19 @@ void OGLvbo<T>::destroy() {
 
 
 template<typename T>
-inline void draw_vbo(HgVboMemory<T>* vbo, uint32_t count, uint32_t offset) {}
+inline void draw_vbo(HgVboMemory<T>* vbo, uint32_t count, uint32_t offset, uint32_t idx_offset) {}
 
 //NOTE: THESE ARE INLINE. THEY NEED TO BE IN THE HEADER, NOT CPP
 template<>
-inline void draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t count, uint32_t offset) {
-	//count is indice count
-	glDrawElementsBaseVertex(GL_TRIANGLES, count, GL_UNSIGNED_BYTE, 0, offset);
+inline void draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
+	const uint32_t offset = sizeof(uint8_t)*idx_offset; //offset into indice buffer
+	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_BYTE, (void*)offset, vertex_offset);
 }
 
 template<>
-inline void draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t count, uint32_t offset) {
-	//count is indice count
-	glDrawElementsBaseVertex(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, 0, offset);
+inline void draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
+	const uint32_t offset = sizeof(uint16_t)*idx_offset; //offset into indice buffer
+	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_SHORT, (void*)offset, vertex_offset);
 }
 
 

@@ -78,7 +78,7 @@ public:
 
 	virtual void use() = 0;
 
-	virtual void draw(uint32_t count, uint32_t offset) = 0;
+	virtual void draw(uint32_t count, uint32_t vertex_offset, uint32_t idx_offset) = 0;
 
 	inline VBO_TYPE VboType() const { return m_type;  }
 
@@ -95,3 +95,5 @@ template<typename T> IHgVbo* new_vbo();
 extern IHgVbo* staticVbo;
 extern IHgVbo* staticVboVNU;
 extern IHgVbo* staticVboVNUT;
+extern IHgVbo* staticIndice8;
+extern IHgVbo* staticIndice16;
