@@ -22,6 +22,10 @@ static uint8_t indices[] = {
 	0,1,2
 };
 
+static void render() {
+
+}
+
 static void SetupRenderData() {
 	trd = OGLRenderData::Create();
 
@@ -34,6 +38,9 @@ static void SetupRenderData() {
 	trd->index_count = 3;
 	trd->indices.data = indices;
 	trd->vbo_offset = staticVbo->add_data(raw_data, trd->vertex_count);
+
+	trd->index_offset = staticIndice8->add_data(indices, 3);
+	trd->indexVbo = staticIndice8;
 
 //	trd->baseRender.destroy = NULL; //render data is shared by all triangles so we don't really want to do anything
 }

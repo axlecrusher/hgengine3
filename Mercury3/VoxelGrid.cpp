@@ -40,16 +40,11 @@ model_data generateVoxelVBO(uint8_t x, uint8_t y) {
 static void render(RenderData* rd) {
 	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
 	OGLRenderData *d = (OGLRenderData*)rd;
-	if (d->idx_id == 0) {
-		d->idx_id = new_index_buffer16((uint16_t*)d->indices.data, d->index_count);
-//		free_arbitrary(&d->indices);
-	}
 
 	setBlendMode(rd->blendMode);
 	d->hgVbo->use();
-	d->hgVbo->draw(d->index_count, d->vbo_offset);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d->idx_id);
-	//glDrawElementsBaseVertex(GL_TRIANGLES, d->index_count, GL_UNSIGNED_SHORT, 0, d->vbo_offset);
+	d->indexVbo->use();
+	d->indexVbo->draw(d->index_count, d->vbo_offset, d->index_offset);
 }
 
 static void SetupRenderData() {

@@ -13,6 +13,7 @@
 
 #include <HgVbo.h>
 #include <HgElement.h>
+#include <HgUtils.h>
 
 //TestRegistration("test");
 
@@ -76,18 +77,21 @@ static void cube_render(RenderData* rd) {
 
 	setBlendMode(rd->blendMode);
 	d->hgVbo->use();
-
-	glDrawArrays(GL_TRIANGLES, d->vbo_offset, d->vertex_count);
+	d->hgVbo->draw(d->vertex_count, d->vbo_offset, d->index_offset);
+	//glDrawArrays(GL_TRIANGLES, d->vbo_offset, d->vertex_count);
 }
 
 static void SetupRenderData() {
 	crd = OGLRenderData::Create();
 
-	crd->vertex_count = 24;
+	crd->vertex_count = NUM_ARRAY_ELEMENTS(raw_cube_data);
 	crd->hgVbo = staticVboVNUT;
 	crd->vbo_offset = staticVboVNUT->add_data(raw_cube_data, crd->vertex_count);
-	crd->index_count = 36;
+	crd->index_count = NUM_ARRAY_ELEMENTS(cube_indices);
 	crd->indices.data = cube_indices;
+
+	crd->index_offset = staticIndice8->add_data(cube_indices, crd->index_count);
+	crd->indexVbo = staticIndice8;
 
 //	crd->baseRender.renderFunc = cube_render;
 

@@ -120,7 +120,7 @@ static void render(RenderData* rd) {
 
 	setBlendMode((BlendMode)rd->blendMode);
 
-	d->indexVbo->draw(d->index_count, d->vbo_offset);
+	d->indexVbo->draw(d->index_count, d->vbo_offset, d->index_offset);
 	//	draw_index_vbo(d->indexVbo, d->vbo_offset);
 }
 
@@ -153,7 +153,7 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 	rd->indices.data = mdl.indices;
 	rd->indices.owns_ptr = 1;
 	rd->indexVbo = new_vbo<uint16_t>();
-	rd->indexVbo->add_data(mdl.indices, mdl.index_count);
+	rd->index_offset = rd->indexVbo->add_data(mdl.indices, mdl.index_count);
 
 	rd->renderFunction = render;
 

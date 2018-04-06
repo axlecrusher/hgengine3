@@ -67,6 +67,8 @@ public:
 	uint16_t vertex_count;
 //private:
 	GLuint idx_id;
+
+	uint32_t index_offset;
 	uint32_t index_count;
 
 //	std::shared_ptr<char*> indices;
@@ -85,8 +87,7 @@ void hgViewport(uint8_t vp);
 void setup_viewports(uint16_t width, uint16_t height);
 void ogl_render_renderData(RenderData* rd);
 
-GLuint new_index_buffer8(uint8_t* indices, uint32_t count);
-GLuint new_index_buffer16(uint16_t* indices, uint32_t count);
+
 void setBlendMode(BlendMode blendMode);
 inline RenderData* new_renderData_ogl() { return new OGLRenderData(); }
 
@@ -95,8 +96,10 @@ inline RenderData* new_renderData_ogl() { return new OGLRenderData(); }
 
 inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->renderData(); }
 
-void Indice8Render(RenderData* rd);
-void Indice16Render(RenderData* rd);
+//GLuint new_index_buffer8(uint8_t* indices, uint32_t count);
+//GLuint new_index_buffer16(uint16_t* indices, uint32_t count);
+//void Indice8Render(RenderData* rd);
+//void Indice16Render(RenderData* rd);
 
 //uint32_t ogl_updateTextureData(uint16_t x, uint16_t y, HgTexture::channels c, unsigned char* data);
 uint32_t ogl_updateTextureData(HgTexture* tex);
