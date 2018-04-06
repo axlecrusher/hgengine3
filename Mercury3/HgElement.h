@@ -175,9 +175,28 @@ void RegisterElementType(const char* c, factory_clbk);
 
 #define REGISTER_ELEMENT_TYPE(str) TestRegistration(str);
 
+// Check windows
+#if _WIN32 || _WIN64
+#if _WIN64
+#define LINKER_PREFIX
+#else
+#define LINKER_PREFIX _
+#endif
+#endif
+
+// Check GCC
+#if __GNUC__
+//#if __x86_64__ || __ppc64__
+//#define ENVIRONMENT64
+//#else
+//#define ENVIRONMENT32
+//#endif
+#define LINKER_PREFIX _
+#endif
+
 #ifdef _MSC_VER
 #define REGISTER_LINKTIME( func, factory ) \
-	__pragma(comment(linker,"/export:_REGISTER_ELEMENT"#func)); \
+	__pragma(comment(linker,"/export:"##LINKER_PREFIX##"REGISTER_ELEMENT"#func)); \
 	extern "C" { void REGISTER_ELEMENT##func() { RegisterElementType(#func,factory); } }
 //	void REGISTER_ELEMENT##func() { VTABLE_INDEX = RegisterElementType(#func); HGELEMT_VTABLES[VTABLE_INDEX] = vtable; }
 //	__pragma(comment(linker, "/export:_GLOBAL_DESTROY"#func)); \
