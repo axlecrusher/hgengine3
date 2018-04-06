@@ -4,13 +4,15 @@
 
 class OGLBackend : public RenderBackend {
 public:
+	OGLBackend() {
+		m_type = RendererType::OPENGL;
+	}
 	static void Init();
 
 	void Clear();
 	void BeginFrame();
 	void EndFrame();
 
-	void sendToGPU(HgVboBase* vbo);
-	void bind(HgVboBase* vbo);
-	void destroy(HgVboBase* vbo);
 };
+
+extern OGLBackend oglRenderer;

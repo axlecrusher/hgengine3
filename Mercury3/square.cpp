@@ -53,10 +53,10 @@ static void SetupRenderData() {
 	points.points.array = vv;
 	points.size = 4;
 
-	trd->hgVbo = &staticVbo;
+	trd->hgVbo = staticVbo;
 	trd->vertex_count = points.size;
 	trd->index_count = 6;
-	trd->vbo_offset = staticVbo.add_data(raw_data, trd->vertex_count);
+	trd->vbo_offset = staticVbo->add_data(raw_data, trd->vertex_count);
 }
 
 static OGLRenderData* init_render_data() {

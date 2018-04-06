@@ -6,36 +6,57 @@
 #include <string.h>
 #include <RenderBackend.h>
 
-HgVboMemory<vbo_layout_vc> staticVbo;
-HgVboMemory<vbo_layout_vnu> staticVboVNU;
-HgVboMemory<vbo_layout_vnut> staticVboVNUT;
-
+#include <OGLvbo.h>
 //static void* _currentVbo;
 
-
-
-
 template<typename T>
-void HgVboMemory<T>::use() {
-	if ((_currentVbo == this) && (needsUpdate == false)) return;
-	_currentVbo = this;
-	use_common();
+static IHgVbo* vbo_from_api_type() {
+	switch (RENDERER->Type()) {
+	case OPENGL:
+		return new OGLvbo<T>();
+		break;
+	default:
+		return nullptr;
+	}
 }
 
-//8 bit index
-template<>
-void HgVboMemory<uint8_t>::use() {
-	use_common();
-}
+//namespace HgVboFactory {
+	template<>
+	IHgVbo* new_vbo<vbo_layout_vc>() {
+		return vbo_from_api_type<vbo_layout_vc>();
+	}
 
-//16 bit index
-template<>
-void HgVboMemory<uint16_t>::use() {
-	use_common();
-}
+	template<>
+	IHgVbo* new_vbo<vbo_layout_vn>() {
+		return vbo_from_api_type<vbo_layout_vn>();
+	}
 
-template<>
-void HgVboMemory<color>::use() {
-	use_common();
-}
+	template<>
+	IHgVbo* new_vbo<vbo_layout_vnu>() {
+		return vbo_from_api_type<vbo_layout_vnu>();
+	}
 
+	template<>
+	IHgVbo* new_vbo<vbo_layout_vnut>() {
+		return vbo_from_api_type<vbo_layout_vnut>();
+	}
+
+	template<>
+	IHgVbo* new_vbo<uint8_t>() {
+		return vbo_from_api_type<uint8_t>();
+	}
+
+	template<>
+	IHgVbo* new_vbo<uint16_t>() {
+		return vbo_from_api_type<uint16_t>();
+	}
+
+	template<>
+	IHgVbo* new_vbo<color>() {
+		return vbo_from_api_type<color>();
+	}
+//}
+
+IHgVbo* staticVbo = new_vbo<vbo_layout_vc>();
+IHgVbo* staticVboVNU = new_vbo<vbo_layout_vnu>();
+IHgVbo* staticVboVNUT = new_vbo<vbo_layout_vnut>();

@@ -143,16 +143,16 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 		printf("%f %f %f %f\n",x, y, z, w);
 	}
 */
-	rd->hgVbo = &staticVboVNUT;
+	rd->hgVbo = staticVboVNUT;
 	rd->vertex_count = mdl.vertex_count;
 	rd->index_count = mdl.index_count;
-	rd->vbo_offset = staticVboVNUT.add_data(mdl.vertices, rd->vertex_count);
+	rd->vbo_offset = staticVboVNUT->add_data(mdl.vertices, rd->vertex_count);
 	free(mdl.vertices);
 
 //	mrd->index_count = mdl.index_count;
 	rd->indices.data = mdl.indices;
 	rd->indices.owns_ptr = 1;
-	rd->indexVbo = new HgVboMemory<uint16_t>();
+	rd->indexVbo = new_vbo<uint16_t>();
 	rd->indexVbo->add_data(mdl.indices, mdl.index_count);
 
 	rd->renderFunction = render;

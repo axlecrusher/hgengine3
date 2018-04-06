@@ -1,6 +1,10 @@
 #pragma once
 
-class HgVboBase;
+enum RendererType {
+	OPENGL = 0,
+	VULKAN,
+	DIRECTX
+};
 
 class RenderBackend {
 public:
@@ -9,12 +13,9 @@ public:
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
 
-	virtual void DrawVBO() {};
-
-	virtual void sendToGPU(HgVboBase* vbo) = 0;
-	virtual void bind(HgVboBase* vbo) = 0;
-
-	virtual void destroy(HgVboBase* vbo) = 0;
+	inline RendererType Type() const { return m_type; }
+protected:
+	RendererType m_type;
 };
 
 namespace Renderer {

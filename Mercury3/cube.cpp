@@ -84,8 +84,8 @@ static void SetupRenderData() {
 	crd = OGLRenderData::Create();
 
 	crd->vertex_count = 24;
-	crd->hgVbo = &staticVboVNUT;
-	crd->vbo_offset = staticVboVNUT.add_data(raw_cube_data, crd->vertex_count);
+	crd->hgVbo = staticVboVNUT;
+	crd->vbo_offset = staticVboVNUT->add_data(raw_cube_data, crd->vertex_count);
 	crd->index_count = 36;
 	crd->indices.data = cube_indices;
 

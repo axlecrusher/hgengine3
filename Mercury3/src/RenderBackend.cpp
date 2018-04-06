@@ -1,7 +1,8 @@
 #include <RenderBackend.h>
 #include <OGLBackend.h>
 
-RenderBackend* RENDERER;
+//replace with some kind of configure based factory thing
+RenderBackend* RENDERER = &oglRenderer;
 
 namespace Renderer {
 	void InitOpenGL() {

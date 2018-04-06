@@ -57,11 +57,11 @@ public:
 	virtual void clearTextureIDs();
 	virtual void setTexture(const HgTexture* t);
 
-	class HgVboBase* hgVbo;
+	class IHgVbo* hgVbo;
 
 	//We need to be able to support multiple VBOs without hardcoding more here.
-	class HgVboBase* indexVbo;
-	class HgVboBase* colorVbo;
+	class IHgVbo* indexVbo;
+	class IHgVbo* colorVbo;
 
 	uint32_t vbo_offset;
 	uint16_t vertex_count;
