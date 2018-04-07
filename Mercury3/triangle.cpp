@@ -36,7 +36,7 @@ static void SetupRenderData() {
 	trd->hgVbo = staticVbo;
 	trd->vertex_count = points.size;
 	trd->index_count = 3;
-	trd->indices.data = indices;
+//	trd->indices.data = indices;
 	trd->vbo_offset = staticVbo->add_data(raw_data, trd->vertex_count);
 
 	trd->index_offset = staticIndice8->add_data(indices, 3);

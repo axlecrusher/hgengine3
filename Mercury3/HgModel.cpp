@@ -150,8 +150,6 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 	free(mdl.vertices);
 
 //	mrd->index_count = mdl.index_count;
-	rd->indices.data = mdl.indices;
-	rd->indices.owns_ptr = 1;
 	rd->indexVbo = new_vbo<uint16_t>();
 	rd->index_offset = rd->indexVbo->add_data(mdl.indices, mdl.index_count);
 

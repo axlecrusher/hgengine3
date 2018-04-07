@@ -49,6 +49,18 @@ class RenderData {
 		BlendMode blendMode;
 
 		indiceRenderFunc renderFunction; // could store VBO_TYPE instead and make a single function do all the rendering?
+
+		class IHgVbo* hgVbo;
+
+		//We need to be able to support multiple VBOs without hardcoding more here.
+		class IHgVbo* indexVbo;
+		class IHgVbo* colorVbo;
+
+		uint32_t vbo_offset;
+		uint16_t vertex_count;
+
+		uint32_t index_offset;
+		uint32_t index_count;
 };
 
 

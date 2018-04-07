@@ -61,7 +61,7 @@ static void SetupRenderData() {
 	crd->hgVbo = staticVboVNUT;
 	crd->vbo_offset = staticVboVNUT->add_data(voxelGridVertices, crd->vertex_count);
 
-	crd->indices.data = indices;
+//	crd->indices.data = indices;
 	crd->index_count = data.index_count;
 //	rd->indices.owns_ptr = 1;
 	crd->indexVbo = new_vbo<uint16_t>();

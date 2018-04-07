@@ -20,7 +20,9 @@ void RegisterElementType(const char* c, factory_clbk factory) {
 RenderData::newRenderDataCallback RenderData::Create = nullptr;
 
 RenderData::RenderData()
-	:blendMode(BlendMode::BLEND_NORMAL), renderFunction(nullptr)
+	:blendMode(BlendMode::BLEND_NORMAL), renderFunction(nullptr),
+	hgVbo(nullptr), indexVbo(nullptr), colorVbo(nullptr),
+	vbo_offset(0), vertex_count(0), index_count(0)
 {
 
 }

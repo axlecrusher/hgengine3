@@ -57,24 +57,6 @@ public:
 	virtual void clearTextureIDs();
 	virtual void setTexture(const HgTexture* t);
 
-	class IHgVbo* hgVbo;
-
-	//We need to be able to support multiple VBOs without hardcoding more here.
-	class IHgVbo* indexVbo;
-	class IHgVbo* colorVbo;
-
-	uint32_t vbo_offset;
-	uint16_t vertex_count;
-//private:
-	GLuint idx_id;
-
-	uint32_t index_offset;
-	uint32_t index_count;
-
-//	std::shared_ptr<char*> indices;
-	ArbitraryData indices; //can be in different formats, requiring different renderers, set renderFunction
-//	indiceRenderFunc renderFunction;
-
 	GLuint textureID[HgTexture::TEXTURE_TYPE_COUNT]; //zero ID to stop rendering
 };
 

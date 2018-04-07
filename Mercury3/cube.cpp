@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <oglDisplay.h>
+//#include <oglDisplay.h>
 #include <vertex.h>
 #include <shapes.h>
 
@@ -88,7 +88,7 @@ static void SetupRenderData() {
 	crd->hgVbo = staticVboVNUT;
 	crd->vbo_offset = staticVboVNUT->add_data(raw_cube_data, crd->vertex_count);
 	crd->index_count = NUM_ARRAY_ELEMENTS(cube_indices);
-	crd->indices.data = cube_indices;
+//	crd->indices.data = cube_indices;
 
 	crd->index_offset = staticIndice8->add_data(cube_indices, crd->index_count);
 	crd->indexVbo = staticIndice8;

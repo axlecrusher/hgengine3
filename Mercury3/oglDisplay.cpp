@@ -110,20 +110,15 @@ void setBlendMode(BlendMode blendMode) {
 }
 
 static void default_render(RenderData* rd) {
-	OGLRenderData *d = (OGLRenderData*)rd;
-
 	setBlendMode(rd->blendMode);
-	d->hgVbo->use();
-	d->indexVbo->use();
-	d->indexVbo->draw(d->index_count, d->vbo_offset, d->index_offset);
+	rd->hgVbo->use();
+	rd->indexVbo->use();
+	rd->indexVbo->draw(rd->index_count, rd->vbo_offset, rd->index_offset);
 }
 
 OGLRenderData::OGLRenderData()
-	:RenderData(),hgVbo(nullptr),
-	indexVbo(nullptr), colorVbo(nullptr),
-	vbo_offset(0), vertex_count(0), idx_id(0), index_count(0)
+	:RenderData()
 {
-	memset(&indices, 0, sizeof(indices));
 	renderFunction = default_render;
 	memset(textureID, 0, sizeof(textureID));
 	init();
@@ -138,17 +133,8 @@ void OGLRenderData::init() {
 }
 
 void OGLRenderData::destroy() {
-//	OGLRenderData* oglrd = (OGLRenderData*)rd;
-	free_arbitrary(&indices);
-//	if (idx_id>0) glDeleteBuffers(1, &idx_id);
-
 	//FIXME: Do something to clean up hgVbo
 	//hgvbo_remove(d->hgvbo, d->vbo_offset, d->vertex_count)
-
-	if (idx_id > 0) {
-		glDeleteBuffers(1, &idx_id);
-		idx_id = 0;
-	}
 
 	RenderData::destroy();
 }
