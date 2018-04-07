@@ -11,7 +11,8 @@ namespace IniLoader {
 	static std::string toLower(const char* str) {
 		std::string tmp(str);
 		std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
-		return std::move(tmp);
+		return tmp; //RVO
+//		return std::move(tmp);
 	}
 
 	int sectionHandler(void* user, const char* _section, const char* _name, const char* value) {
@@ -36,9 +37,8 @@ namespace IniLoader {
 
 	Contents parse(const std::string &filename) {
 		Contents contents;
-//		ini_contents contents;
 		ini_parse(filename.c_str(), &sectionHandler, &contents.m_ini);
-		return std::move(contents);
+		return contents; //std::move is not a good idea here, prevents RVO
 	}
 
 	const std::string& getValue(const ini_contents& c, const std::string& sec, const std::string& name) {
