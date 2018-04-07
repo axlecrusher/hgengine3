@@ -6,6 +6,8 @@
 #include "oglDisplay.h"
 
 #include <ini.h>
+#include <IniLoader.h>
+#include <StringConversions.h>
 
 typedef struct header {
 	uint32_t vertex_count, index_count;
@@ -89,7 +91,7 @@ static void updateClbk(HgElement* e, uint32_t tdelta) {
 }
 
 model_data::model_data()
-	:vertices(nullptr), indices(nullptr)
+	:vertices(nullptr), indices(nullptr), element(nullptr)
 {
 
 }
@@ -160,139 +162,63 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 	return 0;
 }
 
-typedef struct iniData{
-	iniData() {
-		scale = 1.0f;
-		origin = position = { 0,0,0 };
-	}
-	std::string modelFilename;
-	float scale;
+bool model_data::load_ini(HgElement* element, std::string filename) {
+	change_to_model(element);
+
+	IniLoader::Contents contents = IniLoader::parse(filename);
+
+	float scale = 1;
 	vector3 origin;
 	vector3 position;
 	quaternion orientation;
-	std::string vertexShader;
-	std::string fragmentShader;
 
-	//material data
-	std::string diffuseTexture;
-	std::string specularTexture;
-	std::string normalTexture;
-} iniData;
+	StringConverters::convertValue(contents.getValue("model","scale"), scale);
+	StringConverters::convertValue(contents.getValue("model","origin"), origin);
+	StringConverters::convertValue(contents.getValue("model","position"), position);
+	StringConverters::convertValue(contents.getValue("model","orientation"), orientation);
 
-#define MATCH(s, n) strcmp(name, n) == 0
+	const std::string& modelFilename = contents.getValue("model", "file");
 
-static int material_iniHandler(void* user, const char* name, const char* value) {
-	iniData* data = (iniData*)user;
+	const std::string& vertexShader = contents.getValue("model", "vertexshader");
+	const std::string& fragmentShader = contents.getValue("model", "fragmentshader");
 
-	if (MATCH("Material", "diffuseTexture")) {
-		data->diffuseTexture = value;
-	}
-	else if (MATCH("Material", "specularTexture")) {
-		data->specularTexture = value;
-	}
-	else if (MATCH("Material", "normalTexture")) {
-		data->normalTexture = value;
-	}
-	return 0;
-}
+	const std::string& diffuseTexture = contents.getValue("material", "diffusetexture");
+	const std::string& specularTexture = contents.getValue("material", "speculartexture");
+	const std::string& normalTexture = contents.getValue("material", "normaltexture");
 
-static int model_iniHandler(void* user, const char* name, const char* value) {
-	iniData* data = (iniData*)user;
+	if (model_data::load(element, modelFilename.c_str()) < 0) return false;
 
-	if (MATCH("Model", "file")) {
-		data->modelFilename = value;
-	}
-	else if (MATCH("Model", "scale")) {
-		data->scale = (float)::atof(value);
-	}
-	else if (MATCH("Model", "origin")) {
-		float x, y, z;
-		int r = sscanf(value, "%f,%f,%f", &x, &y, &z);
-		if (r == 3) {
-			data->origin = { x,y,z };
-		}
-		else {
-			//warn
-		}
-	}
-	else if (MATCH("Model", "position")) {
-		float x, y, z;
-		int r = sscanf(value, "%f,%f,%f", &x, &y, &z);
-		if (r == 3) {
-			data->position = { x,y,z };
-		}
-		else {
-			//warn
-		}
-	}
-	else if (MATCH("Model", "orientation")) {
-		float x, y, z;
-		int r = sscanf(value, "%f,%f,%f", &x, &y, &z);
-		if (r == 3) {
-			data->orientation = toQuaternion2(y, x, z); //y,x,z
-		}
-		else {
-			//warn
-		}
-	}
-	else if (MATCH("Model", "vertexShader")) {
-		data->vertexShader = value;
-	}
-	else if (MATCH("Model", "fragmentShader")) {
-		data->fragmentShader = value;
-	}
+	element->scale = scale;
+	element->origin.components.z = origin.components.z / scale;
+	element->origin.components.y = origin.components.y / scale;
+	element->origin.components.x = origin.components.x / scale;
+	element->position = position;
+	element->rotation = orientation;
 
-	return 0;
-}
+	if (!vertexShader.empty() && !fragmentShader.empty())
+		element->m_renderData->shader = HgShader::acquire(vertexShader.c_str(), fragmentShader.c_str());
 
-static int iniHandler(void* user, const char* section, const char* name, const char* value) {
-//	#define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
-
-	if (strcmp(section, "Model") == 0) return model_iniHandler(user, name, value);
-	if (strcmp(section, "Material") == 0) return material_iniHandler(user, name, value);
-
-	return 0;
-}
-
-bool model_data::load_ini(HgElement* element, std::string filename) {
-	change_to_model(element);
-	iniData data;
-
-	ini_parse(filename.c_str(), iniHandler, &data);
-
-	if (model_data::load(element, data.modelFilename.c_str()) < 0) return false;
-
-	element->scale = data.scale;
-	element->origin.components.z = data.origin.components.z / element->scale;
-	element->origin.components.y = data.origin.components.y / element->scale;
-	element->origin.components.x = data.origin.components.x / element->scale;
-	element->position = data.position;
-	element->rotation = data.orientation;
-
-	if (!data.vertexShader.empty() && !data.fragmentShader.empty())
-		element->m_renderData->shader = HgShader::acquire(data.vertexShader.c_str(), data.fragmentShader.c_str());
-
-	if (!data.diffuseTexture.empty())
+	if (!diffuseTexture.empty())
 	{
-		auto tmp = HgTexture::acquire(data.diffuseTexture, HgTexture::DIFFUSE);
+		auto tmp = HgTexture::acquire(diffuseTexture, HgTexture::DIFFUSE);
 		if (tmp != nullptr) {
 			element->m_extendedData->textures.push_back(std::move(tmp));
 			SET_FLAG(element, HGE_UPDATE_TEXTURES);
 		}
 	}
 
-	if (!data.specularTexture.empty())
+	if (!specularTexture.empty())
 	{
-		auto tmp = HgTexture::acquire(data.specularTexture, HgTexture::SPECULAR);
+		auto tmp = HgTexture::acquire(specularTexture, HgTexture::SPECULAR);
 		if (tmp != nullptr) {
 			element->m_extendedData->textures.push_back(std::move(tmp));
 			SET_FLAG(element, HGE_UPDATE_TEXTURES);
 		}
 	}
 
-	if (!data.normalTexture.empty())
+	if (!normalTexture.empty())
 	{
-		auto tmp = HgTexture::acquire(data.normalTexture, HgTexture::NORMAL);
+		auto tmp = HgTexture::acquire(normalTexture, HgTexture::NORMAL);
 		if (tmp != nullptr) {
 			element->m_extendedData->textures.push_back(std::move(tmp));
 			SET_FLAG(element, HGE_UPDATE_TEXTURES);

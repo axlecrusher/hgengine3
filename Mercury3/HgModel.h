@@ -14,6 +14,8 @@ public:
 	uint32_t vertex_count;
 	uint32_t index_count;
 
+	HgElement *element;
+
 
 	static int8_t load(HgElement* element, const char* filename);
 	static bool load_ini(HgElement* element, std::string filename);

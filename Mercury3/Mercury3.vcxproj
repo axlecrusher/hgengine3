@@ -200,6 +200,7 @@
     <ClCompile Include="src\OGLvbo.cpp" />
     <ClCompile Include="src\RenderBackend.cpp" />
     <ClCompile Include="src\HgTimer.cpp" />
+    <ClCompile Include="src\IniLoader.cpp" />
     <ClCompile Include="src\OGLBackend.cpp" />
     <ClCompile Include="str_utils.c" />
     <ClCompile Include="symbol_enumerator.c">
@@ -250,9 +251,11 @@
     <ClInclude Include="src\HgTimer.h" />
     <ClInclude Include="src\HgUtils.h" />
     <ClInclude Include="src\HgVboMemory.h" />
+    <ClInclude Include="src\IniLoader.h" />
     <ClInclude Include="src\OGLBackend.h" />
     <ClInclude Include="src\OGLvbo.h" />
     <ClInclude Include="src\RenderBackend.h" />
+    <ClInclude Include="src\StringConversions.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stb_image_resize.h" />
     <ClInclude Include="str_utils.h" />
