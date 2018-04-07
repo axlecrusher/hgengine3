@@ -32,9 +32,17 @@ RenderData::~RenderData()
 }
 
 void RenderData::destroy() {
+	//FIXME: Do something to clean up hgVbo
+	//hgvbo_remove(d->hgvbo, d->vbo_offset, d->vertex_count)
+
 	if (shader) HgShader::release(shader);
 	shader = nullptr;
 }
+
+void RenderData::init() {
+	shader = HgShader::acquire("test_vertex.glsl", "test_frag.glsl");
+}
+
 
 void HgElement::init()
 {

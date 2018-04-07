@@ -40,8 +40,8 @@ class RenderData {
 		virtual ~RenderData();
 
 		inline void render() { renderFunction(this); }
-		virtual void destroy();
-
+		void destroy();
+		void init();
 		virtual void clearTextureIDs() = 0;
 		virtual void setTexture(const HgTexture* t) = 0;
 

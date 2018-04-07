@@ -33,25 +33,11 @@ extern char *UniformString[];
 #define L_COLOR		3
 #define L_TANGENT	4
 
-typedef struct ArbitraryData {
-	void* data;
-	uint8_t owns_ptr;
-} ArbitraryData;
-
-inline void free_arbitrary(ArbitraryData* x) {
-	if (x->owns_ptr == 0 || x->data == NULL) return;
-	free(x->data);
-	x->data = NULL;
-	x->owns_ptr = 0;
-}
-
 class OGLRenderData : public RenderData {
 public:
 	inline static OGLRenderData* Create() { return (OGLRenderData*)RenderData::Create(); }
 	OGLRenderData();
 	~OGLRenderData();
-	virtual void init();
-	virtual void destroy();
 //	virtual void render();
 
 	virtual void clearTextureIDs();
@@ -59,8 +45,6 @@ public:
 
 	GLuint textureID[HgTexture::TEXTURE_TYPE_COUNT]; //zero ID to stop rendering
 };
-
-GLuint hgOglVbo(vertices v);
 
 //void destroy_render_data_ogl(struct RenderData* render_data);
 //void ogl_destroy_renderData();

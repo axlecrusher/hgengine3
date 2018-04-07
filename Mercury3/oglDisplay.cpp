@@ -39,19 +39,6 @@ void hgViewport(uint8_t idx) {
 	glEnable(GL_SCISSOR_TEST);
 }
 
-GLuint hgOglVbo(vertices v) {
-	GLuint vbo = 0;
-	GLuint vao = 0;
-
-//	glGenVertexArrays(1, &vao);
-//	glBindVertexArray(vao);
-
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, v.size * sizeof(*(v.points.v)), v.points.array, GL_STATIC_DRAW);
-	return vbo;
-}
-
 void setup_viewports(uint16_t width, uint16_t height) {
 	uint8_t i = 0;
 
@@ -110,16 +97,6 @@ OGLRenderData::~OGLRenderData() {
 	destroy();
 }
 
-void OGLRenderData::init() {
-	shader = HgShader::acquire("test_vertex.glsl", "test_frag.glsl");
-}
-
-void OGLRenderData::destroy() {
-	//FIXME: Do something to clean up hgVbo
-	//hgvbo_remove(d->hgvbo, d->vbo_offset, d->vertex_count)
-
-	RenderData::destroy();
-}
 /*
 static GLint colorDepth(HgTexture::channels c) {
 	switch (c) {
