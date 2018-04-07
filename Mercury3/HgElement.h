@@ -74,6 +74,8 @@ public:
 	std::vector< HgTexture::TexturePtr > textures;
 
 	HgScene* m_scene; //Scene that element is a member of
+
+	bool m_ownRenderData;
 };
 
 //#define MAX_ELEMENT_TYPES 255
@@ -120,7 +122,7 @@ public:
 
 		inline void setChild(HgElement* child) { child->setParent(this); }
 
-		inline void setRenderData(RenderData* rd) { m_renderData = rd; }
+		inline void setRenderData(RenderData* rd, bool owner) { m_renderData = rd; m_extendedData->m_ownRenderData = owner; }
 		RenderData* renderData() { return m_renderData; }
 
 		inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }

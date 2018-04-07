@@ -68,7 +68,7 @@ static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 static void destroy(HgElement* e) {
 //	if (e->m_renderData && e->m_renderData->destroy) e->m_renderData->destroy(e->m_renderData);
 //	free(e->m_renderData);
-	e->setRenderData( NULL );
+	e->setRenderData( NULL, false );
 }
 
 //Draw vertices directly. We aren't using indices here,
@@ -103,7 +103,7 @@ void change_to_cube(HgElement* element) {
 	//create an instance of the render data for all triangles to share
 	if (crd == NULL) SetupRenderData();
 
-	element->setRenderData((RenderData*)crd);
+	element->setRenderData(crd, false);
 }
 /*
 void shape_create_cube(HgElement* element) {

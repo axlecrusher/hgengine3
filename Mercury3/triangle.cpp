@@ -52,7 +52,7 @@ OGLRenderData* triangle_init_render_data() {
 
 void change_to_triangle(HgElement* element) {
 	//create an instance of the render data for all triangles to share
-	element->setRenderData( triangle_init_render_data() );
+	element->setRenderData( triangle_init_render_data(), false);
 }
 /*
 void shape_create_triangle(HgElement* element) {

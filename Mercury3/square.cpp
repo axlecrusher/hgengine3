@@ -39,7 +39,7 @@ static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 }
 */
 static void destroy(HgElement* e) {
-	e->setRenderData(NULL);
+	e->setRenderData(NULL,false);
 }
 
 //instanced render data
@@ -70,7 +70,7 @@ static OGLRenderData* init_render_data() {
 
 static void change_to_square(HgElement* element) {
 	//create an instance of the render data for all triangles to share
-	element->setRenderData( (RenderData*)init_render_data() );
+	element->setRenderData( init_render_data(), false );
 }
 /*
 void shape_create_square(HgElement* element) {

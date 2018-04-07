@@ -99,14 +99,14 @@ model_data::~model_data() {
 static void destroy(HgElement* e) {
 //	SCALL(e->m_renderData, destroy);
 	free(e->renderData());
-	e->setRenderData(NULL);
+	e->setRenderData(NULL,false);
 }
 
 static void change_to_model(HgElement* element) {
 //	element->vptr_idx = VTABLE_INDEX;
 
 	//create an instance of the render data for all triangles to share
-	element->setRenderData( init_render_data() ); //this needs to be per model instance if the model is animated
+	element->setRenderData( init_render_data(), true ); //this needs to be per model instance if the model is animated
 }
 
 static void render(RenderData* rd) {
