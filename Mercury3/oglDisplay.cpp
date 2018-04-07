@@ -71,24 +71,6 @@ void setup_viewports(uint16_t width, uint16_t height) {
 	view_port[i].height = height;
 }
 
-GLuint new_index_buffer8(uint8_t* indices, uint32_t count) {
-	GLuint buf_id;
-	glGenBuffers(1, &buf_id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(*indices), indices, GL_STATIC_DRAW);
-
-	return buf_id;
-}
-
-GLuint new_index_buffer16(uint16_t* indices, uint32_t count) {
-	GLuint buf_id;
-	glGenBuffers(1, &buf_id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(*indices), indices, GL_STATIC_DRAW);
-
-	return buf_id;
-}
-
 void setBlendMode(BlendMode blendMode) {
 	if (_currentBlendMode == blendMode) return;
 	_currentBlendMode = blendMode;

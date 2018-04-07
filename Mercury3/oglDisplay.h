@@ -73,15 +73,6 @@ void ogl_render_renderData(RenderData* rd);
 void setBlendMode(BlendMode blendMode);
 inline RenderData* new_renderData_ogl() { return new OGLRenderData(); }
 
-//void ogl_draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t offset);
-//void ogl_draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t offset);
-
 inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->renderData(); }
 
-//GLuint new_index_buffer8(uint8_t* indices, uint32_t count);
-//GLuint new_index_buffer16(uint16_t* indices, uint32_t count);
-//void Indice8Render(RenderData* rd);
-//void Indice16Render(RenderData* rd);
-
-//uint32_t ogl_updateTextureData(uint16_t x, uint16_t y, HgTexture::channels c, unsigned char* data);
 uint32_t ogl_updateTextureData(HgTexture* tex);
