@@ -46,7 +46,6 @@ class RenderData {
 		virtual void setTexture(const HgTexture* t) = 0;
 
 		HgShader* shader;
-		BlendMode blendMode;
 
 		indiceRenderFunc renderFunction; // could store VBO_TYPE instead and make a single function do all the rendering?
 
@@ -56,11 +55,13 @@ class RenderData {
 		class IHgVbo* indexVbo;
 		class IHgVbo* colorVbo;
 
+		uint32_t index_offset;
+		uint32_t index_count;
+
 		uint32_t vbo_offset;
 		uint16_t vertex_count;
 
-		uint32_t index_offset;
-		uint32_t index_count;
+		BlendMode blendMode;
 };
 
 
