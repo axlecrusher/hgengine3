@@ -14,13 +14,16 @@ pointers for the duration of program execution.
 
 class SceneChunk {
 	public:
+		typedef uint32_t usedType;
+
 		SceneChunk();
 		bool isUsed(uint16_t i);
 		void set_used(uint16_t i);
 		void clear_used(uint16_t idx);
 
 		HgElement elements[512];
-		uint8_t used[512 / 8];
+	private:
+		usedType used[512 / (sizeof(usedType)*8)];
 };
 
 class HgScene {

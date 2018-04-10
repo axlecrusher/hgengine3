@@ -17,20 +17,21 @@ SceneChunk::SceneChunk() {
 
 bool SceneChunk::isUsed(uint16_t i)
 {
-	uint32_t q = i / 8;
-	uint32_t r = i % 8;
+	uint32_t q = i / (sizeof(usedType) * 8);
+//	uint32_t q = i >> 5;
+	uint32_t r = i % (sizeof(usedType) * 8);
 	return 0<(used[q] & (1 << r));
 }
 
 void SceneChunk::set_used(uint16_t i) {
-	uint32_t q = i / 8;
-	uint32_t r = i % 8;
+	uint32_t q = i / (sizeof(usedType) * 8);
+	uint32_t r = i % (sizeof(usedType) * 8);
 	used[q] |= (1 << r);
 }
 
 void SceneChunk::clear_used(uint16_t idx) {
-	uint32_t q = idx / 8;
-	uint32_t r = idx % 8;
+	uint32_t q = idx / (sizeof(usedType) * 8);
+	uint32_t r = idx % (sizeof(usedType) * 8);
 	used[q] &= ~(1 << r);
 }
 
