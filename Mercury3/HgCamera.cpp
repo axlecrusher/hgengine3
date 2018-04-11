@@ -7,12 +7,10 @@ HgCamera::HgCamera() : initialDirection({0,0,-1}), rotation(quaternion_default),
 
 void HgCamera::FreeRotate(double yaw, double pitch) {
 	//seperate quaternions keep the camera from rolling when yawing and pitching
-	auto p = toQuaternion2(0, pitch, 0);
-	auto y = toQuaternion2(yaw, 0, 0);
+	auto p = quaternion::fromEuler(pitch, 0, 0);
+	auto y = quaternion::fromEuler(0, yaw, 0);
 	auto r = quat_mult(&p, &rotation);
-	auto final_rot = quat_mult(&r, &y);
-	//normalize quaternion?
-	SetRotation(final_rot);
+	SetRotation(quat_mult(&r, &y).normalize());
 }
 
 // Project a ray in the direction of the camera's view

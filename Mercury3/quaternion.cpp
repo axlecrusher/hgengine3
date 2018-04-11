@@ -20,12 +20,9 @@ quaternion::quaternion(const quaternion& lhs)
 	wxyz = lhs.wxyz;
 }
 
-quaternion quaternion::invert() const {
-	return quaternion(-w(), x(), y(), z());
-}
-
 void toQuaternion(double x, double y, double z, double deg, quaternion* q)
 {
+	// AxisAngle to Quaternion
 	// don't know how to properly use this function...
 	double rad = deg * RADIANS;
 //	x *= RADIANS;
@@ -39,43 +36,61 @@ void toQuaternion(double x, double y, double z, double deg, quaternion* q)
 	q->z(  (float)(s_rad * cos(z)));
 }
 
-quaternion toQuaternion2(double pitch, double roll, double yaw) {
+//quaternion quaternion::fromEuler(double y, double x, double z) {
+//
+//	double y = z * RADIANS;
+//	double r = x * RADIANS;
+//	double p = y * RADIANS;
+//
+//	double c1 = cos(y * 0.5);
+//	double s1 = sin(y * 0.5);
+//	double c3 = cos(r * 0.5);
+//	double s3 = sin(r * 0.5);
+//	double c2 = cos(p * 0.5);
+//	double s2 = sin(p * 0.5);
+//
+//	quaternion tmp;
+//	tmp.w ( (float)(c1 * c3 * c2 + s1 * s3 * s2) );
+//	tmp.x ( (float)(c1 * s3 * c2 - s1 * c3 * s2) );
+//	tmp.y ( (float)(c1 * c3 * s2 + s1 * s3 * c2) );
+//	tmp.z ( (float)(s1 * c3 * c2 - c1 * s3 * s2) );
+//
+//	return tmp.normalize();
+//}
 
-	double y = yaw * RADIANS;
-	double r = roll * RADIANS;
-	double p = pitch * RADIANS;
+quaternion quaternion::fromEuler(double x, double y, double z) {
+	//match http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
+	double h = y * RADIANS; //heading
+	double a = z * RADIANS; //attitude
+	double b = x * RADIANS; //bank
 
-	double t0 = cos(y * 0.5);
-	double t1 = sin(y * 0.5);
-	double t2 = cos(r * 0.5);
-	double t3 = sin(r * 0.5);
-	double t4 = cos(p * 0.5);
-	double t5 = sin(p * 0.5);
+	double c1 = cos(h * 0.5);
+	double s1 = sin(h * 0.5);
+	double c2 = cos(a * 0.5);
+	double s2 = sin(a * 0.5);
+	double c3 = cos(b * 0.5);
+	double s3 = sin(b * 0.5);
 
 	quaternion tmp;
-	tmp.w ( (float)(t0 * t2 * t4 + t1 * t3 * t5) );
-	tmp.x ( (float)(t0 * t3 * t4 - t1 * t2 * t5) );
-	tmp.y ( (float)(t0 * t2 * t5 + t1 * t3 * t4) );
-	tmp.z ( (float)(t1 * t2 * t4 - t0 * t3 * t5) );
+	tmp.w((float)(c1 * c2 * c3 - s1 * s2 * s3));
+	tmp.x((float)(s1 * s2 * c3 + c1 * c2 * s3));
+	tmp.y((float)(s1 * c2 * c3 + c1 * s2 * s3));
+	tmp.z((float)(c1 * s2 * c3 - s1 * c2 * s3));
 
-	return quaternion_normalize(tmp);
+	return tmp.normalize();
 }
 
-#define SQUARE(x) (x*x)
-
-float quat_length(quaternion* q) {
-	return (float)sqrt(SQUARE(q->x()) + SQUARE(q->y()) + SQUARE(q->z()) + SQUARE(q->w()));
-}
-
-quaternion quaternion_normalize(const quaternion& q) {
-	quaternion r = q;
-	float l = (float)sqrt( SQUARE(q.x()) + SQUARE(q.y()) + SQUARE(q.z()) + SQUARE(q.w()) );
-	r.w ( q.w() / l );
-	r.x ( q.x() / l );
-	r.y ( q.y() / l );
-	r.z ( q.z() / l );
-	return std::move(r);
-}
+//#define SQUARE(x) (x*x)
+//
+//quaternion quaternion_normalize(const quaternion& q) {
+//	quaternion r = q;
+//	float l = (float)sqrt( SQUARE(q.x()) + SQUARE(q.y()) + SQUARE(q.z()) + SQUARE(q.w()) );
+//	r.w ( q.w() / l );
+//	r.x ( q.x() / l );
+//	r.y ( q.y() / l );
+//	r.z ( q.z() / l );
+//	return r;
+//}
 
 quaternion quat_mult(const quaternion* q, const quaternion* r) {
 	quaternion t;

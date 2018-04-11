@@ -31,7 +31,7 @@ namespace StringConverters {
 		float x, y, z;
 		int r = sscanf(str_val.c_str(), "%f,%f,%f", &x, &y, &z);
 		if (r == 3) {
-			value = toQuaternion2(y, x, z); //y,x,z
+			value = quaternion::fromEuler(x, y, z);
 			return true;
 		}
 		//warn

@@ -206,8 +206,10 @@ int main()
 	printf("element size %d\n", s);
 	printf("vertex size %d\n", sizeof(vertex));
 	printf("render_packet size %d\n", sizeof(render_packet));
+	printf("render data size %d\n", sizeof(RenderData));
 	printf("oglrd size %d\n", sizeof(OGLRenderData));
-	printf("vbo type size %d\n", sizeof(VBO_TYPE));
+//	printf("vbo type size %d\n", sizeof(VBO_TYPE));
+	printf("HgTexture size %d\n", sizeof(HgTexture));
 
 	//	Perspective(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
 	//	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
@@ -215,7 +217,7 @@ int main()
 
 	camera[0].position.components.z = 1.5f;
 	camera[0].position.components.y = 2.0f;
-	camera[0].SetRotation( toQuaternion2(0, 15, 0) ); //y,x,z
+	camera[0].SetRotation(quaternion::fromEuler(15, 0, 0) );
 
 	camera[1] = camera[0];
 	camera[1].position.components.x += EYE_DISTANCE;
@@ -279,7 +281,7 @@ int main()
 		if (create_element("square", &scene, &element) > 0) {
 			element->scale = 100.0f;
 			element->position.components.z = -4;
-			element->rotation = toQuaternion2(0, -90, 0);
+			element->rotation = quaternion::fromEuler(-90, 0, 0);
 			element->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
 			element->renderData()->blendMode = BLEND_ADDITIVE;
 			//	model_data d = LoadModel("test.hgmdl");
@@ -394,8 +396,7 @@ int main()
 
 		{
 			HgElement* element = tris[0];
-			//		y,x,z
-			element->rotation = toQuaternion2((time.milliseconds() % 10000) / 27.777777777777777777777777777778, 0, 0);
+			element->rotation = quaternion::fromEuler(0,(time.milliseconds() % 10000) / 27.777777777777777777777777777778,0);
 
 			for (i = 0; i < ANI_TRIS; i++) {
 				HgElement* e = tris[i];
