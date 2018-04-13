@@ -16,10 +16,10 @@ public:
 	float speedMsec;
 	vector3 m_moveDirection;
 
-	void setPosition(point p) { m_position = p; }
+	void setPosition(const point& p) { m_position = p; }
 	inline point position() const { return m_position; }
 
-	void setRotation(quaternion q) { m_rotation = q; computeDirection(); }
+	void setRotation(const quaternion& q) { m_rotation = q; computeDirection(); }
 	inline quaternion rotation() const { return m_rotation; }
 
 	inline vector3 direction() const { return m_direction; }
@@ -27,7 +27,7 @@ public:
 private:
 	void computeDirection() {
 		vector3 ray = { 0, 0, -1 }; //correct.
-		m_direction = vector3_normalize(vector3_quat_rotate(ray, m_rotation));
+		m_direction = vector3_quat_rotate(ray, m_rotation).normalize();
 	}
 
 };

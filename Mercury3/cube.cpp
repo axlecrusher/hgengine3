@@ -19,6 +19,8 @@
 
 //static vtable_index VTABLE_INDEX;
 
+vertex3d test__ = { 1.0,0.0,0.0 };
+
 //dump from a hgmdl model, VNU format.
 vbo_layout_vnut raw_cube_data[] = {
 	0.5, -0.5, 0.5, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 32767, 32767,

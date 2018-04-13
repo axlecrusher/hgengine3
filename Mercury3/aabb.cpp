@@ -8,8 +8,11 @@
 //#define max(a,b) (a > b ? a : b)
 //#define min(a,b) (a < b ? a : b)
 
-inline float max(float a, float b) { return (a > b) ? a : b; }
-inline float min(float a, float b) { return (a < b) ? a : b; }
+template<typename T>
+inline T max(T a, T b) { return (a > b) ? a : b; }
+
+template<typename T>
+inline T min(T a, T b) { return (a < b) ? a : b; }
 
 AABB* BoundingBoxes::allocate(uint32_t count) {
 	AABB* r = (AABB*)malloc(sizeof(*r) * count);
@@ -36,15 +39,12 @@ void BoundingBoxes::setBoxes(const AABB* bc, uint32_t count) {
 	}
 }
 
-static bool cast_ray(const vector3* dirfrac, const vector3* pos, AABB bb) {
-	vector3 a = vector3_sub(&bb.lb, pos);
-	a = vector3_mul(&a, dirfrac);
+static bool cast_ray(const vector3& dirfrac, const vector3& pos, AABB bb) {
+	vector3 a = (bb.lb - pos) * dirfrac;
+	vector3 b = (bb.rt - pos) * dirfrac;
 
-	vector3 b = vector3_sub(&bb.rt, pos);
-	b = vector3_mul(&b, dirfrac);
-
-	float dmin = max(max(min(a.components.x, b.components.x), min(a.components.y, b.components.y)), min(a.components.z, b.components.z));
-	float dmax = min(min(max(a.components.x, b.components.x), max(a.components.y, b.components.y)), max(a.components.z, b.components.z));
+	float dmin = max(max(min(a.x(), b.x()), min(a.y(), b.y())), min(a.z(), b.z()));
+	float dmax = min(min(max(a.x(), b.x()), max(a.y(), b.y())), max(a.z(), b.z()));
 
 	//intersection, but behind ray position
 	if (dmax < 0) return false;
@@ -53,11 +53,11 @@ static bool cast_ray(const vector3* dirfrac, const vector3* pos, AABB bb) {
 	if (dmin > dmax) return false;
 }
 
-void BoundingBoxes::cast_ray(const vector3* ray, const vector3* pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) const {
+void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) const {
 	//see https://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms
 
 	vector3 one = { 1.0,1.0,1.0 };
-	vector3 dirfrac = vector3_div(&one, ray);
+	vector3 dirfrac = one / ray;
 	aabb_result r;
 	AABB* cubes = bounding_boxes;
 
@@ -67,14 +67,11 @@ void BoundingBoxes::cast_ray(const vector3* ray, const vector3* pos, void(*inter
 //	if (!::cast_ray(&dirfrac, pos, boundingVolume)) return; //broken.....
 
 	for (uint32_t i = 0; i < cube_count; i++) {
-		a = vector3_sub(&cubes[i].lb, pos);
-		a = vector3_mul(&a, &dirfrac);
+		a = (cubes[i].lb - pos) * dirfrac;
+		b = (cubes[i].rt - pos) * dirfrac;
 
-		b = vector3_sub(&cubes[i].rt, pos);
-		b = vector3_mul(&b, &dirfrac);
-
-		dmin = max(max(min(a.components.x, b.components.x), min(a.components.y, b.components.y)), min(a.components.z, b.components.z));
-		dmax = min(min(max(a.components.x, b.components.x), max(a.components.y, b.components.y)), max(a.components.z, b.components.z));
+		dmin = max(max(min(a.x(), b.x()), min(a.y(), b.y())), min(a.z(), b.z()));
+		dmax = min(min(max(a.x(), b.x()), max(a.y(), b.y())), max(a.z(), b.z()));
 
 		//intersection, but behind ray position
 		if (dmax < 0) continue;

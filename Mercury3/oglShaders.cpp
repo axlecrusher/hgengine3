@@ -217,7 +217,7 @@ void HgOglShader::setGlobalUniforms(const HgCamera& c) {
 
 	if (uniform_locations[U_PROJECTION] > -1) glUniformMatrix4fv(uniform_locations[U_PROJECTION], 1, GL_TRUE, _projection);
 	if (uniform_locations[U_CAMERA_ROT] > -1) glUniform4f(uniform_locations[U_CAMERA_ROT], c.rotation.x(), c.rotation.y(), c.rotation.z(), c.rotation.w());
-	if (uniform_locations[U_CAMERA_POS] > -1) glUniform3f(uniform_locations[U_CAMERA_POS], c.position.components.x, c.position.components.y, c.position.components.z);
+	if (uniform_locations[U_CAMERA_POS] > -1) glUniform3f(uniform_locations[U_CAMERA_POS], c.position.x(), c.position.y(), c.position.z());
 
 	if (old_program != program_id) {
 		useShaderProgram(old_program); //change back to previous program
@@ -234,8 +234,8 @@ void HgOglShader::setLocalUniforms(const quaternion* rotation, const point* posi
 	}
 
 	if (uniform_locations[U_ROTATION] > -1) glUniform4f(uniform_locations[U_ROTATION], rotation->x(), rotation->y(), rotation->z(), rotation->w());
-	if (uniform_locations[U_POSITION] > -1) glUniform4f(uniform_locations[U_POSITION], position->components.x, position->components.y, position->components.z, scale);
-	if (uniform_locations[U_ORIGIN] > -1) glUniform3f(uniform_locations[U_ORIGIN], origin->components.x, origin->components.y, origin->components.z);
+	if (uniform_locations[U_POSITION] > -1) glUniform4f(uniform_locations[U_POSITION], position->x(), position->y(), position->z(), scale);
+	if (uniform_locations[U_ORIGIN] > -1) glUniform3f(uniform_locations[U_ORIGIN], origin->x(), origin->y(), origin->z());
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);

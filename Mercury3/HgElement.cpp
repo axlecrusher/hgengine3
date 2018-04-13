@@ -48,11 +48,11 @@ void HgElement::init()
 {
 	flags = 0;
 	m_renderData = NULL;
-	position = vector3_zero;
+	position = vector3();
 	m_logic = nullptr;
 	m_renderData = nullptr;
 	scale = 1;
-	origin = vector3_zero;
+	origin = vector3();
 
 	rotation = quaternion_default;
 	m_extendedData = std::make_unique<HgElementExtended>();

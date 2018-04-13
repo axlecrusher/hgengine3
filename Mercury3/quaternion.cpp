@@ -2,6 +2,7 @@
 #include <HgMath.h>
 
 #include <memory>
+#include <cmath>
 
 const quaternion quaternion_default = { 1.0f,0,0,0 };
 
@@ -91,28 +92,27 @@ quaternion quaternion::fromEuler(double x, double y, double z) {
 //	r.z ( q.z() / l );
 //	return r;
 //}
-
-quaternion quat_mult(const quaternion* q, const quaternion* r) {
-	quaternion t;
-	t.w ( (r->w()*q->w()) - (r->x()*q->x()) - (r->y()*q->y()) - (r->z()*q->z()) );
-	t.x ( (r->w()*q->x()) + (r->x()*q->w()) - (r->y()*q->z()) + (r->z()*q->y()) );
-	t.y ( (r->w()*q->y()) + (r->x()*q->z()) + (r->y()*q->w()) - (r->z()*q->x()) );
-	t.z ( (r->w()*q->z()) - (r->x()*q->y()) + (r->y()*q->x()) + (r->z()*q->w()) );
-//	quaternion_normal(&t);
-	return std::move(t);
-}
+//
+//quaternion quat_mult(const quaternion* q, const quaternion* r) {
+//	quaternion t;
+//	t.w ( (r->w()*q->w()) - (r->x()*q->x()) - (r->y()*q->y()) - (r->z()*q->z()) );
+//	t.x ( (r->w()*q->x()) + (r->x()*q->w()) - (r->y()*q->z()) + (r->z()*q->y()) );
+//	t.y ( (r->w()*q->y()) + (r->x()*q->z()) + (r->y()*q->w()) - (r->z()*q->x()) );
+//	t.z ( (r->w()*q->z()) - (r->x()*q->y()) + (r->y()*q->x()) + (r->z()*q->w()) );
+//	return t; //rvo
+//}
 
 quaternion vector3_to_quat(vector3 a) {
-	return quaternion(1.0, a.components.x, a.components.y, a.components.z);
+	return quaternion(1.0, a.x(), a.y(), a.z());
 }
 
 
 vector3 vector3_quat_rotate(vector3 v, const quaternion& q) {
-	vector3 r1 = vector3_scale(v, q.w());
-	vector3 r2 = vector3_cross((vector3*)&q.wxyz.wxyz[1], &v); //XXX fix this
-	r1 = vector3_add(&r1, &r2);
-	r2 = vector3_cross((vector3*)&q.wxyz.wxyz[1], &r1); //XXX fix this
-	r1 = vector3_scale(r2, 2.0);
-	r2 = vector3_add(&v, &r1);
+	vector3 r1 = v.scale( q.w() );
+	vector3 r2 = vector3(q.wxyz.wxyz + 1).cross(v); //XXX fix this
+	r1 = r1 + r2;
+	r2 = vector3(q.wxyz.wxyz + 1).cross(r1); //XXX fix this
+	r1 = r2.scale(2.0);
+	r2 = v + r1;
 	return r2;
 }

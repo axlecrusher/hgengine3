@@ -13,7 +13,6 @@ float projectileMsecSpeed = 1.0f / 50.0f;
 Projectile::Projectile()
 	:total_time(0)
 {
-	direction = vector3_zero;
 }
 
 void Projectile::update(uint32_t tdelta) {
@@ -25,8 +24,8 @@ void Projectile::update(uint32_t tdelta) {
 		}
 
 		float tmp = tdelta * projectileMsecSpeed;
-		vector3 r = vector3_scale(direction, tmp);
-		element->position = vector3_add(&element->position, &r);
+		vector3 r = direction.scale(tmp);
+		element->position = element->position + r;
 }
 
 static void change_to_projectile(HgElement* element) {

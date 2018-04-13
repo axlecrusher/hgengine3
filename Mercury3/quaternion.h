@@ -1,12 +1,12 @@
 #pragma once
 
-#include <math.h>
+#include <cmath>
 #include <HgTypes.h>
 
 #include <xmmintrin.h>
 
 template<typename T>
-T square(T x) { return x*x; }
+inline T square(T x) { return x*x; }
 
 class quaternion {
 public:
@@ -34,6 +34,10 @@ public:
 		return (float)sqrt(square(x()) + square(y()) + square(z()) + square(w()));
 	}
 
+	inline quaternion operator*(const quaternion& rhs) {
+		return quat_mult(this, &rhs).normalize();
+	}
+
 	inline quaternion normalize() const {
 		quaternion r;
 		float l = length();
@@ -48,16 +52,23 @@ public:
 		float wxyz[4];
 //		__m128 sse_data; //using this and an enhanced instruction set (SSE2) seem to make the compiler do the correct things SOMETIMES rather than never
 	} wxyz;
+
+private:
+	inline quaternion quat_mult(const quaternion* q, const quaternion* r) {
+		quaternion t;
+		t.w((r->w()*q->w()) - (r->x()*q->x()) - (r->y()*q->y()) - (r->z()*q->z()));
+		t.x((r->w()*q->x()) + (r->x()*q->w()) - (r->y()*q->z()) + (r->z()*q->y()));
+		t.y((r->w()*q->y()) + (r->x()*q->z()) + (r->y()*q->w()) - (r->z()*q->x()));
+		t.z((r->w()*q->z()) - (r->x()*q->y()) + (r->y()*q->x()) + (r->z()*q->w()));
+		return t; //rvo
+	}
 };
 
 extern const quaternion quaternion_default;
-inline void quaternion_init(quaternion* q) { *q = quaternion_default;  }
+//inline void quaternion_init(quaternion* q) { *q = quaternion_default;  }
 
 void toQuaternion(double x, double y, double z, double deg, quaternion* q);
 //quaternion toQuaternion2(double pitch, double roll, double yaw);
-
-quaternion quat_mult(const quaternion* q1, const quaternion* q2);
-inline quaternion quat_mult(const quaternion& q, const quaternion& r) { return quat_mult(&q, &r); }
 
 quaternion vector3_to_quat(vector3 a);
 vector3 vector3_quat_rotate(vector3 v, const quaternion& q);

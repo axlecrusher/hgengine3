@@ -215,12 +215,12 @@ int main()
 	//	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
 	//	Perspective2(60, 320.0 / 480.0, 0.1f, 100.0f, projection);
 
-	camera[0].position.components.z = 1.5f;
-	camera[0].position.components.y = 2.0f;
+	camera[0].position.z(1.5f);
+	camera[0].position.y(2.0f);
 	camera[0].SetRotation(quaternion::fromEuler(15, 0, 0) );
 
 	camera[1] = camera[0];
-	camera[1].position.components.x += EYE_DISTANCE;
+	camera[1].position.x(camera[1].position.x() + EYE_DISTANCE);
 
 	//	MatrixMultiply4f(projection, camera, view);
 
@@ -234,20 +234,20 @@ int main()
 	GravityField gravity = { 0 };
 	allocate_space(&gravity, ANI_TRIS);
 	gravity.scene = &scene;
-	gravity.vector.components.y = -1;
+	gravity.vector.y(-1);
 	uint32_t i;
 	{
 		HgElement* element = NULL;
 
 		if (create_element("triangle", &scene, &element) > 0) {
-			element->position.components.x = 1.5f;
-			element->position.components.z = -1.0f;
+			element->position.x(1.5f);
+			element->position.z(1.0f);
 			//	toQuaternion2(0, 0, 90, &element->rotation);
 		}
 
 		if (create_element("triangle", &scene, &element) > 0) {
-			element->position.components.x = -0.0f;
-			element->position.components.z = -2.0f;
+			element->position.x(-0.0f);
+			element->position.z(-2.0f);
 			//	toQuaternion2(45,0,0,&element->rotation);
 		}
 
@@ -259,9 +259,9 @@ int main()
 				//		shape_create_triangle(element);
 				float x = (i % 20)*1.1f;
 				float z = (i / 20)*1.1f;
-				element->position.components.y = 5.0f;
-				element->position.components.x = -10.0f + x;
-				element->position.components.z = -2.0f - z;
+				element->position.y(5.0f);
+				element->position.x(-10.0f + x);
+				element->position.z(-2.0f - z);
 				element->scale = 0.3f;
 				//			element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
 				element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
@@ -270,17 +270,18 @@ int main()
 
 		scene.getNewElement(&element);
 		model_data::load_ini(element, "teapot.ini");
+//		element->position.
 
 		if (create_element("voxelGrid", &scene, &element) > 0) {
 			//		element->scale = 100.0f;
-			element->position.components.z = -10;
+			element->position.z(-10);
 			//		toQuaternion2(0, -90, 0, &element->rotation);
 			element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 		}
 
 		if (create_element("square", &scene, &element) > 0) {
 			element->scale = 100.0f;
-			element->position.components.z = -4;
+			element->position.z(-4);
 			element->rotation = quaternion::fromEuler(-90, 0, 0);
 			element->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
 			element->renderData()->blendMode = BLEND_ADDITIVE;
@@ -344,12 +345,12 @@ int main()
 #endif
 
 		if (dtime > 0) {
-			vector3 v = vector3_zero;
+			vector3 v;
 
-			if (KeyDownMap['w']) v.components.z -= 1.0f;
-			if (KeyDownMap['s']) v.components.z += 1.0f;
-			if (KeyDownMap['a']) v.components.x -= 1.0f;
-			if (KeyDownMap['d']) v.components.x += 1.0f;
+			if (KeyDownMap['w']) v.z(v.z() - 1.0f);
+			if (KeyDownMap['s']) v.z(v.z() + 1.0f);
+			if (KeyDownMap['a']) v.x(v.x() - 1.0f);
+			if (KeyDownMap['d']) v.x(v.x() + 1.0f);
 			if (KeyDownMap['r']) {
 				mouse_x = 0; mouse_y = -42;
 			}
@@ -361,9 +362,9 @@ int main()
 
 			//			if (v.components.z > 0) DebugBreak();
 
-			v = vector3_quat_rotate(vector3_normalize(v), camera->rotation.invert());
+			v = vector3_quat_rotate(v.normalize(), camera->rotation.invert());
 			float scale = (1.0 / 1000.0) * dtime;
-			v = vector3_scale(vector3_normalize(v), scale);
+			v = v.normalize().scale(scale);
 			camera->Move(v);
 
 			mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
@@ -405,7 +406,7 @@ int main()
 		}
 
 		camera[1] = camera[0];
-		camera[1].position.components.x += EYE_DISTANCE;
+		camera[1].position.x(camera[1].position.x()+EYE_DISTANCE);
 
 		uint32_t updateNumber = scene.nextUpdateNumber();
 

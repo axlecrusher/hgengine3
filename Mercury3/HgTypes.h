@@ -1,13 +1,17 @@
 #pragma once
 
 #include <vertex.h>
+#include <vertex3d.h>
+
+typedef vertex3d point;
+typedef vertex3d vector3;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-	typedef vertex point;
-	typedef vertex vector3;
+//	typedef vertex point;
+//	typedef vertex vector3;
 
 	typedef struct viewport {
 		uint16_t x, y, width, height;

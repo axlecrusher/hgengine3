@@ -2,23 +2,13 @@
 
 #include <HgTypes.h>
 
-class vertex3D : public vertex {
-public:
-	vertex3D() {}
-	vertex3D(vertex v) { components = v.components; }
-	bool operator<(const vertex& rhs) const {
-		return ((components.x < rhs.components.x)
-			&& (components.y < rhs.components.y)
-			&& (components.z < rhs.components.z));
-	}
-};
 
 typedef struct AABB {
 	//left bottom
-	vertex3D lb;
+	vertex3d lb;
 
 	//right top
-	vertex3D rt;
+	vertex3d rt;
 } AABB;
 
 typedef struct aabb_result {
@@ -31,7 +21,7 @@ public:
 	BoundingBoxes();
 
 	void setBoxes(const AABB* bc, uint32_t count);
-	void cast_ray(const vector3* ray, const vector3* pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) const;
+	void cast_ray(const vector3& ray, const vector3& pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) const;
 
 	static AABB* allocate(uint32_t count);
 

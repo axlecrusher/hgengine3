@@ -4,7 +4,7 @@
 #define RAD_360 6.28318530717958647692528676655900576839433879875021
 #define M_PI 3.14159265358979323846264338327950288419716939937511
 
-#include <HgTypes.h>
+//#include <HgTypes.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -25,22 +25,22 @@ void Perspective2(
 	const double aspect,
 	const double znear,
 	const double zfar, float* M);
-
-vector3 vector3_scale(vector3 lhs, float scale);
-vector3 vector3_add(const vector3* lhs, const vector3* rhs);
-vector3 vector3_sub(const vector3* lhs, const vector3* rhs);
-vector3 vector3_mul(const vector3* lhs, const vector3* rhs);
-vector3 vector3_div(const vector3* lhs, const vector3* rhs);
-float vector3_dot(const vector3* lhs, const vector3* rhs);
-
-float vector3_length(vector3 v);
-vector3 vector3_normalize(vector3 v);
-
-extern const vertex vertex_zero;
-extern const vector3 vector3_zero;
-//inline vector3 vector3_zero() { vector3 a = { 0,0,0 }; return a; }
-
-vector3 vector3_cross(const vector3* v1, const vector3* v3);
+//
+//vector3 vector3_scale(vector3 lhs, float scale);
+//vector3 vector3_add(const vector3* lhs, const vector3* rhs);
+//vector3 vector3_sub(const vector3* lhs, const vector3* rhs);
+//vector3 vector3_mul(const vector3* lhs, const vector3* rhs);
+//vector3 vector3_div(const vector3* lhs, const vector3* rhs);
+//float vector3_dot(const vector3* lhs, const vector3* rhs);
+//
+//float vector3_length(vector3 v);
+//vector3 vector3_normalize(vector3 v);
+//
+//extern const vertex vertex_zero;
+//extern const vector3 vector3_zero;
+////inline vector3 vector3_zero() { vector3 a = { 0,0,0 }; return a; }
+//
+//vector3 vector3_cross(const vector3* v1, const vector3* v3);
 
 #ifdef __cplusplus
 }

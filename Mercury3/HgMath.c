@@ -6,9 +6,9 @@
 #include <memory.h>
 #include <stdlib.h>
 
-const vertex vertex_zero = { 0,0,0 };
-const vector3 vector3_zero = { 0,0,0 };
-
+//const vertex vertex_zero = { 0,0,0 };
+//const vector3 vector3_zero = { 0,0,0 };
+//
 void MatrixMultiply4f(const float* in1, const float* in2, float* outa)
 {
 	float* r = outa;
@@ -96,94 +96,94 @@ void Perspective2(
 	M[11] = (float)((2 * zfar*znear) / (znear - zfar));
 	M[14] = -1.0f;
 }
-
-vector3 vector3_scale(vector3 v, float scale) {
-	v.array[0] *= scale;
-	v.array[1] *= scale;
-	v.array[2] *= scale;
-	return v;
-}
-
-vector3 vector3_mul(const vector3* v, const vector3* v2) {
-	vector3 r = *v;
-	r.array[0] *= v2->array[0];
-	r.array[1] *= v2->array[1];
-	r.array[2] *= v2->array[2];
-	return r;
-}
-
-vector3 vector3_div(const vector3* lhs, const vector3* rhs) {
-	vector3 r = *lhs;
-	r.array[0] /= rhs->array[0];
-	r.array[1] /= rhs->array[1];
-	r.array[2] /= rhs->array[2];
-	return r;
-}
-
-vector3 vector3_add(const vector3* lhs, const vector3* rhs) {
-	vector3 r = *lhs;
-	r.array[0] += rhs->array[0];
-	r.array[1] += rhs->array[1];
-	r.array[2] += rhs->array[2];
-	return r;
-}
-
-vector3 vector3_sub(const vector3* lhs, const vector3* rhs) {
-	/*
-	float result[4];
-
-	__m128 rx = _mm_loadu_ps(v->array);
-	__m128 xx = _mm_loadu_ps(v2->array);
-	rx = _mm_sub_ps(rx, xx);
-	_mm_store_ps(result, rx);
-
-	return *(vector3*)result;
-	*/
-	vector3 r = *lhs;
-	r.array[0] -= rhs->array[0];
-	r.array[1] -= rhs->array[1];
-	r.array[2] -= rhs->array[2];
-	return r;
-}
-
-float vector3_dot(const vector3* a, const vector3* b) {
-	float r = a->array[0] * b->array[0] +
-		a->array[1] * b->array[1] +
-		a->array[2] * b->array[2];
-	return r;
-}
-
-#define SQUARE(x) (x*x)
-
-float vector3_length(vector3 v) {
-	float x = SQUARE(v.array[0])
-			+ SQUARE(v.array[1])
-			+ SQUARE(v.array[2]);
-
-	return (float)sqrt(x);
-}
-
-vector3 vector3_normalize(vector3 v) {
-	float length = vector3_length(v);
-//	if (fabs(length) < 0.000000000001f) return *v;
-	if (length == 0.0) return v;
-
-	v.array[0] /= length;
-	v.array[1] /= length;
-	v.array[2] /= length;
-
-	return v;
-}
-
-vector3 vector3_cross(const vector3* v1, const vector3* v2) {
-	const float* x = v1->array;
-	const float* y = v2->array;
-	vector3 r;
-	r.array[0] = (x[1] * y[2]) - (x[2] * y[1]);
-	r.array[1] = (x[2] * y[0]) - (x[0] * y[2]);
-	r.array[2] = (x[0] * y[1]) - (x[1] * y[0]);
-	return r;
-}
+//
+//vector3 vector3_scale(vector3 v, float scale) {
+//	v.array[0] *= scale;
+//	v.array[1] *= scale;
+//	v.array[2] *= scale;
+//	return v;
+//}
+//
+//vector3 vector3_mul(const vector3* v, const vector3* v2) {
+//	vector3 r = *v;
+//	r.array[0] *= v2->array[0];
+//	r.array[1] *= v2->array[1];
+//	r.array[2] *= v2->array[2];
+//	return r;
+//}
+//
+//vector3 vector3_div(const vector3* lhs, const vector3* rhs) {
+//	vector3 r = *lhs;
+//	r.array[0] /= rhs->array[0];
+//	r.array[1] /= rhs->array[1];
+//	r.array[2] /= rhs->array[2];
+//	return r;
+//}
+//
+//vector3 vector3_add(const vector3* lhs, const vector3* rhs) {
+//	vector3 r = *lhs;
+//	r.array[0] += rhs->array[0];
+//	r.array[1] += rhs->array[1];
+//	r.array[2] += rhs->array[2];
+//	return r;
+//}
+//
+//vector3 vector3_sub(const vector3* lhs, const vector3* rhs) {
+//	/*
+//	float result[4];
+//
+//	__m128 rx = _mm_loadu_ps(v->array);
+//	__m128 xx = _mm_loadu_ps(v2->array);
+//	rx = _mm_sub_ps(rx, xx);
+//	_mm_store_ps(result, rx);
+//
+//	return *(vector3*)result;
+//	*/
+//	vector3 r = *lhs;
+//	r.array[0] -= rhs->array[0];
+//	r.array[1] -= rhs->array[1];
+//	r.array[2] -= rhs->array[2];
+//	return r;
+//}
+//
+//float vector3_dot(const vector3* a, const vector3* b) {
+//	float r = a->array[0] * b->array[0] +
+//		a->array[1] * b->array[1] +
+//		a->array[2] * b->array[2];
+//	return r;
+//}
+//
+//#define SQUARE(x) (x*x)
+//
+//float vector3_length(vector3 v) {
+//	float x = SQUARE(v.array[0])
+//			+ SQUARE(v.array[1])
+//			+ SQUARE(v.array[2]);
+//
+//	return (float)sqrt(x);
+//}
+//
+//vector3 vector3_normalize(vector3 v) {
+//	float length = vector3_length(v);
+////	if (fabs(length) < 0.000000000001f) return *v;
+//	if (length == 0.0) return v;
+//
+//	v.array[0] /= length;
+//	v.array[1] /= length;
+//	v.array[2] /= length;
+//
+//	return v;
+//}
+//
+//vector3 vector3_cross(const vector3* v1, const vector3* v2) {
+//	const float* x = v1->array;
+//	const float* y = v2->array;
+//	vector3 r;
+//	r.array[0] = (x[1] * y[2]) - (x[2] * y[1]);
+//	r.array[1] = (x[2] * y[0]) - (x[0] * y[2]);
+//	r.array[2] = (x[0] * y[1]) - (x[1] * y[0]);
+//	return r;
+//}
 
 /*
 // set the OpenGL perspective projection matrix
