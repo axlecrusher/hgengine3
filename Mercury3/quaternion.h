@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cmath>
-#include <HgTypes.h>
+//#include <HgTypes.h>
 
 #include <xmmintrin.h>
 
@@ -70,5 +70,7 @@ extern const quaternion quaternion_default;
 void toQuaternion(double x, double y, double z, double deg, quaternion* q);
 //quaternion toQuaternion2(double pitch, double roll, double yaw);
 
-quaternion vector3_to_quat(vector3 a);
-vector3 vector3_quat_rotate(vector3 v, const quaternion& q);
+class vertex3d;
+quaternion vector3_to_quat(const vertex3d& a);
+
+//vector3 vector3_quat_rotate(const vector3& v, const quaternion& q);

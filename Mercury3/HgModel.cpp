@@ -189,7 +189,7 @@ bool model_data::load_ini(HgElement* element, std::string filename) {
 	if (model_data::load(element, modelFilename.c_str()) < 0) return false;
 
 	element->scale = scale;
-	element->origin.scale(1.0f/scale);
+	element->origin = origin.scale(1.0f/scale);
 	element->position = position;
 	element->rotation = orientation;
 

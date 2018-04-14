@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <cmath>
+#include <HgTypes.h>
 
 const quaternion quaternion_default = { 1.0f,0,0,0 };
 
@@ -102,17 +103,17 @@ quaternion quaternion::fromEuler(double x, double y, double z) {
 //	return t; //rvo
 //}
 
-quaternion vector3_to_quat(vector3 a) {
+quaternion vector3_to_quat(const vertex3d& a) {
 	return quaternion(1.0, a.x(), a.y(), a.z());
 }
 
 
-vector3 vector3_quat_rotate(vector3 v, const quaternion& q) {
-	vector3 r1 = v.scale( q.w() );
-	vector3 r2 = vector3(q.wxyz.wxyz + 1).cross(v); //XXX fix this
-	r1 = r1 + r2;
-	r2 = vector3(q.wxyz.wxyz + 1).cross(r1); //XXX fix this
-	r1 = r2.scale(2.0);
-	r2 = v + r1;
-	return r2;
-}
+//vector3 vector3_quat_rotate(const vector3& v, const quaternion& q) {
+//	vector3 r1 = v.scale( q.w() );
+//	vector3 r2 = vector3(q.wxyz.wxyz + 1).cross(v); //XXX fix this
+//	r1 = r1 + r2;
+//	r2 = vector3(q.wxyz.wxyz + 1).cross(r1); //XXX fix this
+//	r1 = r2.scale(2.0);
+//	r2 = v + r1;
+//	return r2;
+//}

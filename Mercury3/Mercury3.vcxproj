@@ -262,6 +262,7 @@
     <ClInclude Include="symbol_enumerator.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="vertex.h" />
+    <ClInclude Include="vertex3d.h" />
     <ClInclude Include="VoxelGrid.h" />
     <ClInclude Include="Win32Window.h" />
   </ItemGroup>

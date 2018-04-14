@@ -362,7 +362,7 @@ int main()
 
 			//			if (v.components.z > 0) DebugBreak();
 
-			v = vector3_quat_rotate(v.normalize(), camera->rotation.invert());
+			v = v.normalize().rotate(camera->rotation.invert());
 			float scale = (1.0 / 1000.0) * dtime;
 			v = v.normalize().scale(scale);
 			camera->Move(v);
