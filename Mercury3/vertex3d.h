@@ -109,12 +109,9 @@ public:
 
 	inline vertex3d rotate(const quaternion& q) const {
 		vertex3d r1 = this->scale(q.w());
-		vertex3d r2 = vertex3d(q.wxyz.wxyz + 1).cross(*this); //XXX fix this
-		r1 = r1 + r2;
-		r2 = vertex3d(q.wxyz.wxyz + 1).cross(r1); //XXX fix this
-		r1 = r2.scale(2.0);
-		r2 = *this + r1;
-		return r2;
+		vertex3d r2 = vertex3d(q.wxyz.wxyz + 1).cross(*this); 
+		vertex3d tmp = vertex3d(q.wxyz.wxyz + 1).cross(r1 + r2).scale(2.0); //XXX fix this
+		return *this + tmp;
 	}
 
 	inline bool operator<(const vertex3d& rhs) const {
