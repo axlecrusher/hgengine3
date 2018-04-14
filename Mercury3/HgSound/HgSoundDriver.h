@@ -31,3 +31,5 @@ namespace HgSound {
 		bool m_initialized;
 	};
 }
+
+extern std::unique_ptr<HgSound::Driver> SOUND;

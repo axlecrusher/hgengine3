@@ -7,6 +7,8 @@
 
 #include <HgSound\HgSoundDriver_libsoundio.h>
 
+std::unique_ptr<HgSound::Driver> SOUND;
+
 namespace HgSound {
 
 	std::unique_ptr<HgSound::Driver> Driver::Create() { return std::make_unique<HgSound::LibSoundIoDriver>(); }
