@@ -27,7 +27,7 @@ public:
 private:
 	void computeDirection() {
 		vector3 ray = { 0, 0, -1 }; //correct.
-		m_direction = ray.rotate(m_rotation).normalize();
+		m_direction = ray.rotate(m_rotation).normal();
 	}
 
 };

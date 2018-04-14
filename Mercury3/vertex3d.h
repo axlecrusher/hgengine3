@@ -86,7 +86,7 @@ public:
 		return (float)sqrt(x);
 	}
 
-	inline vertex3d normalize() {
+	inline vertex3d normal() {
 		vertex3d tmp(*this);
 
 		float length = this->length();

@@ -362,9 +362,9 @@ int main()
 
 			//			if (v.components.z > 0) DebugBreak();
 
-			v = v.normalize().rotate(camera->rotation.invert());
+			v = v.normal().rotate(camera->rotation.invert());
 			float scale = (1.0 / 1000.0) * dtime;
-			v = v.normalize().scale(scale);
+			v = v.normal().scale(scale);
 			camera->Move(v);
 
 			mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;

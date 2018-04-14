@@ -32,10 +32,10 @@ public:
 	}
 
 	inline quaternion operator*(const quaternion& rhs) {
-		return quat_mult(this, &rhs).normalize();
+		return quat_mult(this, &rhs).normal();
 	}
 
-	inline quaternion normalize() const {
+	inline quaternion normal() const {
 		quaternion r;
 		float l = length();
 		r.w(w() / l);

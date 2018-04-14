@@ -79,7 +79,7 @@ quaternion quaternion::fromEuler(double x, double y, double z) {
 	tmp.y((float)(s1 * c2 * c3 + c1 * s2 * s3));
 	tmp.z((float)(c1 * s2 * c3 - s1 * c2 * s3));
 
-	return tmp.normalize();
+	return tmp.normal();
 }
 
 //#define SQUARE(x) (x*x)
