@@ -41,7 +41,8 @@ static void render(RenderData* rd) {
 	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
 	OGLRenderData *d = (OGLRenderData*)rd;
 
-	setBlendMode(rd->blendMode);
+	setRenderAttributes(rd->blendMode, rd->renderFlags);
+
 	d->hgVbo->use();
 	d->indexVbo->use();
 	d->indexVbo->draw(d->index_count, d->vbo_offset, d->index_offset);
@@ -67,7 +68,7 @@ static void SetupRenderData() {
 	crd->indexVbo = new_vbo<uint16_t>();
 	crd->indexVbo->add_data(indices, data.index_count);
 
-	crd->renderFunction = render;
+//	crd->renderFunction = render;
 }
 
 void change_to_voxelGrid(HgElement* element) {

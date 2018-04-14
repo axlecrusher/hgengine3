@@ -120,7 +120,7 @@ static void render(RenderData* rd) {
 
 	d->indexVbo->use();
 
-	setBlendMode((BlendMode)rd->blendMode);
+	setRenderAttributes(rd->blendMode, rd->renderFlags);
 
 	d->indexVbo->draw(d->index_count, d->vbo_offset, d->index_offset);
 	//	draw_index_vbo(d->indexVbo, d->vbo_offset);

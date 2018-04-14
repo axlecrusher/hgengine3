@@ -30,6 +30,12 @@ enum BlendMode : uint8_t {
 	BLEND_INVALID = 0xFF
 };
 
+enum RenderFlags : uint8_t {
+	NONE = 0,
+	FACE_CULLING = 1,
+	DEPTH_WRITE = 2
+};
+
 class RenderData {
 	public:
 		typedef RenderData*(*newRenderDataCallback)();
@@ -39,7 +45,9 @@ class RenderData {
 		RenderData();
 		virtual ~RenderData();
 
-		inline void render() { renderFunction(this); }
+		inline void render() { 
+			renderFunction(this);
+		}
 		void destroy();
 		void init();
 		virtual void clearTextureIDs() = 0;
@@ -62,6 +70,7 @@ class RenderData {
 		uint16_t vertex_count;
 
 		BlendMode blendMode;
+		RenderFlags renderFlags;
 };
 
 

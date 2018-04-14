@@ -58,29 +58,47 @@ void setup_viewports(uint16_t width, uint16_t height) {
 	view_port[i].height = height;
 }
 
-void setBlendMode(BlendMode blendMode) {
+void setRenderAttributes(BlendMode blendMode, RenderFlags flags) {
 	if (_currentBlendMode == blendMode) return;
 	_currentBlendMode = blendMode;
 
-	if (blendMode == BLEND_NORMAL) {
-//		glDepthMask(GL_TRUE);
+	switch (blendMode) {
+	case BLEND_NORMAL:
+		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 //		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
-	else if (blendMode == BLEND_ADDITIVE) {
+		break;
+	case BLEND_ADDITIVE:
 //		glDepthMask(GL_FALSE);
 		glEnable (GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	}
-	else if (blendMode == BLEND_ALPHA) {
+		break;
+	case BLEND_ALPHA:
+//		glDepthMask(GL_TRUE);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	}
+
+	if ((flags & FACE_CULLING)>0) {
+		glEnable(GL_CULL_FACE);
+	}
+	else {
+		glDisable(GL_CULL_FACE);
+	}
+
+	if ((flags & DEPTH_WRITE)>0) {
+		glDepthMask(GL_TRUE);
+	}
+	else {
+		glDepthMask(GL_FALSE);
 	}
 }
 
 static void default_render(RenderData* rd) {
-	setBlendMode(rd->blendMode);
+	setRenderAttributes(rd->blendMode, rd->renderFlags);
 	rd->hgVbo->use();
+	if (rd->colorVbo!=nullptr) rd->colorVbo->use();
 	rd->indexVbo->use();
 	rd->indexVbo->draw(rd->index_count, rd->vbo_offset, rd->index_offset);
 }

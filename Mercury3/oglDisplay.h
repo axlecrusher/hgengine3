@@ -54,7 +54,9 @@ void setup_viewports(uint16_t width, uint16_t height);
 void ogl_render_renderData(RenderData* rd);
 
 
-void setBlendMode(BlendMode blendMode);
+//void setBlendMode(BlendMode blendMode);
+void setRenderAttributes(BlendMode blendMode, RenderFlags flags);
+
 inline RenderData* new_renderData_ogl() { return new OGLRenderData(); }
 
 inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->renderData(); }

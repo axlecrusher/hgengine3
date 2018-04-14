@@ -77,7 +77,7 @@ static void destroy(HgElement* e) {
 static void cube_render(RenderData* rd) {
 	OGLRenderData *d = (OGLRenderData*)rd;
 
-	setBlendMode(rd->blendMode);
+	setRenderAttributes(rd->blendMode, rd->renderFlags);
 	d->hgVbo->use();
 	d->hgVbo->draw(d->vertex_count, d->vbo_offset, d->index_offset);
 	//glDrawArrays(GL_TRIANGLES, d->vbo_offset, d->vertex_count);

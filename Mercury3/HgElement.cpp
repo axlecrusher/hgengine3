@@ -22,7 +22,8 @@ RenderData::newRenderDataCallback RenderData::Create = nullptr;
 RenderData::RenderData()
 	:blendMode(BlendMode::BLEND_NORMAL), renderFunction(nullptr),
 	hgVbo(nullptr), indexVbo(nullptr), colorVbo(nullptr),
-	vbo_offset(0), vertex_count(0), index_count(0)
+	vbo_offset(0), vertex_count(0), index_count(0),
+	renderFlags(RenderFlags(FACE_CULLING | DEPTH_WRITE))
 {
 
 }
