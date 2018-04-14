@@ -1,12 +1,9 @@
 #pragma once
 
 #include <cmath>
-//#include <HgTypes.h>
+#include <HgMath.h>
 
 #include <xmmintrin.h>
-
-template<typename T>
-inline T square(T x) { return x*x; }
 
 class quaternion {
 public:
@@ -31,7 +28,7 @@ public:
 	inline void z(float a) { wxyz.wxyz[3] = a; }
 
 	inline float length() const {
-		return (float)sqrt(square(x()) + square(y()) + square(z()) + square(w()));
+		return (float)sqrt(HgMath::square(x()) + HgMath::square(y()) + HgMath::square(z()) + HgMath::square(w()));
 	}
 
 	inline quaternion operator*(const quaternion& rhs) {

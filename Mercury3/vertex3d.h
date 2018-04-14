@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <memory>
+#include <HgMath.h>
 #include <quaternion.h>
 
 class vertex3d {
@@ -78,9 +79,9 @@ public:
 	}
 
 	inline float length() {
-		float x = square(xyz[0])
-			+ square(xyz[1])
-			+ square(xyz[2]);
+		float x = HgMath::square(xyz[0])
+			+ HgMath::square(xyz[1])
+			+ HgMath::square(xyz[2]);
 
 		return (float)sqrt(x);
 	}
@@ -121,7 +122,4 @@ public:
 	}
 private:
 	float xyz[3];
-
-	template<typename T>
-	inline T square(T x) { return x*x; }
 };
