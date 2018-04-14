@@ -163,9 +163,12 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 }
 
 bool model_data::load_ini(HgElement* element, std::string filename) {
-	change_to_model(element);
-
 	IniLoader::Contents contents = IniLoader::parse(filename);
+	return load_ini(element, contents);
+}
+
+bool model_data::load_ini(HgElement* element, const IniLoader::Contents& contents) {
+	change_to_model(element);
 
 	float scale = 1;
 	vector3 origin;

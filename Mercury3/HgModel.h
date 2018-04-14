@@ -4,6 +4,7 @@
 #include <HgElement.h>
 
 #include <string>
+#include <IniLoader.h>
 
 class model_data {
 public:
@@ -18,7 +19,9 @@ public:
 
 
 	static int8_t load(HgElement* element, const char* filename);
+
 	static bool load_ini(HgElement* element, std::string filename);
+	static bool load_ini(HgElement* element, const IniLoader::Contents& ini);
 
 };
 

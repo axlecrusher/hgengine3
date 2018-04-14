@@ -25,7 +25,7 @@ namespace IniLoader {
 
 	class Contents {
 	public:
-		inline const std::string& getValue(const std::string& sec, const std::string& name) {
+		inline const std::string& getValue(const std::string& sec, const std::string& name) const {
 			return IniLoader::getValue(m_ini, sec, name);
 		}
 
