@@ -59,6 +59,6 @@ void setRenderAttributes(BlendMode blendMode, RenderFlags flags);
 
 inline RenderData* new_renderData_ogl() { return new OGLRenderData(); }
 
-inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->renderData(); }
+//inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->renderData(); }
 
 uint32_t ogl_updateTextureData(HgTexture* tex);

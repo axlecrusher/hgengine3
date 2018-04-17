@@ -89,8 +89,10 @@ protected:
 	VBO_TYPE m_type;
 };
 
-//Factyory Function
-template<typename T> IHgVbo* new_vbo();
+namespace HgVbo {
+	//Factory Function
+	template<typename T> IHgVbo* Create();
+}
 
 extern IHgVbo* staticVbo;
 extern IHgVbo* staticVboVNU;

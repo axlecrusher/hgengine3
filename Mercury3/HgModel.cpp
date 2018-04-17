@@ -152,7 +152,7 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 	free(mdl.vertices);
 
 //	mrd->index_count = mdl.index_count;
-	rd->indexVbo = new_vbo<uint16_t>();
+	rd->indexVbo = HgVbo::Create<uint16_t>();
 	rd->index_offset = rd->indexVbo->add_data(mdl.indices, mdl.index_count);
 
 	rd->renderFunction = render;

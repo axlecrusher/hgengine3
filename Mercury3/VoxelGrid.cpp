@@ -65,7 +65,7 @@ static void SetupRenderData() {
 //	crd->indices.data = indices;
 	crd->index_count = data.index_count;
 //	rd->indices.owns_ptr = 1;
-	crd->indexVbo = new_vbo<uint16_t>();
+	crd->indexVbo = HgVbo::Create<uint16_t>();
 	crd->indexVbo->add_data(indices, data.index_count);
 
 //	crd->renderFunction = render;

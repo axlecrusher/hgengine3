@@ -20,45 +20,46 @@ static IHgVbo* vbo_from_api_type() {
 	}
 }
 
-//namespace HgVboFactory {
+
+namespace HgVbo {
 	template<>
-	IHgVbo* new_vbo<vbo_layout_vc>() {
+	IHgVbo* Create<vbo_layout_vc>() {
 		return vbo_from_api_type<vbo_layout_vc>();
 	}
 
 	template<>
-	IHgVbo* new_vbo<vbo_layout_vn>() {
+	IHgVbo* Create<vbo_layout_vn>() {
 		return vbo_from_api_type<vbo_layout_vn>();
 	}
 
 	template<>
-	IHgVbo* new_vbo<vbo_layout_vnu>() {
+	IHgVbo* Create<vbo_layout_vnu>() {
 		return vbo_from_api_type<vbo_layout_vnu>();
 	}
 
 	template<>
-	IHgVbo* new_vbo<vbo_layout_vnut>() {
+	IHgVbo* Create<vbo_layout_vnut>() {
 		return vbo_from_api_type<vbo_layout_vnut>();
 	}
 
 	template<>
-	IHgVbo* new_vbo<uint8_t>() {
+	IHgVbo* Create<uint8_t>() {
 		return vbo_from_api_type<uint8_t>();
 	}
 
 	template<>
-	IHgVbo* new_vbo<uint16_t>() {
+	IHgVbo* Create<uint16_t>() {
 		return vbo_from_api_type<uint16_t>();
 	}
 
 	template<>
-	IHgVbo* new_vbo<color>() {
+	IHgVbo* Create<color>() {
 		return vbo_from_api_type<color>();
 	}
-//}
+}
 
-IHgVbo* staticVbo = new_vbo<vbo_layout_vc>();
-IHgVbo* staticVboVNU = new_vbo<vbo_layout_vnu>();
-IHgVbo* staticVboVNUT = new_vbo<vbo_layout_vnut>();
-IHgVbo* staticIndice8 = new_vbo<uint8_t>();
-IHgVbo* staticIndice16 = new_vbo<uint16_t>();
+IHgVbo* staticVbo = HgVbo::Create<vbo_layout_vc>();
+IHgVbo* staticVboVNU = HgVbo::Create<vbo_layout_vnu>();
+IHgVbo* staticVboVNUT = HgVbo::Create<vbo_layout_vnut>();
+IHgVbo* staticIndice8 = HgVbo::Create<uint8_t>();
+IHgVbo* staticIndice16 = HgVbo::Create<uint16_t>();
