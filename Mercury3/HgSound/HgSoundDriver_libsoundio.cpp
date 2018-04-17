@@ -45,6 +45,11 @@ namespace HgSound {
 			return;
 		}
 
+		//mixAudio probably should be moved out of write_callback into its own thread
+		//as write_callback needs to be fast. Will need some kind of thread sync.
+		//should probably also double buffer mixed audio. Or have a larger circular buffer
+		//with a moving play head. New playing audio could be mixed in at the play
+		//head for low latency.
 		driver->mixAudio();
 
 		for (uint32_t frame = 0; frame < frame_count; frame++) {

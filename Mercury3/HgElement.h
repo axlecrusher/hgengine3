@@ -114,6 +114,7 @@ handling special cases.
 */
 class HgElement {
 public:
+		//position, and rotation are in global coordinate system
 		point position; float scale; //16
 		point origin; //origin (0,0,0) in local space
 		quaternion rotation; //16
