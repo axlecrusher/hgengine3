@@ -176,7 +176,7 @@
     <ClCompile Include="HgCamera.cpp" />
     <ClCompile Include="HgElement.cpp" />
     <ClCompile Include="HgInput.cpp" />
-    <ClCompile Include="HgMath.c" />
+    <ClCompile Include="HgMath.cpp" />
     <ClCompile Include="HgModel.cpp" />
     <ClCompile Include="HgRenderQueue.cpp" />
     <ClCompile Include="HgScene.cpp" />
