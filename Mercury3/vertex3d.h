@@ -15,7 +15,7 @@ public:
 	{
 	}
 
-	vertex3d(const float *_xyz)
+	inline vertex3d(const float *_xyz)
 	{
 		xyz[0] = _xyz[0];
 		xyz[1] = _xyz[1];
