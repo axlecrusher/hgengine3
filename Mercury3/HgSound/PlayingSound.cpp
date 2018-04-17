@@ -2,7 +2,8 @@
 
 namespace HgSound {
 
-	PlayingSound::PlayingSound(SoundAsset::ptr asset) : m_sound(std::move(asset)), m_nextSample(0)
+	PlayingSound::PlayingSound(SoundAsset::ptr asset)
+		: m_sound(std::move(asset)), m_nextSample(0), m_playbackEndedClbk(nullptr)
 	{
 
 	}

@@ -16,12 +16,16 @@ namespace HgSound {
 	PlayingSound::ptr Driver::play(SoundAsset::ptr asset) {
 		PlayingSound::ptr tmp = asset->play();
 		m_playingSounds.insert(std::make_pair(tmp.get(),tmp));
-		return tmp;
+		return std::move(tmp);
 	}
 
 	void Driver::stop(PlayingSound::ptr playingAsset) {
 		auto it = m_playingSounds.find(playingAsset.get());
-		if (it != m_playingSounds.end()) m_playingSounds.erase(it);
+		if (it != m_playingSounds.end()) {
+			auto playingSound = it->second;
+			playingSound->eventPlaybackEnded();
+			m_playingSounds.erase(it);
+		}
 	}
 
 	Driver::Driver() : m_buffer(nullptr), m_bufferSize(0), m_initialized(false)
@@ -46,7 +50,10 @@ namespace HgSound {
 			auto this_iter = it++;
 			auto playing = this_iter->second;
 			playing->getSamples(total_samples, m_buffer);
-			if (playing->isFinished()) m_playingSounds.erase(this_iter);
+			if (playing->isFinished()) {
+				playing->eventPlaybackEnded();
+				m_playingSounds.erase(this_iter);
+			}
 		}
 
 		for (uint32_t i = 0; i < total_samples; ++i) {

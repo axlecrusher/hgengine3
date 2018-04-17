@@ -6,6 +6,7 @@ namespace HgSound {
 	class PlayingSound {
 	public:
 		typedef std::shared_ptr<PlayingSound> ptr;
+		typedef void(*playbackEndedFunc)(SoundAsset::ptr& p);
 
 		PlayingSound(SoundAsset::ptr SoundAsset);
 
@@ -14,8 +15,11 @@ namespace HgSound {
 
 		void stop();
 
+		inline void setEventPlaybackEnded(const playbackEndedFunc& clbk) { m_playbackEndedClbk = clbk; }
+		inline void eventPlaybackEnded() { if (m_playbackEndedClbk) m_playbackEndedClbk(m_sound); }
 	private:
 		SoundAsset::ptr m_sound;
 		uint64_t m_nextSample; //next sample to play
+		playbackEndedFunc m_playbackEndedClbk;
 	};
 }
