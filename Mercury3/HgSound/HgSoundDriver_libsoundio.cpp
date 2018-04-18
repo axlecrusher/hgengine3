@@ -15,7 +15,7 @@ namespace HgSound {
 
 	uint32_t Driver::samples = 441; //for each channel
 
-	static void write_sample_float32le(char *ptr, double sample) {
+	inline void write_sample_float32le(char *ptr, double sample) {
 		float *buf = (float *)ptr;
 		*buf = sample;
 	}
@@ -29,14 +29,12 @@ namespace HgSound {
 		//	double seconds_per_frame = 1.0 / float_sample_rate;
 		struct SoundIoChannelArea *areas;
 		int err;
-		int frames_left = LibSoundIoDriver::samples;
-		uint32_t counterx = 0;
 
 		LibSoundIoDriver* driver = (LibSoundIoDriver*)outstream->userdata;
 		if (!driver->m_initialized) return;
 
 
-		int frame_count = frames_left;
+		int frame_count = LibSoundIoDriver::samples;
 
 		const struct SoundIoChannelLayout *layout = &outstream->layout;
 
@@ -45,13 +43,7 @@ namespace HgSound {
 			return;
 		}
 
-		//mixAudio probably should be moved out of write_callback into its own thread
-		//as write_callback needs to be fast. Will need some kind of thread sync.
-		//should probably also double buffer mixed audio. Or have a larger circular buffer
-		//with a moving play head. New playing audio could be mixed in at the play
-		//head for low latency.
-		driver->mixAudio();
-
+		uint32_t counterx = 0;
 		for (uint32_t frame = 0; frame < frame_count; frame++) {
 			for (int channel = 0; channel < layout->channel_count; channel++) {
 				write_sample(areas[channel].ptr, driver->m_buffer[counterx++]);
@@ -65,6 +57,13 @@ namespace HgSound {
 			fprintf(stderr, "unrecoverable stream error: %s\n", soundio_strerror(err));
 			return;
 		}
+
+		//mixAudio probably should be moved out of write_callback into its own thread
+		//as write_callback needs to be fast. Will need some kind of thread sync.
+		//should probably also double buffer mixed audio. Or have a larger circular buffer
+		//with a moving play head. New playing audio could be mixed in at the play
+		//head for low latency.
+		driver->mixAudio();
 
 		/*
 		double out_latency;
@@ -164,7 +163,7 @@ namespace HgSound {
 
 		uint8_t channels = 2; //stereo
 		m_bufferSize = channels*samples;
-		m_buffer = new float[m_bufferSize];
+		m_buffer = new float[m_bufferSize](); //allocate and init to 0
 
 		this->soundio = std::move(soundio);
 		this->device = std::move(device);

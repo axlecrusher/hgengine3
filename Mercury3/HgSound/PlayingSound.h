@@ -15,6 +15,7 @@ namespace HgSound {
 
 		void stop();
 
+		//playbackEndedFunc callback will be called from a thread
 		inline void setEventPlaybackEnded(const playbackEndedFunc& clbk) { m_playbackEndedClbk = clbk; }
 		inline void eventPlaybackEnded() { if (m_playbackEndedClbk) m_playbackEndedClbk(m_sound); }
 	private:
