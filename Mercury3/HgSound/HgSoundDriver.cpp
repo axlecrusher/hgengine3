@@ -15,16 +15,26 @@ namespace HgSound {
 	
 	PlayingSound::ptr Driver::play(SoundAsset::ptr asset) {
 		PlayingSound::ptr tmp = asset->play();
-		m_playingSounds.insert(std::make_pair(tmp.get(),tmp));
+		{
+			std::lock_guard<std::mutex> lock(m_mutex);
+			m_playingSounds.insert(std::make_pair(tmp.get(), tmp));
+		}
 		return std::move(tmp);
 	}
 
 	void Driver::stop(PlayingSound::ptr playingAsset) {
-		auto it = m_playingSounds.find(playingAsset.get());
-		if (it != m_playingSounds.end()) {
-			auto playingSound = it->second;
+		PlayingSound::ptr playingSound;
+		{
+			std::lock_guard<std::mutex> lock(m_mutex);
+			auto it = m_playingSounds.find(playingAsset.get());
+			if (it != m_playingSounds.end())
+			{
+				playingSound = it->second;
+				m_playingSounds.erase(it);
+			}
+		}
+		if (playingSound != nullptr) {
 			playingSound->eventPlaybackEnded();
-			m_playingSounds.erase(it);
 		}
 	}
 
@@ -46,13 +56,18 @@ namespace HgSound {
 			m_buffer[i] = 0.0f;
 		}
 
-		for (auto it = m_playingSounds.begin(); it != m_playingSounds.end();) {
-			auto this_iter = it++;
-			auto playing = this_iter->second;
-			playing->getSamples(total_samples, m_buffer);
-			if (playing->isFinished()) {
-				playing->eventPlaybackEnded();
-				m_playingSounds.erase(this_iter);
+		{
+			//figure out how to make this lock smaller...
+			//the iterators make it hard to do
+			std::lock_guard<std::mutex> lock(m_mutex);
+			for (auto it = m_playingSounds.begin(); it != m_playingSounds.end();) {
+				auto this_iter = it++;
+				auto playing = this_iter->second;
+				playing->getSamples(total_samples, m_buffer);
+				if (playing->isFinished()) {
+					playing->eventPlaybackEnded();
+					m_playingSounds.erase(this_iter);
+				}
 			}
 		}
 

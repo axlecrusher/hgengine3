@@ -5,6 +5,8 @@
 #include <HgSound/SoundAsset.h>
 #include <HgSound/PlayingSound.h>
 
+#include <mutex>
+
 namespace HgSound {
 	class Driver {
 	public:
@@ -20,7 +22,6 @@ namespace HgSound {
 		static std::unique_ptr<HgSound::Driver> Create();
 
 	protected:
-		std::map<const PlayingSound*, PlayingSound::ptr> m_playingSounds;
 		static uint32_t samples;
 
 		void mixAudio();
@@ -29,6 +30,10 @@ namespace HgSound {
 		uint32_t m_bufferSize;
 
 		bool m_initialized;
+
+	private:
+		std::map<const PlayingSound*, PlayingSound::ptr> m_playingSounds;
+		std::mutex m_mutex;
 	};
 }
 
