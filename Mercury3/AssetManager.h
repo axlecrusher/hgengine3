@@ -4,6 +4,8 @@
 #include <memory>
 #include <map>
 
+#include <mutex>
+
 template<typename T>
 class AssetManager {
 public:
@@ -17,31 +19,56 @@ public:
 	inline AssetPtr get(const std::string& path) { return get(path, nullptr); }
 
 	AssetPtr get(const std::string& path, bool* isNew) {
-		auto itr = map.find(path);
-		if (itr != map.end()) {
-			auto t = itr->second.lock();
-			if (t != nullptr) {
-				if (isNew != nullptr) *isNew = false;
-				return std::move(t);
-			}
+		AssetPtr asset = tryExisting(path);
+		if (asset != nullptr) {
+			if (isNew != nullptr) *isNew = false;
+			return std::move(asset);
 		}
-
-		auto asset = AssetPtr(new T(), [this](T* asset) {this->release(asset); });
+		
+		asset = AssetPtr(new T(), [this](T* asset) { this->release(asset); });
 		asset->load(path);
-		map.insert(std::make_pair(path, asset));
+		{
+			//scoped block for mutex lock
+			std::lock_guard<std::mutex> lock(m_mutex);
+			//check if some other thread created it while we were trying to
+			auto ptr = find(path).lock();
+			if (ptr != nullptr) {
+				if (isNew != nullptr) *isNew = true;
+				return std::move(ptr);
+			}
+			m_map.insert(std::make_pair(path, asset));
+		}
 		if (isNew != nullptr) *isNew = true;
 		return std::move(asset);
 	}
 
 //	void remove(const std::string& path) { map.erase(path); }
 private:
+	inline AssetPtr tryExisting(const std::string& path) {
+		std::weak_ptr<T> ptr;
+		{
+			std::lock_guard<std::mutex> lock(m_mutex);
+			ptr = find(path);
+		}
+		return std::move(ptr.lock());
+	}
+
+	inline std::weak_ptr<T> find(const std::string& path) {
+		const auto& map = m_map;
+		auto itr = map.find(path);
+		if (itr == map.end()) return std::weak_ptr<T>();
+		return itr->second;
+	}
+
 	void release(T* asset) {
 		if (isValid()) { //make sure map hasn't been destroyed (when program exiting)
-			map.erase(asset->m_path);
+			std::lock_guard<std::mutex> lock(m_mutex);
+			m_map.erase(asset->m_path);
 		}
 		delete asset;
 	}
 
 	bool is_valid;
-	std::map< const std::string, std::weak_ptr<T> > map;
+	std::map< const std::string, std::weak_ptr<T> > m_map;
+	std::mutex m_mutex;
 };
