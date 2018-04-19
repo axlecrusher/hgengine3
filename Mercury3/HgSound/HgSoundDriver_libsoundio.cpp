@@ -63,7 +63,8 @@ namespace HgSound {
 		//should probably also double buffer mixed audio. Or have a larger circular buffer
 		//with a moving play head. New playing audio could be mixed in at the play
 		//head for low latency.
-		driver->mixAudio();
+//		driver->mixAudio();
+		driver->ReadyMix();
 
 		/*
 		double out_latency;
@@ -87,7 +88,7 @@ namespace HgSound {
 		m_buffer = nullptr;
 	}
 
-	void LibSoundIoDriver::Init() {
+	void LibSoundIoDriver::init() {
 		auto soundio = soundio_ptr(soundio_create(), soundio_destroy);
 
 		if (!soundio) {

@@ -12,7 +12,7 @@ namespace HgSound {
 	public:
 		LibSoundIoDriver();
 		~LibSoundIoDriver();
-		void Init();
+		void init();
 
 		void start() {}
 	private:

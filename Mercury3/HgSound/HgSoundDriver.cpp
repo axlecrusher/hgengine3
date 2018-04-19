@@ -13,6 +13,21 @@ namespace HgSound {
 
 	std::unique_ptr<HgSound::Driver> Driver::Create() { return std::make_unique<HgSound::LibSoundIoDriver>(); }
 	
+	void Driver::threadLoop(Driver* driver) {
+		while (!driver->m_stopThread) {
+			{
+				std::unique_lock<std::mutex> tmp(driver->m_mixMutex);
+				driver->m_mixWait.wait(tmp);
+			}
+			if (!driver->m_stopThread) driver->mixAudio();
+		}
+	}
+
+	void Driver::start() {
+		m_stopThread = false;
+		m_mixThread = std::thread(threadLoop, this);
+	}
+
 	PlayingSound::ptr Driver::play(SoundAsset::ptr asset) {
 		PlayingSound::ptr tmp = asset->play();
 		{
@@ -38,11 +53,13 @@ namespace HgSound {
 		}
 	}
 
-	Driver::Driver() : m_buffer(nullptr), m_bufferSize(0), m_initialized(false)
+	Driver::Driver() : m_buffer(nullptr), m_bufferSize(0), m_initialized(false), m_stopThread(true)
 	{
 	}
 
 	Driver::~Driver() {
+		stopThread();
+
 		if (m_buffer) delete m_buffer;
 		m_buffer = nullptr;
 	}
