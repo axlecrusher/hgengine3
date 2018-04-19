@@ -56,13 +56,13 @@ static bool cast_ray(const vector3& dirfrac, const vector3& pos, AABB bb) {
 void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) const {
 	//see https://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms
 
-	vector3 one = { 1.0,1.0,1.0 };
+	static const vector3 one = { 1.0,1.0,1.0 };
 	vector3 dirfrac = one / ray;
-	aabb_result r;
 	AABB* cubes = bounding_boxes;
 
 	vector3 a, b;
 	float dmin, dmax;
+	aabb_result r;
 
 //	if (!::cast_ray(&dirfrac, pos, boundingVolume)) return; //broken.....
 
@@ -79,9 +79,7 @@ void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*inter
 		//ray doesn't intersect AABB
 		if (dmin > dmax) continue;
 
-		r.dist = dmin;
-		r.index = i;
-
+		r = { dmin, i };
 		intersectClbk(&r, userData);
 	}
 }
