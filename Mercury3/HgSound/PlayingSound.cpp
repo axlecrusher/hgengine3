@@ -3,7 +3,7 @@
 namespace HgSound {
 
 	PlayingSound::PlayingSound(SoundAsset::ptr asset)
-		: m_sound(std::move(asset)), m_nextSample(0), m_playbackEndedClbk(nullptr)
+		: m_sound(std::move(asset)), m_nextSample(0), m_playbackEndedClbk(nullptr), m_volume(1.0)
 	{
 
 	}
@@ -16,7 +16,7 @@ namespace HgSound {
 		uint32_t i = 0;
 
 		while ((i<samples) && (m_nextSample<totalSamples)) {
-			buffer[i] += data[i];
+			buffer[i] += data[i] * m_volume;
 			i++;
 			m_nextSample++;
 		}
