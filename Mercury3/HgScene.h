@@ -45,7 +45,7 @@ class HgScene {
 
 		void update(uint32_t dtime);
 
-		void(*submit_for_render)(HgElement* e);
+//		void(*submit_for_render)(HgElement* e);
 private:
 		void allocate_chunk();
 		std::vector< std::unique_ptr<SceneChunk> > chunks;

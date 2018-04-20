@@ -1,9 +1,17 @@
+
 #pragma once
+
+#include <stdint.h>
+#include <vector>
 
 enum RendererType {
 	OPENGL = 0,
 	VULKAN,
 	DIRECTX
+};
+
+struct viewport {
+	uint16_t x, y, width, height;
 };
 
 class RenderBackend {
@@ -14,12 +22,26 @@ public:
 	virtual void EndFrame() = 0;
 
 	inline RendererType Type() const { return m_type; }
+	virtual void Viewport(uint8_t idx) = 0;
+
+	void setup_viewports(uint16_t width, uint16_t height);
 protected:
 	RendererType m_type;
+
+	struct viewport view_port[3];
+	uint8_t _currenViewPort_idx = 0xFF;
 };
+
+class HgElement;
+class HgCamera;
 
 namespace Renderer {
 	void InitOpenGL();
+
+	extern std::vector<HgElement*> opaqueElements;
+	extern std::vector<HgElement*> transparentElements;
+
+	void Render(HgCamera* camera);
 }
 
 extern RenderBackend* RENDERER;

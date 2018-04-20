@@ -12,7 +12,7 @@ public:
 	void Clear();
 	void BeginFrame();
 	void EndFrame();
-
+	void Viewport(uint8_t idx);
 };
 
 extern OGLBackend oglRenderer;

@@ -7,9 +7,6 @@
 #include <string.h>
 #include <HgVbo.h>
 
-viewport view_port[3];
-
-static uint8_t _currenViewPort_idx =  0xFF;
 static BlendMode _currentBlendMode = BLEND_INVALID;
 
 HgCamera* _camera;
@@ -29,42 +26,13 @@ char *UniformString[] = {
 	NULL
 };
 
-void hgViewport(uint8_t idx) {
-	if (idx == _currenViewPort_idx) return;
-	_currenViewPort_idx = idx;
-
-	const viewport vp = view_port[idx];
-	glViewport(vp.x, vp.y, vp.width, vp.height);
-	glScissor(vp.x, vp.y, vp.width, vp.height);
-	glEnable(GL_SCISSOR_TEST);
-}
-
-void setup_viewports(uint16_t width, uint16_t height) {
-	uint8_t i = 0;
-
-	view_port[i].x = view_port[i].y = 0;
-	view_port[i].width = width;
-	view_port[i].height = height;
-	++i;
-
-	view_port[i].x = view_port[i].y = 0;
-	view_port[i].width = width/2;
-	view_port[i].height = height;
-	++i;
-
-	view_port[i].x = width/2;
-	view_port[i].y = 0;
-	view_port[i].width = width/2;
-	view_port[i].height = height;
-}
-
 void setRenderAttributes(BlendMode blendMode, RenderFlags flags) {
-	if (_currentBlendMode == blendMode) return;
-	_currentBlendMode = blendMode;
+	//if (_currentBlendMode == blendMode) return;
+	//_currentBlendMode = blendMode;
 
 	switch (blendMode) {
 	case BLEND_NORMAL:
-		glDepthMask(GL_TRUE);
+		//glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 //		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		break;
@@ -91,7 +59,7 @@ void setRenderAttributes(BlendMode blendMode, RenderFlags flags) {
 		glDepthMask(GL_TRUE);
 	}
 	else {
-		glDepthMask(GL_FALSE);
+  		glDepthMask(GL_FALSE);
 	}
 }
 

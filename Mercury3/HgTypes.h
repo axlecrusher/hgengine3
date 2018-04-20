@@ -13,10 +13,6 @@ extern "C" {
 //	typedef vertex point;
 //	typedef vertex vector3;
 
-	typedef struct viewport {
-		uint16_t x, y, width, height;
-	} viewport;
-
 	typedef struct color {
 		uint8_t r, g, b, a;
 	} color;

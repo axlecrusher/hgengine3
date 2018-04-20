@@ -53,6 +53,8 @@ void OGLBackend::Init() {
 }
 
 void OGLBackend::Clear() {
+	//Write masking state glColorMask, glStencilMask and glDepthMask can affect Framebuffer Clearing functionality.
+	glDepthMask(GL_TRUE); //glClear requires depth mask
 	glDisable(GL_SCISSOR_TEST);
 	glClearColor(.1f, .1f, .1f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -67,3 +69,12 @@ void OGLBackend::EndFrame() {
 
 }
 
+void OGLBackend::Viewport(uint8_t idx) {
+	if (idx == _currenViewPort_idx) return;
+	_currenViewPort_idx = idx;
+
+	const viewport vp = view_port[idx];
+	glViewport(vp.x, vp.y, vp.width, vp.height);
+	glScissor(vp.x, vp.y, vp.width, vp.height);
+	glEnable(GL_SCISSOR_TEST);
+}

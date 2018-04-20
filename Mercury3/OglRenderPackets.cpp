@@ -1,11 +1,11 @@
 #include <HgRenderQueue.h>
 
 #include <oglDisplay.h>
-
+#include <RenderBackend.h>
 #include <assert.h>
 
 int8_t draw_render_packet(const render_packet* p) {
-	hgViewport(p->viewport_idx);
+	RENDERER->Viewport(p->viewport_idx);
 
 
 //	_camera = &p->camera;

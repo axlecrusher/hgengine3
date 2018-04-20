@@ -145,31 +145,10 @@ void submit_for_render_threaded(uint8_t viewport_idx, HgCamera* camera, HgScene 
 	hgRenderQueue_push(create_render_packet(e, viewport_idx, camera + 0, s, idx)); //submit to renderer
 }
 
-void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
-	if (e == NULL) {
-		window->SwapBuffers();
-		return;
-	}
-	//	printf("serial\n");
-	hgViewport(viewport_idx);
-
-	HgShader* shader = e->renderData()->shader;
-
-	if (shader) {
-		shader->enable();
-		//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
-		//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
-		shader->setGlobalUniforms(*camera);
-		shader->setLocalUniforms(&e->rotation, &e->position, e->scale, &e->origin, e->renderData());
-	}
-
-	e->renderData()->render();
-}
-
 void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
 	RenderData* rd = e->renderData();
 	//	if (rd->shader) VCALL(rd->shader, enable);
-	hgViewport(viewport_idx);
+	RENDERER->Viewport(viewport_idx);
 
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
@@ -193,11 +172,11 @@ int main()
 	StartWindowSystem();
 
 	if (stereo_view) {
-		setup_viewports(1280, 480);
+		RENDERER->setup_viewports(1280, 480);
 		//		Perspective2(60, 1280.0 / 480.0, 0.1f, 100.0f, projection);
 	}
 	else {
-		setup_viewports(640, 480);
+		RENDERER->setup_viewports(640, 480);
 	}
 
 	Perspective2(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
@@ -302,7 +281,7 @@ int main()
 	HANDLE thread = CreateThread(NULL, 0, &StartRenderThread, NULL, 0, NULL);
 	submit_for_render = submit_for_render_threaded;
 #else
-	submit_for_render = submit_for_render_serial;
+	//submit_for_render = submit_for_render_serial;
 #endif
 
 	/*
@@ -408,45 +387,41 @@ int main()
 		camera[1] = camera[0];
 		camera[1].position.x(camera[1].position.x()+EYE_DISTANCE);
 
-		uint32_t updateNumber = scene.nextUpdateNumber();
+		scene.update(dtime);
+
+		Renderer::opaqueElements.clear();
+		Renderer::transparentElements.clear();
 
 		uint32_t maxCount = scene.maxItems();
-		for (uint32_t i = 0; i<maxCount; ++i) {
-			//			if (IS_USED(&scene, i) == 0) continue;
+		for (uint32_t i = 0; i < maxCount; ++i) {
 			if (!scene.isUsed(i)) continue;
 			HgElement* e = scene.get_element(i);
-
-			if ((dtime > 0) && e->needsUpdate(updateNumber)) {
-				e->update(dtime, updateNumber);
-			}
-
-			/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash! rendering from previous update loop*/
-			if (CHECK_FLAG(e, HGE_DESTROY) > 0) {
-				scene.removeElement(i);
-				continue;
-			}
-			if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (do_render > 0)) {
-				submit_for_render(stereo_view, camera + 0, e);
-				//				quick_render(2, camera + 1, &scene, i);
+			if (CHECK_FLAG(e, HGE_HIDDEN) == 0) {
+				if (CHECK_FLAG(e, HGE_TRANSPARENT) > 0) {
+					Renderer::transparentElements.push_back(e);
+				}
+				else {
+					Renderer::opaqueElements.push_back(e);
+				}
 			}
 		}
 
-		maxCount = scene.maxItems();
-		if (stereo_view && do_render > 0) {
-			for (uint32_t i = 0; i < maxCount; ++i) {
-				if (!scene.isUsed(i)) continue;
-				HgElement* e = scene.get_element(i);
-				if (CHECK_FLAG(e, HGE_HIDDEN) == 0) submit_for_render(2, camera + 1, e);
-			}
-		}
+		//render below
+		Renderer::Render(camera);
 
-		//		scene_clearUpdate(&scene);
+		//if (stereo_view) {
+		//	for (auto e : opaqueElements) {
+		//		submit_for_render_serial(2, camera + 1, e);
+		//	}
+
+		//	for (auto e : transparentElements) {
+		//		submit_for_render_serial(2, camera + 1, e);
+		//	}
+		//}
+
+		window->SwapBuffers();
 
 		InterlockedAdd(&itrctr, 1);
-
-
-		if ((do_render > 0)) submit_for_render(2, camera + 1, NULL);
-		//			hgRenderQueue_push(create_render_packet(NULL, 2, camera + 1, NULL, 0)); //null element to indicate end of frame
 
 		do_render = 0;
 

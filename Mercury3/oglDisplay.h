@@ -48,9 +48,7 @@ public:
 
 //void destroy_render_data_ogl(struct RenderData* render_data);
 //void ogl_destroy_renderData();
-void hgViewport(uint8_t vp);
 
-void setup_viewports(uint16_t width, uint16_t height);
 void ogl_render_renderData(RenderData* rd);
 
 

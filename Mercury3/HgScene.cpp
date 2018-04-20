@@ -95,7 +95,7 @@ bool HgScene::isUsed(uint32_t index)
 void HgScene::update(uint32_t dtime) {
 	uint32_t updateNumber = nextUpdateNumber();
 	uint32_t maxCount = maxItems();
-	for (uint32_t i = 0; i<maxCount; ++i) {
+	for (uint32_t i = 0; i < maxCount; ++i) {
 		if (!isUsed(i)) continue;
 		HgElement* e = get_element(i);
 
@@ -109,10 +109,11 @@ void HgScene::update(uint32_t dtime) {
 			removeElement(i);
 			continue;
 		}
-		if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (submit_for_render != nullptr)) {
-			submit_for_render(e);
-		}
 	}
+	//	if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (submit_for_render != nullptr)) {
+	//		submit_for_render(e);
+	//	}
+	//}
 }
 
 #include <map>

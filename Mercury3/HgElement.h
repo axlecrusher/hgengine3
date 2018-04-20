@@ -11,16 +11,16 @@
 #include <HgTexture.h>
 #include <vector>
 
-	enum HgElementFlag {
-		HGE_USED = 0x01, //used in scene graph
-		HGE_ACTIVE = 0x02,
-		HGE_HIDDEN = 0x04,
-		HGE_UPDATED = 0x08,
-		HGE_DESTROY = 0x10,
-		HGE_UPDATE_TEXTURES = 0x20
-	};
+enum HgElementFlag {
+	HGE_USED = 0x01, //used in scene graph
+	HGE_ACTIVE = 0x02,
+	HGE_HIDDEN = 0x04,
+	HGE_UPDATED = 0x08,
+	HGE_DESTROY = 0x10,
+	HGE_UPDATE_TEXTURES = 0x20,
+	HGE_TRANSPARENT = 0x40
+};
 
-extern viewport view_port[];
 extern float* _projection;
 
 enum BlendMode : uint8_t {
