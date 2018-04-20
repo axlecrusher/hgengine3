@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 
+#include <RenderBackend.h>
+
 //Must be a multiple of 8
 //#define CHUNK_SIZE		128
 
@@ -109,6 +111,18 @@ void HgScene::update(uint32_t dtime) {
 			removeElement(i);
 			continue;
 		}
+
+		//I would like to move this out of here for a more perminent, solution
+		//where the vectors don't need to be rebuild every time
+		if (CHECK_FLAG(e, HGE_HIDDEN) == 0) {
+			if (CHECK_FLAG(e, HGE_TRANSPARENT) > 0) {
+				Renderer::transparentElements.push_back(e);
+			}
+			else {
+				Renderer::opaqueElements.push_back(e);
+			}
+		}
+
 	}
 	//	if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (submit_for_render != nullptr)) {
 	//		submit_for_render(e);

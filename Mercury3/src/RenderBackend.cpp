@@ -57,9 +57,7 @@ static void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgE
 	e->renderData()->render();
 }
 
-extern uint8_t stereo_view;
-
-void Renderer::Render(HgCamera* camera) {
+void Renderer::Render(uint8_t stereo_view, HgCamera* camera) {
 	for (auto e : opaqueElements) {
 		submit_for_render_serial(stereo_view, camera + 0, e);
 	}

@@ -41,7 +41,7 @@ namespace Renderer {
 	extern std::vector<HgElement*> opaqueElements;
 	extern std::vector<HgElement*> transparentElements;
 
-	void Render(HgCamera* camera);
+	void Render(uint8_t stereo_view, HgCamera* camera);
 }
 
 extern RenderBackend* RENDERER;

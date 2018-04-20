@@ -407,17 +407,8 @@ int main()
 		}
 
 		//render below
-		Renderer::Render(camera);
-
-		//if (stereo_view) {
-		//	for (auto e : opaqueElements) {
-		//		submit_for_render_serial(2, camera + 1, e);
-		//	}
-
-		//	for (auto e : transparentElements) {
-		//		submit_for_render_serial(2, camera + 1, e);
-		//	}
-		//}
+		Renderer::Render(stereo_view, camera+0);
+		if (stereo_view>0) Renderer::Render(2, camera+1);
 
 		window->SwapBuffers();
 
