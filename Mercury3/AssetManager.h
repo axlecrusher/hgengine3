@@ -29,7 +29,7 @@ public:
 		asset->load(path);
 		{
 			//scoped block for mutex lock
-			std::lock_guard<std::mutex> lock(m_mutex);
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			//check if some other thread created it while we were trying to
 			auto ptr = find(path).lock();
 			if (ptr != nullptr) {
@@ -47,7 +47,7 @@ private:
 	inline AssetPtr tryExisting(const std::string& path) {
 		std::weak_ptr<T> ptr;
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			ptr = find(path);
 		}
 		return std::move(ptr.lock());
@@ -62,7 +62,7 @@ private:
 
 	void release(T* asset) {
 		if (isValid()) { //make sure map hasn't been destroyed (when program exiting)
-			std::lock_guard<std::mutex> lock(m_mutex);
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			m_map.erase(asset->m_path);
 		}
 		delete asset;
@@ -70,5 +70,5 @@ private:
 
 	bool is_valid;
 	std::map< const std::string, std::weak_ptr<T> > m_map;
-	std::mutex m_mutex;
+	std::recursive_mutex m_mutex;
 };
