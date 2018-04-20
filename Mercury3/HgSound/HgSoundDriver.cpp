@@ -16,7 +16,7 @@ namespace HgSound {
 	PlayingSound::ptr Driver::play(SoundAsset::ptr asset) {
 		PlayingSound::ptr tmp = asset->play();
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			m_playingSounds.insert(std::make_pair(tmp.get(), tmp));
 		}
 		return std::move(tmp);
@@ -25,7 +25,7 @@ namespace HgSound {
 	void Driver::stop(PlayingSound::ptr playingAsset) {
 		PlayingSound::ptr playingSound;
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			auto it = m_playingSounds.find(playingAsset.get());
 			if (it != m_playingSounds.end())
 			{
@@ -59,12 +59,13 @@ namespace HgSound {
 		{
 			//figure out how to make this lock smaller...
 			//the iterators make it hard to do
-			std::lock_guard<std::mutex> lock(m_mutex);
+			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			for (auto it = m_playingSounds.begin(); it != m_playingSounds.end();) {
 				auto this_iter = it++;
 				auto playing = this_iter->second;
 				playing->getSamples(total_samples, m_buffer);
 				if (playing->isFinished()) {
+					//can cause recursive mutex if receiver of event plays new audio.
 					playing->eventPlaybackEnded();
 					m_playingSounds.erase(this_iter);
 				}

@@ -33,7 +33,7 @@ namespace HgSound {
 
 	private:
 		std::map<const PlayingSound*, PlayingSound::ptr> m_playingSounds;
-		std::mutex m_mutex;
+		std::recursive_mutex m_mutex;
 	};
 }
 
