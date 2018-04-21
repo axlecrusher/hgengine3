@@ -4,6 +4,7 @@
 
 namespace HgSound {
 	class PlayingSound;
+	class Driver;
 
 	class SoundAsset
 	{
@@ -14,8 +15,6 @@ namespace HgSound {
 		~SoundAsset();
 
 		static SoundAsset::ptr acquire(const std::string& path);
-
-		std::shared_ptr<PlayingSound> play();
 
 		float* data() const { return m_data; }
 		uint8_t channels() const { return m_channels; }
@@ -32,8 +31,11 @@ namespace HgSound {
 		std::weak_ptr<SoundAsset> selfPtr; //for creating shared pointers in play()
 
 		bool load(const std::string& path);
+		std::shared_ptr<PlayingSound> play();
 
 		static AssetManager<SoundAsset> soundAssets;
 		friend AssetManager<SoundAsset>;
+
+		friend HgSound::Driver;
 	};
 }
