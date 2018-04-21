@@ -17,7 +17,7 @@ namespace HgSound {
 
 	inline void write_sample_float32le(char *ptr, double sample) {
 		float *buf = (float *)ptr;
-		*buf = sample;
+		*buf = (float)sample;
 	}
 
 	void LibSoundIoDriver::write_callback(struct SoundIoOutStream *outstream, int frame_count_min, int frame_count_max) {
@@ -44,7 +44,7 @@ namespace HgSound {
 		}
 
 		uint32_t counterx = 0;
-		for (uint32_t frame = 0; frame < frame_count; frame++) {
+		for (int frame = 0; frame < frame_count; frame++) {
 			for (int channel = 0; channel < layout->channel_count; channel++) {
 				write_sample(areas[channel].ptr, driver->m_buffer[counterx++]);
 				areas[channel].ptr += areas[channel].step;

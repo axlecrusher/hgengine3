@@ -38,8 +38,8 @@ class HgScene {
 		inline HgElement* get_element(uint32_t index) { return &chunks[(index >> 9) & 0x7F]->elements[index & 0x1FF]; }
 
 		inline uint32_t usedCount() const { return used_count; }
-		inline uint32_t chunkCount() const { return chunks.size(); }
-		inline uint32_t maxItems() const { return chunks.size() * 512; }
+		inline uint32_t chunkCount() const { return (uint32_t)chunks.size(); }
+		inline uint32_t maxItems() const { return (uint32_t)(chunks.size() * 512); }
 
 		inline uint32_t nextUpdateNumber() { return ++m_updateCount; }
 

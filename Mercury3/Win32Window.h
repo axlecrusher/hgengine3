@@ -18,10 +18,10 @@ public:
 
 	static MercuryWindow* GenWin32Window();
 	virtual void* GetProcAddress(const MString& x);
-	static uint16_t ConvertScancode( uint32_t scanin );
+	static uint16_t ConvertScancode( size_t scanin );
 
 private:
-	bool IsKeyRepeat(uint32_t c);
+	bool IsKeyRepeat(size_t c);
 	static LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void GenWindow();

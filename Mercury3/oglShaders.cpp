@@ -45,11 +45,11 @@ static char* read_from_disk(const char* path) {
 	}
 
 	fseek(f, 0, SEEK_END);
-	uint32_t size = ftell(f);
+	size_t size = ftell(f);
 	fseek(f, 0, SEEK_SET);
 
 	char *str = (char*)malloc(size + 1);
-	uint32_t bytes_read = fread(str, 1, size, f);
+	size_t bytes_read = fread(str, 1, size, f);
 	int error = ferror(f);
 	fclose(f);
 

@@ -183,12 +183,12 @@ int main()
 
 	uint8_t s = sizeof(HgElement);
 	printf("element size %d\n", s);
-	printf("vertex size %d\n", sizeof(vertex));
-	printf("render_packet size %d\n", sizeof(render_packet));
-	printf("render data size %d\n", sizeof(RenderData));
-	printf("oglrd size %d\n", sizeof(OGLRenderData));
-//	printf("vbo type size %d\n", sizeof(VBO_TYPE));
-	printf("HgTexture size %d\n", sizeof(HgTexture));
+	printf("vertex size %zd\n", sizeof(vertex));
+	printf("render_packet size %zd\n", sizeof(render_packet));
+	printf("render data size %zd\n", sizeof(RenderData));
+	printf("oglrd size %zd\n", sizeof(OGLRenderData));
+//	printf("vbo type size %zd\n", sizeof(VBO_TYPE));
+	printf("HgTexture size %zd\n", sizeof(HgTexture));
 
 	//	Perspective(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
 	//	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
@@ -342,7 +342,7 @@ int main()
 			//			if (v.components.z > 0) DebugBreak();
 
 			v = v.normal().rotate(camera->rotation.invert());
-			float scale = (1.0 / 1000.0) * dtime;
+			float scale = (1.0f / 1000.0) * dtime;
 			v = v.normal().scale(scale);
 			camera->Move(v);
 

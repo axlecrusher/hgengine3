@@ -30,7 +30,7 @@ static model_data LoadModel(const char* filename) {
 		return r;
 	}
 
-	int32_t read = fread(&head, sizeof(head), 1, f);
+	size_t read = fread(&head, sizeof(head), 1, f);
 	if (read != 1) {
 		fprintf(stderr, "Unable to read file header for \"%s\"\n", filename);
 		fclose(f);
@@ -54,7 +54,7 @@ static model_data LoadModel(const char* filename) {
 
 	read = fread(buffer1, sizeof(*buffer1), head.vertex_count, f);
 	if (read != head.vertex_count) {
-		fprintf(stderr, "Error, %d vertices expected, read %d", head.vertex_count, read);
+		fprintf(stderr, "Error, %d vertices expected, read %zd", head.vertex_count, read);
 		free(buffer1);
 		free(buffer2);
 		fclose(f);
@@ -63,7 +63,7 @@ static model_data LoadModel(const char* filename) {
 
 	read = fread(buffer2, sizeof(*buffer2), head.index_count, f);
 	if (read != head.index_count) {
-		fprintf(stderr, "Error, %d indices expected, read %d", head.index_count, read);
+		fprintf(stderr, "Error, %d indices expected, read %zd", head.index_count, read);
 		free(buffer1);
 		free(buffer2);
 		fclose(f);

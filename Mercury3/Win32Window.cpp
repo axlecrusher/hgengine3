@@ -357,13 +357,13 @@ void* Win32Window::GetProcAddress(const MString& x)
 	return wglGetProcAddress( x.c_str() );
 }
 
-bool Win32Window::IsKeyRepeat(uint32_t c)
+bool Win32Window::IsKeyRepeat(size_t c)
 {
 //	printf("count %d\n", (c&65535));
 	return (c&65535) > 1;
 }
 
-uint16_t Win32Window::ConvertScancode( uint32_t scanin )
+uint16_t Win32Window::ConvertScancode( size_t scanin )
 {
 //	Specifies the scan code. The value depends on the OEM.
 	scanin = (scanin>>16)&511;
@@ -462,11 +462,11 @@ uint16_t Win32Window::ConvertScancode( uint32_t scanin )
 	default:
 		// numbers
 		if( scanin >= 10 && scanin <= 18 )
-			return scanin + ( (short)'1' - 10 );
+			return (uint16_t)(scanin + ( (short)'1' - 10 ));
 		// f1 -- f10
 		if( scanin >= 67 && scanin <= 76 )
-			return scanin + ( 282 - 67 );
-		return scanin;
+			return (uint16_t)(scanin + ( 282 - 67 ));
+		return (uint16_t)scanin;
 	}
 }
 

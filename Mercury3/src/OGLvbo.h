@@ -115,7 +115,7 @@ void OGLvbo<T>::sendToGPU() {
 		break;
 	case VBO_VNUT:
 	{
-		int offset = sizeof(vertex);
+		size_t offset = sizeof(vertex);
 		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, m_mem.Stride(), (void*)offset);
 		glEnableVertexAttribArray(L_NORMAL);
 		offset += sizeof(normal);
@@ -159,13 +159,13 @@ inline void draw_vbo(HgVboMemory<T>* vbo, uint32_t count, uint32_t offset, uint3
 //NOTE: THESE ARE INLINE. THEY NEED TO BE IN THE HEADER, NOT CPP
 template<>
 inline void draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
-	const uint32_t offset = sizeof(uint8_t)*idx_offset; //offset into indice buffer
+	const size_t offset = sizeof(uint8_t)*idx_offset; //offset into indice buffer
 	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_BYTE, (void*)offset, vertex_offset);
 }
 
 template<>
 inline void draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
-	const uint32_t offset = sizeof(uint16_t)*idx_offset; //offset into indice buffer
+	const size_t offset = sizeof(uint16_t)*idx_offset; //offset into indice buffer
 	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_SHORT, (void*)offset, vertex_offset);
 }
 
