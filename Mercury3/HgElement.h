@@ -86,6 +86,7 @@ public:
 
 	inline void setElement(HgElement* x) { element = x; }
 	inline HgElement& getElement() { return *element; }
+	inline const HgElement& getElement() const { return *element; }
 protected:
 	HgElement* element; //just a weak pointer back to the parent
 };
@@ -167,6 +168,13 @@ private:
 	friend HgElementLogic;
 	friend model_data;
 };
+
+class IUpdatableCollection;
+
+namespace Engine {
+	std::vector<IUpdatableCollection*>& collections();
+	void updateCollections(uint32_t dtime);
+}
 
 //typedef void(*SignalHandler)(int signum);
 //typedef void(*hgelement_function)(class HgElement* e);

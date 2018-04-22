@@ -9,6 +9,8 @@
 #include <HgMath.h>
 #include <map>
 
+#include <UpdatableCollection.h>
+
 RenderData* (*new_RenderData)() = NULL;
 
 std::map<std::string, factory_clbk> element_factories;
@@ -86,6 +88,20 @@ void HgElement::updateGpuTextures() {
 		//refactor into HgTexture making callback into renderData to set texture IDs.
 		//NOTE: Not sure this applies anymore. HgTexture is pretty immutable after creation.
 		m_renderData->setTexture(texture.get()); 
+	}
+}
+
+namespace Engine {
+	std::vector<IUpdatableCollection*>& collections() {
+		static std::vector<IUpdatableCollection*> c;
+		return c;
+	}
+
+	void updateCollections(uint32_t dtime) {
+		auto c = collections();
+		for (auto i : c) {
+			i->update(dtime);
+		}
 	}
 }
 
