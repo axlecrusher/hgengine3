@@ -342,7 +342,7 @@ int main()
 			//			if (v.components.z > 0) DebugBreak();
 
 			v = v.normal().rotate(camera->rotation.invert());
-			float scale = (1.0f / 1000.0) * dtime;
+			float scale = (1.0f / 1000.0f) * dtime;
 			v = v.normal().scale(scale);
 			camera->Move(v);
 

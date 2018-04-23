@@ -13,7 +13,7 @@ typedef struct AABB {
 
 typedef struct aabb_result {
 	float dist;
-	uint32_t index;
+	int32_t index;
 } aabb_result;
 
 class BoundingBoxes {

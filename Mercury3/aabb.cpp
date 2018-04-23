@@ -66,7 +66,7 @@ void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*inter
 
 //	if (!::cast_ray(&dirfrac, pos, boundingVolume)) return; //broken.....
 
-	for (uint32_t i = 0; i < cube_count; i++) {
+	for (int32_t i = 0; i < cube_count; i++) {
 		a = (cubes[i].lb - pos) * dirfrac;
 		b = (cubes[i].rt - pos) * dirfrac;
 
