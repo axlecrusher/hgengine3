@@ -19,6 +19,8 @@ public:
 	}
 
 	virtual void update(uint32_t dtime) final {
+		if (entityCount() == 0) return;
+
 		for (T& i : m_entities) {
 			//if ((dtime > 0) && i.needsUpdate(updateNumber)) {
 			//	e.update(dtime, updateNumber);
@@ -33,6 +35,8 @@ public:
 		m_entities.push_back(T());
 		return m_entities.back();
 	}
+
+	inline uint32_t entityCount() const { return m_entities.size(); }
 
 	inline const std::vector<T>& entities() const { return m_entities; }
 	inline std::vector<T>& entities() { return m_entities; }
