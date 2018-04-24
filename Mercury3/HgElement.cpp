@@ -104,37 +104,3 @@ namespace Engine {
 		}
 	}
 }
-
-/*
-vtable_index hgelement_get_type_index(char* type) {
-	for (vtable_index i = 0; i < MAX_ELEMENT_TYPES; ++i) {
-		char* str = HGELEMENT_TYPE_NAMES.str + HGELEMENT_TYPE_NAME_OFFSETS[i];
-		if (strcmp(type, str) == 0) return i;
-	}
-
-	return 0;
-}
-*/
-/*
-void HgElement_destroy(HgElement* e) {
-	if (e->m_renderData && e->m_renderData->destroy) e->m_renderData->destroy(e->m_renderData);
-	free(e->m_renderData);
-	e->m_renderData = NULL;
-}
-*/
-/*
-void HgElement_destroy(HgElement* element) {
-	VCALL_IDX(element, destroy);
-	if (element->m_renderData) {
-		if (element->m_renderData->shader) {
-			HGShader_release(element->m_renderData->shader);
-			element->m_renderData->shader = NULL;
-		}
-		if (element->m_renderData->destroy) element->m_renderData->destroy(element->m_renderData);
-
-		free(element->m_renderData);
-		element->m_renderData = NULL;
-	}
-}
-*/
-
