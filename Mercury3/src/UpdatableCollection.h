@@ -24,7 +24,7 @@ public:
 			//	e.update(dtime, updateNumber);
 			//}
 			if (dtime > 0) {
-				i.update(dtime);
+				i.T::update(dtime); //avoid vtable lookup
 			}
 		}
 	}

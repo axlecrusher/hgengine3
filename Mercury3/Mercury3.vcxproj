@@ -252,6 +252,7 @@
     <ClInclude Include="src\HgUtils.h" />
     <ClInclude Include="src\HgVboMemory.h" />
     <ClInclude Include="src\IniLoader.h" />
+    <ClInclude Include="src\IUpdatable.h" />
     <ClInclude Include="src\OGLBackend.h" />
     <ClInclude Include="src\OGLvbo.h" />
     <ClInclude Include="src\RenderBackend.h" />
