@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <set>
 
 class IUpdatableCollection {
 public:
@@ -29,6 +30,8 @@ public:
 				i.T::update(dtime); //avoid vtable lookup
 			}
 		}
+
+		doRemovals();
 	}
 
 	inline T& newItem() {
@@ -36,10 +39,29 @@ public:
 		return m_entities.back();
 	}
 
+	inline void remove(const T& x) {
+		m_remove.insert(&x);
+	}
+
 	inline uint32_t entityCount() const { return m_entities.size(); }
 
 	inline const std::vector<T>& entities() const { return m_entities; }
 	inline std::vector<T>& entities() { return m_entities; }
 private:
+
+	void doRemovals() {
+		if (m_remove.empty()) return;
+		size_t i = m_entities.size() - 1;
+		while (!m_entities.empty()) {
+			const T* p = &(m_entities[i]);
+			auto r = m_remove.find(p);
+			if (r != m_remove.end()) m_entities.erase(m_entities.begin()+i);
+			if (i == 0) break;
+			i--;
+		}
+		m_remove.clear();
+	}
+
 	std::vector<T> m_entities;
+	std::set<const T*> m_remove;
 };
