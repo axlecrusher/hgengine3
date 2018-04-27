@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <set>
+#include <algorithm>
 
 class IUpdatableCollection {
 public:
@@ -13,55 +14,266 @@ be stored contiguously in memory. Updates benefit from cache hits.*/
 template<typename T>
 class UpdatableCollection : public IUpdatableCollection {
 public:
-	UpdatableCollection() {}
+	class iterator;
 
-	UpdatableCollection(uint32_t reserve) {
-		m_entities.reserve(reserve);
+	UpdatableCollection() : m_size(0), m_usedSize(0), m_allocatedSize(0), head(nullptr) {
+		allocate(1);
+	}
+
+	UpdatableCollection(uint32_t reserve) : m_size(0), m_usedSize(0), m_allocatedSize(0), head(nullptr) {
+//		m_entities.reserve(reserve);
+		allocate(reserve);
+	}
+
+	~UpdatableCollection() {
+		for (size_t i = 0; i < m_size; ++i) {
+			if (m_used[i]) head[i].~T();
+		}
+		if (head != nullptr) m_alloc.deallocate(head, m_allocatedSize);
 	}
 
 	virtual void update(uint32_t dtime) final {
-		if (entityCount() == 0) return;
+		if (empty()) return;
+		if (dtime < 1) return;
 
-		for (T& i : m_entities) {
-			//if ((dtime > 0) && i.needsUpdate(updateNumber)) {
-			//	e.update(dtime, updateNumber);
-			//}
-			if (dtime > 0) {
-				i.T::update(dtime); //avoid vtable lookup
-			}
+		//for (size_t i = 0; i < m_entities.size(); ++i) {
+		//	if (!m_used[i]) continue;
+		//	//if ((dtime > 0) && i.needsUpdate(updateNumber)) {
+		//	//	e.update(dtime, updateNumber);
+		//	//}
+		//	m_entities[i].T::update(dtime); //avoid vtable lookup
+		//}
+		for (auto itr = begin(); itr != end(); itr++) {
+			itr->T::update(dtime); //avoid vtable lookup
 		}
 
-		doRemovals();
+//		doRemovals();
 	}
 
 	inline T& newItem() {
-		m_entities.push_back(T());
-		return m_entities.back();
+		for (size_t i = 0; i < m_size; ++i) {
+			if (!m_used[i]) {
+				m_used[i] = true;
+				m_usedSize++;
+				T& tmp = head[i];
+				new (&tmp) T();
+				return tmp;
+			}
+		}
+//		m_size++;
+//		m_entities.push_back(T());
+		T& tmp = push_back();
+		new (&tmp) T();
+		m_used.push_back(true);
+		m_usedSize++;
+		return tmp;
 	}
 
 	inline void remove(const T& x) {
-		m_remove.insert(&x);
+		//super scalar the next 2 lines?
+		size_t i = &x - head;
+		if ((&x - head) > m_size) return;
+		//auto end = this->end();
+		//auto r = std::find_if(begin(), end,
+		//	[&x](const auto& ent) { return &x == &ent; }
+		//);
+		//if (r == end) return;
+		//size_t i = r - m_entities.begin();
+		//size_t i = r.itr_;
+		//r->~T();
+		head[i].~T();
+		m_used[i] = false;
+		m_usedSize--;
+//		m_remove.insert(&x);
 	}
 
-	inline uint32_t entityCount() const { return m_entities.size(); }
+	inline iterator erase(const iterator& itr) {
+		iterator r(itr);
 
-	inline const std::vector<T>& entities() const { return m_entities; }
-	inline std::vector<T>& entities() { return m_entities; }
-private:
-
-	void doRemovals() {
-		if (m_remove.empty()) return;
-		size_t i = m_entities.size() - 1;
-		while (!m_entities.empty()) {
-			const T* p = &(m_entities[i]);
-			auto r = m_remove.find(p);
-			if (r != m_remove.end()) m_entities.erase(m_entities.begin()+i);
-			if (i == 0) break;
-			i--;
+		if (itr.itr_ < m_size) {
+			T& tmp = head[itr.itr_];
+			tmp.~T();
+			m_used[itr.itr_] = false;
+			m_usedSize--;
+			r++;
 		}
-		m_remove.clear();
+
+		return r;
 	}
 
-	std::vector<T> m_entities;
-	std::set<const T*> m_remove;
+//	inline uint32_t size() const { return m_entities.size(); }
+
+	//inline const std::vector<T>& entities() const { return m_entities; }
+	//inline std::vector<T>& entities() { return m_entities; }
+
+	class iterator
+	{
+	public:
+		typedef iterator self_type;
+		typedef T value_type;
+		typedef T& reference;
+		typedef T* pointer;
+		typedef std::forward_iterator_tag iterator_category;
+		typedef int difference_type;
+
+		iterator(size_t i, UpdatableCollection* c) : itr_(i), collection(c) { }
+
+		inline self_type operator++() {
+			self_type i = *this;
+			do {
+				itr_++;
+				if (itr_ >= collection->m_size) break;
+				if (collection->m_used[itr_]) break;
+			} while (true);
+			return i;
+		}
+
+		inline self_type operator++(int junk) {
+			do {
+				itr_++;
+				if (itr_ >= collection->m_size) break;
+				if (collection->m_used[itr_]) break;
+			} while (true);
+			return *this;
+		}
+
+		inline reference operator*() { return collection->operator[](itr_); }
+		inline pointer operator->() { return &collection->operator[](itr_); }
+		inline bool operator==(const self_type& rhs) const { return (collection == rhs.collection) && (itr_ == rhs.itr_); }
+		inline bool operator!=(const self_type& rhs) const { return (collection != rhs.collection) || (itr_ != rhs.itr_); }
+	private:
+		UpdatableCollection<T>* collection;
+		size_t itr_;
+		friend UpdatableCollection<T>;
+	};
+
+
+	//class const_iterator
+	//{
+	//public:
+	//	typedef const_iterator self_type;
+	//	typedef T value_type;
+	//	typedef T& reference;
+	//	typedef T* pointer;
+	//	typedef std::forward_iterator_tag iterator_category;
+	//	typedef int difference_type;
+
+	//	const_iterator(size_t i, UpdatableCollection* c) : itr_(i), collection(c) { }
+
+	//	self_type operator++() {
+	//		self_type i = *this;
+	//		do {
+	//			itr_++;
+	//			if (itr_ >= collection->m_size) break;
+	//			if (collection->m_used[itr_]) break;
+	//		} while (true);
+	//		return i;
+	//	}
+
+	//	self_type operator++(int junk) {  //post increment
+	//		do {
+	//			itr_++;
+	//			if (itr_ >= collection->m_size) break;
+	//			if (collection->m_used[itr_]) break;
+	//		} while (true);
+	//		return *this;
+	//	}
+
+	//	const reference operator*() { return collection->operator[](itr_); }
+	//	const pointer operator->() { return &collection->operator[](itr_); }
+	//	bool operator==(const self_type& rhs) { return(collection == rhs.collection) || (itr_ == rhs.itr_); }
+	//	bool operator!=(const self_type& rhs) { return (collection != rhs.collection) || (itr_ != rhs.itr_); }
+	//private:
+	//	UpdatableCollection<T>* collection;
+	//	size_t itr_;
+	//	friend UpdatableCollection<T>;
+	//};
+
+
+	iterator begin()
+	{
+		size_t i = 0;
+		for (; i < m_used.size(); ++i) {
+			if (m_used[i]) break;
+		}
+		return iterator(i, this);
+	}
+
+	iterator end()
+	{
+		return iterator(m_size, this);
+	}
+
+	//const_iterator begin() const
+	//{
+	//	size_t i = 0;
+	//	for (; i < m_used.size(); ++i) {
+	//		if (m_used[i]) break;
+	//	}
+	//	return iterator(i, this);
+	//}
+
+	//const_iterator end() const
+	//{
+	//	return iterator(m_entities.size(), this);
+	//}
+
+	inline size_t empty() const { return m_usedSize == 0; }
+
+private:
+	inline T& operator[](size_t index)
+	{
+		return head[index];
+	}
+
+	//add uninitalized element
+	T& push_back() {
+		if (m_size >= m_allocatedSize) reallocate();
+		T& p = head[m_size];
+		m_size++;
+		return p;
+	}
+
+	void reallocate() {
+		size_t newSize = m_allocatedSize*2;
+		allocate(newSize);
+	}
+
+	void allocate(size_t size) {
+		//size_t newSize = m_allocatedSize + 10;
+		//std::allocator<T> newMem;
+		T* p = m_alloc.allocate(size);
+		memcpy(p, head, sizeof(T)*m_allocatedSize);
+
+		m_alloc.deallocate(head, m_allocatedSize);
+
+		m_allocatedSize = size;
+		head = p;
+	}
+
+	//void doRemovals() {
+	//	if (m_remove.empty()) return;
+	//	size_t i = m_entities.size() - 1;
+	//	while (!m_entities.empty()) {
+	//		const T* p = &(m_entities[i]);
+	//		auto r = m_remove.find(p);
+	//		if (r != m_remove.end()) m_entities.erase(m_entities.begin()+i);
+	//		if (i == 0) break;
+	//		i--;
+	//	}
+	//	m_remove.clear();
+	//}
+
+	size_t m_size; //size of m_entities and m_used
+	size_t m_usedSize;
+
+	size_t m_allocatedSize;
+	T* head;
+
+	std::allocator<T> m_alloc;
+
+	//std::vector<T> m_entities;
+	std::vector<bool> m_used;
+
+	//std::set<const T*> m_remove;
 };
