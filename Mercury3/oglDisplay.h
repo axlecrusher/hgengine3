@@ -49,7 +49,7 @@ public:
 //void destroy_render_data_ogl(struct RenderData* render_data);
 //void ogl_destroy_renderData();
 
-void ogl_render_renderData(RenderData* rd);
+//void ogl_render_renderData(RenderData* rd);
 
 
 //void setBlendMode(BlendMode blendMode);
