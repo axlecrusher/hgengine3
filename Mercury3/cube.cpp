@@ -100,12 +100,13 @@ static void SetupRenderData() {
 //	trd->baseRender.destroy = NULL; //render data is shared by all triangles so we don't really want to do anything
 }
 
-void change_to_cube(HgElement* element) {
+void* change_to_cube(HgElement* element) {
 //	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
 	if (crd == NULL) SetupRenderData();
 
 	element->setRenderData(crd, false);
+	return nullptr;
 }
 /*
 void shape_create_cube(HgElement* element) {

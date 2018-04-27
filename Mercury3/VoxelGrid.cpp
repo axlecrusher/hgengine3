@@ -78,7 +78,7 @@ void change_to_voxelGrid(HgElement* element) {
 	element->setRenderData( crd, false );
 }
 
-void voxelGrid_create(HgElement* element) {
+void* voxelGrid_create(HgElement* element) {
 //	element->position.components.x = 0.0f;
 //	element->position.components.y = 0.0f;
 //	element->position.components.z = 0.0f;
@@ -88,6 +88,7 @@ void voxelGrid_create(HgElement* element) {
 	element->scale = 1.0f;
 
 	change_to_voxelGrid(element);
+	return nullptr;
 }
 /*
 static void destroy(HgElement* e) {

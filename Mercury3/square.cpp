@@ -68,9 +68,10 @@ static OGLRenderData* init_render_data() {
 	return trd;
 }
 
-static void change_to_square(HgElement* element) {
+static void* change_to_square(HgElement* element) {
 	//create an instance of the render data for all triangles to share
 	element->setRenderData( init_render_data(), false );
+	return nullptr;
 }
 /*
 void shape_create_square(HgElement* element) {

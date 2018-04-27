@@ -78,8 +78,9 @@ static void global_destroy() {
 
 REGISTER_GLOBAL_DESTROY(global_destroy);
 */
-static void triangle_factory(HgElement* e) {
+static void* triangle_factory(HgElement* e) {
 	change_to_triangle(e);
+	return nullptr;
 }
 
 REGISTER_LINKTIME(triangle, triangle_factory)

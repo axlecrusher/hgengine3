@@ -34,7 +34,11 @@ class HgScene {
 		uint32_t getNewElement(HgElement** element);
 		void removeElement(uint32_t i);
 
-		bool isUsed(uint32_t idx);
+		inline bool isUsed(uint32_t idx) {
+			uint32_t a = (idx >> 9) & 0x7F;
+			uint32_t b = idx & 0x1FF;
+			return chunks[a]->isUsed(b);
+		}
 		inline HgElement* get_element(uint32_t index) { return &chunks[(index >> 9) & 0x7F]->elements[index & 0x1FF]; }
 
 		inline uint32_t usedCount() const { return used_count; }
@@ -56,6 +60,25 @@ private:
 
 
 uint8_t create_element(char* type, HgScene* scene, HgElement** element);
+
+//class HgScene;
+
+extern std::map<std::string, factory_clbk> element_factories;
+
+template<typename T>
+T* create_element(char* type, HgScene* scene, HgElement** element) {
+	//	uint32_t idx = hgelement_get_type_index(type);
+
+	auto factory = element_factories.find(type);
+
+	if (factory == element_factories.end()) {
+		fprintf(stderr, "Unable to find element type \"%s\"\n", type);
+		return 0;
+	}
+	factory_clbk clbk = factory->second;
+	scene->getNewElement(element);
+	return (T*)clbk(*element);
+}
 
 /*
 typedef struct HgScene_iterator {

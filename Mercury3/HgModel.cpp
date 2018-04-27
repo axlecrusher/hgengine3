@@ -104,11 +104,12 @@ static void destroy(HgElement* e) {
 	e->setRenderData(NULL,false);
 }
 
-static void change_to_model(HgElement* element) {
+static void* change_to_model(HgElement* element) {
 //	element->vptr_idx = VTABLE_INDEX;
 
 	//create an instance of the render data for all triangles to share
 	element->setRenderData( init_render_data(), true ); //this needs to be per model instance if the model is animated
+	return nullptr;
 }
 
 static void render(RenderData* rd) {

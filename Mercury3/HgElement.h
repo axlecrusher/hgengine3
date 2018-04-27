@@ -201,7 +201,7 @@ extern RenderData* (*new_RenderData)();
 #define VCALL_IDX(e,function,...) if (HGELEMT_VTABLES[e->vptr_idx].function) HGELEMT_VTABLES[e->vptr_idx].function(e,__VA_ARGS__)
 */
 
-typedef void(*factory_clbk)(HgElement* e);
+typedef void*(*factory_clbk)(HgElement* e);
 
 //vtable_index RegisterElementType(const char* c);
 void RegisterElementType(const char* c, factory_clbk);

@@ -89,11 +89,6 @@ void HgScene::allocate_chunk() {
 	chunks.push_back(std::make_unique<SceneChunk>());
 }
 
-bool HgScene::isUsed(uint32_t index)
-{
-	return chunks[(index >> 9) & 0x7F]->isUsed(index & 0x1FF);
-}
-
 void HgScene::update(uint32_t dtime) {
 	uint32_t updateNumber = nextUpdateNumber();
 	uint32_t maxCount = maxItems();
