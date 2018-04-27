@@ -1,8 +1,10 @@
 #pragma once
 
-#include <HgElement.h>
+//#include <HgElement.h>
+#include <IUpdatable.h>
+#include <HgTypes.h>
 
-class Projectile : public HgElementLogic {
+class Projectile : public IUpdatable {
 public:
 	Projectile();
 	virtual void update(uint32_t tdelta);
