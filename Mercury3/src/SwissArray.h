@@ -85,33 +85,33 @@ public:
 		typedef std::forward_iterator_tag iterator_category;
 		typedef int difference_type;
 
-		iterator(size_t i, SwissArray<T>* c) : itr_(i), collection(c) { }
+		iterator(size_t i, SwissArray<T>* c) : itr_(i), sa(c) { }
 
-		inline self_type operator++() {
-			self_type i = *this;
+		inline self_type& operator++() { //prefix
 			do {
 				itr_++;
-				if (itr_ >= collection->m_size) break;
-				if (collection->m_used[itr_]) break;
-			} while (true);
-			return i;
-		}
-
-		inline self_type operator++(int junk) {
-			do {
-				itr_++;
-				if (itr_ >= collection->m_size) break;
-				if (collection->m_used[itr_]) break;
+				if (itr_ >= sa->m_size) break;
+				if (sa->m_used[itr_]) break;
 			} while (true);
 			return *this;
 		}
 
-		inline reference operator*() { return collection->operator[](itr_); }
-		inline pointer operator->() { return &collection->operator[](itr_); }
-		inline bool operator==(const self_type& rhs) const { return (collection == rhs.collection) && (itr_ == rhs.itr_); }
-		inline bool operator!=(const self_type& rhs) const { return (collection != rhs.collection) || (itr_ != rhs.itr_); }
+		inline self_type operator++(int junk) { //postfix
+			self_type copy(*this);
+			do {
+				itr_++;
+				if (itr_ >= sa->m_size) break;
+				if (sa->m_used[itr_]) break;
+			} while (true);
+			return copy;
+		}
+
+		inline value_type& operator*() { return sa->operator[](itr_); }
+		inline value_type* operator->() { return &sa->operator[](itr_); }
+		inline bool operator==(const self_type& rhs) const { return (sa == rhs.sa) && (itr_ == rhs.itr_); }
+		inline bool operator!=(const self_type& rhs) const { return (sa != rhs.sa) || (itr_ != rhs.itr_); }
 	private:
-		SwissArray<T>* collection;
+		SwissArray<T>* sa;
 		size_t itr_;
 		friend SwissArray<T>;
 	};
