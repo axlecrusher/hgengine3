@@ -257,6 +257,7 @@
     <ClInclude Include="src\OGLvbo.h" />
     <ClInclude Include="src\RenderBackend.h" />
     <ClInclude Include="src\StringConversions.h" />
+    <ClInclude Include="src\SwissArray.h" />
     <ClInclude Include="src\UpdatableCollection.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stb_image_resize.h" />
