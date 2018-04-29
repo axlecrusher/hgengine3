@@ -34,7 +34,7 @@ void BoundingBoxes::setBoxes(const AABB* bc, uint32_t count) {
 	}
 }
 
-static bool cast_ray(const vector3& dirfrac, const vector3& pos, AABB bb) {
+bool cast_ray(const vector3& dirfrac, const vector3& pos, const AABB& bb) {
 	vector3 a = (bb.lb - pos) * dirfrac;
 	vector3 b = (bb.rt - pos) * dirfrac;
 

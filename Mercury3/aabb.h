@@ -29,5 +29,4 @@ private:
 	uint32_t cube_count;
 };
 
-//void aabb_allocate_cubes(BoundingBoxes* bc, uint32_t count);
-//void cast_ray_to_aabb(const BoundingBoxes* aabb, const vector3* ray, const vector3* pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData);
+bool cast_ray(const vector3& dirfrac, const vector3& pos, const AABB& bb);
