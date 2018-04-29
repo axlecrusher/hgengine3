@@ -22,7 +22,7 @@ namespace HgSound {
 		static std::unique_ptr<HgSound::Driver> Create();
 
 	protected:
-		static uint32_t samples;
+		const static int32_t samples;
 
 		void mixAudio();
 

@@ -13,7 +13,7 @@ namespace HgSound {
 
 	static void(*write_sample)(char *ptr, double sample);
 
-	uint32_t Driver::samples = 441; //for each channel
+	const int32_t Driver::samples = 441; //for each channel
 
 	inline void write_sample_float32le(char *ptr, double sample) {
 		float *buf = (float *)ptr;

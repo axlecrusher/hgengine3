@@ -50,9 +50,9 @@ namespace HgSound {
 	void Driver::mixAudio() {
 		if (!m_initialized) return;
 
-		uint32_t total_samples = samples * 2; //stereo
+		const int32_t total_samples = samples * 2; //stereo
 
-		for (uint32_t i = 0; i < total_samples; ++i) {
+		for (int32_t i = 0; i < total_samples; ++i) {
 			m_buffer[i] = 0.0f;
 		}
 
@@ -72,7 +72,7 @@ namespace HgSound {
 			}
 		}
 
-		for (uint32_t i = 0; i < total_samples; ++i) {
+		for (int32_t i = 0; i < total_samples; ++i) {
 			m_buffer[i] *= 0.1f;
 		}
 	}
