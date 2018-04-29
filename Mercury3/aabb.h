@@ -21,6 +21,7 @@ public:
 	BoundingBoxes();
 
 	void setBoxes(const AABB* bc, uint32_t count);
+	void setBoxes(std::unique_ptr<AABB[]>& bc, uint32_t count);
 	void cast_ray(const vector3& ray, const vector3& pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) const;
 
 private:

@@ -34,6 +34,22 @@ void BoundingBoxes::setBoxes(const AABB* bc, uint32_t count) {
 	}
 }
 
+void BoundingBoxes::setBoxes(std::unique_ptr<AABB[]>& bc, uint32_t count) {
+	for (uint32_t i = 0; i < count; i++) {
+		boundingVolume.lb.x(min(boundingVolume.lb.x(), bc[i].lb.x()));
+		boundingVolume.lb.y(min(boundingVolume.lb.y(), bc[i].lb.y()));
+		boundingVolume.lb.z(min(boundingVolume.lb.z(), bc[i].lb.z()));
+
+		boundingVolume.rt.x(max(boundingVolume.rt.x(), bc[i].rt.x()));
+		boundingVolume.rt.y(max(boundingVolume.rt.y(), bc[i].rt.y()));
+		boundingVolume.rt.z(max(boundingVolume.rt.z(), bc[i].rt.z()));
+	}
+
+	bounding_boxes = std::move(bc);
+	cube_count = count;
+}
+
+
 bool cast_ray(const vector3& dirfrac, const vector3& pos, const AABB& bb) {
 	vector3 a = (bb.lb - pos) * dirfrac;
 	vector3 b = (bb.rt - pos) * dirfrac;
