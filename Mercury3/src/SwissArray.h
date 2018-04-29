@@ -45,8 +45,8 @@ public:
 
 	inline void remove(const T& x) {
 		//super scalar the next 2 lines?
-		size_t i = &x - head;
-		if ((&x - head) > m_size) return;
+		ptrdiff_t i = &x - head;
+		if ((&x - head) > ptrdiff_t(m_size)) return;
 		//auto end = this->end();
 		//auto r = std::find_if(begin(), end,
 		//	[&x](const auto& ent) { return &x == &ent; }
