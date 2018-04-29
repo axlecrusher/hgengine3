@@ -5,28 +5,18 @@
 
 #include "str_utils.h"
 
-//#define max(a,b) (a > b ? a : b)
-//#define min(a,b) (a < b ? a : b)
-
 template<typename T>
 inline T max(T a, T b) { return (a > b) ? a : b; }
 
 template<typename T>
 inline T min(T a, T b) { return (a < b) ? a : b; }
 
-AABB* BoundingBoxes::allocate(uint32_t count) {
-	AABB* r = (AABB*)malloc(sizeof(*r) * count);
-	return r;
-}
-
-BoundingBoxes::BoundingBoxes() : bounding_boxes(nullptr)
+BoundingBoxes::BoundingBoxes() : bounding_boxes(nullptr), cube_count(0)
 {
-	cube_count = 0;
 }
 
 void BoundingBoxes::setBoxes(const AABB* bc, uint32_t count) {
-	if (bounding_boxes) SAFE_FREE(bounding_boxes);
-	bounding_boxes = (AABB*)malloc(sizeof(*bounding_boxes) * count);
+	bounding_boxes = std::unique_ptr<AABB[]>(new AABB[sizeof(AABB) * count]);
 	cube_count = count;
 
 	boundingVolume = bc[0];
@@ -65,7 +55,7 @@ void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*inter
 
 	static const vector3 one = { 1.0,1.0,1.0 };
 	vector3 dirfrac = one / ray;
-	AABB* cubes = bounding_boxes;
+	AABB* cubes = bounding_boxes.get();
 
 	vector3 a, b;
 	float dmin, dmax;

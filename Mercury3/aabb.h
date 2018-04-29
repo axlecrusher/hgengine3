@@ -23,11 +23,9 @@ public:
 	void setBoxes(const AABB* bc, uint32_t count);
 	void cast_ray(const vector3& ray, const vector3& pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) const;
 
-	static AABB* allocate(uint32_t count);
-
 private:
 	AABB boundingVolume;
-	AABB* bounding_boxes;
+	std::unique_ptr<AABB[]> bounding_boxes;
 	uint32_t cube_count;
 };
 
