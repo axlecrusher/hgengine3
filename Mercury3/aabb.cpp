@@ -34,8 +34,13 @@ void BoundingBoxes::setBoxes(const AABB* bc, uint32_t count) {
 	for (uint32_t i = 0; i < count; i++) {
 		bounding_boxes[i] = bc[i];
 
-		if (bounding_boxes[i].lb < boundingVolume.lb) boundingVolume.lb = bounding_boxes[i].lb;
-		if (!(boundingVolume.rt < bounding_boxes[i].rt)) boundingVolume.rt = bounding_boxes[i].rt;
+		boundingVolume.lb.x(min(boundingVolume.lb.x(), bc[i].lb.x()));
+		boundingVolume.lb.y(min(boundingVolume.lb.y(), bc[i].lb.y()));
+		boundingVolume.lb.z(min(boundingVolume.lb.z(), bc[i].lb.z()));
+
+		boundingVolume.rt.x(max(boundingVolume.rt.x(), bc[i].rt.x()));
+		boundingVolume.rt.y(max(boundingVolume.rt.y(), bc[i].rt.y()));
+		boundingVolume.rt.z(max(boundingVolume.rt.z(), bc[i].rt.z()));
 	}
 }
 
@@ -51,6 +56,8 @@ static bool cast_ray(const vector3& dirfrac, const vector3& pos, AABB bb) {
 
 	//ray doesn't intersect AABB
 	if (dmin > dmax) return false;
+
+	return true;
 }
 
 void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) const {
@@ -64,7 +71,7 @@ void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*inter
 	float dmin, dmax;
 	aabb_result r;
 
-//	if (!::cast_ray(&dirfrac, pos, boundingVolume)) return; //broken.....
+	if (!::cast_ray(dirfrac, pos, boundingVolume)) return;
 
 	for (int32_t i = 0; i < cube_count; i++) {
 		a = (cubes[i].lb - pos) * dirfrac;

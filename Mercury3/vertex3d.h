@@ -115,11 +115,11 @@ public:
 		return *this + tmp;
 	}
 
-	inline bool operator<(const vertex3d& rhs) const {
-		return ((x() < rhs.x())
-			&& (y() < rhs.y())
-			&& (z() < rhs.z()));
-	}
+	//inline bool operator<(const vertex3d& rhs) const {
+	//	return ((x() < rhs.x())
+	//		&& (y() < rhs.y())
+	//		&& (z() < rhs.z()));
+	//}
 private:
 	float xyz[3];
 };
