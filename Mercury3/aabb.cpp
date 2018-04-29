@@ -51,11 +51,11 @@ static bool cast_ray(const vector3& dirfrac, const vector3& pos, AABB bb) {
 	float dmin = max(max(min(a.x(), b.x()), min(a.y(), b.y())), min(a.z(), b.z()));
 	float dmax = min(min(max(a.x(), b.x()), max(a.y(), b.y())), max(a.z(), b.z()));
 
-	//intersection, but behind ray position
-	if (dmax < 0) return false;
-
-	//ray doesn't intersect AABB
-	if (dmin > dmax) return false;
+	if ((dmax < 0) ||	//intersection, but behind ray position
+		(dmin > dmax))	//ray doesn't intersect AABB
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -77,14 +77,23 @@ void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*inter
 		a = (cubes[i].lb - pos) * dirfrac;
 		b = (cubes[i].rt - pos) * dirfrac;
 
-		dmin = max(max(min(a.x(), b.x()), min(a.y(), b.y())), min(a.z(), b.z()));
-		dmax = min(min(max(a.x(), b.x()), max(a.y(), b.y())), max(a.z(), b.z()));
+		//super scalar?
+		float min1 = min(a.x(), b.x());
+		float min2 = min(a.y(), b.y());
+		float min3 = min(a.z(), b.z());
 
-		//intersection, but behind ray position
-		if (dmax < 0) continue;
+		float max1 = max(a.x(), b.x());
+		float max2 = max(a.y(), b.y());
+		float max3 = max(a.z(), b.z());
 
-		//ray doesn't intersect AABB
-		if (dmin > dmax) continue;
+		dmin = max(max(min1, min2), min3);
+		dmax = min(min(max1, max2), max3);
+
+		if ((dmax < 0) ||	//intersection, but behind ray position
+			(dmin > dmax))	//ray doesn't intersect AABB
+		{
+			continue;
+		}
 
 		r = { dmin, i };
 		intersectClbk(&r, userData);
