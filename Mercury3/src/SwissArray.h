@@ -47,14 +47,6 @@ public:
 		//super scalar the next 2 lines?
 		ptrdiff_t i = &x - head;
 		if ((&x - head) > ptrdiff_t(m_size)) return;
-		//auto end = this->end();
-		//auto r = std::find_if(begin(), end,
-		//	[&x](const auto& ent) { return &x == &ent; }
-		//);
-		//if (r == end) return;
-		//size_t i = r - m_entities.begin();
-		//size_t i = r.itr_;
-		//r->~T();
 		head[i].~T();
 		m_used[i] = false;
 		m_usedSize--;
@@ -110,6 +102,8 @@ public:
 		inline value_type* operator->() { return &sa->operator[](itr_); }
 		inline bool operator==(const self_type& rhs) const { return (sa == rhs.sa) && (itr_ == rhs.itr_); }
 		inline bool operator!=(const self_type& rhs) const { return (sa != rhs.sa) || (itr_ != rhs.itr_); }
+
+		inline bool itemValid() const { return sa->m_used[itr_]; }
 	private:
 		SwissArray<T>* sa;
 		size_t itr_;
@@ -161,11 +155,10 @@ public:
 
 	iterator begin()
 	{
-		size_t i = 0;
-		for (; i < m_used.size(); ++i) {
-			if (m_used[i]) break;
+		for (size_t i = 0; i < m_used.size(); ++i) {
+			if (m_used[i]) return iterator(i, this);
 		}
-		return iterator(i, this);
+		return end();
 	}
 
 	iterator end()
