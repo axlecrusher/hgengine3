@@ -14,6 +14,8 @@ namespace HgSound {
 	std::unique_ptr<HgSound::Driver> Driver::Create() { return std::make_unique<HgSound::LibSoundIoDriver>(); }
 	
 	PlayingSound::ptr Driver::play(SoundAsset::ptr asset) {
+		if (asset == nullptr) return nullptr;
+
 		PlayingSound::ptr tmp = asset->play();
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_mutex);

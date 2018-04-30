@@ -94,6 +94,7 @@ class HgScene;
 
 class HgElementLogic {
 public:
+	virtual ~HgElementLogic() {}
 	virtual void update(HgTime tdelta) = 0;
 
 	inline void setElement(HgElement* x) { element = x; }
