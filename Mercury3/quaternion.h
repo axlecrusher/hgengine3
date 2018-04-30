@@ -10,7 +10,7 @@ typedef vertex3d vector3;
 
 class quaternion {
 public:
-	static const quaternion& IDENTITY;
+	static const quaternion IDENTITY;
 
 	quaternion() { wxyz = { 1.0f, 0, 0, 0 }; }
 	quaternion(float w, float x, float y, float z) { wxyz = { w, x, y, z }; }
