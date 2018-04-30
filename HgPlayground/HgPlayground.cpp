@@ -401,6 +401,8 @@ int main()
 			}
 		}
 
+		Engine::EnqueueForRender();
+
 		//render below
 		Renderer::Render(stereo_view, camera+0);
 		if (stereo_view>0) Renderer::Render(2, camera+1);

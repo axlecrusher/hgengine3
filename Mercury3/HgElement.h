@@ -179,6 +179,7 @@ class IUpdatableCollection;
 namespace Engine {
 	std::vector<IUpdatableCollection*>& collections();
 	void updateCollections(HgTime dtime);
+	void EnqueueForRender();
 }
 
 //typedef void(*SignalHandler)(int signum);

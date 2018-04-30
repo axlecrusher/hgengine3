@@ -8,6 +8,7 @@
 class IUpdatableCollection {
 public:
 	virtual void update(HgTime dtime) = 0;
+	virtual void EnqueueForRender() = 0;
 };
 
 /* This is for data oriented processing. Large collections of objects can
@@ -25,11 +26,25 @@ public:
 
 	virtual void update(HgTime dtime) final {
 		if (empty()) return;
-		if (dtime.msec() >= 1) {
-			updateAndRender(dtime);
+		if (dtime.msec() == 0) return;
+
+		for (auto itr = begin(); itr != end(); itr++) {
+			itr->T::update(dtime); //avoid vtable lookup
+			//if a thing is enqueued for rendering here, a different part
+			//of the engine could come along a delete it before the render
+			//happens, causing a crash.
+			//Enqueue in secodn pass after updates.
 		}
-		else {
-			renderOnly();
+	}
+
+	virtual void EnqueueForRender() final {
+		if (empty()) return;
+
+		for (auto itr = begin(); itr != end(); itr++) {
+			auto& e = itr->getElement();
+			if (!e.check_flag(HGE_HIDDEN)) {
+				Renderer::Enqueue(e);
+			}
 		}
 	}
 
@@ -72,28 +87,6 @@ public:
 	inline bool empty() const { return m_items.empty(); }
 
 private:
-
-	void updateAndRender(HgTime dtime) {
-		for (auto itr = begin(); itr != end(); itr++) {
-			itr->T::update(dtime); //avoid vtable lookup
-			if (itr.itemValid()) //check for deletion
-			{
-				submitRender(itr->T::getElement());
-			}
-		}
-	}
-
-	void renderOnly() {
-		for (auto itr = begin(); itr != end(); itr++) {
-			submitRender(itr->T::getElement());
-		}
-	}
-
-	inline void submitRender(HgElement& e) {
-		if (!e.check_flag(HGE_HIDDEN)) {
-			Renderer::Enqueue(e);
-		}
-	}
 
 	SwissArray<T> m_items;
 };

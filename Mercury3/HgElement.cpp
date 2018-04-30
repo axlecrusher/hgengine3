@@ -105,4 +105,11 @@ namespace Engine {
 			i->update(dtime);
 		}
 	}
+
+	void EnqueueForRender() {
+		auto c = collections();
+		for (auto i : c) {
+			i->EnqueueForRender();
+		}
+	}
 }
