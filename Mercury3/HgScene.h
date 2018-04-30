@@ -82,6 +82,21 @@ T* create_element(char* type, HgScene* scene, HgElement** element) {
 	return (T*)clbk(*element);
 }
 
+
+template<typename T>
+T* create_element(char* type, HgScene* scene) {
+	//	uint32_t idx = hgelement_get_type_index(type);
+
+	auto factory = element_factories.find(type);
+
+	if (factory == element_factories.end()) {
+		fprintf(stderr, "Unable to find element type \"%s\"\n", type);
+		return 0;
+	}
+	factory_clbk clbk = factory->second;
+	return (T*)clbk(nullptr);
+}
+
 /*
 typedef struct HgScene_iterator {
 	uint32_t _current;
