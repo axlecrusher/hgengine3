@@ -34,7 +34,7 @@ class HgTimer {
 public:
 	HgTimer();
 	void start();
-	inline HgTime getElasped() const { uint64_t t = (currentTime() / 1000) - (m_startTime / 1000); return HgTime::msec((uint32_t)t); }
+	inline HgTime getElasped() const { uint64_t t = ( currentTime() - m_startTime ) / 1000; return HgTime::msec((uint32_t)t); }
 //	inline float f_millisecondsElasped() const { return (currentTime() - m_startTime) / 1000.0f; }
 private:
 	uint64_t currentTime() const;

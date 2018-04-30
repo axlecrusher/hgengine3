@@ -14,7 +14,7 @@ void HgTimer::start() {
 uint64_t HgTimer::currentTime() const {
 	//	return GetTickCount64();
 	//use QueryUnbiasedInterruptTime in place of GetTickCount64 as GetTickCount64 has a resolution between 10 and 16 milliseconds
-	QueryUnbiasedInterruptTime((PULONGLONG)&m_wtime); //
+	QueryUnbiasedInterruptTime((PULONGLONG)&m_wtime); //100 nano seconds
 	return (m_wtime / 10); //usec
 }
 
