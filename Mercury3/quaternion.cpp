@@ -58,10 +58,24 @@ quaternion quaternion::fromEuler(HgMath::angle x, HgMath::angle y, HgMath::angle
 //should be vector, but vector include is broken
 quaternion getRotationTo(const vertex3d& v1, const vertex3d& v2) {
 	//https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
+	float d = v1.dot(v2);
+
+	//adapted from ogre https://bitbucket.org/sinbad/ogre/src/9db75e3ba05c0f710998b0816484f3112d5d29ed/OgreMain/include/OgreVector3.h?at=default&fileviewer=file-view-default#OgreVector3.h-664
+	if (d >= 1.0f) {
+		return quaternion::IDENTITY;
+	}
+
+	if (d < (1e-6f - 1.0f)) { //-0.999999
+		vector3 axis = vector3::UNIT_X.cross(v1);
+		if (axis.isZeroLength())
+			axis = vector3::UNIT_Y.cross(v1);
+		return quaternion::fromAxisAngle(axis.normal(), HgMath::angle::rad(M_PI));
+	}
+
 	quaternion q = vector3_to_quat(v1.cross(v2));
-	float x = v1.dot(v2);
 	float y = v1.squaredLength() * v2.squaredLength();
-	q.w(x+y);
+	q.w(d + y);
+
 	return q.normal();
 }
 

@@ -7,6 +7,10 @@
 
 class vertex3d {
 public:
+	static const vertex3d UNIT_X;
+	static const vertex3d UNIT_Y;
+	static const vertex3d UNIT_Z;
+
 	vertex3d() : xyz{ 0,0,0 }
 	{
 	}
@@ -116,6 +120,11 @@ public:
 		vertex3d r2 = vertex3d(q.wxyz.wxyz + 1).cross(*this); 
 		vertex3d tmp = vertex3d(q.wxyz.wxyz + 1).cross(r1 + r2).scale(2.0); //XXX fix this
 		return *this + tmp;
+	}
+
+	inline bool isZeroLength() const
+	{
+		return (squaredLength() < HgMath::square(1e-06)); //does squaredLength need to be double here?
 	}
 
 	//inline bool operator<(const vertex3d& rhs) const {

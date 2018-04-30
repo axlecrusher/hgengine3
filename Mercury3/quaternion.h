@@ -5,6 +5,9 @@
 
 #include <xmmintrin.h>
 
+class vertex3d;
+typedef vertex3d vector3;
+
 class quaternion {
 public:
 	static const quaternion& IDENTITY;
@@ -50,6 +53,8 @@ public:
 		r.z(z() / l);
 		return r;
 	}
+
+	static inline quaternion fromAxisAngle(const vector3& axis, HgMath::angle angle);
 
 	union {
 		float wxyz[4];

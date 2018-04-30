@@ -6,12 +6,18 @@
 #include <memory.h>
 #include <stdlib.h>
 
+#include <vertex3d.h>
+
 //const vertex vertex_zero = { 0,0,0 };
 //const vector3 vector3_zero = { 0,0,0 };
 //
 
 template<>
 const HgMath::angle HgMath::angle::ZERO;
+
+const vertex3d vertex3d::UNIT_X( 1.0,0,0 );
+const vertex3d vertex3d::UNIT_Y( 0,1.0,0 );
+const vertex3d vertex3d::UNIT_Z( 0,0,1.0 );
 
 void MatrixMultiply4f(const float* in1, const float* in2, float* outa)
 {
