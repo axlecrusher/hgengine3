@@ -7,9 +7,9 @@
 
 class quaternion {
 public:
-	quaternion();
-	quaternion(const quaternion& lhs);
-	quaternion(float w,float x, float y, float z);
+	quaternion::quaternion() { wxyz = { 1.0f, 0, 0, 0 }; }
+	quaternion::quaternion(float w, float x, float y, float z) { wxyz = { w, x, y, z }; }
+	quaternion::quaternion(const quaternion& lhs) { wxyz = lhs.wxyz; }
 
 	static quaternion fromEuler(double x, double y, double z);
 
