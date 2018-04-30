@@ -17,21 +17,21 @@ SceneChunk::SceneChunk() {
 	memset(used, 0, sizeof(used));
 }
 
-bool SceneChunk::isUsed(uint16_t i)
+bool SceneChunk::isUsed(uint32_t i)
 {
+	uint32_t r = i % (sizeof(uint32_t) * 8);
 	uint32_t q = i / (sizeof(usedType) * 8);
 //	uint32_t q = i >> 5;
-	uint32_t r = i % (sizeof(usedType) * 8);
 	return 0<(used[q] & (1 << r));
 }
 
-void SceneChunk::set_used(uint16_t i) {
+void SceneChunk::set_used(uint32_t i) {
 	uint32_t q = i / (sizeof(usedType) * 8);
 	uint32_t r = i % (sizeof(usedType) * 8);
 	used[q] |= (1 << r);
 }
 
-void SceneChunk::clear_used(uint16_t idx) {
+void SceneChunk::clear_used(uint32_t idx) {
 	uint32_t q = idx / (sizeof(usedType) * 8);
 	uint32_t r = idx % (sizeof(usedType) * 8);
 	used[q] &= ~(1 << r);

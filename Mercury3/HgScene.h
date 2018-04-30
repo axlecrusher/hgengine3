@@ -19,9 +19,9 @@ class SceneChunk {
 		typedef uint32_t usedType;
 
 		SceneChunk();
-		bool isUsed(uint16_t i);
-		void set_used(uint16_t i);
-		void clear_used(uint16_t idx);
+		bool isUsed(uint32_t i);
+		void set_used(uint32_t i);
+		void clear_used(uint32_t idx);
 
 		HgElement elements[512];
 	private:
