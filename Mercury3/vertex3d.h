@@ -124,7 +124,7 @@ public:
 
 	inline bool isZeroLength() const
 	{
-		return (squaredLength() < HgMath::square(1e-06)); //does squaredLength need to be double here?
+		return (squaredLength() < HgMath::square(1e-06f)); //does squaredLength need to be double here if 1e-06 is double?
 	}
 
 	//inline bool operator<(const vertex3d& rhs) const {
