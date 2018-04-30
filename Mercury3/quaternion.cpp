@@ -82,6 +82,15 @@ quaternion quaternion::fromEuler(double x, double y, double z) {
 	return tmp.normal();
 }
 
+quaternion getRotationTo(const vector3& v1, const vector3& v2) {
+	//https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
+	quaternion q = vector3_to_quat(v1.cross(v2));
+	float x = v1.dot(v2);
+	float y = v1.squaredLength() * v2.squaredLength();
+	q.w(x+y);
+	return q.normal();
+}
+
 //#define SQUARE(x) (x*x)
 //
 //quaternion quaternion_normalize(const quaternion& q) {

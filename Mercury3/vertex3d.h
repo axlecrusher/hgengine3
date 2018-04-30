@@ -79,11 +79,14 @@ public:
 	}
 
 	inline float length() const {
+		return (float)sqrt(squaredLength());
+	}
+
+	inline float squaredLength() const {
 		float x = HgMath::square(xyz[0])
 			+ HgMath::square(xyz[1])
 			+ HgMath::square(xyz[2]);
-
-		return (float)sqrt(x);
+		return x;
 	}
 
 	inline vertex3d normal() const {

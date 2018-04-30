@@ -27,8 +27,12 @@ public:
 	inline float z() const { return wxyz.wxyz[3]; }
 	inline void z(float a) { wxyz.wxyz[3] = a; }
 
+	inline float squaredLength() const {
+		return HgMath::square(x()) + HgMath::square(y()) + HgMath::square(z()) + HgMath::square(w());
+	}
+
 	inline float length() const {
-		return (float)sqrt(HgMath::square(x()) + HgMath::square(y()) + HgMath::square(z()) + HgMath::square(w()));
+		return (float)sqrt(squaredLength());
 	}
 
 	inline quaternion operator*(const quaternion& rhs) {
@@ -69,5 +73,8 @@ void toQuaternion(double x, double y, double z, double deg, quaternion* q);
 
 class vertex3d;
 quaternion vector3_to_quat(const vertex3d& a);
+
+//Produces shortest arc from v1 to v2
+quaternion getRotationTo(const vertex3d& v1, const vertex3d& v2);
 
 //vector3 vector3_quat_rotate(const vector3& v, const quaternion& q);
