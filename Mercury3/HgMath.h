@@ -1,6 +1,8 @@
 #pragma once
 
-#define RADIANS 0.01745329251994329576923690768488612713442871888542
+#define DEG_RAD 0.01745329251994329576923690768488612713442871888542
+#define RAD_DEG 57.29577951308232087679815481410517033240547246656432
+
 #define RAD_360 6.28318530717958647692528676655900576839433879875021
 #define M_PI 3.14159265358979323846264338327950288419716939937511
 
@@ -22,4 +24,22 @@ void Perspective2(
 namespace HgMath {
 	template<typename T>
 	inline T square(T x) { return x*x; }
+
+	template<typename T>
+	class angle_template {
+	public:
+		angle_template<T>() : m_radians(0) {}
+		static const angle_template<T> ZERO;
+
+		static inline angle_template<T> deg(T x) { angle_template<T> tmp; tmp.m_radians = (T)x*DEG_RAD; return tmp; }
+		//inline angle_template<T>& deg(T x) { m_radians = x*DEG_RAD; return *this; }
+		inline T deg() const { return (T)m_radians*RAD_DEG; }
+
+		inline T rad() const { return m_radians; }
+		static inline angle_template<T> rad(T x) { angle_template<T> tmp; tmp.m_radians = x; return tmp; }
+	private:
+		T m_radians;
+	};
+
+	typedef angle_template<double> angle;
 }

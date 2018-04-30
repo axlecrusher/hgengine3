@@ -13,7 +13,7 @@ public:
 	quaternion(float w, float x, float y, float z) { wxyz = { w, x, y, z }; }
 	quaternion(const quaternion& lhs) { wxyz = lhs.wxyz; }
 
-	static quaternion fromEuler(double x, double y, double z);
+	static quaternion fromEuler(HgMath::angle x, HgMath::angle y, HgMath::angle z);
 
 	inline quaternion invert() const { return quaternion(w(), -x(), -y(), -z()); }
 
@@ -67,10 +67,10 @@ private:
 	}
 };
 
-void toQuaternion(double x, double y, double z, double deg, quaternion* q);
+//void toQuaternion(double x, double y, double z, double deg, quaternion* q);
 //quaternion toQuaternion2(double pitch, double roll, double yaw);
 
-class vertex3d;
+//class vertex3d;
 quaternion vector3_to_quat(const vertex3d& a);
 
 //Produces shortest arc from v1 to v2

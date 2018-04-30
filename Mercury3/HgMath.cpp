@@ -9,6 +9,10 @@
 //const vertex vertex_zero = { 0,0,0 };
 //const vector3 vector3_zero = { 0,0,0 };
 //
+
+template<>
+const HgMath::angle HgMath::angle::ZERO;
+
 void MatrixMultiply4f(const float* in1, const float* in2, float* outa)
 {
 	float* r = outa;
@@ -64,7 +68,7 @@ void Perspective(
 	const double znear,
 	const double zfar, float* M)
 {
-	double top = tan(fov*0.5 * RADIANS) * znear;
+	double top = tan(fov*0.5 * DEG_RAD) * znear;
 	double bottom = -top;
 	double right = aspect*top;
 	double left = -right;
@@ -84,7 +88,7 @@ void Perspective2(
 	const double znear,
 	const double zfar, float* M)
 {
-	fov *= RADIANS;
+	fov *= DEG_RAD;
 
 	double f = 1.0 / tan(fov*0.5);
 	memset(M, 0, 16 * sizeof* M);

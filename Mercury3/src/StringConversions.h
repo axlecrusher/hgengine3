@@ -28,10 +28,11 @@ namespace StringConverters {
 	}
 
 	inline bool convertValue(const std::string& str_val, quaternion& value) {
+		using namespace HgMath;
 		float x, y, z;
 		int r = sscanf(str_val.c_str(), "%f,%f,%f", &x, &y, &z);
 		if (r == 3) {
-			value = quaternion::fromEuler(x, y, z);
+			value = quaternion::fromEuler(angle::deg(x), angle::deg(y), angle::deg(z));
 			return true;
 		}
 		//warn

@@ -7,34 +7,44 @@
 
 const quaternion& quaternion::IDENTITY = { 1.0f,0,0,0 };
 
-void toQuaternion(double x, double y, double z, double deg, quaternion* q)
-{
-	// AxisAngle to Quaternion
-	// don't know how to properly use this function...
-	double rad = deg * RADIANS;
-//	x *= RADIANS;
-//	y *= RADIANS;
-//	z *= RADIANS;
+//void toQuaternion(double x, double y, double z, double deg, quaternion* q)
+//{
+//	// AxisAngle to Quaternion
+//	// don't know how to properly use this function...
+//	double rad = deg * RADIANS;
+////	x *= RADIANS;
+////	y *= RADIANS;
+////	z *= RADIANS;
+//
+//	double s_rad = sin(rad*0.5);
+//	q->w( (float)cos(rad*0.5) );
+//	q->x(  (float)(s_rad * cos(x)));
+//	q->y(  (float)(s_rad * cos(y)));
+//	q->z(  (float)(s_rad * cos(z)));
+//}
 
-	double s_rad = sin(rad*0.5);
-	q->w( (float)cos(rad*0.5) );
-	q->x(  (float)(s_rad * cos(x)));
-	q->y(  (float)(s_rad * cos(y)));
-	q->z(  (float)(s_rad * cos(z)));
+quaternion quaternion::fromAxisAngle(const vector3& axis, HgMath::angle angle) {
+	vector3 a = axis.normal();
+	double s = sin(angle.rad()*0.5);
+	quaternion q(cos(angle.rad() * 0.5),
+		a.x()*s,
+		a.y()*s,
+		a.z()*s);
+	return q;
 }
 
-quaternion quaternion::fromEuler(double x, double y, double z) {
+quaternion quaternion::fromEuler(HgMath::angle x, HgMath::angle y, HgMath::angle z) {
 	//match http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
-	double h = y * RADIANS; //heading
-	double a = z * RADIANS; //attitude
-	double b = x * RADIANS; //bank
+	//double h = y.rad(); //heading
+	//double a = z.rad(); //attitude
+	//double b = x.rad(); //bank
 
-	double c1 = cos(h * 0.5);
-	double s1 = sin(h * 0.5);
-	double c2 = cos(a * 0.5);
-	double s2 = sin(a * 0.5);
-	double c3 = cos(b * 0.5);
-	double s3 = sin(b * 0.5);
+	double c1 = cos(y.rad() * 0.5);
+	double s1 = sin(y.rad() * 0.5);
+	double c2 = cos(z.rad() * 0.5);
+	double s2 = sin(z.rad() * 0.5);
+	double c3 = cos(x.rad() * 0.5);
+	double s3 = sin(x.rad() * 0.5);
 
 	quaternion tmp;
 	tmp.w((float)(c1 * c2 * c3 - s1 * s2 * s3));

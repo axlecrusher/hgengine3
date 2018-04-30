@@ -8,7 +8,7 @@ class HgCamera {
 	public:
 		HgCamera();
 
-		void FreeRotate(double yaw, double pitch);
+		void FreeRotate(HgMath::angle yaw, HgMath::angle pitch);
 
 		inline void Move(const vector3& v) { position = position + v;	}
 		inline void SetRotation(const quaternion& r) { rotation = r; }

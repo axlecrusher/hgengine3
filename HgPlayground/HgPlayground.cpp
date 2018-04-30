@@ -193,10 +193,10 @@ int main()
 	//	Perspective(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
 	//	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
 	//	Perspective2(60, 320.0 / 480.0, 0.1f, 100.0f, projection);
-
+	using namespace HgMath;
 	camera[0].position.z(1.5f);
 	camera[0].position.y(2.0f);
-	camera[0].SetRotation(quaternion::fromEuler(15, 0, 0) );
+	camera[0].SetRotation(quaternion::fromEuler(angle::deg(15), angle::ZERO, angle::ZERO) );
 
 	camera[1] = camera[0];
 	camera[1].position.x(camera[1].position.x() + EYE_DISTANCE);
@@ -261,7 +261,7 @@ int main()
 		if (create_element("square", &scene, &element) > 0) {
 			element->scale = 100.0f;
 			element->position.z(-4);
-			element->rotation = quaternion::fromEuler(-90, 0, 0);
+			element->rotation = quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO);
 			element->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
 			element->renderData()->blendMode = BLEND_ADDITIVE;
 			//	model_data d = LoadModel("test.hgmdl");
@@ -349,8 +349,8 @@ int main()
 			mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
 			mouse_y = (MOUSE_INPUT.dy + mouse_y) % 2000;
 
-
-			camera->FreeRotate((-MOUSE_INPUT.dx / 2000.0f) * 360, (-MOUSE_INPUT.dy / 2000.0f) * 360);
+			using namespace HgMath;
+			camera->FreeRotate(angle::deg((-MOUSE_INPUT.dx / 2000.0f) * 360), angle::deg((-MOUSE_INPUT.dy / 2000.0f) * 360));
 
 			MOUSE_INPUT.dx = 0;
 			MOUSE_INPUT.dy = 0;
@@ -376,7 +376,7 @@ int main()
 
 		{
 			HgElement* element = tris[0];
-			element->rotation = quaternion::fromEuler(0,(time.milliseconds() % 10000) / 27.777777777777777777777777777778,0);
+			element->rotation = quaternion::fromEuler(angle::ZERO,angle::deg((time.milliseconds() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
 
 			for (i = 0; i < ANI_TRIS; i++) {
 				HgElement* e = tris[i];
