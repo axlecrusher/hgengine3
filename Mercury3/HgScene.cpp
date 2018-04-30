@@ -96,7 +96,7 @@ void HgScene::update(HgTime dtime) {
 		if (!isUsed(i)) continue;
 		HgElement* e = get_element(i);
 
-		if ((dtime > 0) && e->needsUpdate(updateNumber)) {
+		if ((dtime.msec() > 0) && e->needsUpdate(updateNumber)) {
 			e->update(dtime, updateNumber);
 		}
 

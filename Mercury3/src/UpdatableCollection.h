@@ -22,7 +22,7 @@ public:
 
 	virtual void update(HgTime dtime) final {
 		if (empty()) return;
-		if (dtime < 1) return;
+		if (dtime.msec() < 1) return;
 
 		for (auto itr = begin(); itr != end(); itr++) {
 			itr->T::update(dtime); //avoid vtable lookup

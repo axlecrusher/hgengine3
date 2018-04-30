@@ -27,14 +27,13 @@ static Projectile& CreateProjectile() {
 }
 
 Projectile::Projectile()
-	:total_time(0)
 {
 }
 
 void Projectile::update(HgTime tdelta) {
 		total_time += tdelta;
 
-		if (total_time >= 3000) {
+		if (total_time >= HgTime::msec(3000)) {
 //			printf("set destroy\n");
 			SET_FLAG(element, HGE_DESTROY);
 			ProjectileCollection().remove(*this);

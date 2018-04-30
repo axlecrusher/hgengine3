@@ -323,7 +323,7 @@ int main()
 		BeginFrame();
 #endif
 
-		if (dtime > 0) {
+		if (dtime.msec() > 0) {
 			vector3 v;
 
 			if (KeyDownMap['w']) v.z(v.z() - 1.0f);
