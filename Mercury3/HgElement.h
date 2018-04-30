@@ -153,9 +153,8 @@ public:
 
 		inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 
-		inline bool check_flag(uint32_t x) const {
-			return (flags & x) > 0;
-		}
+		inline bool check_flag(uint32_t x) const { return (flags & x) != 0; }
+		inline void setFlag(uint32_t x) { flags |= x; }
 
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }

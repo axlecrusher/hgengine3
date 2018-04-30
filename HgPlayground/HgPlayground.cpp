@@ -397,12 +397,7 @@ int main()
 			if (!scene.isUsed(i)) continue;
 			HgElement* e = scene.get_element(i);
 			if (CHECK_FLAG(e, HGE_HIDDEN) == 0) {
-				if (CHECK_FLAG(e, HGE_TRANSPARENT) > 0) {
-					Renderer::transparentElements.push_back(e);
-				}
-				else {
-					Renderer::opaqueElements.push_back(e);
-				}
+				Renderer::Enqueue(*e);
 			}
 		}
 
