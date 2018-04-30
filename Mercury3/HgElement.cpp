@@ -9,6 +9,8 @@
 #include <HgMath.h>
 #include <map>
 
+#include <HgTimer.h>
+
 #include <UpdatableCollection.h>
 
 RenderData* (*new_RenderData)() = NULL;
@@ -97,7 +99,7 @@ namespace Engine {
 		return c;
 	}
 
-	void updateCollections(uint32_t dtime) {
+	void updateCollections(HgTime dtime) {
 		auto c = collections();
 		for (auto i : c) {
 			i->update(dtime);

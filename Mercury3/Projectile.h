@@ -7,9 +7,10 @@
 class Projectile : public IUpdatable {
 public:
 	Projectile();
-	virtual void update(uint32_t tdelta);
+	virtual void update(HgTime tdelta);
 	vector3 direction;
-	uint32_t total_time;
+private:
+	HgTime total_time;
 //	float projectileMsecSpeed;
 };
 

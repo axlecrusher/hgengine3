@@ -302,7 +302,7 @@ int main()
 #endif
 
 	HgTimer gameTimer;
-	HgDeltaTime last_time;
+	HgTime last_time;
 
 	int8_t do_render = 1;
 	uint8_t did_change = 0;
@@ -312,8 +312,8 @@ int main()
 
 	gameTimer.start();
 	while (1 && !window->m_close) {
-		HgDeltaTime time = gameTimer.getElasped();
-		uint32_t dtime = time.milliseconds() - last_time.milliseconds();
+		HgTime time = gameTimer.getElasped();
+		HgTime dtime = time - last_time;
 		last_time = time;
 
 //		if (dtime > 17) {
@@ -342,7 +342,7 @@ int main()
 			//			if (v.components.z > 0) DebugBreak();
 
 			v = v.normal().rotate(camera->rotation.invert());
-			float scale = (1.0f / 1000.0f) * dtime;
+			float scale = (1.0f / 1000.0f) * dtime.msec();
 			v = v.normal().scale(scale);
 			camera->Move(v);
 
@@ -376,7 +376,7 @@ int main()
 
 		{
 			HgElement* element = tris[0];
-			element->rotation = quaternion::fromEuler(angle::ZERO,angle::deg((time.milliseconds() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
+			element->rotation = quaternion::fromEuler(angle::ZERO,angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
 
 			for (i = 0; i < ANI_TRIS; i++) {
 				HgElement* e = tris[i];

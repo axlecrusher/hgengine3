@@ -11,6 +11,8 @@
 #include <HgTexture.h>
 #include <vector>
 
+#include <HgTimer.h>
+
 enum HgElementFlag {
 	HGE_USED = 0x01, //used in scene graph
 	HGE_ACTIVE = 0x02,
@@ -82,7 +84,7 @@ class HgScene;
 
 class HgElementLogic {
 public:
-	virtual void update(uint32_t tdelta) = 0;
+	virtual void update(HgTime tdelta) = 0;
 
 	inline void setElement(HgElement* x) { element = x; }
 	inline HgElement& getElement() { return *element; }
@@ -128,7 +130,7 @@ public:
 		inline void render() { if (isRenderable()) m_renderData->render();  }
 
 		inline bool needsUpdate(uint32_t updateNumber) const { return (hasLogic() && (m_updateNumber != updateNumber)); }
-		inline void update(uint32_t dtime, uint32_t updateNumber) { 
+		inline void update(HgTime dtime, uint32_t updateNumber) {
 			m_updateNumber = updateNumber;
 			//require parents to be updated first
 			if ((m_parent != nullptr) && m_parent->needsUpdate(updateNumber)) m_parent->update(dtime, updateNumber);
@@ -173,7 +175,7 @@ class IUpdatableCollection;
 
 namespace Engine {
 	std::vector<IUpdatableCollection*>& collections();
-	void updateCollections(uint32_t dtime);
+	void updateCollections(HgTime dtime);
 }
 
 //typedef void(*SignalHandler)(int signum);

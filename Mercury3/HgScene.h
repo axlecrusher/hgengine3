@@ -5,6 +5,8 @@
 
 #include <HgElement.h>
 
+#include <HgTimer.h>
+
 /* HgScene could be reworked into a linked list (or array of pointers to list items) with each
 list item containing 512 elements and a used map. We could still index into the linked list
 by using the first 9 least significant bits to represent 512 elements. The last 7 MSB could
@@ -47,7 +49,7 @@ class HgScene {
 
 		inline uint32_t nextUpdateNumber() { return ++m_updateCount; }
 
-		void update(uint32_t dtime);
+		void update(HgTime dtime);
 
 //		void(*submit_for_render)(HgElement* e);
 private:

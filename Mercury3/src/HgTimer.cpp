@@ -18,7 +18,7 @@ uint64_t HgTimer::currentTime() const {
 	return (m_wtime / 10); //usec
 }
 
-HgDeltaTime::HgDeltaTime(uint64_t begin, uint64_t end) {
+HgTime::HgTime(uint64_t begin, uint64_t end) {
 	uint64_t dt = begin - end;
 	m_msec = (uint32_t)dt; //should not overflow unless dt is greater than 49 days
 }

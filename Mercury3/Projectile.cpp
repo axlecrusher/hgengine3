@@ -31,7 +31,7 @@ Projectile::Projectile()
 {
 }
 
-void Projectile::update(uint32_t tdelta) {
+void Projectile::update(HgTime tdelta) {
 		total_time += tdelta;
 
 		if (total_time >= 3000) {
@@ -41,6 +41,7 @@ void Projectile::update(uint32_t tdelta) {
 			return;
 		}
 
+		float tmp = tdelta.msec() * projectileMsecSpeed;
 		float tmp = tdelta * projectileMsecSpeed;
 		vector3 r = direction.scale(tmp);
 		element->position = element->position + r;

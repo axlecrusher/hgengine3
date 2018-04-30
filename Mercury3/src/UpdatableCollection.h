@@ -1,10 +1,10 @@
 #pragma once
 
 #include <SwissArray.h>
-
+#include <HgTimer.h>
 class IUpdatableCollection {
 public:
-	virtual void update(uint32_t dtime) = 0;
+	virtual void update(HgTime dtime) = 0;
 };
 
 /* This is for data oriented processing. Large collections of objects can
@@ -20,7 +20,7 @@ public:
 	UpdatableCollection(uint32_t reserve) : m_items(reserve) {
 	}
 
-	virtual void update(uint32_t dtime) final {
+	virtual void update(HgTime dtime) final {
 		if (empty()) return;
 		if (dtime < 1) return;
 

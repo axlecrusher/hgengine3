@@ -89,7 +89,7 @@ void HgScene::allocate_chunk() {
 	chunks.push_back(std::make_unique<SceneChunk>());
 }
 
-void HgScene::update(uint32_t dtime) {
+void HgScene::update(HgTime dtime) {
 	uint32_t updateNumber = nextUpdateNumber();
 	uint32_t maxCount = maxItems();
 	for (uint32_t i = 0; i < maxCount; ++i) {
