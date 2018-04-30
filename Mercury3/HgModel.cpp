@@ -77,7 +77,7 @@ static model_data LoadModel(const char* filename) {
 	r.vertex_count = head.vertex_count;
 	r.index_count = head.index_count;
 
-	return r;
+	return std::move(r);
 }
 
 static RenderData* init_render_data() {
@@ -96,6 +96,24 @@ model_data::model_data()
 
 }
 model_data::~model_data() {
+	if (vertices) free(vertices);
+	if (indices) free(indices);
+
+	vertices = nullptr;
+	indices = nullptr;
+}
+
+model_data::model_data(model_data && other) {
+	memcpy(this, &other, sizeof(model_data));
+	other.vertices = nullptr;
+	other.indices = nullptr;
+}
+
+model_data& model_data::operator=(model_data && other) {
+	memcpy(this, &other, sizeof(model_data));
+	other.vertices = nullptr;
+	other.indices = nullptr;
+	return *this;
 }
 
 static void destroy(HgElement* e) {
@@ -116,14 +134,14 @@ static void render(RenderData* rd) {
 	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
 	OGLRenderData *d = (OGLRenderData*)rd;
 
-	d->hgVbo->use();
+	d->hgVbo()->use();
 //	d->colorVbo->use();
 
-	d->indexVbo->use();
+	d->indexVbo()->use();
 
 	setRenderAttributes(rd->blendMode, rd->renderFlags);
 
-	d->indexVbo->draw(d->index_count, d->vbo_offset, d->index_offset);
+	d->indexVbo()->draw(d->index_count, d->vbo_offset, d->index_offset);
 	//	draw_index_vbo(d->indexVbo, d->vbo_offset);
 }
 
@@ -134,7 +152,7 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 
 	SET_FLAG(element, HGE_DESTROY); //clear when we make it to the end
 
-	model_data mdl = LoadModel(filename);
+	model_data mdl( LoadModel(filename) );
 	if (mdl.vertices == NULL || mdl.indices == NULL) return -1;
 
 	/*
@@ -146,15 +164,15 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 		printf("%f %f %f %f\n",x, y, z, w);
 	}
 */
-	rd->hgVbo = staticVboVNUT;
+	rd->hgVbo( staticVboVNUT );
 	rd->vertex_count = mdl.vertex_count;
 	rd->index_count = mdl.index_count;
 	rd->vbo_offset = staticVboVNUT->add_data(mdl.vertices, rd->vertex_count);
-	free(mdl.vertices);
+	//free(mdl.vertices);
 
 //	mrd->index_count = mdl.index_count;
-	rd->indexVbo = HgVbo::Create<uint16_t>();
-	rd->index_offset = rd->indexVbo->add_data(mdl.indices, mdl.index_count);
+	rd->indexVbo( HgVbo::Create<uint16_t>() );
+	rd->index_offset = rd->indexVbo()->add_data(mdl.indices, mdl.index_count);
 
 	rd->renderFunction = render;
 

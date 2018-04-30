@@ -38,6 +38,8 @@ enum RenderFlags : uint8_t {
 	DEPTH_WRITE = 2
 };
 
+class IHgVbo;
+
 class RenderData {
 	public:
 		typedef RenderData*(*newRenderDataCallback)();
@@ -59,11 +61,13 @@ class RenderData {
 
 		indiceRenderFunc renderFunction; // could store VBO_TYPE instead and make a single function do all the rendering?
 
-		class IHgVbo* hgVbo;
+		inline IHgVbo* hgVbo() { return m_hgVbo.get(); }
+		inline IHgVbo* indexVbo() {	return m_indexVbo.get(); }
+		inline IHgVbo* colorVbo() { return m_colorVbo.get(); }
 
-		//We need to be able to support multiple VBOs without hardcoding more here.
-		class IHgVbo* indexVbo;
-		class IHgVbo* colorVbo;
+		inline void hgVbo(std::shared_ptr<IHgVbo>& vbo) { m_hgVbo = vbo; }
+		inline void indexVbo(std::shared_ptr<IHgVbo>& vbo) { m_indexVbo = vbo; }
+		inline void colorVbo(std::shared_ptr<IHgVbo>& vbo) { m_colorVbo = vbo; }
 
 		uint32_t index_offset;
 		uint32_t index_count;
@@ -73,6 +77,12 @@ class RenderData {
 
 		BlendMode blendMode;
 		RenderFlags renderFlags;
+
+private:
+	//We need to be able to support multiple VBOs without hardcoding more here.
+	std::shared_ptr<IHgVbo> m_hgVbo;
+	std::shared_ptr<IHgVbo> m_indexVbo;
+	std::shared_ptr<IHgVbo> m_colorVbo;
 };
 
 
@@ -123,6 +133,8 @@ public:
 		quaternion rotation; //16
 		uint8_t flags; //1
 
+		~HgElement();
+
 		void init();
 		void destroy();
 
@@ -155,6 +167,7 @@ public:
 
 		inline bool check_flag(uint32_t x) const { return (flags & x) != 0; }
 		inline void setFlag(uint32_t x) { flags |= x; }
+		inline bool clearFlag(uint32_t x) { flags &= ~x; }
 
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }

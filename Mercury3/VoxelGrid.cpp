@@ -33,7 +33,7 @@ model_data generateVoxelVBO(uint8_t x, uint8_t y) {
 		}
 	}
 //	voxelGridVertices = vertices;
-	return data;
+	return std::move(data);
 }
 
 //Draw vertices directly. We aren't using indices here,
@@ -43,9 +43,9 @@ static void render(RenderData* rd) {
 
 	setRenderAttributes(rd->blendMode, rd->renderFlags);
 
-	d->hgVbo->use();
-	d->indexVbo->use();
-	d->indexVbo->draw(d->index_count, d->vbo_offset, d->index_offset);
+	d->hgVbo()->use();
+	d->indexVbo()->use();
+	d->indexVbo()->draw(d->index_count, d->vbo_offset, d->index_offset);
 }
 
 static void SetupRenderData() {
@@ -59,14 +59,14 @@ static void SetupRenderData() {
 	crd = (OGLRenderData*)RenderData::Create();
 
 	crd->vertex_count = data.vertex_count;
-	crd->hgVbo = staticVboVNUT;
+	crd->hgVbo(staticVboVNUT);
 	crd->vbo_offset = staticVboVNUT->add_data(voxelGridVertices, crd->vertex_count);
 
 //	crd->indices.data = indices;
 	crd->index_count = data.index_count;
 //	rd->indices.owns_ptr = 1;
-	crd->indexVbo = HgVbo::Create<uint16_t>();
-	crd->indexVbo->add_data(indices, data.index_count);
+	crd->indexVbo( HgVbo::Create<uint16_t>() );
+	crd->indexVbo()->add_data(indices, data.index_count);
 
 //	crd->renderFunction = render;
 }

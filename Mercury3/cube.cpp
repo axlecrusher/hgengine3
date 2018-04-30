@@ -78,8 +78,8 @@ static void cube_render(RenderData* rd) {
 	OGLRenderData *d = (OGLRenderData*)rd;
 
 	setRenderAttributes(rd->blendMode, rd->renderFlags);
-	d->hgVbo->use();
-	d->hgVbo->draw(d->vertex_count, d->vbo_offset, d->index_offset);
+	d->hgVbo()->use();
+	d->hgVbo()->draw(d->vertex_count, d->vbo_offset, d->index_offset);
 	//glDrawArrays(GL_TRIANGLES, d->vbo_offset, d->vertex_count);
 }
 
@@ -87,13 +87,13 @@ static void SetupRenderData() {
 	crd = OGLRenderData::Create();
 
 	crd->vertex_count = NUM_ARRAY_ELEMENTS(raw_cube_data);
-	crd->hgVbo = staticVboVNUT;
+	crd->hgVbo(staticVboVNUT);
 	crd->vbo_offset = staticVboVNUT->add_data(raw_cube_data, crd->vertex_count);
 	crd->index_count = NUM_ARRAY_ELEMENTS(cube_indices);
 //	crd->indices.data = cube_indices;
 
 	crd->index_offset = staticIndice8->add_data(cube_indices, crd->index_count);
-	crd->indexVbo = staticIndice8;
+	crd->indexVbo(staticIndice8);
 
 //	crd->baseRender.renderFunc = cube_render;
 

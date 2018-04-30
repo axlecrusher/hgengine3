@@ -10,10 +10,10 @@
 //static void* _currentVbo;
 
 template<typename T>
-static IHgVbo* vbo_from_api_type() {
+static std::shared_ptr<IHgVbo> vbo_from_api_type() {
 	switch (RENDERER->Type()) {
 	case OPENGL:
-		return new OGLvbo<T>();
+		return std::move( std::make_shared< OGLvbo<T> >() );
 		break;
 	default:
 		return nullptr;
@@ -23,43 +23,43 @@ static IHgVbo* vbo_from_api_type() {
 
 namespace HgVbo {
 	template<>
-	IHgVbo* Create<vbo_layout_vc>() {
-		return vbo_from_api_type<vbo_layout_vc>();
+	std::shared_ptr<IHgVbo> Create<vbo_layout_vc>() {
+		return std::move(vbo_from_api_type<vbo_layout_vc>());
 	}
 
 	template<>
-	IHgVbo* Create<vbo_layout_vn>() {
-		return vbo_from_api_type<vbo_layout_vn>();
+	std::shared_ptr<IHgVbo> Create<vbo_layout_vn>() {
+		return std::move(vbo_from_api_type<vbo_layout_vn>());
 	}
 
 	template<>
-	IHgVbo* Create<vbo_layout_vnu>() {
-		return vbo_from_api_type<vbo_layout_vnu>();
+	std::shared_ptr<IHgVbo> Create<vbo_layout_vnu>() {
+		return std::move(vbo_from_api_type<vbo_layout_vnu>());
 	}
 
 	template<>
-	IHgVbo* Create<vbo_layout_vnut>() {
-		return vbo_from_api_type<vbo_layout_vnut>();
+	std::shared_ptr<IHgVbo> Create<vbo_layout_vnut>() {
+		return std::move(vbo_from_api_type<vbo_layout_vnut>());
 	}
 
 	template<>
-	IHgVbo* Create<uint8_t>() {
-		return vbo_from_api_type<uint8_t>();
+	std::shared_ptr<IHgVbo> Create<uint8_t>() {
+		return std::move(vbo_from_api_type<uint8_t>());
 	}
 
 	template<>
-	IHgVbo* Create<uint16_t>() {
-		return vbo_from_api_type<uint16_t>();
+	std::shared_ptr<IHgVbo> Create<uint16_t>() {
+		return std::move(vbo_from_api_type<uint16_t>());
 	}
 
 	template<>
-	IHgVbo* Create<color>() {
-		return vbo_from_api_type<color>();
+	std::shared_ptr<IHgVbo> Create<color>() {
+		return std::move(vbo_from_api_type<color>());
 	}
 }
 
-IHgVbo* staticVbo = HgVbo::Create<vbo_layout_vc>();
-IHgVbo* staticVboVNU = HgVbo::Create<vbo_layout_vnu>();
-IHgVbo* staticVboVNUT = HgVbo::Create<vbo_layout_vnut>();
-IHgVbo* staticIndice8 = HgVbo::Create<uint8_t>();
-IHgVbo* staticIndice16 = HgVbo::Create<uint16_t>();
+std::shared_ptr<IHgVbo> staticVbo = HgVbo::Create<vbo_layout_vc>();
+std::shared_ptr<IHgVbo> staticVboVNU = HgVbo::Create<vbo_layout_vnu>();
+std::shared_ptr<IHgVbo> staticVboVNUT = HgVbo::Create<vbo_layout_vnut>();
+std::shared_ptr<IHgVbo> staticIndice8 = HgVbo::Create<uint8_t>();
+std::shared_ptr<IHgVbo> staticIndice16 = HgVbo::Create<uint16_t>();

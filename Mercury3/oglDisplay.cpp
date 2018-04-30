@@ -65,10 +65,10 @@ void setRenderAttributes(BlendMode blendMode, RenderFlags flags) {
 
 static void default_render(RenderData* rd) {
 	setRenderAttributes(rd->blendMode, rd->renderFlags);
-	rd->hgVbo->use();
-	if (rd->colorVbo!=nullptr) rd->colorVbo->use();
-	rd->indexVbo->use();
-	rd->indexVbo->draw(rd->index_count, rd->vbo_offset, rd->index_offset);
+	rd->hgVbo()->use();
+	if (rd->colorVbo() != nullptr) rd->colorVbo()->use();
+	rd->indexVbo()->use();
+	rd->indexVbo()->draw(rd->index_count, rd->vbo_offset, rd->index_offset);
 }
 
 OGLRenderData::OGLRenderData()

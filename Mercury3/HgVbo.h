@@ -91,11 +91,11 @@ protected:
 
 namespace HgVbo {
 	//Factory Function
-	template<typename T> IHgVbo* Create();
+	template<typename T> std::shared_ptr<IHgVbo> Create();
 }
 
-extern IHgVbo* staticVbo;
-extern IHgVbo* staticVboVNU;
-extern IHgVbo* staticVboVNUT;
-extern IHgVbo* staticIndice8;
-extern IHgVbo* staticIndice16;
+extern std::shared_ptr<IHgVbo> staticVbo;
+extern std::shared_ptr<IHgVbo> staticVboVNU;
+extern std::shared_ptr<IHgVbo> staticVboVNUT;
+extern std::shared_ptr<IHgVbo> staticIndice8;
+extern std::shared_ptr<IHgVbo> staticIndice16;

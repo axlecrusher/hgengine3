@@ -10,6 +10,10 @@ class model_data {
 public:
 	model_data();
 	~model_data();
+
+	model_data(model_data && other);
+	model_data& operator=(model_data&& other);
+
 	vbo_layout_vnut* vertices;
 	uint16_t* indices;
 	uint32_t vertex_count;

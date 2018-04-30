@@ -25,7 +25,6 @@ RenderData::newRenderDataCallback RenderData::Create = nullptr;
 
 RenderData::RenderData()
 	:blendMode(BlendMode::BLEND_NORMAL), renderFunction(nullptr),
-	hgVbo(nullptr), indexVbo(nullptr), colorVbo(nullptr),
 	vbo_offset(0), vertex_count(0), index_count(0),
 	renderFlags(RenderFlags(FACE_CULLING | DEPTH_WRITE))
 {
@@ -34,6 +33,7 @@ RenderData::RenderData()
 
 RenderData::~RenderData()
 {
+	destroy();
 }
 
 void RenderData::destroy() {
@@ -67,12 +67,18 @@ void HgElement::init()
 	m_updateNumber = 0;
 }
 
+HgElement::~HgElement() {
+	destroy();
+}
+
 void HgElement::destroy()
 {
 	m_logic.reset();
 //	if (m_logic) delete(m_logic);
 //	m_logic = nullptr;
-	if (m_extendedData->m_ownRenderData) delete m_renderData;
+	if (m_extendedData && m_extendedData->m_ownRenderData) {
+		if (m_renderData != nullptr) delete m_renderData;
+	}
 	m_renderData = nullptr; //need some way to signal release
 }
 

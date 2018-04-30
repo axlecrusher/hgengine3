@@ -33,14 +33,14 @@ static void SetupRenderData() {
 //	points.points.array = vv;
 	points.size = 3;
 
-	trd->hgVbo = staticVbo;
+	trd->hgVbo(staticVbo);
 	trd->vertex_count = points.size;
 	trd->index_count = 3;
 //	trd->indices.data = indices;
 	trd->vbo_offset = staticVbo->add_data(raw_data, trd->vertex_count);
 
 	trd->index_offset = staticIndice8->add_data(indices, 3);
-	trd->indexVbo = staticIndice8;
+	trd->indexVbo(staticIndice8);
 
 //	trd->baseRender.destroy = NULL; //render data is shared by all triangles so we don't really want to do anything
 }
