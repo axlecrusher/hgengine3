@@ -71,14 +71,14 @@ public:
 		return tmp;
 	}
 
-	inline float dot(const vertex3d& rhs) {
+	inline float dot(const vertex3d& rhs) const {
 		float r = xyz[0] * rhs.xyz[0] +
 			xyz[1] * rhs.xyz[1] +
 			xyz[2] * rhs.xyz[2];
 		return r;
 	}
 
-	inline float length() {
+	inline float length() const {
 		float x = HgMath::square(xyz[0])
 			+ HgMath::square(xyz[1])
 			+ HgMath::square(xyz[2]);
@@ -86,7 +86,7 @@ public:
 		return (float)sqrt(x);
 	}
 
-	inline vertex3d normal() {
+	inline vertex3d normal() const {
 		vertex3d tmp(*this);
 
 		float length = this->length();
@@ -100,7 +100,7 @@ public:
 		return tmp;
 	}
 
-	inline vertex3d cross(const vertex3d& rhs) {
+	inline vertex3d cross(const vertex3d& rhs) const {
 		vertex3d r;
 		r.x( (y() * rhs.z()) - (z() * rhs.y()) );
 		r.y( (z() * rhs.x()) - (x() * rhs.z()) );
