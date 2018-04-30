@@ -35,6 +35,8 @@ protected:
 class HgElement;
 class HgCamera;
 
+#include <HgElement.h>
+
 namespace Renderer {
 	void InitOpenGL();
 
@@ -42,6 +44,14 @@ namespace Renderer {
 	extern std::vector<HgElement*> transparentElements;
 
 	void Render(uint8_t stereo_view, HgCamera* camera);
+	inline void Enqueue(HgElement& e) {
+		if (e.check_flag(HGE_TRANSPARENT)) {
+			Renderer::transparentElements.push_back(&e);
+		}
+		else {
+			Renderer::opaqueElements.push_back(&e);
+		}
+	}
 }
 
 extern RenderBackend* RENDERER;

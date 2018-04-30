@@ -2,6 +2,9 @@
 
 #include <SwissArray.h>
 #include <HgTimer.h>
+
+#include <RenderBackend.h>
+
 class IUpdatableCollection {
 public:
 	virtual void update(HgTime dtime) = 0;
@@ -22,10 +25,11 @@ public:
 
 	virtual void update(HgTime dtime) final {
 		if (empty()) return;
-		if (dtime.msec() < 1) return;
-
-		for (auto itr = begin(); itr != end(); itr++) {
-			itr->T::update(dtime); //avoid vtable lookup
+		if (dtime.msec() >= 1) {
+			updateAndRender(dtime);
+		}
+		else {
+			renderOnly();
 		}
 	}
 
@@ -68,5 +72,28 @@ public:
 	inline bool empty() const { return m_items.empty(); }
 
 private:
+
+	void updateAndRender(HgTime dtime) {
+		for (auto itr = begin(); itr != end(); itr++) {
+			itr->T::update(dtime); //avoid vtable lookup
+			if (itr.itemValid()) //check for deletion
+			{
+				submitRender(itr->T::getElement());
+			}
+		}
+	}
+
+	void renderOnly() {
+		for (auto itr = begin(); itr != end(); itr++) {
+			submitRender(itr->T::getElement());
+		}
+	}
+
+	inline void submitRender(HgElement& e) {
+		if (!e.check_flag(HGE_HIDDEN)) {
+			Renderer::Enqueue(e);
+		}
+	}
+
 	SwissArray<T> m_items;
 };
