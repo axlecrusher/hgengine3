@@ -57,7 +57,7 @@ void HgElement::init()
 	scale = 1;
 	origin = vector3();
 
-	rotation = quaternion_default;
+	rotation = quaternion::IDENTITY;
 	m_extendedData = std::make_unique<HgElementExtended>();
 	m_extendedData->owner = this;
 

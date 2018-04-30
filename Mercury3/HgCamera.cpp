@@ -1,7 +1,7 @@
 #include <HgCamera.h>
 #include <HgMath.h>
 
-HgCamera::HgCamera() : initialDirection({0,0,-1}), rotation(quaternion_default)
+HgCamera::HgCamera() : initialDirection({0,0,-1}), rotation(quaternion::IDENTITY)
 {
 }
 

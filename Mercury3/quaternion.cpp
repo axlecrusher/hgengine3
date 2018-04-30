@@ -5,7 +5,7 @@
 #include <cmath>
 #include <HgTypes.h>
 
-const quaternion quaternion_default = { 1.0f,0,0,0 };
+const quaternion& quaternion::IDENTITY = { 1.0f,0,0,0 };
 
 void toQuaternion(double x, double y, double z, double deg, quaternion* q)
 {
