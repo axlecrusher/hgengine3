@@ -24,8 +24,8 @@ model_data generateVoxelVBO(uint8_t x, uint8_t y) {
 	for (uint16_t i = 0; i < cube_count; i++) {
 		for (uint8_t ix = 0; ix < 24; ++ix) {
 			vbo_layout_vnut vert = raw_cube_data[ix];
-			vert.v.components.x += i % x;
-			vert.v.components.y -= (i / x)%y;
+			vert.v.vert.x(vert.v.vert.x() + (i % x) );
+			vert.v.vert.y(vert.v.vert.y() - ((i / x)%y));
 //			vert.v.components.z += i / 100;
 			data.vertices[vert_counter++] = vert;
 		}

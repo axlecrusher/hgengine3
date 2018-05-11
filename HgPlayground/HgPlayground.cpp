@@ -160,7 +160,7 @@ void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
 }
 
 void vertex_print(const vertex* v) {
-	printf("%f %f %f\n", v->array[0], v->array[1], v->array[2]);
+	printf("%f %f %f\n", v->raw[0], v->raw[1], v->raw[2]);
 }
 
 int main()
