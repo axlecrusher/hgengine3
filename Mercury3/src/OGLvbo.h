@@ -1,6 +1,9 @@
 #pragma once
+
 #include <HgVbo.h>
 #include <HgVboMemory.h>
+
+#include <glew.h>
 
 template<typename T>
 class OGLvbo : public IHgVbo {

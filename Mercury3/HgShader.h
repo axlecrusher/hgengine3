@@ -5,6 +5,8 @@
 #include <HgCamera.h>
 #include <memory>
 
+#include <RenderData.h>
+
 class RenderData;
 
 class HgShader {

@@ -3,13 +3,17 @@
 #include <stdlib.h>
 #include <glew.h>
 #include <vertex.h>
-#include <HgElement.h>
+
+#include <RenderData.h>
+//#include <HgElement.h>
 
 #include <HgTypes.h>
 
 //#include <HgVbo.h>
 #include <memory>
 #include <HgTexture.h>
+
+
 
 enum UniformLocations {
 	U_ROTATION=0,
@@ -26,12 +30,7 @@ enum UniformLocations {
 };
 
 extern char *UniformString[];
-
-#define L_VERTEX	0
-#define L_NORMAL	1
-#define L_UV		2
-#define L_COLOR		3
-#define L_TANGENT	4
+extern float* _projection;
 
 class OGLRenderData : public RenderData {
 public:

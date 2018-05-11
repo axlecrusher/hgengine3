@@ -186,7 +186,7 @@ int main()
 	printf("vertex size %zd\n", sizeof(vertex));
 	printf("render_packet size %zd\n", sizeof(render_packet));
 	printf("render data size %zd\n", sizeof(RenderData));
-	printf("oglrd size %zd\n", sizeof(OGLRenderData));
+	//printf("oglrd size %zd\n", sizeof(OGLRenderData));
 //	printf("vbo type size %zd\n", sizeof(VBO_TYPE));
 	printf("HgTexture size %zd\n", sizeof(HgTexture));
 

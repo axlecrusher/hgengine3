@@ -210,6 +210,7 @@
     <ClCompile Include="src\HgTimer.cpp" />
     <ClCompile Include="src\IniLoader.cpp" />
     <ClCompile Include="src\OGLBackend.cpp" />
+    <ClCompile Include="src\RenderData.cpp" />
     <ClCompile Include="str_utils.c" />
     <ClCompile Include="symbol_enumerator.c">
     </ClCompile>
@@ -264,6 +265,7 @@
     <ClInclude Include="src\OGLBackend.h" />
     <ClInclude Include="src\OGLvbo.h" />
     <ClInclude Include="src\RenderBackend.h" />
+    <ClInclude Include="src\RenderData.h" />
     <ClInclude Include="src\StringConversions.h" />
     <ClInclude Include="src\SwissArray.h" />
     <ClInclude Include="src\UpdatableCollection.h" />

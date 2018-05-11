@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <vector>
 
+#include <HgElement.h>
+
 enum RendererType {
 	OPENGL = 0,
 	VULKAN,
@@ -32,10 +34,10 @@ protected:
 	uint8_t _currenViewPort_idx = 0xFF;
 };
 
-class HgElement;
+//class HgElement;
 class HgCamera;
 
-#include <HgElement.h>
+//#include <HgElement.h>
 
 namespace Renderer {
 	void InitOpenGL();

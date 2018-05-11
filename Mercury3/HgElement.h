@@ -12,6 +12,8 @@
 #include <vector>
 
 #include <HgTimer.h>
+//#include <HgVbo.h>
+#include <RenderData.h>
 
 enum HgElementFlag {
 	HGE_USED = 0x01, //used in scene graph
@@ -24,69 +26,6 @@ enum HgElementFlag {
 };
 
 extern float* _projection;
-
-enum BlendMode : uint8_t {
-	BLEND_NORMAL = 0,
-	BLEND_ADDITIVE,
-	BLEND_ALPHA,
-	BLEND_INVALID = 0xFF
-};
-
-enum RenderFlags : uint8_t {
-	NONE = 0,
-	FACE_CULLING = 1,
-	DEPTH_WRITE = 2
-};
-
-class IHgVbo;
-
-class RenderData {
-	public:
-		typedef RenderData*(*newRenderDataCallback)();
-		typedef void(*indiceRenderFunc)(RenderData* rd);
-		static newRenderDataCallback Create;
-
-		RenderData();
-		virtual ~RenderData();
-
-		inline void render() { 
-			renderFunction(this);
-		}
-		void destroy();
-		void init();
-		virtual void clearTextureIDs() = 0;
-		virtual void setTexture(const HgTexture* t) = 0;
-
-		HgShader* shader;
-
-		indiceRenderFunc renderFunction; // could store VBO_TYPE instead and make a single function do all the rendering?
-
-		inline IHgVbo* hgVbo() { return m_hgVbo.get(); }
-		inline IHgVbo* indexVbo() {	return m_indexVbo.get(); }
-		inline IHgVbo* colorVbo() { return m_colorVbo.get(); }
-
-		inline void hgVbo(std::shared_ptr<IHgVbo>& vbo) { m_hgVbo = vbo; }
-		inline void indexVbo(std::shared_ptr<IHgVbo>& vbo) { m_indexVbo = vbo; }
-		inline void colorVbo(std::shared_ptr<IHgVbo>& vbo) { m_colorVbo = vbo; }
-
-		uint32_t index_offset;
-		uint32_t index_count;
-
-		uint32_t vbo_offset;
-		uint16_t vertex_count;
-
-		BlendMode blendMode;
-		RenderFlags renderFlags;
-
-private:
-	//We need to be able to support multiple VBOs without hardcoding more here.
-	std::shared_ptr<IHgVbo> m_hgVbo;
-	std::shared_ptr<IHgVbo> m_indexVbo;
-	std::shared_ptr<IHgVbo> m_colorVbo;
-};
-
-
-//typedef uint8_t vtable_index;
 
 class HgElement;
 class model_data;
@@ -114,12 +53,14 @@ public:
 	bool m_ownRenderData;
 };
 
-//#define MAX_ELEMENT_TYPES 255
-/*
-extern HgElement_vtable HGELEMT_VTABLES[MAX_ELEMENT_TYPES];
-extern hgstring HGELEMENT_TYPE_NAMES;
-extern uint32_t HGELEMENT_TYPE_NAME_OFFSETS[MAX_ELEMENT_TYPES];
-*/
+struct PositionalData {
+	//position, and rotation are in global coordinate system
+	point position; float scale; //16
+	point origin; //origin (0,0,0) in local space
+	quaternion rotation; //16
+	uint8_t flags; //1
+};
+
 /* NOTES: Try to avoid pointers, especially on 64 bit.
 The entity that allocates memory for render data should
 be responsible for destroying it. This is more clear than
@@ -196,30 +137,11 @@ namespace Engine {
 	void EnqueueForRender(std::vector<IUpdatableCollection*>& c);
 }
 
-//typedef void(*SignalHandler)(int signum);
-//typedef void(*hgelement_function)(class HgElement* e);
-//typedef void (*hgelement_update_function)(struct HgElement* e, uint32_t tdelta); //strange warnings with this....
-/*
-typedef struct HgElement_vtable {
-	hgelement_function create;
-	hgelement_function destroy;
-	void(*updateFunc)(class HgElement* e, uint32_t tdelta);
-} HgElement_vtable;
-*/
 extern RenderData* (*new_RenderData)();
 
 #define CHECK_FLAG(e,x) ((e)->flags&(x))
 #define CLEAR_FLAG(e,x) ((e)->flags &= ~(x))
 #define SET_FLAG(e,x) ((e)->flags |= (x))
-
-//#define VCALL(e,function,...) if (e && e->vptr && e->vptr->function) e->vptr->function(e,__VA_ARGS__)
-
-/*
-#define VCALL(e,function,...) if (e->vptr->function) e->vptr->function(e,__VA_ARGS__)
-#define VCALL_F(e,function,...) e->vptr->function(e,__VA_ARGS__)
-#define SCALL(x,function,...) x->function(x,__VA_ARGS__)
-#define VCALL_IDX(e,function,...) if (HGELEMT_VTABLES[e->vptr_idx].function) HGELEMT_VTABLES[e->vptr_idx].function(e,__VA_ARGS__)
-*/
 
 typedef void*(*factory_clbk)(HgElement* e);
 
@@ -251,9 +173,6 @@ void RegisterElementType(const char* c, factory_clbk);
 #define REGISTER_LINKTIME( func, factory ) \
 	__pragma(comment(linker,"/export:"##LINKER_PREFIX##"REGISTER_ELEMENT"#func)); \
 	extern "C" { void REGISTER_ELEMENT##func() { RegisterElementType(#func,factory); } }
-//	void REGISTER_ELEMENT##func() { VTABLE_INDEX = RegisterElementType(#func); HGELEMT_VTABLES[VTABLE_INDEX] = vtable; }
-//	__pragma(comment(linker, "/export:_GLOBAL_DESTROY"#func)); \
-//	void GLOBAL_DESTROY##func() { }
 #else
 #define REGISTER_LINKTIME( func ) \
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }

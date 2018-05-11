@@ -10,10 +10,10 @@
 //static void* _currentVbo;
 
 template<typename T>
-static std::shared_ptr<IHgVbo> vbo_from_api_type() {
+static std::unique_ptr<IHgVbo> vbo_from_api_type() {
 	switch (RENDERER->Type()) {
 	case OPENGL:
-		return std::move( std::make_shared< OGLvbo<T> >() );
+		return std::move( std::make_unique< OGLvbo<T> >() );
 		break;
 	default:
 		return nullptr;
@@ -23,37 +23,37 @@ static std::shared_ptr<IHgVbo> vbo_from_api_type() {
 
 namespace HgVbo {
 	template<>
-	std::shared_ptr<IHgVbo> Create<vbo_layout_vc>() {
+	std::unique_ptr<IHgVbo> Create<vbo_layout_vc>() {
 		return std::move(vbo_from_api_type<vbo_layout_vc>());
 	}
 
 	template<>
-	std::shared_ptr<IHgVbo> Create<vbo_layout_vn>() {
+	std::unique_ptr<IHgVbo> Create<vbo_layout_vn>() {
 		return std::move(vbo_from_api_type<vbo_layout_vn>());
 	}
 
 	template<>
-	std::shared_ptr<IHgVbo> Create<vbo_layout_vnu>() {
+	std::unique_ptr<IHgVbo> Create<vbo_layout_vnu>() {
 		return std::move(vbo_from_api_type<vbo_layout_vnu>());
 	}
 
 	template<>
-	std::shared_ptr<IHgVbo> Create<vbo_layout_vnut>() {
+	std::unique_ptr<IHgVbo> Create<vbo_layout_vnut>() {
 		return std::move(vbo_from_api_type<vbo_layout_vnut>());
 	}
 
 	template<>
-	std::shared_ptr<IHgVbo> Create<uint8_t>() {
+	std::unique_ptr<IHgVbo> Create<uint8_t>() {
 		return std::move(vbo_from_api_type<uint8_t>());
 	}
 
 	template<>
-	std::shared_ptr<IHgVbo> Create<uint16_t>() {
+	std::unique_ptr<IHgVbo> Create<uint16_t>() {
 		return std::move(vbo_from_api_type<uint16_t>());
 	}
 
 	template<>
-	std::shared_ptr<IHgVbo> Create<color>() {
+	std::unique_ptr<IHgVbo> Create<color>() {
 		return std::move(vbo_from_api_type<color>());
 	}
 }

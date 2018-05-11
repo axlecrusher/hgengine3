@@ -2,6 +2,8 @@
 #include <cube.h>
 #include <HgVbo.h>
 
+#include <oglDisplay.h> //TODO: remove this
+
 //instanced render data
 static OGLRenderData *crd = NULL;
 static vbo_layout_vnut* voxelGridVertices = NULL;

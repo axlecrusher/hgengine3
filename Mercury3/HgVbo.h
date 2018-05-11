@@ -1,9 +1,12 @@
 #pragma once
 
+#include <stdint.h>
 #include <HgTypes.h>
-#include <oglDisplay.h>
-#include <assert.h>
-#include <RenderBackend.h>
+
+//#include <HgTypes.h>
+//#include <oglDisplay.h>
+//#include <assert.h>
+//#include <RenderBackend.h>
 
 /*	Interleaved vertex layout because it is faster to resize when adding
 	more mesh data. New mesh data can just be appened to the end. If it
@@ -67,6 +70,7 @@ typedef struct vbo_layout_vnut {
 
 class IHgVbo {
 public:
+	virtual ~IHgVbo() {}
 
 	//	Copy data straight into VBO. Ensure that data, is using the correct vbo layout for your data
 	virtual uint32_t add_data(void* data, uint16_t vertex_count) = 0;
@@ -91,7 +95,7 @@ protected:
 
 namespace HgVbo {
 	//Factory Function
-	template<typename T> std::shared_ptr<IHgVbo> Create();
+	template<typename T> std::unique_ptr<IHgVbo> Create();
 }
 
 extern std::shared_ptr<IHgVbo> staticVbo;

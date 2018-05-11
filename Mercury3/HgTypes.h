@@ -6,6 +6,12 @@
 typedef vertex3d point;
 typedef vertex3d vector3;
 
+#define L_VERTEX	0
+#define L_NORMAL	1
+#define L_UV		2
+#define L_COLOR		3
+#define L_TANGENT	4
+
 #ifdef __cplusplus
 extern "C" {
 #endif
