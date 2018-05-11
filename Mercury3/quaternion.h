@@ -4,9 +4,10 @@
 #include <HgMath.h>
 
 #include <xmmintrin.h>
+#include <vertex3d.h>
 
-class vertex3d;
-typedef vertex3d vector3;
+//class vertex3f;
+typedef vertex3f vector3;
 
 class quaternion {
 public:
@@ -75,10 +76,10 @@ private:
 //void toQuaternion(double x, double y, double z, double deg, quaternion* q);
 //quaternion toQuaternion2(double pitch, double roll, double yaw);
 
-//class vertex3d;
-quaternion vector3_to_quat(const vertex3d& a);
+//class vertex3f;
+quaternion vector3_to_quat(const vertex3f& a);
 
 //Produces shortest arc from v1 to v2
-quaternion getRotationTo(const vertex3d& v1, const vertex3d& v2);
+quaternion getRotationTo(const vertex3f& v1, const vertex3f& v2);
 
 //vector3 vector3_quat_rotate(const vector3& v, const quaternion& q);

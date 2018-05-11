@@ -1,14 +1,15 @@
 #pragma once
 
+#include <memory>
 #include <HgTypes.h>
 
 
 typedef struct AABB {
 	//left bottom
-	vertex3d lb;
+	vertex3f lb;
 
 	//right top
-	vertex3d rt;
+	vertex3f rt;
 } AABB;
 
 typedef struct aabb_result {

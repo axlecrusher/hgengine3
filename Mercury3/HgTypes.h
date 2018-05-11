@@ -3,8 +3,8 @@
 #include <vertex.h>
 #include <vertex3d.h>
 
-typedef vertex3d point;
-typedef vertex3d vector3;
+typedef vertex3f point;
+typedef vertex3f vector3;
 
 #define L_VERTEX	0
 #define L_NORMAL	1

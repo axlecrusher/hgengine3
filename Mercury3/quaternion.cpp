@@ -56,7 +56,7 @@ quaternion quaternion::fromEuler(HgMath::angle x, HgMath::angle y, HgMath::angle
 }
 
 //should be vector, but vector include is broken
-quaternion getRotationTo(const vertex3d& v1, const vertex3d& v2) {
+quaternion getRotationTo(const vertex3f& v1, const vertex3f& v2) {
 	//https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
 	float d = v1.dot(v2);
 
@@ -79,6 +79,6 @@ quaternion getRotationTo(const vertex3d& v1, const vertex3d& v2) {
 	return q.normal();
 }
 
-quaternion vector3_to_quat(const vertex3d& a) {
+quaternion vector3_to_quat(const vertex3f& a) {
 	return quaternion(1.0, a.x(), a.y(), a.z());
 }

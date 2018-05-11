@@ -1,137 +1,152 @@
 #pragma once
 
 #include <cmath>
-#include <memory>
+//#include <memory>
 #include <HgMath.h>
-#include <quaternion.h>
+//#include <quaternion.h>
 
-class vertex3d {
-public:
-	static const vertex3d UNIT_X;
-	static const vertex3d UNIT_Y;
-	static const vertex3d UNIT_Z;
+class quaternion;
 
-	vertex3d() : xyz{ 0,0,0 }
-	{
-	}
+namespace HgMath {
+	template<typename T>
+	class vertex {
+	public:
+		static const vertex UNIT_X;
+		static const vertex UNIT_Y;
+		static const vertex UNIT_Z;
 
-	vertex3d(float x, float y, float z) : xyz{ x,y,z }
-	{
-	}
+		vertex() : xyz{ 0,0,0 }
+		{
+		}
 
-	inline vertex3d(const float *_xyz)
-	{
-		xyz[0] = _xyz[0];
-		xyz[1] = _xyz[1];
-		xyz[2] = _xyz[2];
-	}
+		vertex(T x, T y, T z) : xyz{ x,y,z }
+		{
+		}
 
-	inline float x() const { return xyz[0]; }
-	inline void x(float n) { xyz[0] = n; }
+		inline vertex(const T *_xyz)
+		{
+			xyz[0] = _xyz[0];
+			xyz[1] = _xyz[1];
+			xyz[2] = _xyz[2];
+		}
 
-	inline float y() const { return xyz[1]; }
-	inline void y(float n) { xyz[1] = n; }
+		inline T x() const { return xyz[0]; }
+		inline void x(T n) { xyz[0] = n; }
 
-	inline float z() const { return xyz[2]; }
-	inline void z(float n) { xyz[2] = n; }
+		inline T y() const { return xyz[1]; }
+		inline void y(T n) { xyz[1] = n; }
 
-	inline vertex3d scale(float n) const {
-		vertex3d tmp(*this);
-		tmp.xyz[0] *= n;
-		tmp.xyz[1] *= n;
-		tmp.xyz[2] *= n;
-		return tmp;
-	}
+		inline T z() const { return xyz[2]; }
+		inline void z(T n) { xyz[2] = n; }
 
-	inline vertex3d operator+(const vertex3d& rhs) const {
-		vertex3d tmp(*this);
-		tmp.xyz[0] += rhs.xyz[0];
-		tmp.xyz[1] += rhs.xyz[1];
-		tmp.xyz[2] += rhs.xyz[2];
-		return tmp;
-	}
+		inline vertex scale(T n) const {
+			vertex tmp(*this);
+			tmp.xyz[0] *= n;
+			tmp.xyz[1] *= n;
+			tmp.xyz[2] *= n;
+			return tmp;
+		}
 
-	inline vertex3d operator-(const vertex3d& rhs) const {
-		vertex3d tmp(*this);
-		tmp.xyz[0] -= rhs.xyz[0];
-		tmp.xyz[1] -= rhs.xyz[1];
-		tmp.xyz[2] -= rhs.xyz[2];
-		return tmp;
-	}
+		inline vertex operator+(const vertex& rhs) const {
+			vertex tmp(*this);
+			tmp.xyz[0] += rhs.xyz[0];
+			tmp.xyz[1] += rhs.xyz[1];
+			tmp.xyz[2] += rhs.xyz[2];
+			return tmp;
+		}
 
-	inline vertex3d operator*(const vertex3d& rhs) const {
-		vertex3d tmp(*this);
-		tmp.xyz[0] *= rhs.xyz[0];
-		tmp.xyz[1] *= rhs.xyz[1];
-		tmp.xyz[2] *= rhs.xyz[2];
-		return tmp;
-	}
+		inline vertex operator+=(const vertex& rhs) {
+			xyz[0] += rhs.xyz[0];
+			xyz[1] += rhs.xyz[1];
+			xyz[2] += rhs.xyz[2];
+			return *this;
+		}
 
-	inline vertex3d operator/(const vertex3d& rhs) const {
-		vertex3d tmp(*this);
-		tmp.xyz[0] /= rhs.xyz[0];
-		tmp.xyz[1] /= rhs.xyz[1];
-		tmp.xyz[2] /= rhs.xyz[2];
-		return tmp;
-	}
+		inline vertex operator-(const vertex& rhs) const {
+			vertex tmp(*this);
+			tmp.xyz[0] -= rhs.xyz[0];
+			tmp.xyz[1] -= rhs.xyz[1];
+			tmp.xyz[2] -= rhs.xyz[2];
+			return tmp;
+		}
 
-	inline float dot(const vertex3d& rhs) const {
-		float r = xyz[0] * rhs.xyz[0] +
-			xyz[1] * rhs.xyz[1] +
-			xyz[2] * rhs.xyz[2];
-		return r;
-	}
+		inline vertex operator*(const vertex& rhs) const {
+			vertex tmp(*this);
+			tmp.xyz[0] *= rhs.xyz[0];
+			tmp.xyz[1] *= rhs.xyz[1];
+			tmp.xyz[2] *= rhs.xyz[2];
+			return tmp;
+		}
 
-	inline float length() const {
-		return (float)sqrt(squaredLength());
-	}
+		inline vertex operator/(const vertex& rhs) const {
+			vertex tmp(*this);
+			tmp.xyz[0] /= rhs.xyz[0];
+			tmp.xyz[1] /= rhs.xyz[1];
+			tmp.xyz[2] /= rhs.xyz[2];
+			return tmp;
+		}
 
-	inline float squaredLength() const {
-		float x = HgMath::square(xyz[0])
-			+ HgMath::square(xyz[1])
-			+ HgMath::square(xyz[2]);
-		return x;
-	}
+		inline T dot(const vertex& rhs) const {
+			T a = xyz[0] * rhs.xyz[0];
+			T b = xyz[1] * rhs.xyz[1];
+			T c = xyz[2] * rhs.xyz[2];
+			return a + b + c;
+		}
 
-	inline vertex3d normal() const {
-		vertex3d tmp(*this);
+		inline T length() const {
+			return (T)sqrt(squaredLength());
+		}
 
-		float length = this->length();
-		//	if (fabs(length) < 0.000000000001f) return *v;
-		if (length == 0.0) return tmp;
+		inline T squaredLength() const {
+			T a = HgMath::square(xyz[0]);
+			T b = HgMath::square(xyz[1]);
+			T c = HgMath::square(xyz[2]);
+			return a + b + c;
+		}
 
-		tmp.xyz[0] /= length;
-		tmp.xyz[1] /= length;
-		tmp.xyz[2] /= length;
+		inline vertex normal() const {
+			vertex tmp(*this);
 
-		return tmp;
-	}
+			T length = this->length();
+			//	if (fabs(length) < 0.000000000001f) return *v;
+			if (length == 0.0) return tmp;
 
-	inline vertex3d cross(const vertex3d& rhs) const {
-		vertex3d r;
-		r.x( (y() * rhs.z()) - (z() * rhs.y()) );
-		r.y( (z() * rhs.x()) - (x() * rhs.z()) );
-		r.z( (x() * rhs.y()) - (y() * rhs.x()) );
-		return r;
-	}
+			tmp.xyz[0] /= length;
+			tmp.xyz[1] /= length;
+			tmp.xyz[2] /= length;
 
-	inline vertex3d rotate(const quaternion& q) const {
-		vertex3d r1 = this->scale(q.w());
-		vertex3d r2 = vertex3d(q.wxyz.wxyz + 1).cross(*this); 
-		vertex3d tmp = vertex3d(q.wxyz.wxyz + 1).cross(r1 + r2).scale(2.0); //XXX fix this
-		return *this + tmp;
-	}
+			return tmp;
+		}
 
-	inline bool isZeroLength() const
-	{
-		return (squaredLength() < HgMath::square(1e-06f)); //does squaredLength need to be double here if 1e-06 is double?
-	}
+		inline vertex cross(const vertex& rhs) const {
+			vertex r;
+			r.x((y() * rhs.z()) - (z() * rhs.y()));
+			r.y((z() * rhs.x()) - (x() * rhs.z()));
+			r.z((x() * rhs.y()) - (y() * rhs.x()));
+			return r;
+		}
 
-	//inline bool operator<(const vertex3d& rhs) const {
-	//	return ((x() < rhs.x())
-	//		&& (y() < rhs.y())
-	//		&& (z() < rhs.z()));
-	//}
-private:
-	float xyz[3];
-};
+		inline vertex rotate(const quaternion& q) const {
+			vertex r1 = this->scale(q.w());
+			vertex r2 = vertex(q.wxyz.wxyz + 1).cross(*this);
+			vertex tmp = vertex(q.wxyz.wxyz + 1).cross(r1 + r2).scale(2.0); //XXX fix this
+			return *this + tmp;
+		}
+
+		inline bool isZeroLength() const
+		{
+			return (squaredLength() < HgMath::square(1e-06f)); //does squaredLength need to be double here if 1e-06 is double?
+		}
+
+		//inline bool operator<(const vertex& rhs) const {
+		//	return ((x() < rhs.x())
+		//		&& (y() < rhs.y())
+		//		&& (z() < rhs.z()));
+		//}
+	private:
+		T xyz[3];
+	};
+}
+
+typedef HgMath::vertex<double> vertex3d;
+typedef HgMath::vertex<float> vertex3f;
