@@ -401,7 +401,7 @@ int main()
 			}
 		}
 
-		Engine::EnqueueForRender();
+		Engine::EnqueueForRender(Engine::collections());
 
 		//render below
 		Renderer::Render(stereo_view, camera+0);

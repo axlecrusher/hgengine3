@@ -112,8 +112,7 @@ namespace Engine {
 		}
 	}
 
-	void EnqueueForRender() {
-		auto c = collections();
+	void EnqueueForRender(std::vector<IUpdatableCollection*>& c) {
 		for (auto i : c) {
 			i->EnqueueForRender();
 		}
