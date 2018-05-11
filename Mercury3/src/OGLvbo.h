@@ -47,6 +47,7 @@ private:
 	void destroy();
 
 	HgVboMemory<T> m_mem;
+	GLuint m_vboType;
 
 	inline void use_common() {
 		if (needsUpdate) {
@@ -63,11 +64,13 @@ private:
 	} handle;
 
 	bool needsUpdate;
+
+
 };
 
 template<typename T>
 OGLvbo<T>::OGLvbo()
-	:needsUpdate(false)
+	:needsUpdate(false), IHgVbo()
 {
 	constexpr VBO_TYPE type = Type();
 	m_type = type;
@@ -80,13 +83,25 @@ OGLvbo<T>::~OGLvbo() {
 	destroy();
 }
 
+inline GLenum VboUseage(VBO_USE_TYPE t) {
+	switch (t) {
+	case VBO_DRAW_STATIC:
+		return GL_STATIC_DRAW;
+	case VBO_DRAW_DYNAMIC:
+		return GL_DYNAMIC_DRAW;
+	case VBO_DRAW_STREAM:
+		return GL_STREAM_DRAW;
+	}
+	return 0;
+}
+
 template<typename T>
 void OGLvbo<T>::sendToGPU() {
 	if (handle.vbo_id == 0) glGenBuffers(1, &handle.vbo_id);
 	if (handle.vao_id == 0) glGenVertexArrays(1, &handle.vao_id);
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle.vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
 
 	glBindVertexArray(handle.vao_id);
 
@@ -183,7 +198,7 @@ inline void OGLvbo<uint8_t>::sendToGPU() {
 	}
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
 }
 
 //16 bit index
@@ -196,7 +211,7 @@ inline void OGLvbo<uint16_t>::sendToGPU() {
 	}
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
 }
 
 template<>
@@ -214,7 +229,7 @@ inline void OGLvbo<color>::sendToGPU() {
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle.vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
 }
 
 

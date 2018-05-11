@@ -41,6 +41,11 @@ enum VBO_TYPE : uint8_t {
 	VBO_COLOR8
 };
 
+enum VBO_USE_TYPE : uint8_t {
+	VBO_DRAW_STATIC = 0,
+	VBO_DRAW_DYNAMIC,
+	VBO_DRAW_STREAM
+};
 
 //Vertex,Color
 typedef struct vbo_layout_vc {
@@ -71,6 +76,7 @@ typedef struct vbo_layout_vnut {
 
 class IHgVbo {
 public:
+	IHgVbo() : m_useType(VBO_DRAW_STATIC) {}
 	virtual ~IHgVbo() {}
 
 	//	Copy data straight into VBO. Ensure that data, is using the correct vbo layout for your data
@@ -87,11 +93,15 @@ public:
 
 	inline VBO_TYPE VboType() const { return m_type;  }
 
+	inline void UseType(VBO_USE_TYPE t) { m_useType = t; }
+	inline VBO_USE_TYPE UseType() const { return m_useType; }
+
 	virtual void setNeedsUpdate(bool t) = 0;
 
 	virtual void* getBuffer() = 0;
 protected:
 	VBO_TYPE m_type;
+	VBO_USE_TYPE m_useType;
 };
 
 namespace HgVbo {
