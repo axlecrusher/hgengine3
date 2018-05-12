@@ -21,7 +21,8 @@
 
 vertex3f test__ = { 1.0,0.0,0.0 };
 
-//dump from a hgmdl model, VNU format.
+//dump from a hgmdl model, VNUT format.
+//So many vertices because of different normals
 vbo_layout_vnut raw_cube_data[24] = {
 	{{0.5, -0.5, 0.5}, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 32767, 32767},
 	{{-0.5, -0.5, -0.5}, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 32767, 32767},	//left bottom 1

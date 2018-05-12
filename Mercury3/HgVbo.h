@@ -74,6 +74,11 @@ typedef struct vbo_layout_vnut {
 	uv_coord uv;
 } vbo_layout_vnut;
 
+inline void convert(const vbo_layout_vnut* in, vbo_layout_vn* out) {
+	out->v = in->v;
+	out->n = in->n;
+}
+
 class IHgVbo {
 public:
 	IHgVbo() : m_useType(VBO_DRAW_STATIC) {}
