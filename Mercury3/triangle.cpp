@@ -13,9 +13,9 @@
 static OGLRenderData* trd = NULL;
 
 static vbo_layout_vc raw_data[] = {
-	-0.5f, -0.5f, 0.0f, 255, 0, 0, 255,
-	0.5f, -0.5f, 0.0f, 0, 255, 0, 255,
-	0.0f, 0.5f, 0.0f, 0, 0, 255, 255
+	{{-0.5f, -0.5f, 0.0f}, 255, 0, 0, 255,},
+	{{0.5f, -0.5f, 0.0f}, 0, 255, 0, 255 },
+	{{0.0f, 0.5f, 0.0f }, 0, 0, 255, 255}
 };
 
 static uint8_t indices[] = {

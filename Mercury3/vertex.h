@@ -17,8 +17,11 @@
 //typedef vertex3f vertex;
 
 union vertex {
-	float raw[3]; //first so list initilization works
 	vertex3f object;
+	float raw[3];
+
+	vertex() : object() {}
+	vertex(float x, float y, float z) : object(x,y,z) {}
 };
 
 typedef struct vertices {

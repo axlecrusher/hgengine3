@@ -21,7 +21,7 @@ namespace HgMath {
 		{
 		}
 
-		inline vertex(const T *_xyz)
+		inline vertex(const T _xyz[3])
 		{
 			xyz[0] = _xyz[0];
 			xyz[1] = _xyz[1];
