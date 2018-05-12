@@ -1,9 +1,7 @@
 #pragma once
 
 #include <cmath>
-//#include <memory>
 #include <HgMath.h>
-//#include <quaternion.h>
 
 class quaternion;
 

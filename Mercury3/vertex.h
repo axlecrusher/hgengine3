@@ -18,7 +18,7 @@
 
 union vertex {
 	float raw[3]; //first so list initilization works
-	vertex3f vert;
+	vertex3f object;
 };
 
 typedef struct vertices {
