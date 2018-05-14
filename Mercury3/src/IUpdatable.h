@@ -16,5 +16,5 @@ public:
 
 protected:
 	//HgElement* element; //just a weak pointer
-	HgElement element; //just a weak pointer
+	HgElement element;
 };

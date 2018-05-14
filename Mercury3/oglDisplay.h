@@ -36,7 +36,6 @@ class OGLRenderData : public RenderData {
 public:
 	inline static OGLRenderData* Create() { return (OGLRenderData*)RenderData::Create(); }
 	OGLRenderData();
-	~OGLRenderData();
 //	virtual void render();
 
 	virtual void clearTextureIDs();
@@ -44,6 +43,8 @@ public:
 
 	GLuint textureID[HgTexture::TEXTURE_TYPE_COUNT]; //zero ID to stop rendering
 };
+
+void default_render(RenderData* rd);
 
 //void destroy_render_data_ogl(struct RenderData* render_data);
 //void ogl_destroy_renderData();

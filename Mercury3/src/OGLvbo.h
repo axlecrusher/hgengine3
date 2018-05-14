@@ -100,8 +100,10 @@ void OGLvbo<T>::sendToGPU() {
 	if (handle.vbo_id == 0) glGenBuffers(1, &handle.vbo_id);
 	if (handle.vao_id == 0) glGenVertexArrays(1, &handle.vao_id);
 
+	auto useType = VboUseage(m_useType);
+
 	glBindBuffer(GL_ARRAY_BUFFER, handle.vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
+	glBufferData(GL_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), useType);
 
 	glBindVertexArray(handle.vao_id);
 
@@ -166,7 +168,10 @@ inline void OGLvbo<T>::bind() {
 template<typename T>
 void OGLvbo<T>::destroy() {
 	if (handle.vbo_id>0) glDeleteBuffers(1, &handle.vbo_id);
-	if (handle.vao_id>0) glDeleteBuffers(1, &handle.vao_id);
+	if (handle.vao_id>0) glDeleteVertexArrays(1, &handle.vao_id);
+
+	handle.vbo_id = 0;
+	handle.vao_id = 0;
 	m_mem.clear();
 }
 

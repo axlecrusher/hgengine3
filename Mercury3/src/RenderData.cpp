@@ -4,7 +4,7 @@ RenderData::newRenderDataCallback RenderData::Create = nullptr;
 
 RenderData::RenderData()
 	:blendMode(BlendMode::BLEND_NORMAL), renderFunction(nullptr),
-	vbo_offset(0), vertex_count(0), index_count(0),
+	vbo_offset(0), vertex_count(0), index_offset(0), index_count(0),
 	renderFlags(RenderFlags(FACE_CULLING | DEPTH_WRITE))
 {
 

@@ -33,7 +33,7 @@ public:
 			//if a thing is enqueued for rendering here, a different part
 			//of the engine could come along a delete it before the render
 			//happens, causing a crash.
-			//Enqueue in secodn pass after updates.
+			//Enqueue in second pass after updates.
 		}
 	}
 
@@ -86,6 +86,10 @@ public:
 
 	inline bool empty() const { return m_items.empty(); }
 
+	static UpdatableCollection<T>& Collection() {
+		static UpdatableCollection<T> collection;
+		return collection;
+	}
 private:
 
 	SwissArray<T> m_items;

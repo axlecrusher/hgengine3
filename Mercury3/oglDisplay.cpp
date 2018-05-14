@@ -63,7 +63,7 @@ void setRenderAttributes(BlendMode blendMode, RenderFlags flags) {
 	}
 }
 
-static void default_render(RenderData* rd) {
+void default_render(RenderData* rd) {
 	setRenderAttributes(rd->blendMode, rd->renderFlags);
 	rd->hgVbo()->use();
 	if (rd->colorVbo() != nullptr) rd->colorVbo()->use();
@@ -77,10 +77,6 @@ OGLRenderData::OGLRenderData()
 	renderFunction = default_render;
 	memset(textureID, 0, sizeof(textureID));
 	init();
-}
-
-OGLRenderData::~OGLRenderData() {
-	destroy();
 }
 
 /*
