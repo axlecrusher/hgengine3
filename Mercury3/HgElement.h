@@ -129,6 +129,8 @@ private:
 	friend model_data;
 };
 
+point object_to_world_space(const HgElement* e, const point* p);
+
 class IUpdatableCollection;
 
 namespace Engine {

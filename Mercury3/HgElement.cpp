@@ -72,6 +72,12 @@ void HgElement::updateGpuTextures() {
 	}
 }
 
+//Transform point p into world space of HgElement e
+point object_to_world_space(const HgElement* e, const point* p) {
+	vector3 v1 = (*p - e->origin).scale(e->scale).rotate(e->rotation) + e->position;
+	return v1;
+}
+
 namespace Engine {
 	std::vector<IUpdatableCollection*>& collections() {
 		static std::vector<IUpdatableCollection*> c;

@@ -1,5 +1,8 @@
 #pragma once
 
+#undef max
+#undef min
+
 #define DEG_RAD 0.01745329251994329576923690768488612713442871888542
 #define RAD_DEG 57.29577951308232087679815481410517033240547246656432
 
@@ -24,6 +27,12 @@ void Perspective2(
 namespace HgMath {
 	template<typename T>
 	inline T square(T x) { return x*x; }
+
+	template<typename T>
+	inline T max(T a, T b) { return (a > b) ? a : b; }
+
+	template<typename T>
+	inline T min(T a, T b) { return (a < b) ? a : b; }
 
 	template<typename T>
 	class angle_template {
