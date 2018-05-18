@@ -26,6 +26,7 @@ namespace HgMath {
 			xyz[0] = _xyz[0];
 			xyz[1] = _xyz[1];
 			xyz[2] = _xyz[2];
+			//xyz[3] = _xyz[3];
 		}
 
 		inline T x() const { return xyz[0]; }
@@ -142,7 +143,7 @@ namespace HgMath {
 		//		&& (z() < rhs.z()));
 		//}
 	private:
-		T xyz[3];
+		T xyz[4];
 	};
 }
 
