@@ -20,7 +20,7 @@
 	and glBindVertexArray less.
 */
 
-/*	NOTE: We should try to keep 4 by alignment.
+/*	NOTE: We should try to keep 4 byte alignment.
 	Opengl wiki says "The alignment of any attribute's data should be no
 	less than 4 bytes. So if you have a vec3 of GLushorts, you can't use
 	that 4th component for a new attribute (such as a vec2 of GLbytes).

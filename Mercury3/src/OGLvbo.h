@@ -19,7 +19,7 @@ public:
 
 	virtual void use() { use_common(); }
 
-	virtual void draw(uint32_t count, uint32_t vertex_offset, uint32_t idx_offset) { ::draw_vbo<T>(&m_mem, count, vertex_offset, idx_offset); }
+	virtual void draw(uint32_t count, uint32_t vertex_offset, uint32_t idx_offset) { draw_vbo(count, vertex_offset, idx_offset); }
 	virtual void* getBuffer() { return m_mem.getBuffer(); }
 	virtual void clear() { return m_mem.clear(); }
 	virtual void setNeedsUpdate(bool x) { needsUpdate = x; }
@@ -45,6 +45,8 @@ private:
 	void sendToGPU();
 	void bind();
 	void destroy();
+
+	void draw_vbo(uint32_t count, uint32_t offset, uint32_t idx_offset);
 
 	HgVboMemory<T> m_mem;
 	GLuint m_vboType;
@@ -97,13 +99,28 @@ inline GLenum VboUseage(VBO_USE_TYPE t) {
 
 template<typename T>
 void OGLvbo<T>::sendToGPU() {
-	if (handle.vbo_id == 0) glGenBuffers(1, &handle.vbo_id);
+	bool updateOnly = true;
+	if (handle.vbo_id == 0) {
+		glGenBuffers(1, &handle.vbo_id);
+		updateOnly = false;
+	}
 	if (handle.vao_id == 0) glGenVertexArrays(1, &handle.vao_id);
 
-	auto useType = VboUseage(m_useType);
+	const auto useType = VboUseage(m_useType);
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle.vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), useType);
+
+	const GLsizei size = m_mem.getCount() * m_mem.Stride();
+
+	if (updateOnly) {
+		//try orphaning buffer
+		glBufferData(GL_ARRAY_BUFFER, size, NULL, useType);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, size, m_mem.getBuffer());
+		//glBufferData(GL_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), useType);
+	}
+	else {
+		glBufferData(GL_ARRAY_BUFFER, size, m_mem.getBuffer(), useType);
+	}
 
 	glBindVertexArray(handle.vao_id);
 
@@ -177,17 +194,17 @@ void OGLvbo<T>::destroy() {
 
 
 template<typename T>
-inline void draw_vbo(HgVboMemory<T>* vbo, uint32_t count, uint32_t offset, uint32_t idx_offset) {}
+inline void OGLvbo<T>::draw_vbo(uint32_t count, uint32_t offset, uint32_t idx_offset) {}
 
 //NOTE: THESE ARE INLINE. THEY NEED TO BE IN THE HEADER, NOT CPP
 template<>
-inline void draw_vbo(HgVboMemory<uint8_t>* vbo, uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
+inline void OGLvbo<uint8_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
 	const size_t offset = sizeof(uint8_t)*idx_offset; //offset into indice buffer
 	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_BYTE, (void*)offset, vertex_offset);
 }
 
 template<>
-inline void draw_vbo(HgVboMemory<uint16_t>* vbo, uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
+inline void OGLvbo<uint16_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
 	const size_t offset = sizeof(uint16_t)*idx_offset; //offset into indice buffer
 	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_SHORT, (void*)offset, vertex_offset);
 }

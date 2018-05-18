@@ -55,6 +55,15 @@ public:
 		return r;
 	}
 
+	inline quaternion scale(float m) {
+		quaternion r(*this);
+		r.w(w() * m);
+		r.x(x() * m);
+		r.y(y() * m);
+		r.z(z() * m);
+		return r;
+	}
+
 	static inline quaternion fromAxisAngle(const vector3& axis, HgMath::angle angle);
 
 	union {
