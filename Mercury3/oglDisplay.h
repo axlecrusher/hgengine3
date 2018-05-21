@@ -26,7 +26,8 @@ enum UniformLocations {
 	U_DIFFUSE_TEXTURE=7,
 	U_SPECULAR_TEXTURE = 8,
 	U_NORMAL_TEXTURE = 9,
-	U_UNIFORM_COUNT=10
+	U_BUFFER_OBJECT1 = 10,
+	U_UNIFORM_COUNT=11
 };
 
 extern char *UniformString[];

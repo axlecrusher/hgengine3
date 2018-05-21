@@ -4,6 +4,7 @@
 #include <HgVboMemory.h>
 
 #include <glew.h>
+#include <RenderData.h>
 
 template<typename T>
 class OGLvbo : public IHgVbo {
@@ -19,7 +20,16 @@ public:
 
 	virtual void use() { use_common(); }
 
-	virtual void draw(uint32_t count, uint32_t vertex_offset, uint32_t idx_offset) { draw_vbo(count, vertex_offset, idx_offset); }
+	//virtual void draw(uint32_t count, uint32_t vertex_offset, uint32_t idx_offset)
+	virtual void draw(const RenderData* rd)
+	{ 
+		if (rd->instanceCount > 0) {
+			draw_instanced(rd);
+		}
+		else {
+			draw_vbo(rd->index_count, rd->vbo_offset, rd->index_offset);
+		}
+	}
 	virtual void* getBuffer() { return m_mem.getBuffer(); }
 	virtual void clear() { return m_mem.clear(); }
 	virtual void setNeedsUpdate(bool x) { needsUpdate = x; }
@@ -47,6 +57,7 @@ private:
 	void destroy();
 
 	void draw_vbo(uint32_t count, uint32_t offset, uint32_t idx_offset);
+	void draw_instanced(const RenderData* rd);
 
 	HgVboMemory<T> m_mem;
 	GLuint m_vboType;
@@ -85,13 +96,13 @@ OGLvbo<T>::~OGLvbo() {
 	destroy();
 }
 
-inline GLenum VboUseage(VBO_USE_TYPE t) {
+inline GLenum VboUseage(BUFFER_USE_TYPE t) {
 	switch (t) {
-	case VBO_DRAW_STATIC:
+	case BUFFER_DRAW_STATIC:
 		return GL_STATIC_DRAW;
-	case VBO_DRAW_DYNAMIC:
+	case BUFFER_DRAW_DYNAMIC:
 		return GL_DYNAMIC_DRAW;
-	case VBO_DRAW_STREAM:
+	case BUFFER_DRAW_STREAM:
 		return GL_STREAM_DRAW;
 	}
 	return 0;
@@ -196,6 +207,9 @@ void OGLvbo<T>::destroy() {
 template<typename T>
 inline void OGLvbo<T>::draw_vbo(uint32_t count, uint32_t offset, uint32_t idx_offset) {}
 
+template<typename T>
+inline void OGLvbo<T>::draw_instanced(const RenderData* rd) {}
+
 //NOTE: THESE ARE INLINE. THEY NEED TO BE IN THE HEADER, NOT CPP
 template<>
 inline void OGLvbo<uint8_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
@@ -209,6 +223,17 @@ inline void OGLvbo<uint16_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_of
 	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_SHORT, (void*)offset, vertex_offset);
 }
 
+template<>
+inline void OGLvbo<uint8_t>::draw_instanced(const RenderData* rd) {
+	const size_t offset = rd->index_offset * sizeof(uint16_t); //offset into indice buffer
+	glDrawElementsInstanced(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount);
+}
+
+template<>
+inline void OGLvbo<uint16_t>::draw_instanced(const RenderData* rd) {
+	const size_t offset = rd->index_offset * sizeof(uint16_t); //offset into indice buffer
+	glDrawElementsInstanced(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount);
+}
 
 //8 bit index
 template<>

@@ -132,16 +132,16 @@ static void* change_to_model(HgElement* element) {
 
 static void render(RenderData* rd) {
 	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
-	OGLRenderData *d = (OGLRenderData*)rd;
+	//OGLRenderData *d = (OGLRenderData*)rd;
 
-	d->hgVbo()->use();
+	rd->hgVbo()->use();
 //	d->colorVbo->use();
 
-	d->indexVbo()->use();
+	rd->indexVbo()->use();
 
 	setRenderAttributes(rd->blendMode, rd->renderFlags);
 
-	d->indexVbo()->draw(d->index_count, d->vbo_offset, d->index_offset);
+	rd->indexVbo()->draw(rd);
 	//	draw_index_vbo(d->indexVbo, d->vbo_offset);
 }
 

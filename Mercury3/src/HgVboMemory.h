@@ -10,7 +10,7 @@ public:
 	HgVboMemory();
 	~HgVboMemory();
 
-	uint32_t add_data(T* data, uint16_t vertex_count);
+	uint32_t add_data(const T* data, uint32_t vertex_count);
 	void clear();
 
 	inline T* getBuffer() { return buffer; }
@@ -52,7 +52,7 @@ void HgVboMemory<T>::clear() {
 }
 
 template<typename T>
-uint32_t HgVboMemory<T>::add_data(T* data, uint16_t vertex_count) {
+uint32_t HgVboMemory<T>::add_data(const T* data, uint32_t vertex_count) {
 	T* buf = buffer = resize(count + vertex_count);
 	buf = buf + count;
 

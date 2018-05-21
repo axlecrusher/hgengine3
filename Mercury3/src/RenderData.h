@@ -7,6 +7,8 @@
 //#include <HgTexture.h>
 #include <HgVbo.h>
 
+#include <HgGPUBuffer.h>
+
 class HgShader;
 //class IHgVbo;
 class HgTexture;
@@ -67,9 +69,15 @@ public:
 	BlendMode blendMode;
 	RenderFlags renderFlags;
 
+	//std::shared_ptr<IHgGPUBuffer> gpuBuffer;
+	IHgGPUBuffer* gpuBuffer;
+
+	uint32_t instanceCount;
+
 private:
 	//We need to be able to support multiple VBOs without hardcoding more here.
 	std::shared_ptr<IHgVbo> m_hgVbo;
 	std::shared_ptr<IHgVbo> m_indexVbo;
 	std::shared_ptr<IHgVbo> m_colorVbo;
+
 };

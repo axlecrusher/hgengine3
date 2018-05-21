@@ -6,7 +6,7 @@
 class quaternion;
 
 namespace HgMath {
-	template<typename T>
+	template<typename T, int fcount>
 	class vertex {
 	public:
 		static const vertex UNIT_X;
@@ -143,9 +143,9 @@ namespace HgMath {
 		//		&& (z() < rhs.z()));
 		//}
 	private:
-		T xyz[4];
+		T xyz[fcount];
 	};
 }
 
-typedef HgMath::vertex<double> vertex3d;
-typedef HgMath::vertex<float> vertex3f;
+typedef HgMath::vertex<double,3> vertex3d;
+typedef HgMath::vertex<float,3> vertex3f;

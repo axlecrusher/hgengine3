@@ -41,13 +41,13 @@ model_data generateVoxelVBO(uint8_t x, uint8_t y) {
 //Draw vertices directly. We aren't using indices here,
 static void render(RenderData* rd) {
 	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
-	OGLRenderData *d = (OGLRenderData*)rd;
+	//OGLRenderData *d = (OGLRenderData*)rd;
 
 	setRenderAttributes(rd->blendMode, rd->renderFlags);
 
-	d->hgVbo()->use();
-	d->indexVbo()->use();
-	d->indexVbo()->draw(d->index_count, d->vbo_offset, d->index_offset);
+	rd->hgVbo()->use();
+	rd->indexVbo()->use();
+	rd->indexVbo()->draw(rd);
 }
 
 static void SetupRenderData() {

@@ -204,8 +204,10 @@
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="quaternion.cpp" />
     <ClCompile Include="square.cpp" />
+    <ClCompile Include="src\HgGPUBuffer.cpp" />
     <ClCompile Include="src\HgUtils.cpp" />
     <ClCompile Include="src\OGLvbo.cpp" />
+    <ClCompile Include="src\OGL\OGLGpuBuffer.cpp" />
     <ClCompile Include="src\RenderBackend.cpp" />
     <ClCompile Include="src\HgTimer.cpp" />
     <ClCompile Include="src\IniLoader.cpp" />
@@ -257,13 +259,16 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="quaternion.h" />
+    <ClInclude Include="src\HgGPUBuffer.h" />
     <ClInclude Include="src\HgTimer.h" />
     <ClInclude Include="src\HgUtils.h" />
     <ClInclude Include="src\HgVboMemory.h" />
     <ClInclude Include="src\IniLoader.h" />
+    <ClInclude Include="src\InstancedCollection.h" />
     <ClInclude Include="src\IUpdatable.h" />
     <ClInclude Include="src\OGLBackend.h" />
     <ClInclude Include="src\OGLvbo.h" />
+    <ClInclude Include="src\OGL\OGLGpuBuffer.h" />
     <ClInclude Include="src\RenderBackend.h" />
     <ClInclude Include="src\RenderData.h" />
     <ClInclude Include="src\StringConversions.h" />

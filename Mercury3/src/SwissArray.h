@@ -180,7 +180,13 @@ public:
 	//	return iterator(m_entities.size(), this);
 	//}
 
-	inline size_t empty() const { return m_usedSize == 0; }
+	inline bool empty() const { return m_usedSize == 0; }
+
+	//Number of instantiated items
+	inline size_t count() const { return m_usedSize; }
+
+	//Highwater mark of instantiated items
+	inline size_t size() const { return m_size; }
 
 private:
 	inline T& operator[](size_t index)
@@ -210,7 +216,7 @@ private:
 	}
 
 	size_t m_size; //number of elementes in head and m_used
-	size_t m_usedSize; //number of used
+	size_t m_usedSize; //number of used items. <= m_size
 
 	size_t m_allocatedSize;
 	T* head;

@@ -15,7 +15,7 @@ OGLBackend oglRenderer;
 
 static void GLAPIENTRY ogl_error_clbk(GLenum source, GLenum type, GLuint id,
 	GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-	fprintf(stderr, "%s\n", message);
+	//fprintf(stderr, "%s\n", message);
 }
 
 void OGLBackend::Init() {

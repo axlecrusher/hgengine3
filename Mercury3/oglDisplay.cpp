@@ -23,6 +23,7 @@ char *UniformString[] = {
 	"diffuseTex",
 	"specularTex",
 	"normalTex",
+	"bufferObject1",
 	NULL
 };
 
@@ -68,7 +69,7 @@ void default_render(RenderData* rd) {
 	rd->hgVbo()->use();
 	if (rd->colorVbo() != nullptr) rd->colorVbo()->use();
 	rd->indexVbo()->use();
-	rd->indexVbo()->draw(rd->index_count, rd->vbo_offset, rd->index_offset);
+	rd->indexVbo()->draw(rd);
 }
 
 OGLRenderData::OGLRenderData()

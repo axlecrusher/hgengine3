@@ -10,6 +10,8 @@
 #include <str_utils.h>
 #include <string.h>
 
+#include <OGL/OGLGpuBuffer.h>
+
 static GLuint _currentShaderProgram = 0;
 
 #pragma warning(disable:4996)
@@ -259,6 +261,18 @@ void HgOglShader::setLocalUniforms(const quaternion* rotation, const point* posi
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
 		glUniform1i(uniform_locations[U_NORMAL_TEXTURE], 2);
 	}
+
+	glActiveTexture(GL_TEXTURE3);
+	if ((uniform_locations[U_BUFFER_OBJECT1] > -1)&&(oglrd->gpuBuffer != nullptr)) {
+		OGLHgGPUBuffer* api = (OGLHgGPUBuffer*)oglrd->gpuBuffer->apiImpl();
+		if (oglrd->gpuBuffer->NeedsUpdate()) {
+			//api->OGLHgGPUBuffer::SendToGPU(oglrd->gpuBuffer.get()); //no vtable lookup
+			api->OGLHgGPUBuffer::SendToGPU(oglrd->gpuBuffer); //no vtable lookup
+		}
+		api->OGLHgGPUBuffer::Bind(); //no vtable lookup
+		glUniform1i(uniform_locations[U_BUFFER_OBJECT1], 3);
+	}
+	
 
 	if (old_program != program_id) {
 		useShaderProgram(old_program); //change back to previous program

@@ -76,11 +76,11 @@ static void destroy(HgElement* e) {
 
 //Draw vertices directly. We aren't using indices here,
 static void cube_render(RenderData* rd) {
-	OGLRenderData *d = (OGLRenderData*)rd;
+	//OGLRenderData *d = (OGLRenderData*)rd;
 
 	setRenderAttributes(rd->blendMode, rd->renderFlags);
-	d->hgVbo()->use();
-	d->hgVbo()->draw(d->vertex_count, d->vbo_offset, d->index_offset);
+	rd->hgVbo()->use();
+	rd->hgVbo()->draw(rd);
 	//glDrawArrays(GL_TRIANGLES, d->vbo_offset, d->vertex_count);
 }
 

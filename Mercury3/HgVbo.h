@@ -9,6 +9,7 @@
 //#include <assert.h>
 //#include <RenderBackend.h>
 
+
 /*	Interleaved vertex layout because it is faster to resize when adding
 	more mesh data. New mesh data can just be appened to the end. If it
 	were stored VVVNNNCCC, it would be much more difficult to add new
@@ -41,10 +42,10 @@ enum VBO_TYPE : uint8_t {
 	VBO_COLOR8
 };
 
-enum VBO_USE_TYPE : uint8_t {
-	VBO_DRAW_STATIC = 0,
-	VBO_DRAW_DYNAMIC,
-	VBO_DRAW_STREAM
+enum BUFFER_USE_TYPE : uint8_t {
+	BUFFER_DRAW_STATIC = 0,
+	BUFFER_DRAW_DYNAMIC,
+	BUFFER_DRAW_STREAM
 };
 
 //Vertex,Color
@@ -79,9 +80,11 @@ inline void convert(const vbo_layout_vnut* in, vbo_layout_vn* out) {
 	out->n = in->n;
 }
 
+class RenderData;
+
 class IHgVbo {
 public:
-	IHgVbo() : m_useType(VBO_DRAW_STATIC) {}
+	IHgVbo() : m_useType(BUFFER_DRAW_STATIC) {}
 	virtual ~IHgVbo() {}
 
 	//	Copy data straight into VBO. Ensure that data, is using the correct vbo layout for your data
@@ -94,19 +97,20 @@ public:
 
 	virtual void use() = 0;
 
-	virtual void draw(uint32_t count, uint32_t vertex_offset, uint32_t idx_offset) = 0;
+//	virtual void draw(uint32_t count, uint32_t vertex_offset, uint32_t idx_offset) = 0;
+	virtual void draw(const RenderData* rd) = 0;
 
 	inline VBO_TYPE VboType() const { return m_type;  }
 
-	inline void UseType(VBO_USE_TYPE t) { m_useType = t; }
-	inline VBO_USE_TYPE UseType() const { return m_useType; }
+	inline void UseType(BUFFER_USE_TYPE t) { m_useType = t; }
+	inline BUFFER_USE_TYPE UseType() const { return m_useType; }
 
 	virtual void setNeedsUpdate(bool t) = 0;
 
 	virtual void* getBuffer() = 0;
 protected:
 	VBO_TYPE m_type;
-	VBO_USE_TYPE m_useType;
+	BUFFER_USE_TYPE m_useType;
 };
 
 namespace HgVbo {
