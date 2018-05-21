@@ -54,7 +54,7 @@ namespace HgMath {
 			return tmp;
 		}
 
-		inline vertex operator+=(const vertex& rhs) {
+		inline const vertex& operator+=(const vertex& rhs) {
 			xyz[0] += rhs.xyz[0];
 			xyz[1] += rhs.xyz[1];
 			xyz[2] += rhs.xyz[2];
