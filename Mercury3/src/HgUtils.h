@@ -5,4 +5,5 @@
 
 namespace ENGINE {
 	void EnumberateSymbols();
+	void SetRealtimePriority();
 }
