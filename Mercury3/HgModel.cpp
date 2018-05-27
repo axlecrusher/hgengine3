@@ -150,7 +150,8 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 
 	OGLRenderData* rd = (OGLRenderData*)element->m_renderData;
 
-	SET_FLAG(element, HGE_DESTROY); //clear when we make it to the end
+	element->flags.destroy = true;
+	//SET_FLAG(element, HGE_DESTROY); //clear when we make it to the end
 
 	model_data mdl( LoadModel(filename) );
 	if (mdl.vertices == NULL || mdl.indices == NULL) return -1;
@@ -176,7 +177,8 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 
 	rd->renderFunction = render;
 
-	CLEAR_FLAG(element, HGE_DESTROY);
+	element->flags.destroy = false;
+	//CLEAR_FLAG(element, HGE_DESTROY);
 
 	return 0;
 }
@@ -223,7 +225,8 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 		auto tmp = HgTexture::acquire(diffuseTexture, HgTexture::DIFFUSE);
 		if (tmp != nullptr) {
 			element->m_extendedData->textures.push_back(std::move(tmp));
-			SET_FLAG(element, HGE_UPDATE_TEXTURES);
+			element->flags.update_textures = true;
+			//SET_FLAG(element, HGE_UPDATE_TEXTURES);
 		}
 	}
 
@@ -232,7 +235,8 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 		auto tmp = HgTexture::acquire(specularTexture, HgTexture::SPECULAR);
 		if (tmp != nullptr) {
 			element->m_extendedData->textures.push_back(std::move(tmp));
-			SET_FLAG(element, HGE_UPDATE_TEXTURES);
+			element->flags.update_textures = true;
+			//SET_FLAG(element, HGE_UPDATE_TEXTURES);
 		}
 	}
 
@@ -241,7 +245,8 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 		auto tmp = HgTexture::acquire(normalTexture, HgTexture::NORMAL);
 		if (tmp != nullptr) {
 			element->m_extendedData->textures.push_back(std::move(tmp));
-			SET_FLAG(element, HGE_UPDATE_TEXTURES);
+			element->flags.update_textures = true;
+			//SET_FLAG(element, HGE_UPDATE_TEXTURES);
 		}
 	}
 

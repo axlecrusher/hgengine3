@@ -102,14 +102,14 @@ void HgScene::update(HgTime dtime) {
 
 		/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash!*/
 		//shared_ptr my way out of this?
-		if (CHECK_FLAG(e, HGE_DESTROY) > 0) {
+		if (e->flags.destroy) {
 			removeElement(i);
 			continue;
 		}
 
 		//I would like to move this out of here for a more perminent, solution
 		//where the vectors don't need to be rebuild every time
-		if (CHECK_FLAG(e, HGE_HIDDEN) == 0) { 
+		if (!e->flags.hidden) { 
 			Renderer::Enqueue(*e);
 		}
 

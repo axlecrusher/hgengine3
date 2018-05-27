@@ -396,7 +396,7 @@ int main()
 		for (uint32_t i = 0; i < maxCount; ++i) {
 			if (!scene.isUsed(i)) continue;
 			HgElement* e = scene.get_element(i);
-			if (CHECK_FLAG(e, HGE_HIDDEN) == 0) {
+			if (!e->flags.hidden) {
 				Renderer::Enqueue(*e);
 			}
 		}

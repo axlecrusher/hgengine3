@@ -36,7 +36,7 @@ void Projectile::update(HgTime tdelta) {
 
 		if (total_time >= HgTime::msec(3000)) {
 //			printf("set destroy\n");
-			element.setFlag(HGE_DESTROY);
+			element.flags.destroy = true;
 			ProjectileCollection().remove(*this);
 			return;
 		}

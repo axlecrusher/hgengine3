@@ -42,7 +42,7 @@ public:
 
 		for (auto itr = begin(); itr != end(); itr++) {
 			auto& e = itr->getElement();
-			if (!e.check_flag(HGE_HIDDEN)) {
+			if (!e.flags.hidden) {
 				Renderer::Enqueue(e);
 			}
 		}

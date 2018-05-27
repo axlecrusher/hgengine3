@@ -24,7 +24,8 @@ void RegisterElementType(const char* c, factory_clbk factory) {
 
 void HgElement::init()
 {
-	flags = 0;
+	memset(&flags, 0, sizeof(flags));
+//	flags = 0;
 	m_renderData = NULL;
 	position = vector3();
 	m_logic = nullptr;

@@ -47,7 +47,7 @@ namespace Renderer {
 
 	void Render(uint8_t stereo_view, HgCamera* camera);
 	inline void Enqueue(HgElement& e) {
-		if (e.check_flag(HGE_TRANSPARENT)) {
+		if (e.flags.transparent) {
 			Renderer::transparentElements.push_back(&e);
 		}
 		else {

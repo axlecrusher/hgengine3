@@ -61,6 +61,16 @@ struct PositionalData {
 	uint8_t flags; //1
 };
 
+struct ElementFlags {
+	bool used : 1; //used in scene graph
+	bool active : 1;
+	bool hidden : 1;
+	bool updated : 1;
+	bool destroy : 1;
+	bool update_textures : 1;
+	bool transparent : 1;
+};
+
 /* NOTES: Try to avoid pointers, especially on 64 bit.
 The entity that allocates memory for render data should
 be responsible for destroying it. This is more clear than
@@ -73,7 +83,8 @@ public:
 		point position; float scale; //16
 		point origin; //origin (0,0,0) in local space
 		quaternion rotation; //16
-		uint8_t flags; //1
+//		uint8_t flags; //1
+		ElementFlags flags;
 
 		~HgElement();
 
@@ -107,9 +118,9 @@ public:
 
 		inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 
-		inline bool check_flag(uint32_t x) const { return (flags & x) != 0; }
-		inline void setFlag(uint32_t x) { flags |= x; }
-		inline bool clearFlag(uint32_t x) { flags &= ~x; }
+		//inline bool check_flag(uint32_t x) const { return (flags & x) != 0; }
+		//inline void setFlag(uint32_t x) { flags |= x; }
+		//inline bool clearFlag(uint32_t x) { flags &= ~x; }
 
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }
