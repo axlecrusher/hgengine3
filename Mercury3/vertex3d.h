@@ -2,12 +2,14 @@
 
 #include <cmath>
 #include <HgMath.h>
+#include <cstring>
 
 class quaternion;
 
 namespace HgMath {
-	template<typename T, int fcount>
+	template<typename T>
 	class vertex {
+		constexpr static int fcount = 3;
 	public:
 		static const vertex UNIT_X;
 		static const vertex UNIT_Y;
@@ -21,12 +23,11 @@ namespace HgMath {
 		{
 		}
 
-		inline vertex(const T _xyz[3])
+		inline vertex(const T _xyz[fcount])
 		{
-			xyz[0] = _xyz[0];
-			xyz[1] = _xyz[1];
-			xyz[2] = _xyz[2];
-			//xyz[3] = _xyz[3];
+			for (int i = 0; i < fcount; i++) {
+				xyz[i] = _xyz[i];
+			}
 		}
 
 		inline T x() const { return xyz[0]; }
@@ -40,56 +41,57 @@ namespace HgMath {
 
 		inline vertex scale(T n) const {
 			vertex tmp(*this);
-			tmp.xyz[0] *= n;
-			tmp.xyz[1] *= n;
-			tmp.xyz[2] *= n;
+			for (int i = 0; i < fcount; i++) {
+				tmp.xyz[i] *= n;
+			}
 			return tmp;
 		}
 
 		inline vertex operator+(const vertex& rhs) const {
 			vertex tmp(*this);
-			tmp.xyz[0] += rhs.xyz[0];
-			tmp.xyz[1] += rhs.xyz[1];
-			tmp.xyz[2] += rhs.xyz[2];
+			for (int i = 0; i < fcount; i++) {
+				tmp.xyz[i] += rhs.xyz[i];
+			}
 			return tmp;
 		}
 
 		inline const vertex& operator+=(const vertex& rhs) {
-			xyz[0] += rhs.xyz[0];
-			xyz[1] += rhs.xyz[1];
-			xyz[2] += rhs.xyz[2];
+			for (int i = 0; i < fcount; i++) {
+				xyz[i] += rhs.xyz[i];
+			}
 			return *this;
 		}
 
 		inline vertex operator-(const vertex& rhs) const {
 			vertex tmp(*this);
-			tmp.xyz[0] -= rhs.xyz[0];
-			tmp.xyz[1] -= rhs.xyz[1];
-			tmp.xyz[2] -= rhs.xyz[2];
+			for (int i = 0; i < fcount; i++) {
+				tmp.xyz[i] -= rhs.xyz[i];
+			}
 			return tmp;
 		}
 
 		inline vertex operator*(const vertex& rhs) const {
 			vertex tmp(*this);
-			tmp.xyz[0] *= rhs.xyz[0];
-			tmp.xyz[1] *= rhs.xyz[1];
-			tmp.xyz[2] *= rhs.xyz[2];
+			for (int i = 0; i < fcount; i++) {
+				tmp.xyz[i] *= rhs.xyz[i];
+			}
 			return tmp;
 		}
 
 		inline vertex operator/(const vertex& rhs) const {
 			vertex tmp(*this);
-			tmp.xyz[0] /= rhs.xyz[0];
-			tmp.xyz[1] /= rhs.xyz[1];
-			tmp.xyz[2] /= rhs.xyz[2];
+			for (int i = 0; i < fcount; i++) {
+				tmp.xyz[i] /= rhs.xyz[i];
+			}
 			return tmp;
 		}
 
 		inline T dot(const vertex& rhs) const {
-			T a = xyz[0] * rhs.xyz[0];
-			T b = xyz[1] * rhs.xyz[1];
-			T c = xyz[2] * rhs.xyz[2];
-			return a + b + c;
+			T r = 0;
+			for (int i = 0; i < fcount; i++) {
+				r += xyz[i] * rhs.xyz[i];
+			}
+			return r;
 		}
 
 		inline T length() const {
@@ -97,10 +99,11 @@ namespace HgMath {
 		}
 
 		inline T squaredLength() const {
-			T a = HgMath::square(xyz[0]);
-			T b = HgMath::square(xyz[1]);
-			T c = HgMath::square(xyz[2]);
-			return a + b + c;
+			T r = 0;
+			for (int i = 0; i < fcount; i++) {
+				r += HgMath::square(xyz[i]);
+			}
+			return r;
 		}
 
 		inline vertex normal() const {
@@ -110,9 +113,9 @@ namespace HgMath {
 			//	if (fabs(length) < 0.000000000001f) return *v;
 			if (length == 0.0) return tmp;
 
-			tmp.xyz[0] /= length;
-			tmp.xyz[1] /= length;
-			tmp.xyz[2] /= length;
+			for (int i = 0; i < fcount; i++) {
+				tmp.xyz[i] /= length;
+			}
 
 			return tmp;
 		}
@@ -147,5 +150,5 @@ namespace HgMath {
 	};
 }
 
-typedef HgMath::vertex<double,3> vertex3d;
-typedef HgMath::vertex<float,3> vertex3f;
+typedef HgMath::vertex<double> vertex3d;
+typedef HgMath::vertex<float> vertex3f;
