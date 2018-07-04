@@ -45,59 +45,39 @@ void BoundingBoxes::setBoxes(std::unique_ptr<AABB[]>& bc, uint32_t count) {
 	cube_count = count;
 }
 
+aabb_result BoundingBoxes::cast_ray(const vector3f& dirfrac, const vector3f& pos, const AABB& bb) const {
+	aabb_result result;
 
-bool cast_ray(const vector3& dirfrac, const vector3& pos, const AABB& bb) {
-	vector3 a = (bb.lb - pos) * dirfrac;
-	vector3 b = (bb.rt - pos) * dirfrac;
+	const vector3f a = (bb.lb - pos) * dirfrac;
+	const vector3f b = (bb.rt - pos) * dirfrac;
 
-	float dmin = max(max(min(a.x(), b.x()), min(a.y(), b.y())), min(a.z(), b.z()));
-	float dmax = min(min(max(a.x(), b.x()), max(a.y(), b.y())), max(a.z(), b.z()));
+	const float dmin = max(max(min(a.x(), b.x()), min(a.y(), b.y())), min(a.z(), b.z()));
+	const float dmax = min(min(max(a.x(), b.x()), max(a.y(), b.y())), max(a.z(), b.z()));
 
-	if ((dmax < 0) ||	//intersection, but behind ray position
-		(dmin > dmax))	//ray doesn't intersect AABB
+	if (!((dmax < 0) ||	//intersection, but behind ray position
+		(dmin > dmax)))	//ray doesn't intersect AABB
 	{
-		return false;
+		result.dist = dmin;
 	}
 
-	return true;
+	return result;
 }
 
-void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*intersectClbk)(aabb_result* result, void* userData), void* userData) const {
+void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*intersectClbk)(const aabb_result& result, void* userData), void* userData) const {
 	//see https://gamedev.stackexchange.com/questions/18436/most-efficient-aabb-vs-ray-collision-algorithms
 
 	static const vector3 one = { 1.0,1.0,1.0 };
-	vector3 dirfrac = one / ray;
-	AABB* cubes = bounding_boxes.get();
+	const vector3 dirfrac( one / ray );
+	const AABB* cubes = bounding_boxes.get();
+	const int32_t count = cube_count;
 
-	vector3 a, b;
-	float dmin, dmax;
-	aabb_result r;
+	if (!cast_ray(dirfrac, pos, boundingVolume).hit()) return;
 
-	if (!::cast_ray(dirfrac, pos, boundingVolume)) return;
-
-	for (int32_t i = 0; i < cube_count; i++) {
-		a = (cubes[i].lb - pos) * dirfrac;
-		b = (cubes[i].rt - pos) * dirfrac;
-
-		//super scalar?
-		float min1 = min(a.x(), b.x());
-		float min2 = min(a.y(), b.y());
-		float min3 = min(a.z(), b.z());
-
-		float max1 = max(a.x(), b.x());
-		float max2 = max(a.y(), b.y());
-		float max3 = max(a.z(), b.z());
-
-		dmin = max(max(min1, min2), min3);
-		dmax = min(min(max1, max2), max3);
-
-		if ((dmax < 0) ||	//intersection, but behind ray position
-			(dmin > dmax))	//ray doesn't intersect AABB
-		{
-			continue;
+	for (int32_t i = 0; i < count; i++) {
+		aabb_result r = cast_ray(dirfrac, pos, cubes[i]); //could be done in parallel if needed
+		if (r.hit()) {
+			r.index = i;
+			intersectClbk(r, userData);
 		}
-
-		r = { dmin, i };
-		intersectClbk(&r, userData);
 	}
 }
