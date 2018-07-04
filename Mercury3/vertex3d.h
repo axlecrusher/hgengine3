@@ -40,17 +40,18 @@ namespace HgMath {
 		inline void z(T n) { xyz[2] = n; }
 
 		inline vertex scale(T n) const {
-			vertex tmp(*this);
+			//Writing functions exactly like this lets the compiler make a lot of good optimizations.
+			vertex tmp;
 			for (int i = 0; i < fcount; i++) {
-				tmp.xyz[i] *= n;
+				tmp.xyz[i] = xyz[i] * n;
 			}
 			return tmp;
 		}
 
 		inline vertex operator+(const vertex& rhs) const {
-			vertex tmp(*this);
+			vertex tmp;
 			for (int i = 0; i < fcount; i++) {
-				tmp.xyz[i] += rhs.xyz[i];
+				tmp.xyz[i] = xyz[i] + rhs.xyz[i];
 			}
 			return tmp;
 		}
@@ -63,25 +64,25 @@ namespace HgMath {
 		}
 
 		inline vertex operator-(const vertex& rhs) const {
-			vertex tmp(*this);
+			vertex tmp;
 			for (int i = 0; i < fcount; i++) {
-				tmp.xyz[i] -= rhs.xyz[i];
+				tmp.xyz[i] = xyz[i] - rhs.xyz[i];
 			}
 			return tmp;
 		}
 
 		inline vertex operator*(const vertex& rhs) const {
-			vertex tmp(*this);
+			vertex tmp;
 			for (int i = 0; i < fcount; i++) {
-				tmp.xyz[i] *= rhs.xyz[i];
+				tmp.xyz[i] = xyz[i] * rhs.xyz[i];
 			}
 			return tmp;
 		}
 
 		inline vertex operator/(const vertex& rhs) const {
-			vertex tmp(*this);
+			vertex tmp;
 			for (int i = 0; i < fcount; i++) {
-				tmp.xyz[i] /= rhs.xyz[i];
+				tmp.xyz[i] = xyz[i] / rhs.xyz[i];
 			}
 			return tmp;
 		}
