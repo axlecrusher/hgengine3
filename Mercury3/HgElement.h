@@ -33,6 +33,7 @@ class HgScene;
 
 class HgElementLogic {
 public:
+	HgElementLogic() : element(nullptr) {}
 	virtual ~HgElementLogic() {}
 	virtual void update(HgTime tdelta) = 0;
 
@@ -62,6 +63,10 @@ struct PositionalData {
 };
 
 struct ElementFlags {
+	ElementFlags() :
+		used(false), active(false), hidden(false), updated(false),
+		destroy(false), update_textures(false), transparent(false)
+	{}
 	bool used : 1; //used in scene graph
 	bool active : 1;
 	bool hidden : 1;
@@ -86,6 +91,7 @@ public:
 //		uint8_t flags; //1
 		ElementFlags flags;
 
+		HgElement() : scale(1.0f), m_updateNumber(0), m_renderData(nullptr) {}
 		~HgElement();
 
 		void init();

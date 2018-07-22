@@ -73,7 +73,7 @@ void BoundingBoxes::cast_ray(const vector3& ray, const vector3& pos, void(*inter
 
 	if (!cast_ray(dirfrac, pos, boundingVolume).hit()) return;
 
-	for (int32_t i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		aabb_result r = cast_ray(dirfrac, pos, cubes[i]); //could be done in parallel if needed
 		if (r.hit()) {
 			r.index = i;
