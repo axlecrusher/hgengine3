@@ -41,13 +41,13 @@ public:
 		return (float)sqrt(squaredLength());
 	}
 
-	inline quaternion operator*(const quaternion& rhs) {
+	inline quaternion operator*(const quaternion& rhs) const {
 		return quat_mult(this, &rhs).normal();
 	}
 
 	inline quaternion normal() const {
 		quaternion r;
-		float l = length();
+		const float l = length();
 		r.w(w() / l);
 		r.x(x() / l);
 		r.y(y() / l);
@@ -72,7 +72,7 @@ public:
 	} wxyz;
 
 private:
-	inline quaternion quat_mult(const quaternion* q, const quaternion* r) {
+	inline quaternion quat_mult(const quaternion* q, const quaternion* r) const {
 		quaternion t;
 		t.w((r->w()*q->w()) - (r->x()*q->x()) - (r->y()*q->y()) - (r->z()*q->z()));
 		t.x((r->w()*q->x()) + (r->x()*q->w()) - (r->y()*q->z()) + (r->z()*q->y()));

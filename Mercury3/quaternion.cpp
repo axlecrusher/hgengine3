@@ -24,12 +24,16 @@ const quaternion quaternion::IDENTITY = { 1.0f,0,0,0 };
 //}
 
 quaternion quaternion::fromAxisAngle(const vector3& axis, HgMath::angle angle) {
+	quaternion q;
+
 	vector3 a = axis.normal();
 	double s = sin(angle.rad()*0.5);
-	quaternion q(cos(angle.rad() * 0.5),
-		a.x()*s,
-		a.y()*s,
-		a.z()*s);
+
+	q.w(cos(angle.rad() * 0.5));
+	q.x(a.x()*s);
+	q.y(a.y()*s);
+	q.z(a.z()*s);
+
 	return q;
 }
 
@@ -39,14 +43,15 @@ quaternion quaternion::fromEuler(HgMath::angle x, HgMath::angle y, HgMath::angle
 	//double a = z.rad(); //attitude
 	//double b = x.rad(); //bank
 
-	double c1 = cos(y.rad() * 0.5);
-	double s1 = sin(y.rad() * 0.5);
-	double c2 = cos(z.rad() * 0.5);
-	double s2 = sin(z.rad() * 0.5);
-	double c3 = cos(x.rad() * 0.5);
-	double s3 = sin(x.rad() * 0.5);
-
 	quaternion tmp;
+
+	const double c1 = cos(y.rad() * 0.5);
+	const double s1 = sin(y.rad() * 0.5);
+	const double c2 = cos(z.rad() * 0.5);
+	const double s2 = sin(z.rad() * 0.5);
+	const double c3 = cos(x.rad() * 0.5);
+	const double s3 = sin(x.rad() * 0.5);
+
 	tmp.w((float)(c1 * c2 * c3 - s1 * s2 * s3));
 	tmp.x((float)(s1 * s2 * c3 + c1 * c2 * s3));
 	tmp.y((float)(s1 * c2 * c3 + c1 * s2 * s3));
@@ -58,7 +63,7 @@ quaternion quaternion::fromEuler(HgMath::angle x, HgMath::angle y, HgMath::angle
 //should be vector, but vector include is broken
 quaternion getRotationTo(const vertex3f& v1, const vertex3f& v2) {
 	//https://stackoverflow.com/questions/1171849/finding-quaternion-representing-the-rotation-from-one-vector-to-another
-	float d = v1.dot(v2);
+	const float d = v1.dot(v2);
 
 	//adapted from ogre https://bitbucket.org/sinbad/ogre/src/9db75e3ba05c0f710998b0816484f3112d5d29ed/OgreMain/include/OgreVector3.h?at=default&fileviewer=file-view-default#OgreVector3.h-664
 	if (d >= 1.0f) {
