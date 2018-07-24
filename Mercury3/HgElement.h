@@ -83,19 +83,34 @@ having HgElement free render data by default and then
 handling special cases.
 */
 class HgElement {
-public:
+private:
 		//position, and rotation are in global coordinate system
-		point position; float scale; //16
-		point origin; //origin (0,0,0) in local space
-		quaternion rotation; //16
+		point m_position; float m_scale; //16
+		point m_origin; //origin (0,0,0) in local space
+		quaternion m_rotation; //16
 //		uint8_t flags; //1
+public:
 		ElementFlags flags;
 
-		HgElement() : scale(1.0f), m_updateNumber(0), m_renderData(nullptr) {}
+		HgElement() : m_scale(1.0f), m_updateNumber(0), m_renderData(nullptr) {}
 		~HgElement();
 
 		void init();
 		void destroy();
+
+		inline const point origin() const { return m_origin; }
+		inline void origin(const point& p) { m_origin = p; }
+
+		inline point& position() { return m_position; }
+		inline const point& position() const { return m_position; }
+		inline void position(const point& p) { m_position = p; }
+
+		inline quaternion rotation() { return m_rotation; }
+		inline const quaternion& rotation() const { return m_rotation; }
+		inline void rotation(const quaternion& q) { m_rotation = q; }
+
+		inline float scale() const { return m_scale; }
+		inline void scale(float s) { m_scale = s; }
 
 		inline bool isRenderable() const { return m_renderData != nullptr; }
 		inline void render() { if (isRenderable()) m_renderData->render();  }

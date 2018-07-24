@@ -212,10 +212,10 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 
 	if (model_data::load(element, modelFilename.c_str()) < 0) return false;
 
-	element->scale = scale;
-	element->origin = origin.scale(1.0f/scale);
-	element->position = position;
-	element->rotation = orientation;
+	element->scale(scale);
+	element->origin(origin.scale(1.0f/scale));
+	element->position(position);
+	element->rotation(orientation);
 
 	if (!vertexShader.empty() && !fragmentShader.empty())
 		element->m_renderData->shader = HgShader::acquire(vertexShader.c_str(), fragmentShader.c_str());

@@ -87,7 +87,7 @@ void* voxelGrid_create(HgElement* element) {
 
 //	element->rotation.w = 1.0f;
 	//	element->rotation.z = 0.707f;
-	element->scale = 1.0f;
+	element->scale(1.0f);
 
 	change_to_voxelGrid(element);
 	return nullptr;

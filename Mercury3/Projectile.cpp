@@ -43,7 +43,7 @@ void Projectile::update(HgTime tdelta) {
 
 		float tmp = tdelta.msec() * projectileMsecSpeed;
 		vector3 r = direction.scale(tmp);
-		element.position = element.position + r;
+		element.position(element.position() + r);
 }
 
 static void* generate_projectile(HgElement* element) {

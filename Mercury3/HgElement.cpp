@@ -27,13 +27,13 @@ void HgElement::init()
 	memset(&flags, 0, sizeof(flags));
 //	flags = 0;
 	m_renderData = NULL;
-	position = vector3();
+	m_position = vector3();
 	m_logic = nullptr;
 	m_renderData = nullptr;
-	scale = 1;
-	origin = vector3();
+	m_scale = 1;
+	m_origin = vector3();
 
-	rotation = quaternion::IDENTITY;
+	m_rotation = quaternion::IDENTITY;
 	m_extendedData = std::make_unique<HgElementExtended>();
 	m_extendedData->owner = this;
 
@@ -75,7 +75,7 @@ void HgElement::updateGpuTextures() {
 
 //Transform point p into world space of HgElement e
 point object_to_world_space(const HgElement* e, const point* p) {
-	vector3 v1 = (*p - e->origin).scale(e->scale).rotate(e->rotation) + e->position;
+	vector3 v1 = (*p - e->origin()).scale(e->scale()).rotate(e->rotation()) + e->position();
 	return v1;
 }
 

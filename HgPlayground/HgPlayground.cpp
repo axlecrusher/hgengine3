@@ -130,8 +130,8 @@ void fire(HgScene* scene) {
 
 	Projectile *pd = dynamic_cast<Projectile*>(&element->logic());
 	pd->direction = camera->projectRay();
-	element->rotation = camera->rotation.invert();
-	element->position = camera->position;
+	element->rotation(camera->rotation.invert());
+	element->position(camera->position);
 }
 
 void(*submit_for_render)(uint8_t viewport_idx, HgCamera* camera, HgElement* e);
@@ -219,14 +219,18 @@ int main()
 		HgElement* element = NULL;
 
 		if (create_element("triangle", &scene, &element) > 0) {
-			element->position.x(1.5f);
-			element->position.z(1.0f);
+			auto tmp = element->position();
+			tmp.x(1.5f);
+			tmp.z(1.0f);
+			element->position(tmp);
 			//	toQuaternion2(0, 0, 90, &element->rotation);
 		}
 
 		if (create_element("triangle", &scene, &element) > 0) {
-			element->position.x(-0.0f);
-			element->position.z(-2.0f);
+			auto tmp = element->position();
+			tmp.x(0.0f);
+			tmp.z(-2.0f);
+			element->position(tmp);
 			//	toQuaternion2(45,0,0,&element->rotation);
 		}
 
@@ -238,10 +242,9 @@ int main()
 				//		shape_create_triangle(element);
 				float x = (i % 20)*1.1f;
 				float z = (i / 20)*1.1f;
-				element->position.y(5.0f);
-				element->position.x(-10.0f + x);
-				element->position.z(-2.0f - z);
-				element->scale = 0.3f;
+				;
+				element->position(point(-10.0f + x, 5.0f, -2.0f - z));
+				element->scale(0.3f);
 				//			element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
 				element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 			}
@@ -253,15 +256,15 @@ int main()
 
 		if (create_element("voxelGrid", &scene, &element) > 0) {
 			//		element->scale = 100.0f;
-			element->position.z(-10);
+			element->position().z(-10);
 			//		toQuaternion2(0, -90, 0, &element->rotation);
 			element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 		}
 
 		if (create_element("square", &scene, &element) > 0) {
-			element->scale = 100.0f;
-			element->position.z(-4);
-			element->rotation = quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO);
+			element->scale(100.0f);
+			element->position().z(-4);
+			element->rotation(quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO));
 			element->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
 			element->renderData()->blendMode = BLEND_ADDITIVE;
 			//	model_data d = LoadModel("test.hgmdl");
@@ -376,11 +379,10 @@ int main()
 
 		{
 			HgElement* element = tris[0];
-			element->rotation = quaternion::fromEuler(angle::ZERO,angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
+			element->rotation(quaternion::fromEuler(angle::ZERO,angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO));
 
 			for (i = 0; i < ANI_TRIS; i++) {
-				HgElement* e = tris[i];
-				memcpy(&e->rotation, &element->rotation, sizeof element->rotation);
+				tris[i]->rotation(element->rotation());
 			}
 		}
 
