@@ -71,9 +71,10 @@ public:
 	}
 
 	inline quaternion scale(float m) const {
-		quaternion r;
+		//auto vectorization
+		quaternion r = *this;
 		for (int i = 0; i < 4; i++) {
-			r.wxyz.wxyz[i] = wxyz.wxyz[i] * m;
+			r.wxyz.wxyz[i] *= m;
 		}
 		return r;
 	}
