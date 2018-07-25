@@ -37,7 +37,27 @@ public:
 		return HgMath::square(x()) + HgMath::square(y()) + HgMath::square(z()) + HgMath::square(w());
 	}
 
-	inline float length() const {
+	inline float dot(const quaternion& rhs) const {
+		float r = 0;
+		//const quaternion lhs = this->normal();
+		//const quaternion rhs = this->normal();
+		for (int i = 0; i < 4; ++i) {
+			r += wxyz.wxyz[i] * rhs.wxyz.wxyz[i];
+		}
+		r /= this->magnitude()*rhs.magnitude();
+		return r;
+	}
+
+	inline quaternion operator+(const quaternion& rhs) const {
+		quaternion r;
+		for (int i = 0; i < 4; ++i) {
+			r.wxyz.wxyz[i] = wxyz.wxyz[i] + rhs.wxyz.wxyz[i];
+		}
+		return r;
+		//return r.normal();
+	}
+
+	inline float magnitude() const {
 		return (float)sqrt(squaredLength());
 	}
 
@@ -46,21 +66,15 @@ public:
 	}
 
 	inline quaternion normal() const {
-		quaternion r;
-		const float l = length();
-		r.w(w() / l);
-		r.x(x() / l);
-		r.y(y() / l);
-		r.z(z() / l);
-		return r;
+		const float scalar = 1.0f / magnitude();
+		return this->scale(scalar);
 	}
 
-	inline quaternion scale(float m) {
-		quaternion r(*this);
-		r.w(w() * m);
-		r.x(x() * m);
-		r.y(y() * m);
-		r.z(z() * m);
+	inline quaternion scale(float m) const {
+		quaternion r;
+		for (int i = 0; i < 4; i++) {
+			r.wxyz.wxyz[i] = wxyz.wxyz[i] * m;
+		}
 		return r;
 	}
 

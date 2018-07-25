@@ -203,6 +203,7 @@
     <ClCompile Include="oglShaders.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="quaternion.cpp" />
+    <ClCompile Include="quaternion_dual.cpp" />
     <ClCompile Include="square.cpp" />
     <ClCompile Include="src\HgGPUBuffer.cpp" />
     <ClCompile Include="src\HgUtils.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="oglShaders.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Projectile.h" />
+    <ClInclude Include="quaterion_dual.h" />
     <ClInclude Include="quaternion.h" />
     <ClInclude Include="src\HgGPUBuffer.h" />
     <ClInclude Include="src\HgTimer.h" />
