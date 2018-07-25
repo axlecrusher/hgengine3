@@ -1,4 +1,4 @@
-#include <quaterion_dual.h>
+#include <quaternion_dual.h>
 
 dual_quaternion::dual_quaternion(const quaternion& rotation, const vector3& translation)
 	: m_real(rotation.normal())
