@@ -131,8 +131,8 @@ namespace HgMath {
 
 		inline vertex rotate(const quaternion& q) const {
 			vertex r1 = this->scale(q.w());
-			vertex r2 = vertex(q.wxyz.wxyz + 1).cross(*this);
-			vertex tmp = vertex(q.wxyz.wxyz + 1).cross(r1 + r2).scale(2.0); //XXX fix this
+			vertex r2 = vertex(q.raw() + 1).cross(*this);
+			vertex tmp = vertex(q.raw() + 1).cross(r1 + r2).scale(2.0); //XXX fix this
 			return *this + tmp;
 		}
 

@@ -164,6 +164,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <AdditionalOptions>/Qvec-report:1 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -210,6 +212,7 @@
     <ClCompile Include="src\OGLvbo.cpp" />
     <ClCompile Include="src\OGL\OGLGpuBuffer.cpp" />
     <ClCompile Include="src\RenderBackend.cpp" />
+    <ClCompile Include="src\HgMaterial.cpp" />
     <ClCompile Include="src\HgTimer.cpp" />
     <ClCompile Include="src\IniLoader.cpp" />
     <ClCompile Include="src\OGLBackend.cpp" />
@@ -262,12 +265,14 @@
     <ClInclude Include="quaternion_dual.h" />
     <ClInclude Include="quaternion.h" />
     <ClInclude Include="src\HgGPUBuffer.h" />
+    <ClInclude Include="src\HgMaterial.h" />
     <ClInclude Include="src\HgTimer.h" />
     <ClInclude Include="src\HgUtils.h" />
     <ClInclude Include="src\HgVboMemory.h" />
     <ClInclude Include="src\IniLoader.h" />
     <ClInclude Include="src\InstancedCollection.h" />
     <ClInclude Include="src\IUpdatable.h" />
+    <ClInclude Include="src\math\vector.h" />
     <ClInclude Include="src\OGLBackend.h" />
     <ClInclude Include="src\OGLvbo.h" />
     <ClInclude Include="src\OGL\OGLGpuBuffer.h" />

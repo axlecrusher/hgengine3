@@ -20,7 +20,7 @@ public:
 	}
 
 	inline dual_quaternion dual_quaternion::normal() const {
-		const float scaling = 1.0 / m_real.magnitude();
+		const float scaling = 1.0f / m_real.magnitude();
 		return this->scale(scaling);
 	}
 

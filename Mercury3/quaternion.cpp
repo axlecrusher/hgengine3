@@ -5,6 +5,8 @@
 #include <cmath>
 #include <HgTypes.h>
 
+#include <math/vector.h>
+
 const quaternion quaternion::IDENTITY = { 1.0f,0,0,0 };
 
 //void toQuaternion(double x, double y, double z, double deg, quaternion* q)
@@ -38,6 +40,7 @@ quaternion quaternion::fromAxisAngle(const vector3& axis, HgMath::angle angle) {
 }
 
 quaternion quaternion::fromEuler(HgMath::angle x, HgMath::angle y, HgMath::angle z) {
+	//YZX
 	//match http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/index.htm
 	//double h = y.rad(); //heading
 	//double a = z.rad(); //attitude
@@ -86,4 +89,37 @@ quaternion getRotationTo(const vertex3f& v1, const vertex3f& v2) {
 
 quaternion vector3_to_quat(const vertex3f& a) {
 	return quaternion(1.0, a.x(), a.y(), a.z());
+}
+
+quaternion quaternion::quat_mult(const quaternion& q, const quaternion& r) {
+	quaternion t;
+	t.w((r.w()*q.w()) - (r.x()*q.x()) - (r.y()*q.y()) - (r.z()*q.z()));
+	t.x((r.w()*q.x()) + (r.x()*q.w()) - (r.y()*q.z()) + (r.z()*q.y()));
+	t.y((r.w()*q.y()) + (r.x()*q.z()) + (r.y()*q.w()) - (r.z()*q.x()));
+	t.z((r.w()*q.z()) - (r.x()*q.y()) + (r.y()*q.x()) + (r.z()*q.w()));
+	return t; //rvo
+}
+
+inline HgMath::vec4f compute(const HgMath::vec4f& a, const HgMath::vec4f& b) {
+	return a * b;
+}
+
+quaternion quaternion::quat_mult_vectorized(const quaternion& q, const quaternion& r) {
+	using namespace HgMath;
+	quaternion result;
+
+	//maybe do one or two at a time
+	const vec4f w = vec4f(r.w());
+	const vec4f x = vec4f(r.x()) * vec4f(-1.0, 1.0, 1.0, -1.0);
+	const vec4f y = vec4f(r.y()) * vec4f(-1.0, -1.0, 1.0, 1.0);
+	const vec4f z = vec4f(r.z()) * vec4f(-1.0, 1.0, -1.0, 1.0);
+
+	const vec4f a = q.wxyz;
+	const vec4f b(q.x(), q.w(), q.z(), q.y());
+	const vec4f c(q.y(), q.z(), q.w(), q.x());
+	const vec4f d(q.z(), q.y(), q.x(), q.w());
+
+	result.wxyz = w * a + x * b +y * c + z * d;
+
+	return result; //rvo
 }

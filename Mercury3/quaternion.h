@@ -6,6 +6,7 @@
 #include <xmmintrin.h>
 #include <vertex3d.h>
 
+#include <math/vector.h>
 //class vertex3f;
 typedef vertex3f vector3;
 
@@ -21,80 +22,76 @@ public:
 
 	inline quaternion invert() const { return quaternion(w(), -x(), -y(), -z()); }
 
-	inline float w() const { return wxyz.wxyz[0]; }
-	inline void w(float a) { wxyz.wxyz[0] = a; }
+	inline float w() const { return wxyz[0]; }
+	inline void w(float a) { wxyz[0] = a; }
 
-	inline float x() const { return wxyz.wxyz[1]; }
-	inline void x(float a) { wxyz.wxyz[1] = a; }
+	inline float x() const { return wxyz[1]; }
+	inline void x(float a) { wxyz[1] = a; }
 
-	inline float y() const { return wxyz.wxyz[2]; }
-	inline void y(float a) { wxyz.wxyz[2] = a; }
+	inline float y() const { return wxyz[2]; }
+	inline void y(float a) { wxyz[2] = a; }
 
-	inline float z() const { return wxyz.wxyz[3]; }
-	inline void z(float a) { wxyz.wxyz[3] = a; }
+	inline float z() const { return wxyz[3]; }
+	inline void z(float a) { wxyz[3] = a; }
 
 	inline float squaredLength() const {
-		return HgMath::square(x()) + HgMath::square(y()) + HgMath::square(z()) + HgMath::square(w());
+		return wxyz.squaredLength();
 	}
 
 	inline float dot(const quaternion& rhs) const {
-		float r = 0;
-		//const quaternion lhs = this->normal();
-		//const quaternion rhs = this->normal();
-		for (int i = 0; i < 4; ++i) {
-			r += wxyz.wxyz[i] * rhs.wxyz.wxyz[i];
-		}
-		r /= this->magnitude()*rhs.magnitude();
-		return r;
+		return wxyz.dot(rhs.wxyz);
+		//float r = 0;
+		////const quaternion lhs = this->normal();
+		////const quaternion rhs = this->normal();
+		//for (int i = 0; i < 4; ++i) {
+		//	r += wxyz[i] * rhs.wxyz[i];
+		//}
+		//r /= this->magnitude()*rhs.magnitude();
+		//return r;
 	}
 
 	inline quaternion operator+(const quaternion& rhs) const {
 		quaternion r;
-		for (int i = 0; i < 4; ++i) {
-			r.wxyz.wxyz[i] = wxyz.wxyz[i] + rhs.wxyz.wxyz[i];
-		}
+		r.wxyz = wxyz + rhs.wxyz;
 		return r;
-		//return r.normal();
 	}
 
 	inline float magnitude() const {
-		return (float)sqrt(squaredLength());
+		return wxyz.magnitude();
 	}
 
 	inline quaternion operator*(const quaternion& rhs) const {
-		return quat_mult(this, &rhs).normal();
+		//return quat_mult(*this, rhs).normal();
+		return quat_mult_vectorized(*this, rhs).normal();
 	}
 
 	inline quaternion normal() const {
-		const float scalar = 1.0f / magnitude();
-		return this->scale(scalar);
+		quaternion r;
+		r.wxyz = wxyz.normal();
+		return r;
 	}
 
 	inline quaternion scale(float m) const {
-		//auto vectorization
-		quaternion r = *this;
-		for (int i = 0; i < 4; i++) {
-			r.wxyz.wxyz[i] *= m;
-		}
+		quaternion r;
+		r.wxyz = wxyz.scale(m);
 		return r;
 	}
 
 	static inline quaternion fromAxisAngle(const vector3& axis, HgMath::angle angle);
 
-	union {
-		float wxyz[4];
-//		__m128 sse_data; //using this and an enhanced instruction set (SSE2) seem to make the compiler do the correct things SOMETIMES rather than never
-	} wxyz;
+	//union {
+	//	float wxyz[4];
+	//	//__m128 sse_data; //using this and an enhanced instruction set (SSE2) seem to make the compiler do the correct things SOMETIMES rather than never
+	//} wxyz;
+
+	inline const float* raw() const { return wxyz.raw(); }
+
+	static quaternion quat_mult(const quaternion& q, const quaternion& r);
+	static quaternion quat_mult_vectorized(const quaternion& q, const quaternion& r);
 
 private:
-	inline quaternion quat_mult(const quaternion* q, const quaternion* r) const {
-		quaternion t;
-		t.w((r->w()*q->w()) - (r->x()*q->x()) - (r->y()*q->y()) - (r->z()*q->z()));
-		t.x((r->w()*q->x()) + (r->x()*q->w()) - (r->y()*q->z()) + (r->z()*q->y()));
-		t.y((r->w()*q->y()) + (r->x()*q->z()) + (r->y()*q->w()) - (r->z()*q->x()));
-		t.z((r->w()*q->z()) - (r->x()*q->y()) + (r->y()*q->x()) + (r->z()*q->w()));
-		return t; //rvo
-	}
+
+	HgMath::vec4f wxyz;
 };
 
 //void toQuaternion(double x, double y, double z, double deg, quaternion* q);
