@@ -3,13 +3,22 @@
 
 namespace {
 
-	TEST(QuaternionTest, Invert) {
+	TEST(QuaternionTest, Conjugate) {
 		quaternion a(1, 2, 3, 4);
-		auto r = a.invert();
+		auto r = a.conjugate();
 		EXPECT_NEAR(r.w(), 1.0, 0.000001);
 		EXPECT_NEAR(r.x(), -2.0, 0.000001);
 		EXPECT_NEAR(r.y(), -3.0, 0.000001);
 		EXPECT_NEAR(r.z(), -4.0, 0.000001);
+	}
+
+	TEST(QuaternionTest, Inverse) {
+		quaternion a(1, 2, 3, 4);
+		auto r = a.inverse();
+		EXPECT_NEAR(r.w(), 0.18257418274879456, 0.000001);
+		EXPECT_NEAR(r.x(), -0.36514836549758911, 0.000001);
+		EXPECT_NEAR(r.y(), -0.54772257804870605, 0.000001);
+		EXPECT_NEAR(r.z(), -0.73029673099517822, 0.000001);
 	}
 
 	TEST(QuaternionTest, Magnitude) {
@@ -21,7 +30,9 @@ namespace {
 	TEST(QuaternionTest, Normal) {
 		quaternion a(1, 2, 3, 4);
 		quaternion b = a.normal();
+
 		EXPECT_NEAR(b.magnitude(), 1.0, 0.000001);
+		EXPECT_NEAR(b.squaredLength(), 1.0, 0.000001);
 		EXPECT_NEAR(b.w(), 0.18257418274879456, 0.000001);
 		EXPECT_NEAR(b.x(), 0.36514836549758911, 0.000001);
 		EXPECT_NEAR(b.y(), 0.54772257804870605, 0.000001);

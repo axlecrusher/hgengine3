@@ -16,6 +16,6 @@ void HgCamera::FreeRotate(HgMath::angle yaw, HgMath::angle pitch) {
 
 // Project a ray in the direction of the camera's view
 vector3 HgCamera::projectRay() {
-	vector3 ray = initialDirection.rotate(rotation.invert());
+	vector3 ray = initialDirection.rotate(rotation.conjugate());
 	return ray.normal();
 }

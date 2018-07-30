@@ -20,7 +20,15 @@ public:
 
 	static quaternion fromEuler(HgMath::angle x, HgMath::angle y, HgMath::angle z);
 
-	inline quaternion invert() const { return quaternion(w(), -x(), -y(), -z()); }
+	inline quaternion conjugate() const {
+		//quaternion r;
+		//r.wxyz = wxyz*HgMath::vec4f(0.0, -1.0, -1.0, -1.0);
+		return quaternion(w(),-x(),-y(),-z());
+	}
+
+	inline quaternion inverse() const {
+		return this->normal().conjugate();
+	}
 
 	inline float w() const { return wxyz[0]; }
 	inline void w(float a) { wxyz[0] = a; }
@@ -39,15 +47,9 @@ public:
 	}
 
 	inline float dot(const quaternion& rhs) const {
+		//if the angular difference is wanted between the quaternions,
+		//normalize before calling dot()
 		return wxyz.dot(rhs.wxyz);
-		//float r = 0;
-		////const quaternion lhs = this->normal();
-		////const quaternion rhs = this->normal();
-		//for (int i = 0; i < 4; ++i) {
-		//	r += wxyz[i] * rhs.wxyz[i];
-		//}
-		//r /= this->magnitude()*rhs.magnitude();
-		//return r;
 	}
 
 	inline quaternion operator+(const quaternion& rhs) const {
@@ -55,6 +57,12 @@ public:
 		r.wxyz = wxyz + rhs.wxyz;
 		return r;
 	}
+
+	//inline quaternion operator^(const quaternion& rhs) const {
+	//	quaternion r;
+	//	r.wxyz = wxyz ^ rhs.wxyz;
+	//	return r;
+	//}
 
 	inline float magnitude() const {
 		return wxyz.magnitude();
@@ -78,11 +86,6 @@ public:
 	}
 
 	static inline quaternion fromAxisAngle(const vector3& axis, HgMath::angle angle);
-
-	//union {
-	//	float wxyz[4];
-	//	//__m128 sse_data; //using this and an enhanced instruction set (SSE2) seem to make the compiler do the correct things SOMETIMES rather than never
-	//} wxyz;
 
 	inline const float* raw() const { return wxyz.raw(); }
 

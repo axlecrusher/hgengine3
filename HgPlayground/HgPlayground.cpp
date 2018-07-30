@@ -29,6 +29,9 @@
 #include <RenderBackend.h>
 #include <HgUtils.h>
 
+
+#include <math/vector.h>
+
 float projection[16];
 
 extern viewport view_port[];
@@ -130,7 +133,7 @@ void fire(HgScene* scene) {
 
 	Projectile *pd = dynamic_cast<Projectile*>(&element->logic());
 	pd->direction = camera->projectRay();
-	element->rotation(camera->rotation.invert());
+	element->rotation(camera->rotation.conjugate());
 	element->position(camera->position);
 }
 
@@ -344,7 +347,7 @@ int main()
 
 			//			if (v.components.z > 0) DebugBreak();
 
-			v = v.normal().rotate(camera->rotation.invert());
+			v = v.normal().rotate(camera->rotation.conjugate());
 			float scale = (1.0f / 1000.0f) * dtime.msec();
 			v = v.normal().scale(scale);
 			camera->Move(v);

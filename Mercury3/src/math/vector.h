@@ -89,12 +89,21 @@ namespace HgMath {
 			return r;
 		}
 
+		//inline vector operator^(const vector& _rhs) const {
+		//	vector r = *this;
+		//	const vector rhs = _rhs;
+		//	for (int i = 0; i < fcount; i++) {
+		//		r.xyz[i] = r.xyz[i] ^ rhs.xyz[i];
+		//	}
+		//	return r;
+		//}
+
 		inline T dot(const vector& _rhs) const {
 			//the 1st loop is auto vectorized
 			T sum = 0;
 			T r[fcount];
-			vector a = *this;
-			vector b = *this;
+			const vector a = *this;
+			const vector b = *this;
 			for (int i = 0; i < 4; i++)
 			{
 				r[i] = a[i] * b[i];
@@ -109,15 +118,14 @@ namespace HgMath {
 		inline T squaredLength() const {
 			//the 1st loop is auto vectorized
 			T sum = 0;
-			T r[fcount];
-			vector tmp = *this;
+			T components[fcount];
 			for (int i = 0; i < 4; i++)
 			{
-				r[i] = HgMath::square(tmp[i]);
+				components[i] = HgMath::square(xyz[i]);
 			}
 			for (int i = 0; i < 4; i++)
 			{
-				sum += r[i];
+				sum += components[i];
 			}
 			return sum;
 		}
@@ -148,10 +156,46 @@ namespace HgMath {
 
 		inline const T* raw() const { return xyz; }
 
-	private:
+		inline T w() const { return xyz[0]; }
+		inline T x() const { return xyz[1]; }
+		inline T y() const { return xyz[2]; }
+		inline T z() const { return xyz[3]; }
+
+	protected:
 		T xyz[fcount];
+	};
+
+	template<typename T>
+	class vec3 : public vector<T,4> {
+		vec3() : vector<T,4>()
+		{
+		}
+
+		vec3(T x, T y, T z) : xyz{ 0,x,y,z }
+		{
+		}
+
+		vec3(const T _xyz[3])
+		{
+			for (int i = 1; i < 4; i++) {
+				xyz[i] = _xyz[i];
+			}
+		}
+
+		vec3(const T a)
+		{
+			for (int i = 0; i < fcount; i++) {
+				xyz[i] = a;
+			}
+		}
+
+		inline T x() const { return xyz[1]; }
+		inline T y() const { return xyz[2]; }
+		inline T z() const { return xyz[3]; }
 	};
 	
 	typedef vector<double, 4> vec4d;
 	typedef vector<float, 4> vec4f;
-}
+
+	typedef vec3<double> vec3d;
+	typedef vec3<float> vec3f; }
