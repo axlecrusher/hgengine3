@@ -19,16 +19,40 @@ public:
 		return m_real.dot(rhs.m_real);
 	}
 
-	inline dual_quaternion dual_quaternion::normal() const {
+	inline dual_quaternion normal() const {
 		const float scaling = 1.0f / m_real.magnitude();
 		return this->scale(scaling);
 	}
 
 	dual_quaternion operator+(const dual_quaternion& rhs) const;
 
+	dual_quaternion operator-(const dual_quaternion& rhs) const;
+
 	dual_quaternion operator*(const dual_quaternion& rhs) const;
 
-	void read(float* r) const;
+	inline float w() const { return m_real.w(); }
+	inline void w(float a) { m_real.w(a); }
+
+	inline float x() const { return m_real.x(); }
+	inline void x(float a) { m_real.x(a); }
+
+	inline float y() const { return m_real.y(); }
+	inline void y(float a) { m_real.y(a); }
+
+	inline float z() const { return m_real.z(); }
+	inline void z(float a) { m_real.z(a); }
+
+	inline float dw() const { return m_dual.w(); }
+	inline void dw(float a) { m_dual.w(a); }
+
+	inline float dx() const { return m_dual.x(); }
+	inline void dx(float a) { m_dual.x(a); }
+
+	inline float dy() const { return m_dual.y(); }
+	inline void dy(float a) { m_dual.y(a); }
+
+	inline float dz() const { return m_dual.z(); }
+	inline void dz(float a) { m_dual.z(a); }
 
 private:
 	quaternion m_real;

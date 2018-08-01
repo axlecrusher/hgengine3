@@ -21,18 +21,18 @@ dual_quaternion dual_quaternion::operator+(const dual_quaternion& rhs) const {
 	return r;
 }
 
+dual_quaternion dual_quaternion::operator-(const dual_quaternion& rhs) const {
+	dual_quaternion r;
+	r.m_real = m_real - rhs.m_real;
+	r.m_dual = m_dual - rhs.m_dual;
+	return r;
+}
+
 dual_quaternion dual_quaternion::operator*(const dual_quaternion& rhs) const {
 	//left to right order
 	dual_quaternion r;
 	r.m_real = m_real * rhs.m_real;
 	r.m_dual = (m_real * rhs.m_dual + m_dual * rhs.m_real).scale(0.5); //this is exactly 2x. why?
 	return r;
-}
-
-void dual_quaternion::read(float* r) const {
-	for (int i = 0; i < 4; i++) {
-		r[i] = m_real.raw()[i];
-		r[i + 4] = m_dual.raw()[i];
-	}
 }
 

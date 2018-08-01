@@ -120,6 +120,7 @@
   <ItemGroup>
     <ClCompile Include="..\Mercury3\HgMath.cpp" />
     <ClCompile Include="..\Mercury3\quaternion.cpp" />
+    <ClCompile Include="..\Mercury3\quaternion_dual.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="quaternion_tests.cpp" />
     <ClCompile Include="vector_math_tests.cpp" />

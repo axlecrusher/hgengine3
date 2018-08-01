@@ -30,6 +30,9 @@
     <ClCompile Include="vector_math_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Mercury3\quaternion_dual.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Mercury3\src\math\vector.h">

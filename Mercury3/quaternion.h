@@ -58,6 +58,12 @@ public:
 		return r;
 	}
 
+	inline quaternion operator-(const quaternion& rhs) const {
+		quaternion r;
+		r.wxyz = wxyz - rhs.wxyz;
+		return r;
+	}
+
 	//inline quaternion operator^(const quaternion& rhs) const {
 	//	quaternion r;
 	//	r.wxyz = wxyz ^ rhs.wxyz;
