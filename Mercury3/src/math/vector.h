@@ -166,7 +166,8 @@ namespace HgMath {
 	};
 
 	template<typename T>
-	class vec3 : public vector<T,4> {
+	class vec3 : protected vector<T,4> {
+	public:
 		vec3() : vector<T,4>()
 		{
 		}
@@ -189,9 +190,14 @@ namespace HgMath {
 			}
 		}
 
-		inline T x() const { return xyz[1]; }
-		inline T y() const { return xyz[2]; }
-		inline T z() const { return xyz[3]; }
+		inline T x() const { return vector<T, 4>::xyz[1]; }
+		inline void x(T a) { vector<T, 4>::xyz[1] = a; }
+
+		inline T y() const { return vector<T, 4>::xyz[2]; }
+		inline void y(T a) { vector<T, 4>::xyz[2] = a; }
+
+		inline T z() const { return vector<T, 4>::xyz[3]; }
+		inline void z(T a) { vector<T, 4>::xyz[3] = a; }
 	};
 	
 	typedef vector<double, 4> vec4d;

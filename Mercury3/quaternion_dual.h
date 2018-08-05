@@ -30,6 +30,8 @@ public:
 
 	dual_quaternion operator*(const dual_quaternion& rhs) const;
 
+	HgMath::vec3f getTranslation() const;
+
 	inline float w() const { return m_real.w(); }
 	inline void w(float a) { m_real.w(a); }
 

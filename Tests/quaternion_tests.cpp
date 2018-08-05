@@ -135,10 +135,10 @@ namespace {
 		EXPECT_NEAR(r.x(), 0.43813102, 0.000001);
 		EXPECT_NEAR(r.y(), 0.49975945099999997, 0.000001);
 		EXPECT_NEAR(r.z(), 0.419347971, 0.000001);
-		EXPECT_NEAR(r.dw(), -0.356616214, 0.000001);
-		EXPECT_NEAR(r.dx(), 0.1338174753, 0.000001);
-		EXPECT_NEAR(r.dy(), 0.638480336, 0.000001);
-		EXPECT_NEAR(r.dz(), 0.657806456, 0.000001);
+		EXPECT_NEAR(r.dw(), -8.07424545, 0.000001);
+		EXPECT_NEAR(r.dx(), 2.741452093, 0.000001);
+		EXPECT_NEAR(r.dy(), 14.28674269, 0.000001);
+		EXPECT_NEAR(r.dz(), 14.30818891, 0.000001);
 	}
 
 	TEST(DualQuaternionTest, Subtraction) {
@@ -151,9 +151,22 @@ namespace {
 		EXPECT_NEAR(r.x(), -0.11261297799999997, 0.000001);
 		EXPECT_NEAR(r.y(), -0.10795246099999997, 0.000001);
 		EXPECT_NEAR(r.z(), -0.04094895700000001, 0.000001);
-		EXPECT_NEAR(r.dw(), 0.05670513199999999, 0.000001);
-		EXPECT_NEAR(r.dx(), 0.0636942573, 0.000001);
-		EXPECT_NEAR(r.dy(), -0.05164334199999998, 0.000001);
-		EXPECT_NEAR(r.dz(), 0.06791031400000003, 0.000001);
+		EXPECT_NEAR(r.dw(), 2.46342277, 0.000001);
+		EXPECT_NEAR(r.dx(), 0.953653927, 0.000001);
+		EXPECT_NEAR(r.dy(), -3.308027750000001, 0.000001);
+		EXPECT_NEAR(r.dz(), -0.7312712700000006, 0.000001);
+	}
+
+	TEST(DualQuaternionTest, GetTranslation) {
+		using namespace HgMath;
+		const dual_quaternion dq(quaternion::fromEuler(angle::deg(0), angle::deg(0), angle::deg(0)), vector3(5, 10, 15));
+		//const dual_quaternion dq2(quaternion::fromEuler(angle::deg(25), angle::deg(30), angle::deg(35)), vector3(5, 15, 20));
+		//const auto r = dq * dq2;
+
+		const auto r = dq.getTranslation();
+
+		EXPECT_NEAR(r.x(), 5, 0.000001);
+		EXPECT_NEAR(r.y(), 10, 0.000001);
+		EXPECT_NEAR(r.z(), 15, 0.000001);
 	}
 }

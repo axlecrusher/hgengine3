@@ -101,7 +101,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\Josh\Documents\Visual Studio 2017\Projects\ConsoleApplication1\Mercury3\Mercury3;C:\Users\Josh\Documents\Visual Studio 2017\Projects\ConsoleApplication1\Mercury3\Mercury3\src\math;C:\Users\Josh\Documents\Visual Studio 2017\Projects\ConsoleApplication1\Mercury3\Mercury3\src;C:\Users\Josh\Documents\Visual Studio 2017\Projects\ConsoleApplication1\Mercury3\Mercury3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>../Mercury3\lib\x64/gtest.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
