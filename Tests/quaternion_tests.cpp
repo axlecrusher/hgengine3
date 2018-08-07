@@ -60,7 +60,7 @@ namespace {
 	TEST(QuaternionTest, Multiply) {
 		quaternion a(1, 2, 3, 4);
 		quaternion b(5, 6, 7, 8);
-		auto r = quaternion::quat_mult(a, b);
+		auto r = quaternion::mult(a, b);
 
 		EXPECT_NEAR(r.w(), -60, 0.000001);
 		EXPECT_NEAR(r.x(), 12, 0.000001);
@@ -71,8 +71,8 @@ namespace {
 	TEST(QuaternionTest, VectorizedMultiply) {
 		quaternion a(1, 2, 3, 4);
 		quaternion b(9, 8, 7, 6);
-		quaternion correct = quaternion::quat_mult(a, b);
-		quaternion r = quaternion::quat_mult_vectorized(a, b);
+		quaternion correct = quaternion::mult_c(a, b);
+		quaternion r = quaternion::mult_vectorized(a, b);
 
 		EXPECT_NEAR(r.w(), correct.w(), 0.000001);
 		EXPECT_NEAR(r.x(), correct.x(), 0.000001);

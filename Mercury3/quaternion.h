@@ -76,7 +76,7 @@ public:
 
 	inline quaternion operator*(const quaternion& rhs) const {
 		//return quat_mult(*this, rhs).normal();
-		return quat_mult_vectorized(*this, rhs).normal();
+		return mult(*this, rhs).normal();
 	}
 
 	inline quaternion normal() const {
@@ -95,8 +95,12 @@ public:
 
 	inline const float* raw() const { return wxyz.raw(); }
 
-	static quaternion quat_mult(const quaternion& q, const quaternion& r);
-	static quaternion quat_mult_vectorized(const quaternion& q, const quaternion& r);
+	inline static quaternion mult(const quaternion& q, const quaternion& r) {
+		return mult_vectorized(q, r);
+	}
+
+	static quaternion mult_c(const quaternion& q, const quaternion& r);
+	static quaternion mult_vectorized(const quaternion& q, const quaternion& r);
 
 private:
 

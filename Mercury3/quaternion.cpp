@@ -91,7 +91,7 @@ quaternion vector3_to_quat(const vertex3f& a) {
 	return quaternion(1.0, a.x(), a.y(), a.z());
 }
 
-quaternion quaternion::quat_mult(const quaternion& q, const quaternion& r) {
+quaternion quaternion::mult_c(const quaternion& q, const quaternion& r) {
 	quaternion t;
 	t.w((r.w()*q.w()) - (r.x()*q.x()) - (r.y()*q.y()) - (r.z()*q.z()));
 	t.x((r.w()*q.x()) + (r.x()*q.w()) - (r.y()*q.z()) + (r.z()*q.y()));
@@ -104,7 +104,7 @@ inline HgMath::vec4f compute(const HgMath::vec4f& a, const HgMath::vec4f& b) {
 	return a * b;
 }
 
-quaternion quaternion::quat_mult_vectorized(const quaternion& q, const quaternion& r) {
+quaternion quaternion::mult_vectorized(const quaternion& q, const quaternion& r) {
 	using namespace HgMath;
 	quaternion result;
 
