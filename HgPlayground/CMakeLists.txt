@@ -7,10 +7,11 @@ file(GLOB PLAYGROUNDSRC
 
 if(MSVC)
     add_definitions(-DUNICODE -D_UNICODE)
+    set(WIDECHAR "/Zc:wchar_t")
 endif()
 
 add_executable(hgplayground ${PLAYGROUNDSRC})
-target_compile_options(hgplayground PRIVATE "/Zc:wchar_t")
+target_compile_options(hgplayground PRIVATE ${WIDECHAR})
 
 set(HGENGINE_INCLUDES "../Mercury3")
 

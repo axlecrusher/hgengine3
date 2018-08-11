@@ -33,10 +33,11 @@ source_group("Source" FILES ${ENGINESOURCES})
 
 if(MSVC)
     add_definitions(-DUNICODE -D_UNICODE)
+    set(WIDECHAR "/Zc:wchar_t")
 endif()
 
 add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC})
-target_compile_options(hgengine PRIVATE "/Zc:wchar_t")
+target_compile_options(hgengine PRIVATE ${WIDECHAR})
 
 target_include_directories(hgengine PUBLIC "./")
 target_include_directories(hgengine PUBLIC "include/")

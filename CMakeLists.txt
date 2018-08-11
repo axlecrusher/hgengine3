@@ -1,6 +1,8 @@
 project("HGENGINE3")
 
-set(DBGHELP_LIBRARY "dbghelp")
+if(MSVC)
+	set(DBGHELP_LIBRARY "dbghelp")
+endif()
 
 find_package(OpenGL)
 find_library(GLEW_LIBRARY PATHS Mercury3/lib/x64 NAMES GLEW glew32 glew glew32s PATH_SUFFIXES lib64)
