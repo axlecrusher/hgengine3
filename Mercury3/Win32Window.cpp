@@ -32,12 +32,15 @@ MercuryWindow* Win32Window::GenWin32Window()
 	return new Win32Window("Mercury3", 640, 480, 24, 16, false);
 }
 
-LPCTSTR StringToLPCTSTR(const MString & s)
+template<typename STRTYPE>
+STRTYPE* StringToLPCTSTR(const std::string& s)
 {
 	size_t length = s.length();
-	LPCTSTR str = new WCHAR[length+1];
-	for (size_t i=0;i<length; ++i) ((WCHAR*)str)[i]=s[i];
-	((WCHAR*)str)[length]=0;
+	STRTYPE* str = new STRTYPE[length+1];
+	for (size_t i = 0; i < length; ++i) {
+		str[i] = s[i];
+	}
+	str[length]=0;
 	return str;
 }
 
@@ -45,8 +48,8 @@ Win32Window::Win32Window(const MString& title, int width, int height, int bits, 
 	:m_hwnd(NULL), m_hdc(NULL), m_hglrc(NULL), m_hInstance(NULL), m_className(NULL), m_windowAtom(NULL), m_winTitle(NULL),m_cX(0),
 	m_cY(0),MercuryWindow(title, width, height, bits, depthBits, fullscreen)
 {
-	m_className = (WCHAR*)StringToLPCTSTR("Mercury Render Window");
-	m_winTitle = (WCHAR*)StringToLPCTSTR(title);
+	m_className = StringToLPCTSTR<WCHAR>("Mercury Render Window");
+	m_winTitle = StringToLPCTSTR<WCHAR>(title);
 
 	GenWinClass();
 	GenWindow();
