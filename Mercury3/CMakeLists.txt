@@ -15,7 +15,7 @@ file(GLOB RENDERERSRC
 
 source_group("RenderBackend" FILES ${RENDERERSRC})
 
-file(GLOB SOURCES
+file(GLOB ENGINESOURCES
 	"*.cpp"
 	"*.h"
 	"src/*.cpp"
@@ -29,11 +29,13 @@ file(GLOB SOURCES
 	"ini.c"
 )
 
+source_group("Source" FILES ${ENGINESOURCES})
+
 if(MSVC)
     add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
-add_library(hgengine STATIC ${SOURCES} ${HGSOUNDSRC} ${RENDERERSRC})
+add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC})
 target_compile_options(hgengine PRIVATE "/Zc:wchar_t")
 
 target_include_directories(hgengine PUBLIC "./")
