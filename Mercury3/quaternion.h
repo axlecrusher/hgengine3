@@ -91,7 +91,7 @@ public:
 		return r;
 	}
 
-	static inline quaternion fromAxisAngle(const vector3& axis, HgMath::angle angle);
+	static quaternion fromAxisAngle(const vector3& axis, HgMath::angle angle);
 
 	inline const float* raw() const { return wxyz.raw(); }
 

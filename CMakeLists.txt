@@ -11,3 +11,4 @@ find_library(SOUNDIO_LIB PATHS Mercury3/lib/libsoundio/x86_64 NAMES soundio)
 
 add_subdirectory("Mercury3")
 add_subdirectory("HgPlayground")
+add_subdirectory("Tests")
