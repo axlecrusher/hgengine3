@@ -1,8 +1,4 @@
 
-
-set(GTEST_INCLUDE_DIR ../Mercury3/include/gtest)
-find_library(GTEST_LIBRARY PATHS ../Mercury3/lib/x64 NAMES gtest)
-
 set(HGENGINE_INCLUDES "../Mercury3")
 
 file(GLOB TEST_SRC
@@ -30,10 +26,10 @@ endif()
 add_executable(hgtests ${TEST_SRC})
 target_compile_options(hgtests PRIVATE ${WIDECHAR})
 
-target_link_libraries (hgtests LINK_PUBLIC hgengine ${GTEST_LIBRARY})
+target_link_libraries (hgtests LINK_PUBLIC hgengine ${GTEST_LIBRARIES})
 
 include_directories(${GLEW_INCLUDE_DIRS})
-target_include_directories(hgengine PUBLIC "${GTEST_INCLUDE_DIR}/")
+target_include_directories(hgengine PUBLIC "${GTEST_INCLUDE_DIRS}/")
 target_include_directories(hgengine PUBLIC "${HGENGINE_INCLUDES}/")
 target_include_directories(hgengine PUBLIC "${HGENGINE_INCLUDES}/include/")
 target_include_directories(hgengine PUBLIC "${HGENGINE_INCLUDES}/src/")

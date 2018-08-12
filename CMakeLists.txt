@@ -1,5 +1,10 @@
 project("HGENGINE3")
 
+set(GTEST_ROOT "C:\Program Files\googletest-distribution")
+
+enable_testing()
+find_package(GTest REQUIRED)
+
 if(MSVC)
 	set(DBGHELP_LIBRARY "dbghelp")
 endif()
@@ -11,4 +16,7 @@ find_library(SOUNDIO_LIB PATHS Mercury3/lib/libsoundio/x86_64 NAMES soundio)
 
 add_subdirectory("Mercury3")
 add_subdirectory("HgPlayground")
-add_subdirectory("Tests")
+
+if(GTEST_FOUND)
+	add_subdirectory("Tests")
+endif()
