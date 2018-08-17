@@ -40,7 +40,7 @@ add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC})
 target_compile_options(hgengine PRIVATE ${WIDECHAR})
 
 target_include_directories(hgengine PUBLIC "./")
-target_include_directories(hgengine PUBLIC "include/")
+target_include_directories(hgengine PUBLIC "include/" "include/stb")
 target_include_directories(hgengine PUBLIC "src/")
 target_include_directories(hgengine PUBLIC "HgSound/")
 target_include_directories(hgengine PUBLIC "src/ogl/")
