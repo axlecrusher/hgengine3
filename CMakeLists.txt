@@ -1,6 +1,6 @@
 project("HGENGINE3")
 
-set(GTEST_ROOT "C:\Program Files\googletest-distribution")
+set(GTEST_ROOT "C:/Program Files/googletest-distribution")
 
 enable_testing()
 find_package(GTest REQUIRED)
@@ -8,6 +8,8 @@ find_package(GTest REQUIRED)
 if(MSVC)
 	set(DBGHELP_LIBRARY "dbghelp")
 endif()
+
+set(HGENGINE_INCLUDES "Mercury3")
 
 find_package(OpenGL)
 find_library(GLEW_LIBRARY PATHS Mercury3/lib/x64 NAMES GLEW glew32 glew glew32s PATH_SUFFIXES lib64)
