@@ -129,7 +129,7 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 	}
 
 	// check if link was successful
-	int params = -1;
+	GLint params = -1;
 	glGetProgramiv(shader_program, GL_LINK_STATUS, &params);
 	if (GL_TRUE != params) {
 		fprintf(stderr,
@@ -154,9 +154,9 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 
 	memset(shader->m_uniformLocations, -1, sizeof(*shader->m_uniformLocations)*U_UNIFORM_COUNT);
 
-	for (int32_t i = 0; i < uniform_count; i++)
+	for (GLuint i = 0; i < uniform_count; i++)
 	{
-		glGetActiveUniform(shader_program, (GLuint)i, 64, &length, &size, &type, name);
+		glGetActiveUniform(shader_program, i, 64, &length, &size, &type, name);
 //		printf("Uniform #%d Type: %u Name: %s\n", i, type, name);
 		for (int j = 0; j < U_UNIFORM_COUNT; j++) {
 			if (strcmp(name, UniformString[j]) == 0) {
