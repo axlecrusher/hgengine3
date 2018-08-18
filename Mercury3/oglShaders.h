@@ -7,13 +7,13 @@
 #include <oglDisplay.h>
 
 struct shader_source {
-	char* vert_file_path;
-	char* frag_file_path;
-	char* geom_file_path;
+	std::string vert_file_path;
+	std::string frag_file_path;
+	std::string geom_file_path;
 
-	char* vert_source;
-	char* frag_source;
-	char* geom_source;
+	std::string vert_source;
+	std::string frag_source;
+	std::string geom_source;
 };
 
 class HgOglShader : public HgShader {
@@ -25,7 +25,7 @@ class HgOglShader : public HgShader {
 		virtual void destroy();
 		virtual void enable();
 
-		void setProgramCode(shader_source* ss) { program_code = ss; }
+		inline void setProgramCode(std::unique_ptr<shader_source>& ss) { m_shaderSource = std::move(ss); }
 
 		/* Perhaps shader uniforms should be stored locally per instance of a shader and then
 		sent to the video driver when the shader instance is enables.
@@ -37,17 +37,24 @@ class HgOglShader : public HgShader {
 		virtual void setGlobalUniforms(const HgCamera& c);
 		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd);
 
-		int8_t uniform_locations[U_UNIFORM_COUNT];
-
 		static std::unique_ptr<HgShader> Create(const char* vert, const char* frag);
 	private:
+		enum class LoadState: uint8_t{
+			NOT_LOADED=0,
+			SOURCE_LOADED,
+			READY
+		};
+
 		static void setup_shader(HgOglShader* s);
+		void sendGlobalUniformsToGPU(const HgCamera& c);
+		void sendLocalUniformsToGPU(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd);
 
 		GLuint program_id;
-		uint8_t source_loaded;
+		GLint m_uniformLocations[U_UNIFORM_COUNT];
+		LoadState m_loadState;
 
 		//other things not needed often
-		shader_source* program_code;
+		std::unique_ptr<shader_source> m_shaderSource;
 };
 
 //GLuint shaders_load(const char* path, uint32_t shader_type);
