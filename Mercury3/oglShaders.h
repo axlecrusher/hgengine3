@@ -27,13 +27,6 @@ class HgOglShader : public HgShader {
 
 		inline void setProgramCode(std::unique_ptr<shader_source>& ss) { m_shaderSource = std::move(ss); }
 
-		/* Perhaps shader uniforms should be stored locally per instance of a shader and then
-		sent to the video driver when the shader instance is enables.
-		Currently shaders are essentially global and shared across any element that needs a specific shader.
-		We could make the shader binary shared but keep unform variables on a per instance basis and load
-		them as we process through different instances.
-		*/
-
 		virtual void setGlobalUniforms(const HgCamera& c);
 		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd);
 
@@ -48,6 +41,15 @@ class HgOglShader : public HgShader {
 		static void setup_shader(HgOglShader* s);
 		void sendGlobalUniformsToGPU(const HgCamera& c);
 		void sendLocalUniformsToGPU(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd);
+
+		/* Perhaps shader uniforms should be stored locally per instance of a shader and then
+		sent to the video driver when the shader instance is enabled.
+		Currently shaders are essentially global and shared across any element that needs a specific shader.
+		We could make the shader binary shared but keep unform variables on a per instance basis and load
+		them as we process through different instances.
+
+		What would the benefit of this be? I can't remember. Maybe it makes sense for local uniforms.
+		*/
 
 		GLuint program_id;
 		GLint m_uniformLocations[U_UNIFORM_COUNT];
