@@ -6,13 +6,11 @@
 
 static std::string emptyString;
 
-//static std::map<std::string, std::string> handlers;
 namespace IniLoader {
 	static std::string toLower(const char* str) {
 		std::string tmp(str);
 		std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
 		return tmp; //RVO
-//		return std::move(tmp);
 	}
 
 	int sectionHandler(void* user, const char* _section, const char* _name, const char* value) {
@@ -32,12 +30,24 @@ namespace IniLoader {
 			s.pairs.insert(std::make_pair(std::move(name), std::string(value)));
 			contents->insert(std::make_pair(std::move(sec_name), std::move(s)));
 		}
-		return 0;
+		return 1; //non-zero on success
 	}
 
 	Contents parse(const std::string &filename) {
 		Contents contents;
-		ini_parse(filename.c_str(), &sectionHandler, &contents.m_ini);
+		int r = ini_parse(filename.c_str(), &sectionHandler, &contents.m_ini);
+		if (r == -1) {
+			fprintf(stderr, "Error opening file \"%s\"\n", filename.c_str());
+		}
+		else if (r == -2) {
+			fprintf(stderr, "Memory alignment error opening file \"%s\"\n", filename.c_str());
+		}
+		else if (r > 0) {
+			fprintf(stderr, "Error on line %d in file \"%s\"\n", r, filename.c_str());
+		}
+		else if (r != 0) {
+			fprintf(stderr, "Unknown error opening file \"%s\"\n", filename.c_str() );
+		}
 		return contents; //std::move is not a good idea here, prevents RVO
 	}
 
@@ -52,8 +62,3 @@ namespace IniLoader {
 		return t2->second;
 	}
 }
-//
-//IniRegistrar::IniRegistrar(std::string tag, std::string value) {
-//	auto t = std::make_pair(tag, value);
-//	handlers.insert(t);
-//}
