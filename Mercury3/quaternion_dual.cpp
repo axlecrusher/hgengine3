@@ -75,19 +75,19 @@ void dual_quaternion::toMatrix(float* m) const {
 	const float qz = q.z();
 	const float qw = q.w();
 
-	m[0] = 1.0 - 2 * square(qy) - 2 * square(qz);
-	m[1] = 2*qx*qy - 2*qz*qw;
-	m[2] = 2*qx*qz + 2*qy*qw;
+	m[0] = 1.0f - 2 * square(qy) - 2 * square(qz);
+	m[1] = 2 * qx*qy - 2 * qz*qw;
+	m[2] = 2 * qx*qz + 2 * qy*qw;
 	m[3] = tr.x();
 
 	m[4] = 2 * qx*qy + 2 * qz*qw;
-	m[5] = 1 - 2 * square(qx) - 2 * square(qz);
+	m[5] = 1.0f - 2 * square(qx) - 2 * square(qz);
 	m[6] = 2 * qy*qz - 2 * qx*qw;
 	m[7] = tr.y();
 
 	m[8] = 2 * qx*qz - 2 * qy*qw;
 	m[9] = 2 * qy*qz + 2 * qx*qw;
-	m[10] = 1 - 2 * square(qx) - 2 * square(qy);
+	m[10] = 1.0f - 2 * square(qx) - 2 * square(qy);
 	m[11] = tr.z();
 
 	m[12] = 0;
