@@ -19,10 +19,7 @@ public:
 		return m_real.dot(rhs.m_real);
 	}
 
-	inline dual_quaternion normal() const {
-		const float scaling = 1.0f / m_real.magnitude();
-		return this->scale(scaling);
-	}
+	dual_quaternion normal() const;
 
 	dual_quaternion operator+(const dual_quaternion& rhs) const;
 
@@ -55,6 +52,8 @@ public:
 
 	inline float dz() const { return m_dual.z(); }
 	inline void dz(float a) { m_dual.z(a); }
+
+	void toMatrix(float* m) const;
 
 private:
 	quaternion m_real;

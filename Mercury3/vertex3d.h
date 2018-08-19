@@ -96,7 +96,7 @@ namespace HgMath {
 		}
 
 		inline T length() const {
-			return (T)sqrt(squaredLength());
+			return HgMath::sqrt(squaredLength());
 		}
 
 		inline T squaredLength() const {

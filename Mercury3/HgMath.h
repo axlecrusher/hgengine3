@@ -1,5 +1,7 @@
 #pragma once
 
+#include <math.h>
+
 #undef max
 #undef min
 
@@ -33,6 +35,9 @@ namespace HgMath {
 
 	template<typename T>
 	inline T min(T a, T b) { return (a < b) ? a : b; }
+
+	inline float sqrt(float x) { return ::sqrtf(x); }
+	inline double sqrt(double x) { return ::sqrt(x); }
 
 	template<typename T>
 	class angle_template {

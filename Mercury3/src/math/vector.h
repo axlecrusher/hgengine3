@@ -131,13 +131,17 @@ namespace HgMath {
 		}
 
 		inline T magnitude() const {
-			return (T)sqrt(squaredLength());
+			return HgMath::sqrt(squaredLength());
 		}
 
 		inline vector normal() const {
-			vector r;
-			T length = this->magnitude();
-			r = this->scale(T(1.0) / length);
+			vector r = *this;
+			const T sl = this->squaredLength();
+			if ((sl-T(1.0)) > 0.000001f) {
+				//try to improve accuracy. don't run on things that are already normalized
+				T length = HgMath::sqrt(sl);
+				r = this->scale(T(1.0) / length);
+			}
 			return r;
 		}
 
@@ -162,6 +166,7 @@ namespace HgMath {
 		inline T z() const { return xyz[3]; }
 
 	protected:
+
 		T xyz[fcount];
 	};
 

@@ -11,6 +11,7 @@ file(GLOB TEST_SRC
 	"${HGENGINE_INCLUDES}/quaternion_dual.cpp"
 	"${HGENGINE_INCLUDES}/quaternion_dual.h"
 	"${HGENGINE_INCLUDES}/src/math/vector.h"
+	"${HGENGINE_INCLUDES}/src/math/matrix.h"
 	"${HGENGINE_INCLUDES}/vertex.h"
 )
 
