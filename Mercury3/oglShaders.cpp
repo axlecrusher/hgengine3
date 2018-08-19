@@ -255,6 +255,7 @@ void HgOglShader::setLocalUniforms(const quaternion* rotation, const point* posi
 void HgOglShader::sendLocalUniformsToGPU(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd) {
 	OGLRenderData* oglrd = (OGLRenderData*)rd;
 
+	//this could be replaced with a single matrix uniform for setting the world position and rotation of the object. not check would be needed as it is required information for rendering
 	if (m_uniformLocations[U_ROTATION] > -1) glUniform4f(m_uniformLocations[U_ROTATION], rotation->x(), rotation->y(), rotation->z(), rotation->w());
 	if (m_uniformLocations[U_POSITION] > -1) glUniform4f(m_uniformLocations[U_POSITION], position->x(), position->y(), position->z(), scale);
 	if (m_uniformLocations[U_ORIGIN] > -1) glUniform3f(m_uniformLocations[U_ORIGIN], origin->x(), origin->y(), origin->z());
