@@ -33,9 +33,7 @@ namespace IniLoader {
 		return 1; //non-zero on success
 	}
 
-	Contents parse(const std::string &filename) {
-		Contents contents;
-		int r = ini_parse(filename.c_str(), &sectionHandler, &contents.m_ini);
+	void handleError(int r, const std::string &filename) {
 		if (r == -1) {
 			fprintf(stderr, "Error opening file \"%s\"\n", filename.c_str());
 		}
@@ -46,7 +44,15 @@ namespace IniLoader {
 			fprintf(stderr, "Error on line %d in file \"%s\"\n", r, filename.c_str());
 		}
 		else if (r != 0) {
-			fprintf(stderr, "Unknown error opening file \"%s\"\n", filename.c_str() );
+			fprintf(stderr, "Unknown error opening file \"%s\"\n", filename.c_str());
+		}
+	}
+
+	Contents parse(const std::string &filename) {
+		Contents contents;
+		int r = ini_parse(filename.c_str(), &sectionHandler, &contents.m_ini);
+		if (r != 0) {
+			handleError(r, filename);
 		}
 		return contents; //std::move is not a good idea here, prevents RVO
 	}
