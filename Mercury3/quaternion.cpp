@@ -6,6 +6,7 @@
 #include <HgTypes.h>
 
 #include <math/vector.h>
+#include <math/matrix.h>
 
 const quaternion quaternion::IDENTITY = { 1.0f,0,0,0 };
 
@@ -122,4 +123,45 @@ quaternion quaternion::mult_vectorized(const quaternion& q, const quaternion& r)
 	result.wxyz = w * a + x * b +y * c + z * d;
 
 	return result; //rvo
+}
+
+HgMath::mat4f quaternion::toMatrix() const {
+	using namespace HgMath;
+
+	HgMath::mat4f ret;
+	float m[16];
+
+	const float sx = square(x());
+	const float sy = square(y());
+	const float sz = square(z());
+
+	const float qxqy2 = 2 * x()*y();
+	const float qzqw2 = 2 * z()*w();
+	const float qxqz2 = 2 * x()*z();
+	const float qyqw2 = 2 * y()*w();
+	const float qyqz2 = 2 * y()*z();
+	const float qxqw2 = 2 * x()*w();
+
+	m[0] = 1.0f - 2 * sy - 2 * sz;
+	m[1] = qxqy2 - qzqw2;
+	m[2] = qxqz2 + qyqw2;
+	m[3] = 0;
+
+	m[4] = qxqy2 + qzqw2;
+	m[5] = 1.0f - 2 * sx - 2 * sz;
+	m[6] = qyqz2 - qxqw2;
+	m[7] = 0;
+
+	m[8] = qxqz2 - qyqw2;
+	m[9] = qyqz2 + qxqw2;
+	m[10] = 1.0f - 2 * sx - 2 * sy;
+	m[11] = 0;
+
+	m[12] = 0;
+	m[13] = 0;
+	m[14] = 0;
+	m[15] = 1;
+
+	ret.load(m);
+	return ret;
 }

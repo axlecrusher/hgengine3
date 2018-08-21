@@ -8,6 +8,8 @@
 
 #include <math/vector.h>
 //class vertex3f;
+#include <math/matrix.h>
+
 typedef vertex3f vector3;
 
 class quaternion {
@@ -96,11 +98,13 @@ public:
 	inline const float* raw() const { return wxyz.raw(); }
 
 	inline static quaternion mult(const quaternion& q, const quaternion& r) {
-		return mult_vectorized(q, r);
+		return mult_c(q, r);
 	}
 
 	static quaternion mult_c(const quaternion& q, const quaternion& r);
 	static quaternion mult_vectorized(const quaternion& q, const quaternion& r);
+
+	HgMath::mat4f toMatrix() const;
 
 private:
 

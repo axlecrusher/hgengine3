@@ -111,6 +111,38 @@ namespace {
 		EXPECT_NEAR(r.z(), -0.6494001, 0.000001);
 	}
 
+	TEST(QuaternionTest, toMatrix) {
+		using namespace HgMath;
+		const vector3 axis(12, 3, 31);
+		const auto rotAngle = angle::deg(20);
+		const quaternion q = quaternion::fromAxisAngle(vector3(1.0, 2.0, 1.0), rotAngle);
+		const mat4f cmatrix = mat4f::axisRotation(rotAngle.rad(), vectorial::vec3f(1.0, 2.0, 1.0));
+		const auto r = q.toMatrix();
+
+		float matrix[16];
+		r.store(matrix);
+
+		EXPECT_NEAR(matrix[0], cmatrix.value.x.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[1], cmatrix.value.y.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[2], cmatrix.value.z.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[3], cmatrix.value.w.m128_f32[0], 0.000001);
+
+		EXPECT_NEAR(matrix[4], cmatrix.value.x.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[5], cmatrix.value.y.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[6], cmatrix.value.z.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[7], cmatrix.value.w.m128_f32[1], 0.000001);
+
+		EXPECT_NEAR(matrix[8], cmatrix.value.x.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[9], cmatrix.value.y.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[10], cmatrix.value.z.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[11], cmatrix.value.w.m128_f32[2], 0.000001);
+
+		EXPECT_NEAR(matrix[12], cmatrix.value.x.m128_f32[3], 0.000001);
+		EXPECT_NEAR(matrix[13], cmatrix.value.y.m128_f32[3], 0.000001);
+		EXPECT_NEAR(matrix[14], cmatrix.value.z.m128_f32[3], 0.000001);
+		EXPECT_NEAR(matrix[15], cmatrix.value.w.m128_f32[3], 0.000001);
+	}
+
 	TEST(DualQuaternionTest, Multiplication) {
 		using namespace HgMath;
 		const dual_quaternion dq(quaternion::fromEuler(angle::deg(15), angle::deg(20), angle::deg(25)), vector3(5, 10, 15));
