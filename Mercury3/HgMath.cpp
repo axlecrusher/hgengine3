@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 #include <vertex3d.h>
+#include <math/matrix.h>
 
 //const vertex vertex_zero = { 0,0,0 };
 //const vector3 vector3_zero = { 0,0,0 };
@@ -105,6 +106,10 @@ void Perspective2(
 	M[10] = (float)((zfar + znear) / (znear - zfar));
 	M[11] = (float)((2 * zfar*znear) / (znear - zfar));
 	M[14] = -1.0f;
+
+	const auto projection = vectorial::transpose(vectorial::mat4f(M));
+	projection.store(M);
+
 }
 //
 //vector3 vector3_scale(vector3 v, float scale) {

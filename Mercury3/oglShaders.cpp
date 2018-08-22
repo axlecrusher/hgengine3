@@ -230,7 +230,7 @@ void HgOglShader::setGlobalUniforms(const HgCamera& c) {
 
 void HgOglShader::sendGlobalUniformsToGPU(const HgCamera& c) {
 	//can I send as single global transform matrix combining all transforms?
-	if (m_uniformLocations[U_PROJECTION] > -1) glUniformMatrix4fv(m_uniformLocations[U_PROJECTION], 1, GL_TRUE, _projection);
+	if (m_uniformLocations[U_PROJECTION] > -1) glUniformMatrix4fv(m_uniformLocations[U_PROJECTION], 1, GL_FALSE, _projection);
 	if (m_uniformLocations[U_CAMERA_ROT] > -1) glUniform4f(m_uniformLocations[U_CAMERA_ROT], c.rotation.x(), c.rotation.y(), c.rotation.z(), c.rotation.w());
 	if (m_uniformLocations[U_CAMERA_POS] > -1) glUniform3f(m_uniformLocations[U_CAMERA_POS], c.position.x(), c.position.y(), c.position.z());
 }

@@ -1,5 +1,6 @@
 #include <HgCamera.h>
 #include <HgMath.h>
+#include <math/matrix.h>
 
 HgCamera::HgCamera() : initialDirection({0,0,-1}), rotation(quaternion::IDENTITY)
 {
@@ -15,7 +16,24 @@ void HgCamera::FreeRotate(HgMath::angle yaw, HgMath::angle pitch) {
 }
 
 // Project a ray in the direction of the camera's view
-vector3 HgCamera::projectRay() {
+vector3 HgCamera::projectRay() const {
 	vector3 ray = initialDirection.rotate(rotation.conjugate());
 	return ray.normal();
+}
+
+HgMath::mat4f HgCamera::toMatrix() const {
+	using namespace HgMath;
+
+	//float m[16];
+	//const auto matrix = rotation.toMatrix4();
+	//matrix.store(m);
+	//m[12] = -position.x();
+	//m[13] = -position.y();
+	//m[14] = -position.z();
+
+	mat4f ret;
+	const vectorial::vec3f translation(-position.x(), -position.y(), -position.z());
+	ret = rotation.toMatrix4() * mat4f::translation(translation);
+
+	return ret;
 }

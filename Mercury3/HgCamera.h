@@ -3,6 +3,7 @@
 #include <HgTypes.h>
 #include <quaternion.h>
 #include <HgMath.h>
+#include <src/math/matrix.h>
 
 class HgCamera {
 	public:
@@ -14,13 +15,15 @@ class HgCamera {
 		inline void SetRotation(const quaternion& r) { rotation = r; }
 
 		// Project a ray in the direction of the camera's view
-		vector3 projectRay();
+		vector3 projectRay() const;
 
 		point position;
 		quaternion rotation;
 
 		vector3 direction;
 		float speedMsec;
+
+		HgMath::mat4f toMatrix() const;
 
 private:
 

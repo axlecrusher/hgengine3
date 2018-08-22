@@ -142,18 +142,19 @@ HgMath::mat4f quaternion::toMatrix() const {
 	const float qyqz2 = 2 * y()*z();
 	const float qxqw2 = 2 * x()*w();
 
+	//column major
 	m[0] = 1.0f - 2 * sy - 2 * sz;
-	m[1] = qxqy2 - qzqw2;
-	m[2] = qxqz2 + qyqw2;
+	m[1] = qxqy2 + qzqw2;
+	m[2] = qxqz2 - qyqw2;
 	m[3] = 0;
 
-	m[4] = qxqy2 + qzqw2;
+	m[4] = qxqy2 - qzqw2;
 	m[5] = 1.0f - 2 * sx - 2 * sz;
-	m[6] = qyqz2 - qxqw2;
+	m[6] = qyqz2 + qxqw2;
 	m[7] = 0;
 
-	m[8] = qxqz2 - qyqw2;
-	m[9] = qyqz2 + qxqw2;
+	m[8] = qxqz2 + qyqw2;
+	m[9] = qyqz2 - qxqw2;
 	m[10] = 1.0f - 2 * sx - 2 * sy;
 	m[11] = 0;
 

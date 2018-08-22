@@ -19,7 +19,8 @@ source_group("Source" FILES ${TEST_SRC})
 
 if(MSVC)
 #    add_definitions(-DUNICODE -D_UNICODE)
-#    set(WIDECHAR "/Zc:wchar_t")
+#    set(WIDECHAR "/Zc:wchar_t")CMAKE_CXX_FLAGS_RELWITHDEBINFO 
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /MT")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT")
 endif()

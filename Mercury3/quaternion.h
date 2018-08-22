@@ -104,7 +104,7 @@ public:
 	static quaternion mult_c(const quaternion& q, const quaternion& r);
 	static quaternion mult_vectorized(const quaternion& q, const quaternion& r);
 
-	HgMath::mat4f toMatrix() const;
+	HgMath::mat4f toMatrix4() const;
 
 private:
 
