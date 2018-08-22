@@ -159,6 +159,7 @@ namespace HgMath {
 		}
 
 		inline const T* raw() const { return xyz; }
+		inline T* raw() { return xyz; }
 
 		inline T w() const { return xyz[0]; }
 		inline T x() const { return xyz[1]; }

@@ -7,6 +7,9 @@
 RenderBackend* RENDERER = &oglRenderer;
 
 namespace Renderer {
+	HgMath::mat4f projection_matrix;
+	HgMath::mat4f view_matrix;
+
 	std::vector<HgElement*> opaqueElements;
 	std::vector<HgElement*> transparentElements;
 
@@ -57,12 +60,15 @@ static void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgE
 	e->renderData()->render();
 }
 
-void Renderer::Render(uint8_t stereo_view, HgCamera* camera) {
+void Renderer::Render(uint8_t stereo_view, HgCamera* camera, const HgMath::mat4f& projection) {
+	projection_matrix = projection;
+	view_matrix = camera->toMatrix();
+
 	for (auto e : opaqueElements) {
-		submit_for_render_serial(stereo_view, camera + 0, e);
+		submit_for_render_serial(stereo_view, camera, e);
 	}
 
 	for (auto e : transparentElements) {
-		submit_for_render_serial(stereo_view, camera + 0, e);
+		submit_for_render_serial(stereo_view, camera, e);
 	}
 }

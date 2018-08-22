@@ -25,7 +25,7 @@ enum HgElementFlag {
 	HGE_TRANSPARENT = 0x40
 };
 
-extern float* _projection;
+//extern float* _projection;
 
 class HgElement;
 class model_data;

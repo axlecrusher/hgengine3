@@ -45,7 +45,7 @@ namespace Renderer {
 	extern std::vector<HgElement*> opaqueElements;
 	extern std::vector<HgElement*> transparentElements;
 
-	void Render(uint8_t stereo_view, HgCamera* camera);
+	void Render(uint8_t stereo_view, HgCamera* camera, const HgMath::mat4f& projection);
 	inline void Enqueue(HgElement& e) {
 		if (e.flags.transparent) {
 			Renderer::transparentElements.push_back(&e);
@@ -54,6 +54,9 @@ namespace Renderer {
 			Renderer::opaqueElements.push_back(&e);
 		}
 	}
+
+	extern HgMath::mat4f projection_matrix;
+	extern HgMath::mat4f view_matrix;
 }
 
 extern RenderBackend* RENDERER;

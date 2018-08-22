@@ -27,11 +27,12 @@ enum UniformLocations {
 	U_SPECULAR_TEXTURE = 8,
 	U_NORMAL_TEXTURE = 9,
 	U_BUFFER_OBJECT1 = 10,
-	U_UNIFORM_COUNT=11
+	U_MODEL_MATRIX = 11,
+	U_UNIFORM_COUNT = 12
 };
 
 extern char *UniformString[];
-extern float* _projection;
+//extern float* _projection;
 
 class OGLRenderData : public RenderData {
 public:
