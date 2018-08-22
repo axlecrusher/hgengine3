@@ -80,13 +80,14 @@ void Perspective(
 	double right = aspect*top;
 	double left = -right;
 
+	//column major
 	M[0] = (float)((2 * znear) / (right - left));
-	M[2] = (float)((right + left) / (right - left));
-	M[6] = (float)((top + bottom) / (top - bottom));
 	M[5] = (float)((2 * znear) / (top - bottom));
+	M[8] = (float)((right + left) / (right - left));
+	M[9] = (float)((top + bottom) / (top - bottom));
 	M[10] = (float)((zfar + znear) / (zfar - znear));
-	M[11] = (float)((2 * zfar*znear) / (zfar - znear));
-	M[14] = -1.0f;
+	M[11] = -1.0f;
+	M[14] = (float)((2 * zfar*znear) / (zfar - znear));
 }
 
 void Perspective2(
@@ -100,16 +101,12 @@ void Perspective2(
 	double f = 1.0 / tan(fov*0.5);
 	memset(M, 0, 16 * sizeof* M);
 
-
+	//column major
 	M[0] = (float)(f / aspect);
 	M[5] = (float)f;
 	M[10] = (float)((zfar + znear) / (znear - zfar));
-	M[11] = (float)((2 * zfar*znear) / (znear - zfar));
-	M[14] = -1.0f;
-
-	const auto projection = vectorial::transpose(vectorial::mat4f(M));
-	projection.store(M);
-
+	M[11] = -1.0f;
+	M[14] = (float)((2 * zfar*znear) / (znear - zfar));
 }
 //
 //vector3 vector3_scale(vector3 v, float scale) {

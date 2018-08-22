@@ -214,23 +214,23 @@ namespace {
 		dq.toMatrix(matrix);
 
 		EXPECT_NEAR(matrix[0], cmatrix.value.x.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[1], cmatrix.value.y.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[2], cmatrix.value.z.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[3], cmatrix.value.w.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[1], cmatrix.value.x.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[2], cmatrix.value.x.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[3], cmatrix.value.x.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[4], cmatrix.value.x.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[4], cmatrix.value.y.m128_f32[0], 0.000001);
 		EXPECT_NEAR(matrix[5], cmatrix.value.y.m128_f32[1], 0.000001);
-		EXPECT_NEAR(matrix[6], cmatrix.value.z.m128_f32[1], 0.000001);
-		EXPECT_NEAR(matrix[7], cmatrix.value.w.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[6], cmatrix.value.y.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[7], cmatrix.value.y.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[8], cmatrix.value.x.m128_f32[2], 0.000001);
-		EXPECT_NEAR(matrix[9], cmatrix.value.y.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[8], cmatrix.value.z.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[9], cmatrix.value.z.m128_f32[1], 0.000001);
 		EXPECT_NEAR(matrix[10], cmatrix.value.z.m128_f32[2], 0.000001);
-		EXPECT_NEAR(matrix[11], cmatrix.value.w.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[11], cmatrix.value.z.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[12], cmatrix.value.x.m128_f32[3], 0.000001);
-		EXPECT_NEAR(matrix[13], cmatrix.value.y.m128_f32[3], 0.000001);
-		EXPECT_NEAR(matrix[14], cmatrix.value.z.m128_f32[3], 0.000001);
+		EXPECT_NEAR(matrix[12], cmatrix.value.w.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[13], cmatrix.value.w.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[14], cmatrix.value.w.m128_f32[2], 0.000001);
 		EXPECT_NEAR(matrix[15], cmatrix.value.w.m128_f32[3], 0.000001);
 	}
 
@@ -244,23 +244,23 @@ namespace {
 		dq.toMatrix(matrix);
 
 		EXPECT_NEAR(matrix[0], cmatrix.value.x.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[1], cmatrix.value.y.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[2], cmatrix.value.z.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[3], cmatrix.value.w.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[1], cmatrix.value.x.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[2], cmatrix.value.x.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[3], cmatrix.value.x.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[4], cmatrix.value.x.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[4], cmatrix.value.y.m128_f32[0], 0.000001);
 		EXPECT_NEAR(matrix[5], cmatrix.value.y.m128_f32[1], 0.000001);
-		EXPECT_NEAR(matrix[6], cmatrix.value.z.m128_f32[1], 0.000001);
-		EXPECT_NEAR(matrix[7], cmatrix.value.w.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[6], cmatrix.value.y.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[7], cmatrix.value.y.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[8], cmatrix.value.x.m128_f32[2], 0.000001);
-		EXPECT_NEAR(matrix[9], cmatrix.value.y.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[8], cmatrix.value.z.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[9], cmatrix.value.z.m128_f32[1], 0.000001);
 		EXPECT_NEAR(matrix[10], cmatrix.value.z.m128_f32[2], 0.000001);
-		EXPECT_NEAR(matrix[11], cmatrix.value.w.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[11], cmatrix.value.z.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[12], cmatrix.value.x.m128_f32[3], 0.000001);
-		EXPECT_NEAR(matrix[13], cmatrix.value.y.m128_f32[3], 0.000001);
-		EXPECT_NEAR(matrix[14], cmatrix.value.z.m128_f32[3], 0.000001);
+		EXPECT_NEAR(matrix[12], cmatrix.value.w.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[13], cmatrix.value.w.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[14], cmatrix.value.w.m128_f32[2], 0.000001);
 		EXPECT_NEAR(matrix[15], cmatrix.value.w.m128_f32[3], 0.000001);
 	}
 
@@ -274,23 +274,23 @@ namespace {
 		dq.toMatrix(matrix);
 
 		EXPECT_NEAR(matrix[0], cmatrix.value.x.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[1], cmatrix.value.y.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[2], cmatrix.value.z.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[3], cmatrix.value.w.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[1], cmatrix.value.x.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[2], cmatrix.value.x.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[3], cmatrix.value.x.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[4], cmatrix.value.x.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[4], cmatrix.value.y.m128_f32[0], 0.000001);
 		EXPECT_NEAR(matrix[5], cmatrix.value.y.m128_f32[1], 0.000001);
-		EXPECT_NEAR(matrix[6], cmatrix.value.z.m128_f32[1], 0.000001);
-		EXPECT_NEAR(matrix[7], cmatrix.value.w.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[6], cmatrix.value.y.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[7], cmatrix.value.y.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[8], cmatrix.value.x.m128_f32[2], 0.000001);
-		EXPECT_NEAR(matrix[9], cmatrix.value.y.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[8], cmatrix.value.z.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[9], cmatrix.value.z.m128_f32[1], 0.000001);
 		EXPECT_NEAR(matrix[10], cmatrix.value.z.m128_f32[2], 0.000001);
-		EXPECT_NEAR(matrix[11], cmatrix.value.w.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[11], cmatrix.value.z.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[12], cmatrix.value.x.m128_f32[3], 0.000001);
-		EXPECT_NEAR(matrix[13], cmatrix.value.y.m128_f32[3], 0.000001);
-		EXPECT_NEAR(matrix[14], cmatrix.value.z.m128_f32[3], 0.000001);
+		EXPECT_NEAR(matrix[12], cmatrix.value.w.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[13], cmatrix.value.w.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[14], cmatrix.value.w.m128_f32[2], 0.000001);
 		EXPECT_NEAR(matrix[15], cmatrix.value.w.m128_f32[3], 0.000001);
 	}
 
@@ -304,23 +304,23 @@ namespace {
 		dq.toMatrix(matrix);
 
 		EXPECT_NEAR(matrix[0], cmatrix.value.x.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[1], cmatrix.value.y.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[2], cmatrix.value.z.m128_f32[0], 0.000001);
-		EXPECT_NEAR(matrix[3], cmatrix.value.w.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[1], cmatrix.value.x.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[2], cmatrix.value.x.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[3], cmatrix.value.x.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[4], cmatrix.value.x.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[4], cmatrix.value.y.m128_f32[0], 0.000001);
 		EXPECT_NEAR(matrix[5], cmatrix.value.y.m128_f32[1], 0.000001);
-		EXPECT_NEAR(matrix[6], cmatrix.value.z.m128_f32[1], 0.000001);
-		EXPECT_NEAR(matrix[7], cmatrix.value.w.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[6], cmatrix.value.y.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[7], cmatrix.value.y.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[8], cmatrix.value.x.m128_f32[2], 0.000001);
-		EXPECT_NEAR(matrix[9], cmatrix.value.y.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[8], cmatrix.value.z.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[9], cmatrix.value.z.m128_f32[1], 0.000001);
 		EXPECT_NEAR(matrix[10], cmatrix.value.z.m128_f32[2], 0.000001);
-		EXPECT_NEAR(matrix[11], cmatrix.value.w.m128_f32[2], 0.000001);
+		EXPECT_NEAR(matrix[11], cmatrix.value.z.m128_f32[3], 0.000001);
 
-		EXPECT_NEAR(matrix[12], cmatrix.value.x.m128_f32[3], 0.000001);
-		EXPECT_NEAR(matrix[13], cmatrix.value.y.m128_f32[3], 0.000001);
-		EXPECT_NEAR(matrix[14], cmatrix.value.z.m128_f32[3], 0.000001);
+		EXPECT_NEAR(matrix[12], cmatrix.value.w.m128_f32[0], 0.000001);
+		EXPECT_NEAR(matrix[13], cmatrix.value.w.m128_f32[1], 0.000001);
+		EXPECT_NEAR(matrix[14], cmatrix.value.w.m128_f32[2], 0.000001);
 		EXPECT_NEAR(matrix[15], cmatrix.value.w.m128_f32[3], 0.000001);
 	}
 }

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <quaternion.h>
+#include <vertex3d.h>
+
 
 //Based on, though the implementation seemed buggy.
 //A Beginners Guide to Dual-Quaternions
@@ -27,7 +29,7 @@ public:
 
 	dual_quaternion operator*(const dual_quaternion& rhs) const;
 
-	HgMath::vec3f getTranslation() const;
+	vertex3f getTranslation() const;
 
 	inline float w() const { return m_real.w(); }
 	inline void w(float a) { m_real.w(a); }
@@ -54,6 +56,7 @@ public:
 	inline void dz(float a) { m_dual.z(a); }
 
 	void toMatrix(float* m) const;
+	HgMath::mat4f toMatrix() const;
 
 private:
 	quaternion m_real;

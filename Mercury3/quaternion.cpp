@@ -128,8 +128,8 @@ quaternion quaternion::mult_vectorized(const quaternion& q, const quaternion& r)
 HgMath::mat4f quaternion::toMatrix() const {
 	using namespace HgMath;
 
-	HgMath::mat4f ret;
-	float m[16];
+void quaternion::toMatrix4(float* m) const {
+	using namespace HgMath;
 
 	const float sx = square(x());
 	const float sy = square(y());
@@ -162,7 +162,10 @@ HgMath::mat4f quaternion::toMatrix() const {
 	m[13] = 0;
 	m[14] = 0;
 	m[15] = 1;
+}
 
-	ret.load(m);
-	return ret;
+HgMath::mat4f quaternion::toMatrix4() const {
+	float m[16];
+	toMatrix4(m);
+	return HgMath::mat4f(m);
 }

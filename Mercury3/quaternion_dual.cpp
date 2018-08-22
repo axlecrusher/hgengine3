@@ -63,34 +63,23 @@ vertex3f dual_quaternion::getTranslation() const {
 }
 
 void dual_quaternion::toMatrix(float* m) const {
-	using namespace HgMath;
-
 	const auto q = this->normal();
 	//const auto q = m_real.normal();
-	const auto tr = getTranslation();
+	const auto tr = q.getTranslation();
 
-	const float qx = q.x();
-	const float qy = q.y();
-	const float qz = q.z();
-	const float qw = q.w();
-
-	m[0] = 1.0f - 2 * square(qy) - 2 * square(qz);
-	m[1] = 2 * qx*qy - 2 * qz*qw;
-	m[2] = 2 * qx*qz + 2 * qy*qw;
-	m[3] = tr.x();
-
-	m[4] = 2 * qx*qy + 2 * qz*qw;
-	m[5] = 1.0f - 2 * square(qx) - 2 * square(qz);
-	m[6] = 2 * qy*qz - 2 * qx*qw;
-	m[7] = tr.y();
-
-	m[8] = 2 * qx*qz - 2 * qy*qw;
-	m[9] = 2 * qy*qz + 2 * qx*qw;
-	m[10] = 1.0f - 2 * square(qx) - 2 * square(qy);
-	m[11] = tr.z();
-
-	m[12] = 0;
-	m[13] = 0;
-	m[14] = 0;
+	q.m_real.toMatrix4(m);
+	
+	m[12] = tr.x();
+	m[13] = tr.y();
+	m[14] = tr.z();
 	m[15] = 1;
+}
+
+HgMath::mat4f dual_quaternion::toMatrix() const {
+	using namespace HgMath;
+
+	float mm[16];
+	toMatrix(mm);
+
+	return HgMath::mat4f(mm);
 }
