@@ -15,6 +15,9 @@
 #include <HgElement.h>
 #include <HgUtils.h>
 
+#include <InstancedCollection.h>
+#include <cube.h>
+
 //TestRegistration("test");
 
 //static vtable_index VTABLE_INDEX;
@@ -60,6 +63,8 @@ uint8_t cube_indices[36] = {
 	12, 13, 14,		15, 16, 17,	
 	12, 22, 13,		15, 23, 16
 };
+
+static auto Collection = InstancedCollection<RotatingCube::RotatingCube, RotatingCube::gpuStruct, 1>::Collection;
 
 //instanced render data
 static OGLRenderData *crd = NULL;
@@ -123,4 +128,38 @@ void shape_create_cube(HgElement* element) {
 }
 */
 
+namespace RotatingCube {
+	void RotatingCube::update(HgTime dt, gpuStruct* instanceData) {
+		using namespace HgMath;
+		m_age += dt;
+		if (m_age.msec() > 10000) {
+			m_age -= HgTime::msec(10000);
+		}
+		const quaternion rotation = quaternion::fromEuler(angle::ZERO, angle::deg(m_age.msec() / 27.777777777777777777777777777778), angle::ZERO);
+		getElement().rotation(rotation);
+		instanceData->rotation = rotation;
+	}
+
+	void RotatingCube::init() {
+		HgElement* e = &getElement();
+		change_to_cube(e);
+	}
+
+	RotatingCube& RotatingCube::Generate() {
+		static bool init = false;
+		if (init == false) {
+			Engine::collections().push_back(&Collection());
+			init = true;
+		}
+		return Collection().newItem();
+	}
+}
+
+static void* generate_rotating_cube(HgElement* element) {
+	RotatingCube::RotatingCube& p = RotatingCube::RotatingCube::Generate();
+	p.init();
+	return &p;
+}
+
+REGISTER_LINKTIME(rotating_cube, generate_rotating_cube);
 REGISTER_LINKTIME(cube, change_to_cube)

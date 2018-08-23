@@ -31,6 +31,7 @@
 
 
 #include <math/vector.h>
+#include <InstancedCollection.h>
 
 float projection[16];
 
@@ -236,7 +237,6 @@ int main()
 			//	toQuaternion2(45,0,0,&element->rotation);
 		}
 
-
 		for (i = 0; i < ANI_TRIS; i++) {
 			if (create_element("cube", &scene, &element) > 0) {
 				tris[i] = element;
@@ -246,9 +246,9 @@ int main()
 				float z = (i / 20)*1.1f;
 				;
 				element->position(point(-10.0f + x, 5.0f, -2.0f - z));
-				element->scale(0.3f);
-				//			element->m_renderData->shader = HGShader_acquire("test_vertex2.glsl", "test_frag2.glsl");
-				element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+				element->scale(0.3f); 
+				//element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+				element->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 			}
 		}
 

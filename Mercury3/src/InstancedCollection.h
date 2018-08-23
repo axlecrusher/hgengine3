@@ -1,5 +1,6 @@
 #pragma once
 
+#include <IUpdatable.h>
 #include <UpdatableCollection.h>
 
 template<typename T, typename gpuStruct, int stride>
@@ -110,4 +111,10 @@ private:
 	size_t m_instanceCount;
 	SwissArray<T> m_items;
 	HgGPUBuffer<gpuStruct> m_instanceData;
+};
+
+template<typename gpu_structure>
+class IUpdatableInstance : public IUpdatable {
+public:
+	virtual void update(HgTime tdelta, gpu_structure* instanceData) = 0;
 };
