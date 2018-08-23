@@ -48,7 +48,6 @@ dual_quaternion dual_quaternion::operator*(const dual_quaternion& rhs) const {
 	return r.normal();
 }
 
-HgMath::vec3f dual_quaternion::getTranslation() const {
 vertex3f dual_quaternion::getTranslation() const {
 	using namespace HgMath;
 	vertex3f r;

@@ -125,9 +125,6 @@ quaternion quaternion::mult_vectorized(const quaternion& q, const quaternion& r)
 	return result; //rvo
 }
 
-HgMath::mat4f quaternion::toMatrix() const {
-	using namespace HgMath;
-
 void quaternion::toMatrix4(float* m) const {
 	using namespace HgMath;
 
