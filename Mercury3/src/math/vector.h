@@ -196,6 +196,15 @@ namespace HgMath {
 			}
 		}
 
+		inline vector operator-(const vector& _rhs) const {
+			vector r = *this;
+			const vector rhs = _rhs;
+			for (int i = 0; i < 4; i++) {
+				r.xyz[i] -= rhs.xyz[i];
+			}
+			return r;
+		}
+
 		inline T x() const { return vector<T, 4>::xyz[1]; }
 		inline void x(T a) { vector<T, 4>::xyz[1] = a; }
 

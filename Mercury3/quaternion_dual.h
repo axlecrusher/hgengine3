@@ -3,6 +3,7 @@
 #include <quaternion.h>
 #include <vertex3d.h>
 
+#include <math/matrix.h>
 
 //Based on, though the implementation seemed buggy.
 //A Beginners Guide to Dual-Quaternions
@@ -55,8 +56,8 @@ public:
 	inline float dz() const { return m_dual.z(); }
 	inline void dz(float a) { m_dual.z(a); }
 
-	void toMatrix(float* m) const;
-	HgMath::mat4f toMatrix() const;
+	void toMatrix4(float* m) const;
+	HgMath::mat4f toMatrix4() const;
 
 private:
 	quaternion m_real;

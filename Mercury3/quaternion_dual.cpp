@@ -62,7 +62,7 @@ vertex3f dual_quaternion::getTranslation() const {
 	return r;
 }
 
-void dual_quaternion::toMatrix(float* m) const {
+void dual_quaternion::toMatrix4(float* m) const {
 	const auto q = this->normal();
 	//const auto q = m_real.normal();
 	const auto tr = q.getTranslation();
@@ -75,11 +75,11 @@ void dual_quaternion::toMatrix(float* m) const {
 	m[15] = 1;
 }
 
-HgMath::mat4f dual_quaternion::toMatrix() const {
+HgMath::mat4f dual_quaternion::toMatrix4() const {
 	using namespace HgMath;
 
 	float mm[16];
-	toMatrix(mm);
+	toMatrix4(mm);
 
 	return HgMath::mat4f(mm);
 }

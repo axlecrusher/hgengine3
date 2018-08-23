@@ -211,7 +211,7 @@ namespace {
 		mat4f cmatrix = mat4f::translation(vectorial::vec3f(5, 10, 15)) * mat4f::axisRotation(rotAngle.rad(), vectorial::vec3f(1.0, 0, 0));
 
 		float matrix[16];
-		dq.toMatrix(matrix);
+		dq.toMatrix4(matrix);
 
 		EXPECT_NEAR(matrix[0], cmatrix.value.x.m128_f32[0], 0.000001);
 		EXPECT_NEAR(matrix[1], cmatrix.value.x.m128_f32[1], 0.000001);
@@ -241,7 +241,7 @@ namespace {
 		mat4f cmatrix = mat4f::translation(vectorial::vec3f(5, 10, 15)) * mat4f::axisRotation(rotAngle.rad(), vectorial::vec3f(0, 1.0, 0));
 
 		float matrix[16];
-		dq.toMatrix(matrix);
+		dq.toMatrix4(matrix);
 
 		EXPECT_NEAR(matrix[0], cmatrix.value.x.m128_f32[0], 0.000001);
 		EXPECT_NEAR(matrix[1], cmatrix.value.x.m128_f32[1], 0.000001);
@@ -271,7 +271,7 @@ namespace {
 		mat4f cmatrix = mat4f::translation(vectorial::vec3f(5, 10, 15)) * mat4f::axisRotation(rotAngle.rad(), vectorial::vec3f(0, 0, 1.0));
 
 		float matrix[16];
-		dq.toMatrix(matrix);
+		dq.toMatrix4(matrix);
 
 		EXPECT_NEAR(matrix[0], cmatrix.value.x.m128_f32[0], 0.000001);
 		EXPECT_NEAR(matrix[1], cmatrix.value.x.m128_f32[1], 0.000001);
@@ -301,7 +301,7 @@ namespace {
 		mat4f cmatrix = mat4f::translation(vectorial::vec3f(5, 10, 15)) * mat4f::axisRotation(rotAngle.rad(), vectorial::vec3f(1.0, 2.0, 1.0));
 
 		float matrix[16];
-		dq.toMatrix(matrix);
+		dq.toMatrix4(matrix);
 
 		EXPECT_NEAR(matrix[0], cmatrix.value.x.m128_f32[0], 0.000001);
 		EXPECT_NEAR(matrix[1], cmatrix.value.x.m128_f32[1], 0.000001);
