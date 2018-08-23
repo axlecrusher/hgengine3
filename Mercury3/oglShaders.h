@@ -6,6 +6,9 @@
 #include <HgShader.h>
 #include <oglDisplay.h>
 
+#include <quaternion_dual.h>
+
+
 struct shader_source {
 	std::string vert_file_path;
 	std::string frag_file_path;
@@ -28,7 +31,7 @@ class HgOglShader : public HgShader {
 		inline void setProgramCode(std::unique_ptr<shader_source>& ss) { m_shaderSource = std::move(ss); }
 
 		virtual void setGlobalUniforms(const HgCamera& c);
-		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd);
+		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd, const HgCamera* camera);
 
 		static std::unique_ptr<HgShader> Create(const char* vert, const char* frag);
 	private:
@@ -40,7 +43,10 @@ class HgOglShader : public HgShader {
 
 		static void setup_shader(HgOglShader* s);
 		void sendGlobalUniformsToGPU(const HgCamera& c);
-		void sendLocalUniformsToGPU(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd);
+		void sendLocalUniformsToGPU(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd, const HgCamera* camera);
+
+		void sendModelMatrix(const dual_quaternion& dq);
+		void sendModelMatrix(const quaternion* rotation, const point* position, const HgCamera* camera);
 
 		/* Perhaps shader uniforms should be stored locally per instance of a shader and then
 		sent to the video driver when the shader instance is enabled.

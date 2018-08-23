@@ -170,7 +170,7 @@ namespace HgMath {
 
 		T xyz[fcount];
 	};
-
+/*
 	template<typename T>
 	class vec3 : protected vector<T,4> {
 	public:
@@ -213,10 +213,11 @@ namespace HgMath {
 
 		inline T z() const { return vector<T, 4>::xyz[3]; }
 		inline void z(T a) { vector<T, 4>::xyz[3] = a; }
-	};
+	};*/
 	
 	typedef vector<double, 4> vec4d;
 	typedef vector<float, 4> vec4f;
 
-	typedef vec3<double> vec3d;
-	typedef vec3<float> vec3f; }
+	//typedef vector<double,3> vec3d;
+	//typedef vector<float,3> vec3f;
+}

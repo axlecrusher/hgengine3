@@ -58,7 +58,6 @@ void BeginFrame() {
 	window->PumpMessages();
 	RENDERER->Clear();
 	RENDERER->BeginFrame();
-	_projection = projection;
 }
 
 int32_t RenderThreadLoop() {
@@ -342,7 +341,7 @@ int main()
 
 			if (KeyDownMap[' ']) {
 				//				printf("fire!\n");
-				fire(&scene);
+				//fire(&scene);
 			}
 
 			//			if (v.components.z > 0) DebugBreak();
@@ -409,8 +408,9 @@ int main()
 		Engine::EnqueueForRender(Engine::collections());
 
 		//render below
-		Renderer::Render(stereo_view, camera+0);
-		if (stereo_view>0) Renderer::Render(2, camera+1);
+		const auto projection_matrix = HgMath::mat4f(projection);
+		Renderer::Render(stereo_view, camera+0, projection_matrix);
+		if (stereo_view>0) Renderer::Render(2, camera+1, projection_matrix);
 
 		window->SwapBuffers();
 

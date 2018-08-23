@@ -9,8 +9,8 @@
 
 static BlendMode _currentBlendMode = BLEND_INVALID;
 
-HgCamera* _camera;
-float* _projection;
+//HgCamera* _camera;
+//float* _projection;
 
 char *UniformString[] = {
 	"rotation",
@@ -24,6 +24,7 @@ char *UniformString[] = {
 	"specularTex",
 	"normalTex",
 	"bufferObject1",
+	"modelMatrix",
 	NULL
 };
 
