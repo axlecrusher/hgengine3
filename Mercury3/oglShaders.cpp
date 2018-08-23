@@ -257,7 +257,7 @@ void HgOglShader::setLocalUniforms(const quaternion* rotation, const point* posi
 	useShaderProgram(old_program); //change back to previous program
 }
 
-void HgOglShader::uploadMatrices(const HgMath::mat4f& movelView, const HgMath::mat4f& projection) {
+void HgOglShader::uploadMatrices(const HgMath::mat4f& modelView, const HgMath::mat4f& projection) {
 	using namespace HgMath;
 	constexpr const int matrixCount = 2;
 
@@ -265,7 +265,7 @@ void HgOglShader::uploadMatrices(const HgMath::mat4f& movelView, const HgMath::m
 
 	if (m_uniformLocations[U_MATRICES] <= -1) return;
 
-	movelView.store(mm);
+	modelView.store(mm);
 	projection.store(mm+16);
 	glUniformMatrix4fv(m_uniformLocations[U_MATRICES], matrixCount, GL_FALSE, mm);
 }

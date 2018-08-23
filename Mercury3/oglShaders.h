@@ -32,7 +32,7 @@ class HgOglShader : public HgShader {
 
 		virtual void setGlobalUniforms(const HgCamera& c);
 		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd, const HgCamera* camera);
-		virtual void uploadMatrices(const HgMath::mat4f& movelView, const HgMath::mat4f& projection);
+		virtual void uploadMatrices(const HgMath::mat4f& modelView, const HgMath::mat4f& projection);
 
 		static std::unique_ptr<HgShader> Create(const char* vert, const char* frag);
 	private:
