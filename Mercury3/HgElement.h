@@ -139,6 +139,8 @@ public:
 
 		inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 
+		HgMath::mat4f getWorldSpaceMatrix() const;
+
 		//inline bool check_flag(uint32_t x) const { return (flags & x) != 0; }
 		//inline void setFlag(uint32_t x) { flags |= x; }
 		//inline bool clearFlag(uint32_t x) { flags &= ~x; }

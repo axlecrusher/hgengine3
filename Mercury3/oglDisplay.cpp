@@ -25,6 +25,7 @@ char *UniformString[] = {
 	"normalTex",
 	"bufferObject1",
 	"modelMatrix",
+	"matrices[0]",
 	NULL
 };
 

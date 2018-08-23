@@ -158,13 +158,13 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 	for (GLuint i = 0; i < uniform_count; i++)
 	{
 		glGetActiveUniform(shader_program, i, 64, &length, &size, &type, name);
-//		printf("Uniform #%d Type: %u Name: %s\n", i, type, name);
+		//printf("Uniform #%d Type: %u Name: %s\n", i, type, name);
 		for (int j = 0; j < U_UNIFORM_COUNT; j++) {
 			if (strcmp(name, UniformString[j]) == 0) {
 				shader->m_uniformLocations[j] = glGetUniformLocation(shader_program, name);
 				break;
 			}
-			if (j == (U_UNIFORM_COUNT - 1)) fprintf(stderr, "Unknown uniform %s", name);
+			if (j == (U_UNIFORM_COUNT - 1)) fprintf(stderr, "HgShaders: Unknown uniform \"%s\"\n", name);
 		}
 	}
 }
@@ -257,36 +257,19 @@ void HgOglShader::setLocalUniforms(const quaternion* rotation, const point* posi
 	useShaderProgram(old_program); //change back to previous program
 }
 
-void HgOglShader::sendModelMatrix(const dual_quaternion& dq) {
-	float mm[16];
-	dq.toMatrix4(mm);
-	glUniformMatrix4fv(m_uniformLocations[U_MODEL_MATRIX], 1, GL_TRUE, mm);
-}
-#include <src/math/matrix.h>
-
-void HgOglShader::sendModelMatrix(const quaternion* rotation, const point* position, const HgCamera* camera) {
+void HgOglShader::uploadMatrices(const HgMath::mat4f& movelView, const HgMath::mat4f& projection) {
 	using namespace HgMath;
-	//const mat4f model_matrix = HgMath::mat4f::translation(vectorial::vec3f(position->x(), position->y(), position->z())) * rotation->toMatrix4();
-	//const auto model_dual_quat = dual_quaternion(*rotation, *position);
-	//const mat4f model_matrix2 = model_dual_quat.toMatrix4();
-	mat4f model_matrix3 = rotation->toMatrix4();
-	model_matrix3.value.w = vectorial::vec4f(position->x(), position->y(), position->z(), 1).value;
+	constexpr const int matrixCount = 2;
 
-	//const auto translation = vectorial::vec3f(position->x(), position->y(), position->z());
-	//const mat4f model_matrix3 = mat4f::translation(translation) * rotation->toMatrix4();
-	//const auto camera_dual_quat = dual_quaternion(camera->rotation, camera->position.scale(-1));
-	//const HgMath::mat4f modelView = (camera_dual_quat * model_dual_quat).toMatrix();
-	//const auto combined = dual_quaternion(camera->rotation, camera->position.scale(-1)) * dual_quaternion(*rotation, *position);
+	float mm[16 * matrixCount];
 
-	const auto MVP = Renderer::projection_matrix * Renderer::view_matrix * model_matrix3;
-	//const auto MVP = projection * combined.toMatrix();
+	if (m_uniformLocations[U_MATRICES] <= -1) return;
 
-	//const auto world_view_space = world_space.rotTrans(dual_quaternion(camera->rotation, camera->position.scale(-1.0)));
-	//sendModelMatrix(world_view_space);
-	float mm[16];
-	MVP.store(mm);
-	glUniformMatrix4fv(m_uniformLocations[U_MODEL_MATRIX], 1, GL_FALSE, mm);
+	movelView.store(mm);
+	projection.store(mm+16);
+	glUniformMatrix4fv(m_uniformLocations[U_MATRICES], matrixCount, GL_FALSE, mm);
 }
+
 
 void HgOglShader::sendLocalUniformsToGPU(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd, const HgCamera* camera) {
 	OGLRenderData* oglrd = (OGLRenderData*)rd;
@@ -295,7 +278,6 @@ void HgOglShader::sendLocalUniformsToGPU(const quaternion* rotation, const point
 	if (m_uniformLocations[U_ROTATION] > -1) glUniform4f(m_uniformLocations[U_ROTATION], rotation->x(), rotation->y(), rotation->z(), rotation->w());
 	if (m_uniformLocations[U_POSITION] > -1) glUniform4f(m_uniformLocations[U_POSITION], position->x(), position->y(), position->z(), scale);
 	if (m_uniformLocations[U_ORIGIN] > -1) glUniform3f(m_uniformLocations[U_ORIGIN], origin->x(), origin->y(), origin->z());
-	if (m_uniformLocations[U_MODEL_MATRIX] > -1) sendModelMatrix(rotation, position, camera);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);

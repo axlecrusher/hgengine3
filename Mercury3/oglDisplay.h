@@ -28,7 +28,8 @@ enum UniformLocations {
 	U_NORMAL_TEXTURE = 9,
 	U_BUFFER_OBJECT1 = 10,
 	U_MODEL_MATRIX = 11,
-	U_UNIFORM_COUNT = 12
+	U_MATRICES = 12,
+	U_UNIFORM_COUNT = 13
 };
 
 extern char *UniformString[];

@@ -73,6 +73,24 @@ void HgElement::updateGpuTextures() {
 	}
 }
 
+HgMath::mat4f HgElement::getWorldSpaceMatrix() const {
+	HgMath::mat4f ret;
+
+	HgMath::mat4f modelMatrix = m_rotation.toMatrix4();
+	modelMatrix.value.w = vectorial::vec4f(m_position.x(), m_position.y(), m_position.z(), 1).value;
+
+	if (m_parent) {
+		ret = m_parent->getWorldSpaceMatrix() * modelMatrix;
+	}
+	else {
+		ret = modelMatrix;
+	}
+
+	return ret;
+}
+
+
+
 //Transform point p into world space of HgElement e
 point object_to_world_space(const HgElement* e, const point* p) {
 	vector3 v1 = (*p - e->origin()).scale(e->scale()).rotate(e->rotation()) + e->position();
