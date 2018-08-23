@@ -252,8 +252,6 @@ int main()
 			}
 		}
 
-		scene.getNewElement(&element);
-		model_data::load_ini(element, "teapot.ini");
 //		element->position.
 
 		if (create_element("voxelGrid", &scene, &element) > 0) {
@@ -270,6 +268,20 @@ int main()
 			element->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
 			element->renderData()->blendMode = BLEND_ADDITIVE;
 			//	model_data d = LoadModel("test.hgmdl");
+		}
+	}
+
+	HgElement* teapot = NULL;
+	scene.getNewElement(&teapot);
+	model_data::load_ini(teapot, "teapot.ini");
+	teapot->position(point(3, 0, 0));
+
+	{
+		HgElement* element = NULL;
+		if (create_element("cube", &scene, &element) > 0) {
+			element->scale(0.3f);
+			element->position(point(0, 3, 0));
+			element->setParent(teapot);
 		}
 	}
 
@@ -381,7 +393,9 @@ int main()
 
 		{
 			HgElement* element = tris[0];
-			element->rotation(quaternion::fromEuler(angle::ZERO,angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO));
+			const auto rotation = quaternion::fromEuler(angle::ZERO, angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
+			element->rotation(rotation);
+			teapot->rotation(rotation.conjugate());
 
 			for (i = 0; i < ANI_TRIS; i++) {
 				tris[i]->rotation(element->rotation());
