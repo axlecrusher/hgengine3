@@ -18,11 +18,11 @@ uniform mat4 matrices[3];
 vec3 lightDir = vec3(0,0,1);
 vec3 frag_color = vec3(0.8,0,0);
 float specular = 0.5;
-float shininess = 15.0;
+float shininess = 35.0;
 
 void main() {
 	vec3 normal = normalize(fragNormal);
-	vec3 viewDir = eyePos - fragPos;
+	vec3 viewDir = normalize(eyePos - fragPos);
 	float spec = 0.0;
 
 	float intensity = max(dot(lightDir,normal),0);

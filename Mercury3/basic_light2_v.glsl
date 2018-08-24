@@ -20,7 +20,7 @@ void main() {
 	vec3 worldSpaceNormal = normalize(mat3(matrices[MODEL]) * normal.xyz);
 	fragNormal = worldSpaceNormal;
 
-	eyePos = (matrices[VIEW] * vec4(0,0,0,1)).xyz;
+	eyePos = matrices[VIEW][3].xyz*-1.0; //pull eye position from transform matrix
 
 	vec4 worldSpacePos =  matrices[MODEL] * vec4(vertex,1);
 	fragPos = worldSpacePos.xyz;
