@@ -73,7 +73,9 @@ void HgElement::updateGpuTextures() {
 
 HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation, bool applyTranslation) const {
 	HgMath::mat4f ret;
-	HgMath::mat4f modelMatrix;
+	const vectorial::vec3f origin(m_origin.x(), m_origin.y(), m_origin.z());
+	HgMath::mat4f modelMatrix = HgMath::mat4f::identity() * HgMath::mat4f::translation(origin);
+
 	float scale = 1.0f;
 
 	if (applyScale) scale = this->scale();
@@ -86,8 +88,11 @@ HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation
 	}
 
 	if (applyTranslation) {
-		modelMatrix.value.w = vectorial::vec4f(m_position.x(), m_position.y(), m_position.z(), 1).value;
+		auto tmp = vectorial::vec3f(m_position.x(), m_position.y(), m_position.z());// +origin;
+		modelMatrix.value.w = vectorial::vec4f(tmp.x(), tmp.y(), tmp.z(), 1).value;
 	}
+
+	modelMatrix *= HgMath::mat4f::translation(-origin);
 
 	if (m_parent) {
 		ret = m_parent->getWorldSpaceMatrix(flags.inheritParentScale,
@@ -103,7 +108,7 @@ HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation
 
 
 //Transform point p into world space of HgElement e
-point object_to_world_space(const HgElement* e, const point* p) {
+point toWorldSpace(const HgElement* e, const point* p) {
 	vector3 v1 = (*p - e->origin()).scale(e->scale()).rotate(e->rotation()) + e->position();
 	return v1;
 }

@@ -1,14 +1,14 @@
 #version 420
 
-in vec3 vertex;
-in vec4 normal;
-in vec4 v_color;
+layout(location = 0) in vec3 vertex;
+layout(location = 1) in vec4 normal;
+layout(location = 3) in vec4 v_color;
 
 #define MODEL 0
 #define PROJECTION 1
 #define VIEW 2
 
-//uniforms have their own locations separate from attributes
+//model, projection, and view matrices
 uniform mat4 matrices[3];
 
 out vec4 color;

@@ -31,13 +31,16 @@ namespace HgMath {
 		}
 
 		inline T x() const { return xyz[0]; }
-		inline void x(T n) { xyz[0] = n; }
+		inline vertex x(T n) { xyz[0] = n; return *this; }
+		inline vertex x(T n) const { auto tmp = *this; tmp.xyz[0] = n; return tmp; }
 
 		inline T y() const { return xyz[1]; }
-		inline void y(T n) { xyz[1] = n; }
+		inline vertex y(T n) { xyz[1] = n; return *this; }
+		inline vertex y(T n) const { auto tmp = *this; tmp.xyz[y] = n; return tmp; }
 
 		inline T z() const { return xyz[2]; }
-		inline void z(T n) { xyz[2] = n; }
+		inline vertex z(T n) { xyz[2] = n; return *this; }
+		inline vertex z(T n) const { auto tmp = *this; tmp.xyz[z] = n; return tmp; }
 
 		inline vertex scale(T n) const {
 			//Writing functions exactly like this lets the compiler make a lot of good optimizations.

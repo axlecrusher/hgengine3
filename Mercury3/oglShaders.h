@@ -30,7 +30,6 @@ class HgOglShader : public HgShader {
 
 		inline void setProgramCode(std::unique_ptr<shader_source>& ss) { m_shaderSource = std::move(ss); }
 
-		virtual void setGlobalUniforms(const HgCamera& c);
 		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd, const HgCamera* camera);
 		virtual void uploadMatrices(const HgMath::mat4f& modelView, const HgMath::mat4f& projection, const HgMath::mat4f& view);
 
@@ -43,7 +42,6 @@ class HgOglShader : public HgShader {
 		};
 
 		static void setup_shader(HgOglShader* s);
-		void sendGlobalUniformsToGPU(const HgCamera& c);
 		void sendLocalUniformsToGPU(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd, const HgCamera* camera);
 
 		/* Perhaps shader uniforms should be stored locally per instance of a shader and then

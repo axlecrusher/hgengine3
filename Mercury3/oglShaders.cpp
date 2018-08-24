@@ -211,35 +211,6 @@ void HgOglShader::enable() {
 	if (program_id>0) useShaderProgram(program_id);
 }
 
-void HgOglShader::setGlobalUniforms(const HgCamera& c) {
-	const GLuint old_program = _currentShaderProgram;
-
-	if (old_program == program_id) {
-		//if we are running a shader that is already enabled, just set the values
-		sendGlobalUniformsToGPU(c);
-		return;
-	}
-
-	//Log warning about being slow and change to this program
-	fprintf(stderr, "Warning (%s): Temporary shader context change.\n", __FUNCTION__);
-	enable();
-
-	sendGlobalUniformsToGPU(c);
-
-	useShaderProgram(old_program); //change back to previous program
-}
-
-void HgOglShader::sendGlobalUniformsToGPU(const HgCamera& c) {
-	//can I send as single global transform matrix combining all transforms?
-	if (m_uniformLocations[U_PROJECTION] > -1) {
-		float m[16];
-		Renderer::projection_matrix.store(m);
-		glUniformMatrix4fv(m_uniformLocations[U_PROJECTION], 1, GL_FALSE, m);
-	}
-	if (m_uniformLocations[U_CAMERA_ROT] > -1) glUniform4f(m_uniformLocations[U_CAMERA_ROT], c.rotation.x(), c.rotation.y(), c.rotation.z(), c.rotation.w());
-	if (m_uniformLocations[U_CAMERA_POS] > -1) glUniform3f(m_uniformLocations[U_CAMERA_POS], c.position.x(), c.position.y(), c.position.z());
-}
-
 void HgOglShader::setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd, const HgCamera* camera) {
 	GLuint old_program = _currentShaderProgram;
 
@@ -274,11 +245,6 @@ void HgOglShader::uploadMatrices(const HgMath::mat4f& modelView, const HgMath::m
 
 void HgOglShader::sendLocalUniformsToGPU(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd, const HgCamera* camera) {
 	OGLRenderData* oglrd = (OGLRenderData*)rd;
-
-	//this could be replaced with a single matrix uniform for setting the world position and rotation of the object. not check would be needed as it is required information for rendering
-	if (m_uniformLocations[U_ROTATION] > -1) glUniform4f(m_uniformLocations[U_ROTATION], rotation->x(), rotation->y(), rotation->z(), rotation->w());
-	if (m_uniformLocations[U_POSITION] > -1) glUniform4f(m_uniformLocations[U_POSITION], position->x(), position->y(), position->z(), scale);
-	if (m_uniformLocations[U_ORIGIN] > -1) glUniform3f(m_uniformLocations[U_ORIGIN], origin->x(), origin->y(), origin->z());
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);

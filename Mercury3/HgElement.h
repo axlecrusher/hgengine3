@@ -173,7 +173,8 @@ private:
 	friend model_data;
 };
 
-point object_to_world_space(const HgElement* e, const point* p);
+//Transform point p into world space of HgElement e
+point toWorldSpace(const HgElement* e, const point* p);
 
 class IUpdatableCollection;
 

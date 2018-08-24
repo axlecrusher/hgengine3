@@ -53,7 +53,7 @@ static void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, HgE
 		shader->enable();
 		//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 		//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
-		shader->setGlobalUniforms(*camera);
+		//shader->setGlobalUniforms(*camera);
 		shader->uploadMatrices(e->getWorldSpaceMatrix(), Renderer::projection_matrix, Renderer::view_matrix);
 		shader->setLocalUniforms(&e->rotation(), &e->position(), e->scale(), &e->origin(), e->renderData(), camera);
 	}

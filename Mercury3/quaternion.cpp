@@ -160,9 +160,3 @@ void quaternion::toMatrix4(float* m) const {
 	m[14] = 0;
 	m[15] = 1;
 }
-
-HgMath::mat4f quaternion::toMatrix4() const {
-	float m[16];
-	toMatrix4(m);
-	return HgMath::mat4f(m);
-}

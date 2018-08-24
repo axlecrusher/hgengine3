@@ -21,7 +21,9 @@ int8_t draw_render_packet(const render_packet* p) {
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
-	rd->shader->setGlobalUniforms(p->camera);
+
+	//fix me
+//	rd->shader->setGlobalUniforms(p->camera);
 
 
 	//FIX ME:setLocalUniforms

@@ -11,7 +11,7 @@ in vec3 fragPos;
 #define PROJECTION 1
 #define VIEW 2
 
-//uniforms have their own locations separate from attributes
+//model, projection, and view matrices
 uniform mat4 matrices[3];
 
 //All computations are in world space

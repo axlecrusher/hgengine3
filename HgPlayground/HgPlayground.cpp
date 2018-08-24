@@ -156,7 +156,7 @@ void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
-	rd->shader->setGlobalUniforms(*camera);
+	rd->shader->uploadMatrices(e->getWorldSpaceMatrix(), Renderer::projection_matrix, Renderer::view_matrix);
 	//	setLocalUniforms(&e->rotation, &e->position, e->scale);
 
 	rd->render();
@@ -217,6 +217,12 @@ int main()
 	allocate_space(&gravity, ANI_TRIS);
 	gravity.scene = &scene;
 	gravity.vector.y(-1);
+	
+	HgElement* teapot = NULL;
+	scene.getNewElement(&teapot);
+	model_data::load_ini(teapot, "teapot.ini");
+	teapot->origin(teapot->origin().x(2).z(5));
+	
 	uint32_t i;
 	{
 		HgElement* element = NULL;
@@ -260,20 +266,18 @@ int main()
 			//		toQuaternion2(0, -90, 0, &element->rotation);
 			element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 		}
-
-		if (create_element("square", &scene, &element) > 0) {
-			element->scale(100.0f);
-			element->position().z(-4);
-			element->rotation(quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO));
-			element->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
-			element->renderData()->blendMode = BLEND_ADDITIVE;
-			//	model_data d = LoadModel("test.hgmdl");
-		}
 	}
 
-	HgElement* teapot = NULL;
-	scene.getNewElement(&teapot);
-	model_data::load_ini(teapot, "teapot.ini");
+	HgElement* grid = NULL;
+	if (create_element("square", &scene, &grid) > 0) {
+		grid->scale(100.0f);
+		//element->position().z(-4);
+		grid->rotation(quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO));
+		grid->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
+		grid->renderData()->blendMode = BLEND_ADDITIVE;
+		//	model_data d = LoadModel("test.hgmdl");
+	}
+
 
 	{
 		HgElement* element = NULL;
@@ -378,18 +382,7 @@ int main()
 			needRender = 0;
 		}
 
-		//if (time > 10000) { // && did_change==0) {
-		//	did_change = 1;
-
-		//	//			if (dtime>0) gravity_update(&gravity, dtime);
-		//	/*
-		//	for (i = 0; i < ANI_TRIS; i++) {
-		//	change_to_triangle(tris[i]);
-		//	}
-		//	*/
-		//}
-
-		//		printf("dtime: %d\n", dtime);
+		grid->position(point(camera->position).y(0));
 
 		{
 			HgElement* element = tris[0];
