@@ -234,7 +234,7 @@ void HgOglShader::uploadMatrices(const HgMath::mat4f& modelView, const HgMath::m
 
 	float mm[16 * matrixCount];
 
-	if (m_uniformLocations[U_MATRICES] <= -1) return;
+	//if (m_uniformLocations[U_MATRICES] <= -1) return; //everything needs matrices. don't bother checking
 
 	modelView.store(mm);
 	projection.store(mm + 16);
