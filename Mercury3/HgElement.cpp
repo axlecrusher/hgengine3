@@ -24,8 +24,6 @@ void RegisterElementType(const char* c, factory_clbk factory) {
 
 void HgElement::init()
 {
-	memset(&flags, 0, sizeof(flags));
-//	flags = 0;
 	m_renderData = NULL;
 	m_position = vector3();
 	m_logic = nullptr;
@@ -73,14 +71,27 @@ void HgElement::updateGpuTextures() {
 	}
 }
 
-HgMath::mat4f HgElement::getWorldSpaceMatrix() const {
+HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation, bool applyTranslation) const {
 	HgMath::mat4f ret;
+	HgMath::mat4f modelMatrix;
+	float scale = 1.0f;
 
-	HgMath::mat4f modelMatrix = m_rotation.toMatrix4();
-	modelMatrix.value.w = vectorial::vec4f(m_position.x(), m_position.y(), m_position.z(), 1).value;
+	if (applyScale) scale = this->scale();
+
+	if (applyRotation) {
+		modelMatrix = m_rotation.toMatrix4() * HgMath::mat4f::scale(scale);
+	}
+	else {
+		modelMatrix = HgMath::mat4f::scale(scale);
+	}
+
+	if (applyTranslation) {
+		modelMatrix.value.w = vectorial::vec4f(m_position.x(), m_position.y(), m_position.z(), 1).value;
+	}
 
 	if (m_parent) {
-		ret = m_parent->getWorldSpaceMatrix() * modelMatrix;
+		ret = m_parent->getWorldSpaceMatrix(flags.inheritParentScale,
+			flags.inheritParentRotation, flags.inheritParentTranslation) * modelMatrix;
 	}
 	else {
 		ret = modelMatrix;

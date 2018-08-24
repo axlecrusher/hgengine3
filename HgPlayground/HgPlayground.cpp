@@ -247,8 +247,8 @@ int main()
 				;
 				element->position(point(-10.0f + x, 5.0f, -2.0f - z));
 				element->scale(0.3f); 
-				//element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
-				element->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
+				element->renderData()->shader = HgShader::acquire("basic_light2_v.glsl", "basic_light2_f.glsl");
+				//element->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 			}
 		}
 
@@ -274,13 +274,13 @@ int main()
 	HgElement* teapot = NULL;
 	scene.getNewElement(&teapot);
 	model_data::load_ini(teapot, "teapot.ini");
-	teapot->position(point(3, 0, 0));
 
 	{
 		HgElement* element = NULL;
 		if (create_element("cube", &scene, &element) > 0) {
-			element->scale(0.3f);
+			element->scale(0.3);
 			element->position(point(0, 3, 0));
+			element->inheritParentScale(false);
 			element->setParent(teapot);
 		}
 	}

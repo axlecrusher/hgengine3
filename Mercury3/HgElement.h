@@ -65,7 +65,9 @@ struct PositionalData {
 struct ElementFlags {
 	ElementFlags() :
 		used(false), active(false), hidden(false), updated(false),
-		destroy(false), update_textures(false), transparent(false)
+		destroy(false), update_textures(false), transparent(false),
+		inheritParentScale(true), inheritParentRotation(true),
+		inheritParentTranslation(true)
 	{}
 	bool used : 1; //used in scene graph
 	bool active : 1;
@@ -74,6 +76,9 @@ struct ElementFlags {
 	bool destroy : 1;
 	bool update_textures : 1;
 	bool transparent : 1;
+	bool inheritParentScale : 1;
+	bool inheritParentRotation : 1;
+	bool inheritParentTranslation : 1;
 };
 
 /* NOTES: Try to avoid pointers, especially on 64 bit.
@@ -139,11 +144,16 @@ public:
 
 		inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 
-		HgMath::mat4f getWorldSpaceMatrix() const;
+		HgMath::mat4f getWorldSpaceMatrix(bool scale = true, bool rotation = true, bool translation = true) const;
 
 		//inline bool check_flag(uint32_t x) const { return (flags & x) != 0; }
 		//inline void setFlag(uint32_t x) { flags |= x; }
 		//inline bool clearFlag(uint32_t x) { flags &= ~x; }
+
+		inline void inheritParentScale(bool x) { flags.inheritParentScale = x; }
+		inline void inheritParentRotation(bool x) { flags.inheritParentRotation = x; }
+		inline void inheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
+
 
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }
