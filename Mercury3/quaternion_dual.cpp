@@ -16,11 +16,9 @@ dual_quaternion dual_quaternion::scale(float m) const {
 
 inline dual_quaternion dual_quaternion::normal() const {
 	dual_quaternion ret = *this;
-	const float sl = m_real.squaredLength();
-	if ((sl-1.0f) > 0.000001f) {
-		//const float scaling = 1.0f / m_real.magnitude();
-		const float scaling = 1.0f / HgMath::sqrt(sl);
-		ret = this->scale(scaling);
+	const float length = m_real.magnitude();
+	if (length > 1e-06f) {
+		ret = this->scale(1.0f / length);
 	}
 	return ret;
 }

@@ -108,7 +108,8 @@ public:
 
 	inline HgMath::mat4f toMatrix4() const {
 		float m[16];
-		toMatrix4(m);
+		const auto q = this->normal();
+		q.toMatrix4(m);
 		return HgMath::mat4f(m);
 	}
 

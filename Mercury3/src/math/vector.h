@@ -136,10 +136,8 @@ namespace HgMath {
 
 		inline vector normal() const {
 			vector r = *this;
-			const T sl = this->squaredLength();
-			if ((sl-T(1.0)) > 0.000001f) {
-				//try to improve accuracy. don't run on things that are already normalized
-				T length = HgMath::sqrt(sl);
+			T length = magnitude();
+			if (length > 1e-06f) {
 				r = this->scale(T(1.0) / length);
 			}
 			return r;
