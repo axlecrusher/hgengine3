@@ -221,7 +221,7 @@ int main()
 	HgElement* teapot = NULL;
 	scene.getNewElement(&teapot);
 	model_data::load_ini(teapot, "teapot.ini");
-	teapot->origin(teapot->origin().x(2).z(5));
+	teapot->origin(teapot->origin().x(2).z(3).y(1));
 	
 	uint32_t i;
 	{
