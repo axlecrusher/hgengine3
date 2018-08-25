@@ -17,8 +17,11 @@ dual_quaternion dual_quaternion::scale(float m) const {
 inline dual_quaternion dual_quaternion::normal() const {
 	dual_quaternion ret = *this;
 	const float length = m_real.magnitude();
-	if (length > 1e-06f) {
-		ret = this->scale(1.0f / length);
+	//if very close to unit length, don't compute. more stable
+	if (std::abs(1.0f - length) > 1e-06f) {
+		if (length > 1e-06f) {
+			ret = this->scale(1.0f / length);
+		}
 	}
 	return ret;
 }

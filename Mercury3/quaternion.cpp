@@ -61,7 +61,8 @@ quaternion quaternion::fromEuler(HgMath::angle x, HgMath::angle y, HgMath::angle
 	tmp.y((float)(s1 * c2 * c3 + c1 * s2 * s3));
 	tmp.z((float)(c1 * s2 * c3 - s1 * c2 * s3));
 
-	return tmp.normal();
+	//result is already normalized
+	return tmp;
 }
 
 //should be vector, but vector include is broken

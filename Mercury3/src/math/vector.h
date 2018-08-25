@@ -137,8 +137,11 @@ namespace HgMath {
 		inline vector normal() const {
 			vector r = *this;
 			T length = magnitude();
-			if (length > 1e-06f) {
-				r = this->scale(T(1.0) / length);
+			//if very close to unit length, don't compute. more stable
+			if (std::abs(1.0f - length) > 1e-06f) {
+				if (length > 1e-06f) {
+					r = this->scale(T(1.0) / length);
+				}
 			}
 			return r;
 		}
@@ -153,7 +156,7 @@ namespace HgMath {
 
 		inline bool isZeroLength() const
 		{
-			return (squaredLength() < HgMath::square(1e-06f)); //does squaredLength need to be double here if 1e-06 is double?
+			return (squaredLength() < HgMath::square(1e-06f));
 		}
 
 		inline const T* raw() const { return xyz; }
