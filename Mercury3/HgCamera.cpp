@@ -24,13 +24,6 @@ vector3 HgCamera::projectRay() const {
 HgMath::mat4f HgCamera::toMatrix() const {
 	using namespace HgMath;
 
-	//float m[16];
-	//const auto matrix = rotation.toMatrix4();
-	//matrix.store(m);
-	//m[12] = -position.x();
-	//m[13] = -position.y();
-	//m[14] = -position.z();
-
 	mat4f ret;
 	const vectorial::vec3f translation(-position.x(), -position.y(), -position.z());
 	ret = orientation.toMatrix4() * mat4f::translation(translation);
