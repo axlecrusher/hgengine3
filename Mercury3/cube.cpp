@@ -136,7 +136,7 @@ namespace RotatingCube {
 			m_age -= HgTime::msec(10000);
 		}
 		const quaternion rotation = quaternion::fromEuler(angle::ZERO, angle::deg(m_age.msec() / 27.777777777777777777777777777778), angle::ZERO);
-		getElement().rotation(rotation);
+		getElement().orientation(rotation);
 		instanceData->rotation = rotation;
 	}
 

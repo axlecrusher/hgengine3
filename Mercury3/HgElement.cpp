@@ -31,7 +31,7 @@ void HgElement::init()
 	m_scale = 1;
 	m_origin = vector3();
 
-	m_rotation = quaternion::IDENTITY;
+	m_orientation = quaternion::IDENTITY;
 	m_extendedData = std::make_unique<HgElementExtended>();
 	m_extendedData->owner = this;
 
@@ -81,7 +81,7 @@ HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation
 	if (applyScale) scale = this->scale();
 
 	if (applyRotation) {
-		modelMatrix = m_rotation.toMatrix4() * HgMath::mat4f::scale(scale);
+		modelMatrix = m_orientation.toMatrix4() * HgMath::mat4f::scale(scale);
 	}
 	else {
 		modelMatrix = HgMath::mat4f::scale(scale);
@@ -109,7 +109,7 @@ HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation
 
 //Transform point p into world space of HgElement e
 point toWorldSpace(const HgElement* e, const point* p) {
-	vector3 v1 = (*p - e->origin()).scale(e->scale()).rotate(e->rotation()) + e->position();
+	vector3 v1 = (*p - e->origin()).scale(e->scale()).rotate(e->orientation()) + e->position();
 	return v1;
 }
 

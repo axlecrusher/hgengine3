@@ -133,7 +133,7 @@ void fire(HgScene* scene) {
 
 	Projectile *pd = dynamic_cast<Projectile*>(&element->logic());
 	pd->direction = camera->projectRay();
-	element->rotation(camera->rotation.conjugate());
+	element->orientation(camera->orientation.conjugate());
 	element->position(camera->position);
 }
 
@@ -157,7 +157,7 @@ void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 
 	rd->shader->uploadMatrices(e->getWorldSpaceMatrix(), Renderer::projection_matrix, Renderer::view_matrix);
-	//	setLocalUniforms(&e->rotation, &e->position, e->scale);
+	//	setLocalUniforms(&e->orientation, &e->position, e->scale);
 
 	rd->render();
 }
@@ -199,7 +199,7 @@ int main()
 	using namespace HgMath;
 	camera[0].position.z(1.5f);
 	camera[0].position.y(2.0f);
-	camera[0].SetRotation(quaternion::fromEuler(angle::deg(15), angle::ZERO, angle::ZERO) );
+	camera[0].setOrientation(quaternion::fromEuler(angle::deg(15), angle::ZERO, angle::ZERO) );
 
 	camera[1] = camera[0];
 	camera[1].position.x(camera[1].position.x() + EYE_DISTANCE);
@@ -232,7 +232,7 @@ int main()
 			tmp.x(1.5f);
 			tmp.z(1.0f);
 			element->position(tmp);
-			//	toQuaternion2(0, 0, 90, &element->rotation);
+			//	toQuaternion2(0, 0, 90, &element->orientation);
 		}
 
 		if (create_element("triangle", &scene, &element) > 0) {
@@ -240,7 +240,7 @@ int main()
 			tmp.x(0.0f);
 			tmp.z(-2.0f);
 			element->position(tmp);
-			//	toQuaternion2(45,0,0,&element->rotation);
+			//	toQuaternion2(45,0,0,&element->orientation);
 		}
 
 		for (i = 0; i < ANI_TRIS; i++) {
@@ -263,7 +263,7 @@ int main()
 		if (create_element("voxelGrid", &scene, &element) > 0) {
 			//		element->scale = 100.0f;
 			element->position().z(-10);
-			//		toQuaternion2(0, -90, 0, &element->rotation);
+			//		toQuaternion2(0, -90, 0, &element->orientation);
 			element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 		}
 	}
@@ -272,7 +272,7 @@ int main()
 	if (create_element("square", &scene, &grid) > 0) {
 		grid->scale(100.0f);
 		//element->position().z(-4);
-		grid->rotation(quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO));
+		grid->orientation(quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO));
 		grid->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
 		grid->renderData()->blendMode = BLEND_ADDITIVE;
 		//	model_data d = LoadModel("test.hgmdl");
@@ -362,10 +362,10 @@ int main()
 
 			//			if (v.components.z > 0) DebugBreak();
 
-			v = v.normal().rotate(camera->rotation.conjugate());
+			v = v.normal().rotate(camera->orientation.conjugate());
 			float scale = (1.0f / 1000.0f) * dtime.msec();
 			v = v.normal().scale(scale);
-			camera->Move(v);
+			camera->move(v);
 
 			mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
 			mouse_y = (MOUSE_INPUT.dy + mouse_y) % 2000;
@@ -386,12 +386,12 @@ int main()
 
 		{
 			HgElement* element = tris[0];
-			const auto rotation = quaternion::fromEuler(angle::ZERO, angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
-			element->rotation(rotation);
-			teapot->rotation(rotation.conjugate());
+			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
+			element->orientation(orientation);
+			teapot->orientation(orientation.conjugate());
 
 			for (i = 0; i < ANI_TRIS; i++) {
-				tris[i]->rotation(element->rotation());
+				tris[i]->orientation(element->orientation());
 			}
 		}
 

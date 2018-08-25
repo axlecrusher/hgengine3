@@ -11,14 +11,14 @@ class HgCamera {
 
 		void FreeRotate(HgMath::angle yaw, HgMath::angle pitch);
 
-		inline void Move(const vector3& v) { position = position + v;	}
-		inline void SetRotation(const quaternion& r) { rotation = r; }
+		inline void move(const vector3& v) { position = position + v;	}
+		inline void setOrientation(const quaternion& r) { orientation = r; }
 
 		// Project a ray in the direction of the camera's view
 		vector3 projectRay() const;
 
 		point position;
-		quaternion rotation;
+		quaternion orientation;
 
 		vector3 direction;
 		float speedMsec;

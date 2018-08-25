@@ -215,7 +215,7 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 	element->scale(scale);
 	element->origin(origin.scale(1.0f/scale));
 	element->position(position);
-	element->rotation(orientation);
+	element->orientation(orientation);
 
 	if (!vertexShader.empty() && !fragmentShader.empty())
 		element->m_renderData->shader = HgShader::acquire(vertexShader.c_str(), fragmentShader.c_str());

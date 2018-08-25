@@ -110,7 +110,7 @@ render_packet* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera
 
 	if (e) {
 		rp->position = e->position();
-		rp->rotation = e->rotation();
+		rp->rotation = e->orientation();
 		rp->scale = e->scale();
 		rp->renderData = e->renderData();
 	}

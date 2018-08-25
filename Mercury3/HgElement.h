@@ -92,7 +92,7 @@ private:
 		//position, and rotation are in global coordinate system
 		point m_position; float m_scale; //16
 		point m_origin; //origin (0,0,0) in local space
-		quaternion m_rotation; //16
+		quaternion m_orientation; //16
 //		uint8_t flags; //1
 public:
 		ElementFlags flags;
@@ -110,9 +110,9 @@ public:
 		inline const point& position() const { return m_position; }
 		inline void position(const point& p) { m_position = p; }
 
-		inline quaternion rotation() { return m_rotation; }
-		inline const quaternion& rotation() const { return m_rotation; }
-		inline void rotation(const quaternion& q) { m_rotation = q; }
+		inline quaternion& orientation() { return m_orientation; }
+		inline const quaternion& orientation() const { return m_orientation; }
+		inline void orientation(const quaternion& q) { m_orientation = q; }
 
 		inline float scale() const { return m_scale; }
 		inline void scale(float s) { m_scale = s; }

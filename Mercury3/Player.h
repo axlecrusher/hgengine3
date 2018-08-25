@@ -7,7 +7,7 @@
 class Player {
 private:
 	point m_position;
-	quaternion m_rotation;
+	quaternion m_orientation;
 
 	vector3 m_direction;
 
@@ -19,15 +19,15 @@ public:
 	void setPosition(const point& p) { m_position = p; }
 	inline point position() const { return m_position; }
 
-	void setRotation(const quaternion& q) { m_rotation = q; computeDirection(); }
-	inline quaternion rotation() const { return m_rotation; }
+	void setOrientation(const quaternion& q) { m_orientation = q; computeDirection(); }
+	inline quaternion orientation() const { return m_orientation; }
 
 	inline vector3 direction() const { return m_direction; }
 
 private:
 	void computeDirection() {
 		vector3 ray = { 0, 0, -1 }; //correct.
-		m_direction = ray.rotate(m_rotation).normal();
+		m_direction = ray.rotate(m_orientation).normal();
 	}
 
 };
