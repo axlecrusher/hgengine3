@@ -36,11 +36,11 @@ namespace HgMath {
 
 		inline T y() const { return xyz[1]; }
 		inline vertex y(T n) { xyz[1] = n; return *this; }
-		inline vertex y(T n) const { auto tmp = *this; tmp.xyz[y] = n; return tmp; }
+		inline vertex y(T n) const { auto tmp = *this; tmp.xyz[1] = n; return tmp; }
 
 		inline T z() const { return xyz[2]; }
 		inline vertex z(T n) { xyz[2] = n; return *this; }
-		inline vertex z(T n) const { auto tmp = *this; tmp.xyz[z] = n; return tmp; }
+		inline vertex z(T n) const { auto tmp = *this; tmp.xyz[2] = n; return tmp; }
 
 		inline vertex scale(T n) const {
 			//Writing functions exactly like this lets the compiler make a lot of good optimizations.
@@ -98,7 +98,7 @@ namespace HgMath {
 			return r;
 		}
 
-		inline T length() const {
+		inline T magnitude() const {
 			return HgMath::sqrt(squaredLength());
 		}
 
@@ -111,17 +111,15 @@ namespace HgMath {
 		}
 
 		inline vertex normal() const {
-			vertex tmp(*this);
-
-			T length = this->length();
-			//	if (fabs(length) < 0.000000000001f) return *v;
-			if (length == 0.0) return tmp;
-
-			for (int i = 0; i < fcount; i++) {
-				tmp.xyz[i] /= length;
+			vertex r = *this;
+			T length = magnitude();
+			//if very close to unit length, don't compute. more stable
+			if (std::abs(1.0f - length) > 1e-06f) {
+				if (length > 1e-06f) {
+					r = this->scale(T(1.0) / length);
+				}
 			}
-
-			return tmp;
+			return r;
 		}
 
 		inline vertex cross(const vertex& rhs) const {
@@ -133,10 +131,11 @@ namespace HgMath {
 		}
 
 		inline vertex rotate(const quaternion& q) const {
-			vertex r1 = this->scale(q.w());
-			vertex r2 = vertex(q.raw() + 1).cross(*this);
-			vertex tmp = vertex(q.raw() + 1).cross(r1 + r2).scale(2.0); //XXX fix this
-			return *this + tmp;
+			vertex ret = *this;
+			const vertex r1 = this->scale(q.w());
+			const vertex r2 = vertex(q.raw() + 1).cross(*this);
+			ret += vertex(q.raw() + 1).cross(r1 + r2).scale(2.0); //XXX fix this
+			return ret;
 		}
 
 		inline bool isZeroLength() const
@@ -144,11 +143,9 @@ namespace HgMath {
 			return (squaredLength() < HgMath::square(1e-06f)); //does squaredLength need to be double here if 1e-06 is double?
 		}
 
-		//inline bool operator<(const vertex& rhs) const {
-		//	return ((x() < rhs.x())
-		//		&& (y() < rhs.y())
-		//		&& (z() < rhs.z()));
-		//}
+		inline T* raw() { return xyz; }
+		inline const T* raw() const { return xyz; }
+
 	private:
 		T xyz[fcount];
 	};
