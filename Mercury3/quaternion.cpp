@@ -129,9 +129,10 @@ quaternion quaternion::mult_vectorized(const quaternion& q, const quaternion& r)
 void quaternion::toMatrix4(float* m) const {
 	using namespace HgMath;
 
-	const float sx = square(x());
-	const float sy = square(y());
-	const float sz = square(z());
+	//const float sx = square(x());
+	//const float sy = square(y());
+	//const float sz = square(z());
+	const auto sq = square(wxyz);
 
 	const float qxqy2 = 2 * x()*y();
 	const float qzqw2 = 2 * z()*w();
@@ -141,19 +142,19 @@ void quaternion::toMatrix4(float* m) const {
 	const float qxqw2 = 2 * x()*w();
 
 	//column major
-	m[0] = 1.0f - 2 * sy - 2 * sz;
+	m[0] = 1.0f - 2 * sq.y() -2 * sq.z();
 	m[1] = qxqy2 + qzqw2;
 	m[2] = qxqz2 - qyqw2;
 	m[3] = 0;
 
 	m[4] = qxqy2 - qzqw2;
-	m[5] = 1.0f - 2 * sx - 2 * sz;
+	m[5] = 1.0f - 2 * sq.x() - 2 * sq.z();
 	m[6] = qyqz2 + qxqw2;
 	m[7] = 0;
 
 	m[8] = qxqz2 + qyqw2;
 	m[9] = qyqz2 - qxqw2;
-	m[10] = 1.0f - 2 * sx - 2 * sy;
+	m[10] = 1.0f - 2 * sq.x() -2 * sq.y();
 	m[11] = 0;
 
 	m[12] = 0;

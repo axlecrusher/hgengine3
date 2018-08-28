@@ -73,8 +73,7 @@ void HgElement::updateGpuTextures() {
 
 HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation, bool applyTranslation) const {
 	HgMath::mat4f modelMatrix;
-	const vectorial::vec3f origin(m_origin.raw());
-	modelMatrix = HgMath::mat4f::translation(-origin);
+	modelMatrix = HgMath::mat4f::translation(-vectorial::vec3f(m_origin.raw()));
 
 	if (applyScale) {
 		modelMatrix = HgMath::mat4f::scale(scale()) * modelMatrix;
@@ -85,8 +84,7 @@ HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation
 	}
 
 	if (applyTranslation) {
-		const auto tmp = vectorial::vec3f(m_position.raw());// +origin;
-		modelMatrix = HgMath::mat4f::translation(tmp) * modelMatrix;
+		modelMatrix = HgMath::mat4f::translation(vectorial::vec3f(m_position.raw())) * modelMatrix;
 	}
 
 	if (m_parent) {
