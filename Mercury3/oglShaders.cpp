@@ -211,11 +211,11 @@ void HgOglShader::enable() {
 	if (program_id>0) useShaderProgram(program_id);
 }
 
-void HgOglShader::setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd, const HgCamera* camera) {
+void HgOglShader::setLocalUniforms(const RenderData& rd) {
 	GLuint old_program = _currentShaderProgram;
 
 	if (old_program == program_id) {
-		sendLocalUniformsToGPU(rotation, position, scale, origin, rd, camera);
+		sendLocalUniformsToGPU(rd);
 		return;
 	}
 
@@ -223,7 +223,7 @@ void HgOglShader::setLocalUniforms(const quaternion* rotation, const point* posi
 	fprintf(stderr, "Warning (%s): Temporary shader context change.\n", __FUNCTION__);
 	enable();
 
-	sendLocalUniformsToGPU(rotation, position, scale, origin, rd, camera);
+	sendLocalUniformsToGPU(rd);
 
 	useShaderProgram(old_program); //change back to previous program
 }
@@ -243,8 +243,8 @@ void HgOglShader::uploadMatrices(const HgMath::mat4f& modelView, const HgMath::m
 }
 
 
-void HgOglShader::sendLocalUniformsToGPU(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData* rd, const HgCamera* camera) {
-	OGLRenderData* oglrd = (OGLRenderData*)rd;
+void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
+	OGLRenderData* oglrd = (OGLRenderData*)&rd;
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);

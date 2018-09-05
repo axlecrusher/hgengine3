@@ -18,7 +18,7 @@ class HgShader {
 		virtual void destroy() = 0;
 		virtual void enable() = 0;
 
-		virtual void setLocalUniforms(const quaternion* rotation, const point* position, float scale, const point* origin, const RenderData*, const HgCamera* camera) = 0;
+		virtual void setLocalUniforms(const RenderData& rd) = 0;
 		virtual void uploadMatrices(const HgMath::mat4f& modelView, const HgMath::mat4f& projection, const HgMath::mat4f& view) = 0;
 
 		static HgShader* acquire(const char* vert, const char* frag);

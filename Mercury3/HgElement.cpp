@@ -25,13 +25,9 @@ void RegisterElementType(const char* c, factory_clbk factory) {
 void HgElement::init()
 {
 	m_renderData = NULL;
-	m_position = vector3();
 	m_logic = nullptr;
 	m_renderData = nullptr;
-	m_scale = 1;
-	m_origin = vector3();
 
-	m_orientation = quaternion::IDENTITY;
 	m_extendedData = std::make_unique<HgElementExtended>();
 	m_extendedData->owner = this;
 
@@ -73,18 +69,18 @@ void HgElement::updateGpuTextures() {
 
 HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation, bool applyTranslation) const {
 	HgMath::mat4f modelMatrix;
-	modelMatrix = HgMath::mat4f::translation(-vectorial::vec3f(m_origin.raw()));
+	modelMatrix = HgMath::mat4f::translation(-vectorial::vec3f(origin().raw()));
 
 	if (applyScale) {
 		modelMatrix = HgMath::mat4f::scale(scale()) * modelMatrix;
 	}
 
 	if (applyRotation) {
-		modelMatrix = m_orientation.toMatrix4() * modelMatrix;
+		modelMatrix = orientation().toMatrix4() * modelMatrix;
 	}
 
 	if (applyTranslation) {
-		modelMatrix = HgMath::mat4f::translation(vectorial::vec3f(m_position.raw())) * modelMatrix;
+		modelMatrix = HgMath::mat4f::translation(vectorial::vec3f(position().raw())) * modelMatrix;
 	}
 
 	if (m_parent) {

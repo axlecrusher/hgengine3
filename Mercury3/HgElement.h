@@ -81,6 +81,30 @@ struct ElementFlags {
 	bool inheritParentTranslation : 1;
 };
 
+class SpacialData {
+private:
+	quaternion m_orientation; //16
+	vertex3f m_position; float m_scale; //16
+	vertex3f m_origin;
+public:
+	SpacialData() : m_scale(1.0f) {}
+
+	inline const vertex3f origin() const { return m_origin; }
+	inline void origin(const vertex3f& p) { m_origin = p; }
+
+	//inline vertex3f& position() { return m_position; }
+	inline const vertex3f& position() const { return m_position; }
+	inline void position(const vertex3f& p) { m_position = p; }
+
+	//inline quaternion& orientation() { return m_orientation; }
+	inline const quaternion& orientation() const { return m_orientation; }
+	inline void orientation(const quaternion& q) { m_orientation = q; }
+
+	inline float scale() const { return m_scale; }
+	inline void scale(float s) { m_scale = s; }
+};
+
+
 /* NOTES: Try to avoid pointers, especially on 64 bit.
 The entity that allocates memory for render data should
 be responsible for destroying it. This is more clear than
@@ -89,33 +113,31 @@ handling special cases.
 */
 class HgElement {
 private:
-		//position, and rotation are in global coordinate system
-		point m_position; float m_scale; //16
-		point m_origin; //origin (0,0,0) in local space
-		quaternion m_orientation; //16
-//		uint8_t flags; //1
+	SpacialData m_spacialData; //local transormations
 public:
 		ElementFlags flags;
 
-		HgElement() : m_scale(1.0f), m_updateNumber(0), m_renderData(nullptr) {}
+		HgElement() : m_updateNumber(0), m_renderData(nullptr) {}
 		~HgElement();
 
 		void init();
 		void destroy();
 
-		inline const point origin() const { return m_origin; }
-		inline void origin(const point& p) { m_origin = p; }
+		inline const point origin() const { return m_spacialData.origin(); }
+		inline void origin(const point& p) { m_spacialData.origin(p); }
 
-		inline point& position() { return m_position; }
-		inline const point& position() const { return m_position; }
-		inline void position(const point& p) { m_position = p; }
+		//inline point& position() { return m_spacialData.position(); }
+		inline const point& position() const { return m_spacialData.position(); }
+		inline void position(const point& p) { m_spacialData.position(p); }
 
-		inline quaternion& orientation() { return m_orientation; }
-		inline const quaternion& orientation() const { return m_orientation; }
-		inline void orientation(const quaternion& q) { m_orientation = q; }
+		//inline quaternion& orientation() { return m_spacialData.orientation(); }
+		inline const quaternion& orientation() const { return m_spacialData.orientation(); }
+		inline void orientation(const quaternion& q) { m_spacialData.orientation(q); }
 
-		inline float scale() const { return m_scale; }
-		inline void scale(float s) { m_scale = s; }
+		inline float scale() const { return m_spacialData.scale(); }
+		inline void scale(float s) { m_spacialData.scale(s); }
+
+		const SpacialData& getSpacialData() const { return m_spacialData; }
 
 		inline bool isRenderable() const { return m_renderData != nullptr; }
 		inline void render() { if (isRenderable()) m_renderData->render();  }

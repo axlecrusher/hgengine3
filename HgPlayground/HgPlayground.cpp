@@ -36,7 +36,7 @@
 float projection[16];
 
 extern viewport view_port[];
-HgCamera camera[2];
+HgCamera camera[3];
 
 HANDLE endOfRenderFrame = NULL;
 
@@ -170,7 +170,7 @@ int main()
 {
 	ENGINE::EnumberateSymbols();
 
-	stereo_view = 0;
+	stereo_view = false;
 
 	StartWindowSystem();
 
@@ -396,7 +396,9 @@ int main()
 		}
 
 		camera[1] = camera[0];
-		camera[1].position.x(camera[1].position.x()+EYE_DISTANCE);
+		camera[1].position.x(camera[1].position.x() - EYE_DISTANCE * 0.5f);
+		camera[2] = camera[0];
+		camera[2].position.x(camera[1].position.x() + EYE_DISTANCE * 0.5f);
 
 		scene.update(dtime);
 
@@ -416,8 +418,15 @@ int main()
 
 		//render below
 		const auto projection_matrix = HgMath::mat4f(projection);
-		Renderer::Render(stereo_view, camera+0, projection_matrix);
-		if (stereo_view>0) Renderer::Render(2, camera+1, projection_matrix);
+
+		if(stereo_view) {
+			Renderer::Render(1, camera + 1, projection_matrix); //eye 1
+			Renderer::Render(2, camera + 2, projection_matrix); //eye 2
+		}
+		else
+		{
+			Renderer::Render(0, camera, projection_matrix);
+		}
 
 		window->SwapBuffers();
 
