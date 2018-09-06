@@ -204,13 +204,8 @@ namespace Engine {
 
 extern RenderData* (*new_RenderData)();
 
-//#define CHECK_FLAG(e,x) ((e)->flags&(x))
-//#define CLEAR_FLAG(e,x) ((e)->flags &= ~(x))
-//#define SET_FLAG(e,x) ((e)->flags |= (x))
-
 typedef void*(*factory_clbk)(HgElement* e);
 
-//vtable_index RegisterElementType(const char* c);
 void RegisterElementType(const char* c, factory_clbk);
 
 #define REGISTER_ELEMENT_TYPE(str) TestRegistration(str);

@@ -1,5 +1,4 @@
 #include <stdint.h>
-//#include <oglDisplay.h>
 #include <vertex.h>
 #include <shapes.h>
 
@@ -17,10 +16,6 @@
 
 #include <InstancedCollection.h>
 #include <cube.h>
-
-//TestRegistration("test");
-
-//static vtable_index VTABLE_INDEX;
 
 vertex3f test__ = { 1.0,0.0,0.0 };
 
@@ -68,23 +63,16 @@ static auto Collection = InstancedCollection<RotatingCube::RotatingCube, Rotatin
 
 //instanced render data
 static std::shared_ptr<RenderData> crd;
-/*
-static void updateClbk(struct HgElement* e, uint32_t tdelta) {
-//	printf("cube\n");
-}
-*/
+
 static void destroy(HgElement* e) {
 	e->destroy();
 }
 
 //Draw vertices directly. We aren't using indices here,
 static void cube_render(RenderData* rd) {
-	//OGLRenderData *d = (OGLRenderData*)rd;
-
 	setRenderAttributes(rd->blendMode, rd->renderFlags);
 	rd->hgVbo()->use();
 	rd->hgVbo()->draw(rd);
-	//glDrawArrays(GL_TRIANGLES, d->vbo_offset, d->vertex_count);
 }
 
 static void SetupRenderData() {
@@ -94,37 +82,18 @@ static void SetupRenderData() {
 	crd->hgVbo(staticVboVNUT);
 	crd->vbo_offset = staticVboVNUT->add_data(raw_cube_data, crd->vertex_count);
 	crd->index_count = NUM_ARRAY_ELEMENTS(cube_indices);
-//	crd->indices.data = cube_indices;
 
 	crd->index_offset = staticIndice8->add_data(cube_indices, crd->index_count);
 	crd->indexVbo(staticIndice8);
-
-//	crd->baseRender.renderFunc = cube_render;
-
-//	trd->baseRender.destroy = NULL; //render data is shared by all triangles so we don't really want to do anything
 }
 
 void* change_to_cube(HgElement* element) {
-//	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
 	if (crd == nullptr) SetupRenderData();
 
 	element->setRenderData(crd);
 	return nullptr;
 }
-/*
-void shape_create_cube(HgElement* element) {
-	element->position.components.x = 0.0f;
-	element->position.components.y = 0.0f;
-	element->position.components.z = 0.0f;
-
-	element->rotation.w = 1.0f;
-	//	element->rotation.z = 0.707f;
-	element->scale = 1.0f;
-
-	change_to_cube(element);
-}
-*/
 
 namespace RotatingCube {
 	void RotatingCube::update(HgTime dt, gpuStruct* instanceData) {

@@ -93,15 +93,5 @@ void* voxelGrid_create(HgElement* element) {
 	change_to_voxelGrid(element);
 	return nullptr;
 }
-/*
-static void destroy(HgElement* e) {
-	e->m_renderData = NULL;
-}
 
-static HgElement_vtable vtable = {
-	.create = voxelGrid_create,
-	.destroy = destroy,
-	.updateFunc = NULL
-};
-*/
 REGISTER_LINKTIME(voxelGrid, voxelGrid_create);

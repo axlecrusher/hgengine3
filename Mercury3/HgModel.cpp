@@ -121,8 +121,6 @@ static void destroy(HgElement* e) {
 }
 
 static void* change_to_model(HgElement* element) {
-//	element->vptr_idx = VTABLE_INDEX;
-
 	//create an instance of the render data for all triangles to share
 	element->setRenderData( init_render_data() ); //this needs to be per model instance if the model is animated
 	return nullptr;
@@ -130,8 +128,6 @@ static void* change_to_model(HgElement* element) {
 
 static void render(RenderData* rd) {
 	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
-	//OGLRenderData *d = (OGLRenderData*)rd;
-
 	rd->hgVbo()->use();
 //	d->colorVbo->use();
 
@@ -149,7 +145,6 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 	OGLRenderData* rd = (OGLRenderData*)element->renderData();
 
 	element->flags.destroy = true;
-	//SET_FLAG(element, HGE_DESTROY); //clear when we make it to the end
 
 	model_data mdl( LoadModel(filename) );
 	if (mdl.vertices == NULL || mdl.indices == NULL) return -1;
@@ -250,20 +245,5 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 
 	return true;
 }
-
-/*
-void model_create(HgElement* element) {
-	element->position.components.x = 0.0f;
-	element->position.components.y = 0.0f;
-	element->position.components.z = 0.0f;
-
-	element->rotation.w = 1.0f;
-	//	element->rotation.z = 0.707f;
-
-	element->scale = 1;
-
-	change_to_model(element);
-}
-*/
 
 REGISTER_LINKTIME(hgmodel,change_to_model);

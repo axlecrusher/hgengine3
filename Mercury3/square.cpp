@@ -34,10 +34,7 @@ static vbo_layout_vc raw_data[] = {
 static uint8_t indices[] = {
 	0,1,2,2,3,0
 };
-/*
-static void updateClbk(struct HgElement* e, uint32_t tdelta) {
-}
-*/
+
 static void destroy(HgElement* e) {
 	e->destroy();
 }
@@ -73,19 +70,5 @@ static void* change_to_square(HgElement* element) {
 	element->setRenderData( init_render_data() );
 	return nullptr;
 }
-/*
-void shape_create_square(HgElement* element) {
-	element->position.components.x = 0.0f;
-	element->position.components.y = 0.0f;
-	element->position.components.z = 0.0f;
-
-	element->rotation.w = 1.0f;
-	//	element->rotation.z = 0.707f;
-
-	element->scale = 1;
-
-	change_to_square(element);
-}
-*/
 
 REGISTER_LINKTIME(square,change_to_square)
