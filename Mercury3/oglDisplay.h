@@ -37,7 +37,7 @@ extern char *UniformString[];
 
 class OGLRenderData : public RenderData {
 public:
-	inline static OGLRenderData* Create() { return (OGLRenderData*)RenderData::Create(); }
+	inline static std::shared_ptr<RenderData> Create() { return RenderData::Create(); }
 	OGLRenderData();
 //	virtual void render();
 
@@ -58,7 +58,7 @@ void default_render(RenderData* rd);
 //void setBlendMode(BlendMode blendMode);
 void setRenderAttributes(BlendMode blendMode, RenderFlags flags);
 
-inline RenderData* new_renderData_ogl() { return new OGLRenderData(); }
+inline std::shared_ptr<RenderData> new_renderData_ogl() { return std::make_shared<OGLRenderData>(); }
 
 //inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->renderData(); }
 

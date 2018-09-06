@@ -10,7 +10,7 @@
 #include <HgVbo.h>
 //static vtable_index VTABLE_INDEX;
 //instanced render data
-static OGLRenderData* trd = NULL;
+static std::shared_ptr<RenderData> trd;
 
 static vbo_layout_vc raw_data[] = {
 	{{-0.5f, -0.5f, 0.0f}, 255, 0, 0, 255,},
@@ -45,14 +45,14 @@ static void SetupRenderData() {
 //	trd->baseRender.destroy = NULL; //render data is shared by all triangles so we don't really want to do anything
 }
 
-OGLRenderData* triangle_init_render_data() {
+std::shared_ptr<RenderData> triangle_init_render_data() {
 	if (trd == NULL) SetupRenderData();
 	return trd;
 }
 
 void change_to_triangle(HgElement* element) {
 	//create an instance of the render data for all triangles to share
-	element->setRenderData( triangle_init_render_data(), false);
+	element->setRenderData( triangle_init_render_data());
 }
 /*
 void shape_create_triangle(HgElement* element) {

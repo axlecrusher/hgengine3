@@ -80,8 +80,8 @@ static model_data LoadModel(const char* filename) {
 	return std::move(r);
 }
 
-static RenderData* init_render_data() {
-	OGLRenderData* rd = OGLRenderData::Create();
+static std::shared_ptr<RenderData> init_render_data() {
+	auto rd = OGLRenderData::Create();
 //	rd->baseRender.renderFunc = model_render;
 	return rd;
 }
@@ -117,16 +117,14 @@ model_data& model_data::operator=(model_data && other) {
 }
 
 static void destroy(HgElement* e) {
-//	SCALL(e->m_renderData, destroy);
-	free(e->renderData());
-	e->setRenderData(NULL,false);
+	e->destroy();
 }
 
 static void* change_to_model(HgElement* element) {
 //	element->vptr_idx = VTABLE_INDEX;
 
 	//create an instance of the render data for all triangles to share
-	element->setRenderData( init_render_data(), true ); //this needs to be per model instance if the model is animated
+	element->setRenderData( init_render_data() ); //this needs to be per model instance if the model is animated
 	return nullptr;
 }
 
@@ -148,7 +146,7 @@ static void render(RenderData* rd) {
 int8_t model_data::load(HgElement* element, const char* filename) {
 	change_to_model(element);
 
-	OGLRenderData* rd = (OGLRenderData*)element->m_renderData;
+	OGLRenderData* rd = (OGLRenderData*)element->renderData();
 
 	element->flags.destroy = true;
 	//SET_FLAG(element, HGE_DESTROY); //clear when we make it to the end

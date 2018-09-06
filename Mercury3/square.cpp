@@ -39,11 +39,11 @@ static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 }
 */
 static void destroy(HgElement* e) {
-	e->setRenderData(NULL,false);
+	e->destroy();
 }
 
 //instanced render data
-static OGLRenderData* trd = NULL;
+static std::shared_ptr<RenderData> trd;
 
 
 static void SetupRenderData() {
@@ -63,14 +63,14 @@ static void SetupRenderData() {
 	trd->indexVbo(staticIndice8);
 }
 
-static OGLRenderData* init_render_data() {
+static std::shared_ptr<RenderData> init_render_data() {
 	if (trd == NULL) SetupRenderData();
 	return trd;
 }
 
 static void* change_to_square(HgElement* element) {
 	//create an instance of the render data for all triangles to share
-	element->setRenderData( init_render_data(), false );
+	element->setRenderData( init_render_data() );
 	return nullptr;
 }
 /*

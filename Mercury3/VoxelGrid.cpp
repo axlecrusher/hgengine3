@@ -5,7 +5,7 @@
 #include <oglDisplay.h> //TODO: remove this
 
 //instanced render data
-static OGLRenderData *crd = NULL;
+static std::shared_ptr<RenderData> crd;
 static vbo_layout_vnut* voxelGridVertices = NULL;
 static uint16_t* indices = NULL;
 
@@ -58,7 +58,8 @@ static void SetupRenderData() {
 		indices = data.indices;
 	}
 
-	crd = (OGLRenderData*)RenderData::Create();
+	//crd = (OGLRenderData*)RenderData::Create();
+	crd = RenderData::Create();
 
 	crd->vertex_count = data.vertex_count;
 	crd->hgVbo(staticVboVNUT);
@@ -75,9 +76,9 @@ static void SetupRenderData() {
 
 void change_to_voxelGrid(HgElement* element) {
 	//create an instance of the render data for all triangles to share
-	if (crd == NULL) SetupRenderData();
+	if (crd == nullptr) SetupRenderData();
 
-	element->setRenderData( crd, false );
+	element->setRenderData( crd );
 }
 
 void* voxelGrid_create(HgElement* element) {

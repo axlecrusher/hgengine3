@@ -28,7 +28,7 @@ enum RenderFlags : uint8_t {
 
 class RenderData {
 public:
-	typedef RenderData*(*newRenderDataCallback)();
+	typedef std::shared_ptr<RenderData>(*newRenderDataCallback)();
 	typedef void(*indiceRenderFunc)(RenderData* rd);
 	static newRenderDataCallback Create;
 

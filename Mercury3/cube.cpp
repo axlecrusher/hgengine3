@@ -67,16 +67,14 @@ uint8_t cube_indices[36] = {
 static auto Collection = InstancedCollection<RotatingCube::RotatingCube, RotatingCube::gpuStruct, 1>::Collection;
 
 //instanced render data
-static OGLRenderData *crd = NULL;
+static std::shared_ptr<RenderData> crd;
 /*
 static void updateClbk(struct HgElement* e, uint32_t tdelta) {
 //	printf("cube\n");
 }
 */
 static void destroy(HgElement* e) {
-//	if (e->m_renderData && e->m_renderData->destroy) e->m_renderData->destroy(e->m_renderData);
-//	free(e->m_renderData);
-	e->setRenderData( NULL, false );
+	e->destroy();
 }
 
 //Draw vertices directly. We aren't using indices here,
@@ -109,9 +107,9 @@ static void SetupRenderData() {
 void* change_to_cube(HgElement* element) {
 //	element->vptr_idx = VTABLE_INDEX;
 	//create an instance of the render data for all triangles to share
-	if (crd == NULL) SetupRenderData();
+	if (crd == nullptr) SetupRenderData();
 
-	element->setRenderData(crd, false);
+	element->setRenderData(crd);
 	return nullptr;
 }
 /*

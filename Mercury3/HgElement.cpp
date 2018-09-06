@@ -41,12 +41,7 @@ HgElement::~HgElement() {
 void HgElement::destroy()
 {
 	m_logic.reset();
-//	if (m_logic) delete(m_logic);
-//	m_logic = nullptr;
-	if (m_extendedData && m_extendedData->m_ownRenderData) {
-		if (m_renderData != nullptr) delete m_renderData;
-	}
-	m_renderData = nullptr; //need some way to signal release
+	m_renderData.reset();
 }
 
 void HgElement::updateGpuTextures() {

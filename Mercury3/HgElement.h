@@ -161,16 +161,12 @@ public:
 
 		inline void setChild(HgElement* child) { child->setParent(this); }
 
-		inline void setRenderData(RenderData* rd, bool owner) { m_renderData = rd; m_extendedData->m_ownRenderData = owner; }
-		RenderData* renderData() { return m_renderData; }
+		inline void setRenderData(std::shared_ptr<RenderData>& rd) { m_renderData = rd; }
+		RenderData* renderData() { return m_renderData.get(); }
 
 		inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 
 		HgMath::mat4f getWorldSpaceMatrix(bool scale = true, bool rotation = true, bool translation = true) const;
-
-		//inline bool check_flag(uint32_t x) const { return (flags & x) != 0; }
-		//inline void setFlag(uint32_t x) { flags |= x; }
-		//inline bool clearFlag(uint32_t x) { flags &= ~x; }
 
 		inline void inheritParentScale(bool x) { flags.inheritParentScale = x; }
 		inline void inheritParentRotation(bool x) { flags.inheritParentRotation = x; }
@@ -180,9 +176,7 @@ public:
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }
 
-	//std::shared_ptr<RenderData> m_renderData;
-
-	RenderData* m_renderData; //can be shared //4, whoever populates this must clean it up.
+	std::shared_ptr<RenderData> m_renderData;
 
 	uint32_t m_updateNumber;
 	std::unique_ptr<HgElementLogic> m_logic;
