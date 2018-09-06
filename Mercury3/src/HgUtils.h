@@ -4,6 +4,7 @@
 #define SIZEOF_ARRAY(X) (*(&X + 1) - X)
 
 namespace ENGINE {
+	void InitEngine();
 	void EnumberateSymbols();
 	void SetRealtimePriority();
 }

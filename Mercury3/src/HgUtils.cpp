@@ -1,6 +1,8 @@
 #include <symbol_enumerator.h>
 #include <string.h>
 
+#include <HgUtils.h>
+
 #include <Windows.h>
 #include <stdio.h>
 
@@ -16,6 +18,11 @@ static int SymnumCheck(const char * path, const char * name, void * location, lo
 }
 
 namespace ENGINE {
+	void InitEngine() {
+		EnumberateSymbols();
+		SetRealtimePriority();
+	}
+
 	void EnumberateSymbols() {
 		EnumerateSymbols(SymnumCheck);
 	}

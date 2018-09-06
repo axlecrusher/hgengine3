@@ -168,7 +168,7 @@ void vertex_print(const vertex* v) {
 
 int main()
 {
-	ENGINE::EnumberateSymbols();
+	ENGINE::InitEngine();
 
 	stereo_view = false;
 
