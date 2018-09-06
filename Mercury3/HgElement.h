@@ -46,7 +46,7 @@ protected:
 
 class HgElementExtended {
 public:
-	HgElement* owner; //what is this for?
+	//HgElement* owner; //what is this for?
 	std::vector< HgTexture::TexturePtr > textures;
 
 	HgScene* m_scene; //Scene that element is a member of
@@ -180,6 +180,8 @@ public:
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }
 
+	//std::shared_ptr<RenderData> m_renderData;
+
 	RenderData* m_renderData; //can be shared //4, whoever populates this must clean it up.
 
 	uint32_t m_updateNumber;
@@ -208,9 +210,9 @@ namespace Engine {
 
 extern RenderData* (*new_RenderData)();
 
-#define CHECK_FLAG(e,x) ((e)->flags&(x))
-#define CLEAR_FLAG(e,x) ((e)->flags &= ~(x))
-#define SET_FLAG(e,x) ((e)->flags |= (x))
+//#define CHECK_FLAG(e,x) ((e)->flags&(x))
+//#define CLEAR_FLAG(e,x) ((e)->flags &= ~(x))
+//#define SET_FLAG(e,x) ((e)->flags |= (x))
 
 typedef void*(*factory_clbk)(HgElement* e);
 
