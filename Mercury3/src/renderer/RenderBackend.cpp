@@ -77,12 +77,11 @@ void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f
 }
 
 void Renderer::Enqueue(HgElement& e) {
-	//auto renderData = e.getRenderDataPtr();
-	//renderData->setWorldSpaceMatrix(e.getWorldSpaceMatrix());
+	auto worldSpaceMatrix = e.computeWorldSpaceMatrix();
 	if (e.flags.transparent) {
-		Renderer::transparentElements.emplace_back(e.getWorldSpaceMatrix(), e.getRenderDataPtr());
+		Renderer::transparentElements.emplace_back(worldSpaceMatrix, e.getRenderDataPtr());
 	}
 	else {
-		Renderer::opaqueElements.emplace_back(e.getWorldSpaceMatrix(), e.getRenderDataPtr());
+		Renderer::opaqueElements.emplace_back(worldSpaceMatrix, e.getRenderDataPtr());
 	}
 }

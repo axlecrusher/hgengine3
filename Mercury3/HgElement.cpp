@@ -42,24 +42,34 @@ void HgElement::destroy()
 	m_renderData.reset();
 }
 
-HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation, bool applyTranslation) const {
+HgMath::mat4f HgElement::computeWorldSpaceMatrix(bool applyScale, bool applyRotation, bool applyTranslation) const {
+	//translate to origin, scale, rotate, apply local translation, apply parent transforms
 	HgMath::mat4f modelMatrix;
-	modelMatrix = HgMath::mat4f::translation(-vectorial::vec3f(origin().raw()));
+	const auto origin_vec = -vectorial::vec3f(origin().raw());
+	//modelMatrix = HgMath::mat4f::translation(origin_vec);
 
-	if (applyScale) {
-		modelMatrix = HgMath::mat4f::scale(scale()) * modelMatrix;
-	}
+	const float scaleFactor = (scale()*applyScale) + (!applyScale * 1.0f); //Integral promotion of bool, avoid branching
+
+	//const auto correct = HgMath::mat4f::scale(scaleFactor) * modelMatrix;
+	//I think this is the same result with less math
+	modelMatrix = HgMath::mat4f::scale(scaleFactor);
+	modelMatrix.value.w = (origin_vec * scaleFactor).xyz1().value;
 
 	if (applyRotation) {
 		modelMatrix = orientation().toMatrix4() * modelMatrix;
 	}
 
-	if (applyTranslation) {
-		modelMatrix = HgMath::mat4f::translation(vectorial::vec3f(position().raw())) * modelMatrix;
-	}
+	const float translationScalar = applyTranslation * 1.0f; //Integral promotion of bool, avoid branching
+	//if (applyTranslation) {
+		//auto correct = HgMath::mat4f::translation(vectorial::vec3f(position().raw())) * modelMatrix;
+		//I think this is the same result with less math
+		const auto tmp = vectorial::vec4f(modelMatrix.value.w)
+			+ vectorial::vec3f(position().raw()).xyz0() * translationScalar;
+		modelMatrix.value.w = tmp.value;
+	//}
 
 	if (m_parent) {
-		modelMatrix = m_parent->getWorldSpaceMatrix(flags.inheritParentScale,
+		modelMatrix = m_parent->computeWorldSpaceMatrix(flags.inheritParentScale,
 			flags.inheritParentRotation, flags.inheritParentTranslation) * modelMatrix;
 	}
 
