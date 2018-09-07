@@ -28,9 +28,7 @@ public:
 		return quaternion(w(),-x(),-y(),-z());
 	}
 
-	inline quaternion inverse() const {
-		return this->normal().conjugate();
-	}
+	inline quaternion inverse() const { return this->normal().conjugate(); }
 
 	inline float w() const { return wxyz[0]; }
 	inline void w(float a) { wxyz[0] = a; }
@@ -54,17 +52,9 @@ public:
 		return wxyz.dot(rhs.wxyz);
 	}
 
-	inline quaternion operator+(const quaternion& rhs) const {
-		quaternion r;
-		r.wxyz = wxyz + rhs.wxyz;
-		return r;
-	}
+	inline quaternion operator+(const quaternion& rhs) const { return quaternion(wxyz + rhs.wxyz); }
 
-	inline quaternion operator-(const quaternion& rhs) const {
-		quaternion r;
-		r.wxyz = wxyz - rhs.wxyz;
-		return r;
-	}
+	inline quaternion operator-(const quaternion& rhs) const { return quaternion(wxyz - rhs.wxyz); }
 
 	//inline quaternion operator^(const quaternion& rhs) const {
 	//	quaternion r;
@@ -72,26 +62,16 @@ public:
 	//	return r;
 	//}
 
-	inline float magnitude() const {
-		return wxyz.magnitude();
-	}
+	inline float magnitude() const { return wxyz.magnitude(); }
 
 	inline quaternion operator*(const quaternion& rhs) const {
 		//return quat_mult(*this, rhs).normal();
 		return mult(*this, rhs).normal();
 	}
 
-	inline quaternion normal() const {
-		quaternion r;
-		r.wxyz = wxyz.normal();
-		return r;
-	}
+	inline quaternion normal() const { return quaternion(wxyz.normal()); }
 
-	inline quaternion scale(float m) const {
-		quaternion r;
-		r.wxyz = wxyz.scale(m);
-		return r;
-	}
+	inline quaternion scale(float m) const { return quaternion(wxyz.scale(m)); }
 
 	static quaternion fromAxisAngle(const vector3& axis, HgMath::angle angle);
 
@@ -114,7 +94,7 @@ public:
 	}
 
 private:
-
+	quaternion(const HgMath::vec4f& v) : wxyz(v) {}
 	HgMath::vec4f wxyz;
 };
 
