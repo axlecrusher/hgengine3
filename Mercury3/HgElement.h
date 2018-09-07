@@ -47,7 +47,7 @@ protected:
 class HgElementExtended {
 public:
 	//HgElement* owner; //what is this for?
-	std::vector< HgTexture::TexturePtr > textures;
+	//std::vector< HgTexture::TexturePtr > textures;
 
 	HgScene* m_scene; //Scene that element is a member of
 
@@ -65,7 +65,7 @@ struct PositionalData {
 struct ElementFlags {
 	ElementFlags() :
 		used(false), active(false), hidden(false), updated(false),
-		destroy(false), update_textures(false), transparent(false),
+		destroy(false), /*update_textures(false),*/ transparent(false),
 		inheritParentScale(true), inheritParentRotation(true),
 		inheritParentTranslation(true)
 	{}
@@ -74,7 +74,7 @@ struct ElementFlags {
 	bool hidden : 1;
 	bool updated : 1;
 	bool destroy : 1;
-	bool update_textures : 1;
+	//bool update_textures : 1;
 	bool transparent : 1;
 	bool inheritParentScale : 1;
 	bool inheritParentRotation : 1;
@@ -163,6 +163,7 @@ public:
 
 		inline void setRenderData(std::shared_ptr<RenderData>& rd) { m_renderData = rd; }
 		RenderData* renderData() { return m_renderData.get(); }
+		RenderDataPtr& getRenderDataPtr() { return m_renderData; }
 
 		inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 

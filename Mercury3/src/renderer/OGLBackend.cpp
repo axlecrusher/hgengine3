@@ -11,19 +11,24 @@
 
 #include <HgVbo.h>
 
-OGLBackend oglRenderer;
+//OGLBackend oglRenderer;
 
 static void GLAPIENTRY ogl_error_clbk(GLenum source, GLenum type, GLuint id,
 	GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
 	//fprintf(stderr, "%s\n", message);
 }
 
-void OGLBackend::Init() {
-	RENDERER = &oglRenderer;
+RenderBackend* OGLBackend::Create() {
+	static OGLBackend openglRenderer;
 
 	HgShader::Create = HgOglShader::Create;
 	RenderData::Create = new_renderData_ogl;
 	HgTexture::updateTextureFunc = ogl_updateTextureData;
+
+	return &openglRenderer;
+}
+
+void OGLBackend::Init() {
 
 	GLenum err = glewInit();
 

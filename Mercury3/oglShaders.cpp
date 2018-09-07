@@ -228,7 +228,7 @@ void HgOglShader::setLocalUniforms(const RenderData& rd) {
 	useShaderProgram(old_program); //change back to previous program
 }
 
-void HgOglShader::uploadMatrices(const HgMath::mat4f& modelView, const HgMath::mat4f& projection, const HgMath::mat4f& view) {
+void HgOglShader::uploadMatrices(const float* worldSpaceMatrix, const HgMath::mat4f& projection, const HgMath::mat4f& view) {
 	using namespace HgMath;
 	constexpr const int matrixCount = 3;
 
@@ -236,7 +236,9 @@ void HgOglShader::uploadMatrices(const HgMath::mat4f& modelView, const HgMath::m
 
 	//if (m_uniformLocations[U_MATRICES] <= -1) return; //everything needs matrices. don't bother checking
 
-	modelView.store(mm);
+	//rd->getWorldSpaceMatrix(mm);
+	memcpy(mm, worldSpaceMatrix, sizeof(float) * 16);
+	//modelView.store(mm);
 	projection.store(mm + 16);
 	view.store(mm + 32);
 	glUniformMatrix4fv(m_uniformLocations[U_MATRICES], matrixCount, GL_FALSE, mm);

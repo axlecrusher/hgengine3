@@ -11,7 +11,7 @@
 
 template<typename T>
 static std::unique_ptr<IHgVbo> vbo_from_api_type() {
-	switch (RENDERER->Type()) {
+	switch (RENDERER()->Type()) {
 	case OPENGL:
 		return std::move( std::make_unique< OGLvbo<T> >() );
 		break;

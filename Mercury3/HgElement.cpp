@@ -13,8 +13,6 @@
 
 #include <UpdatableCollection.h>
 
-RenderData* (*new_RenderData)() = NULL;
-
 std::map<std::string, factory_clbk> element_factories;
 
 void RegisterElementType(const char* c, factory_clbk factory) {
@@ -42,23 +40,6 @@ void HgElement::destroy()
 {
 	m_logic.reset();
 	m_renderData.reset();
-}
-
-void HgElement::updateGpuTextures() {
-	m_renderData->clearTextureIDs();
-
-	for (auto itr = m_extendedData->textures.begin(); itr != m_extendedData->textures.end(); itr++) {
-		auto texture = *itr;
-		if (texture->NeedsGPUUpdate()) {
-			texture->sendToGPU();
-			HgTexture::TextureType type = texture->getType();
-		}
-
-		//FIXME: Share texture pointers can cause a problem here. Texture may be updated by another HgElement.
-		//refactor into HgTexture making callback into renderData to set texture IDs.
-		//NOTE: Not sure this applies anymore. HgTexture is pretty immutable after creation.
-		m_renderData->setTexture(texture.get()); 
-	}
 }
 
 HgMath::mat4f HgElement::getWorldSpaceMatrix(bool applyScale, bool applyRotation, bool applyTranslation) const {

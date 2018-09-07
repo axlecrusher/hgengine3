@@ -31,7 +31,7 @@ class HgOglShader : public HgShader {
 		inline void setProgramCode(std::unique_ptr<shader_source>& ss) { m_shaderSource = std::move(ss); }
 
 		virtual void setLocalUniforms(const RenderData& rd);
-		virtual void uploadMatrices(const HgMath::mat4f& modelView, const HgMath::mat4f& projection, const HgMath::mat4f& view);
+		virtual void uploadMatrices(const float* worldSpaceMatrix, const HgMath::mat4f& projection, const HgMath::mat4f& view);
 
 		static std::unique_ptr<HgShader> Create(const char* vert, const char* frag);
 	private:

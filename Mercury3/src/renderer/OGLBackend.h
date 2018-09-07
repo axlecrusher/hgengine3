@@ -7,7 +7,11 @@ public:
 	OGLBackend() {
 		m_type = RendererType::OPENGL;
 	}
-	static void Init();
+
+	//create graphics api singleton
+	static RenderBackend* Create();
+
+	void Init();
 
 	void Clear();
 	void BeginFrame();

@@ -210,16 +210,18 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 	element->position(position);
 	element->orientation(orientation);
 
+	auto renderData = element->renderData();
+
 	if (!vertexShader.empty() && !fragmentShader.empty())
-		element->m_renderData->shader = HgShader::acquire(vertexShader.c_str(), fragmentShader.c_str());
+		renderData->shader = HgShader::acquire(vertexShader.c_str(), fragmentShader.c_str());
 
 	if (!diffuseTexture.empty())
 	{
 		auto tmp = HgTexture::acquire(diffuseTexture, HgTexture::DIFFUSE);
 		if (tmp != nullptr) {
-			element->m_extendedData->textures.push_back(std::move(tmp));
-			element->flags.update_textures = true;
-			//SET_FLAG(element, HGE_UPDATE_TEXTURES);
+
+			renderData->textures.push_back(std::move(tmp));
+			renderData->updateTextures = true;
 		}
 	}
 
@@ -227,9 +229,8 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 	{
 		auto tmp = HgTexture::acquire(specularTexture, HgTexture::SPECULAR);
 		if (tmp != nullptr) {
-			element->m_extendedData->textures.push_back(std::move(tmp));
-			element->flags.update_textures = true;
-			//SET_FLAG(element, HGE_UPDATE_TEXTURES);
+			renderData->textures.push_back(std::move(tmp));
+			renderData->updateTextures = true;
 		}
 	}
 
@@ -237,9 +238,8 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 	{
 		auto tmp = HgTexture::acquire(normalTexture, HgTexture::NORMAL);
 		if (tmp != nullptr) {
-			element->m_extendedData->textures.push_back(std::move(tmp));
-			element->flags.update_textures = true;
-			//SET_FLAG(element, HGE_UPDATE_TEXTURES);
+			renderData->textures.push_back(std::move(tmp));
+			renderData->updateTextures = true;
 		}
 	}
 

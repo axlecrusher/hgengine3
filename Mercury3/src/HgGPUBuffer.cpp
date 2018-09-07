@@ -4,7 +4,7 @@
 #include "OGL/OGLGpuBuffer.h"
 
 std::unique_ptr<IGPUBufferImpl> IHgGPUBuffer::from_api_type() {
-	switch (RENDERER->Type()) {
+	switch (RENDERER()->Type()) {
 	case OPENGL:
 		return std::move( std::make_unique<OGLHgGPUBuffer >());
 		break;

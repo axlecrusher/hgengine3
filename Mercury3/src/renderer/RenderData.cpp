@@ -27,3 +27,20 @@ void RenderData::destroy() {
 void RenderData::init() {
 	shader = HgShader::acquire("test_vertex.glsl", "test_frag.glsl");
 }
+
+void RenderData::updateGpuTextures() {
+	clearTextureIDs();
+
+	for (auto itr = textures.begin(); itr != textures.end(); itr++) {
+		auto texture = *itr;
+		if (texture->NeedsGPUUpdate()) {
+			texture->sendToGPU();
+			HgTexture::TextureType type = texture->getType();
+		}
+
+		//FIXME: Share texture pointers can cause a problem here. Texture may be updated by another HgElement.
+		//refactor into HgTexture making callback into renderData to set texture IDs.
+		//NOTE: Not sure this applies anymore. HgTexture is pretty immutable after creation.
+		setTexture(texture.get());
+	}
+}

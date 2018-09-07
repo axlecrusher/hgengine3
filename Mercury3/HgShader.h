@@ -19,7 +19,7 @@ class HgShader {
 		virtual void enable() = 0;
 
 		virtual void setLocalUniforms(const RenderData& rd) = 0;
-		virtual void uploadMatrices(const HgMath::mat4f& modelView, const HgMath::mat4f& projection, const HgMath::mat4f& view) = 0;
+		virtual void uploadMatrices(const float* worldSpaceMatrix, const HgMath::mat4f& projection, const HgMath::mat4f& view) = 0;
 
 		static HgShader* acquire(const char* vert, const char* frag);
 		static void release(HgShader* shader);

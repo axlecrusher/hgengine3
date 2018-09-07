@@ -8,6 +8,8 @@
 #include <HgVbo.h>
 
 #include <HgGPUBuffer.h>
+#include <HgTexture.h>
+#include <vector>
 
 class HgShader;
 //class IHgVbo;
@@ -60,6 +62,8 @@ public:
 	inline void colorVbo(std::shared_ptr<IHgVbo>& vbo) { m_colorVbo = vbo; }
 	inline void colorVbo(std::unique_ptr<IHgVbo>& vbo) { m_colorVbo = std::move(vbo); }
 
+	void updateGpuTextures();
+
 	uint32_t index_offset;
 	uint32_t index_count;
 
@@ -74,10 +78,14 @@ public:
 
 	uint32_t instanceCount;
 
+	std::vector< HgTexture::TexturePtr > textures;
+	bool updateTextures;
+
 private:
 	//We need to be able to support multiple VBOs without hardcoding more here.
 	std::shared_ptr<IHgVbo> m_hgVbo;
 	std::shared_ptr<IHgVbo> m_indexVbo;
 	std::shared_ptr<IHgVbo> m_colorVbo;
-
 };
+
+typedef std::shared_ptr<RenderData> RenderDataPtr;

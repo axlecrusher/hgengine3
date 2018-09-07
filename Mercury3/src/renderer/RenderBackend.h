@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <stdint.h>
@@ -19,6 +18,7 @@ struct viewport {
 class RenderBackend {
 public:
 
+	virtual void Init() = 0;
 	virtual void Clear() = 0;
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
@@ -34,29 +34,31 @@ protected:
 	uint8_t _currenViewPort_idx = 0xFF;
 };
 
-//class HgElement;
+struct RenderInstance {
+	RenderInstance(const HgMath::mat4f& _worldSpaceMatrix, RenderDataPtr& rd)
+		:renderData(rd)
+	{
+		_worldSpaceMatrix.store(worldSpaceMatrix);
+	}
+	float worldSpaceMatrix[16];
+	RenderDataPtr renderData;
+};
+
 class HgCamera;
 
-//#include <HgElement.h>
-
 namespace Renderer {
-	void InitOpenGL();
 
-	extern std::vector<HgElement*> opaqueElements;
-	extern std::vector<HgElement*> transparentElements;
+	//Must happen after window is created;
+	void Init();
+
+	extern std::vector<RenderInstance> opaqueElements;
+	extern std::vector<RenderInstance> transparentElements;
 
 	void Render(uint8_t stereo_view, HgCamera* camera, const HgMath::mat4f& projection);
-	inline void Enqueue(HgElement& e) {
-		if (e.flags.transparent) {
-			Renderer::transparentElements.push_back(&e);
-		}
-		else {
-			Renderer::opaqueElements.push_back(&e);
-		}
-	}
+	void Enqueue(HgElement& e);
 
-	extern HgMath::mat4f projection_matrix;
-	extern HgMath::mat4f view_matrix;
+	extern HgMath::mat4f ProjectionMatrix;
+	extern HgMath::mat4f ViewMatrix;
 }
 
-extern RenderBackend* RENDERER;
+RenderBackend* RENDERER();

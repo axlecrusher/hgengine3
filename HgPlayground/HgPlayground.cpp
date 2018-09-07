@@ -52,13 +52,13 @@ MercuryWindow* window = NULL;
 
 void StartWindowSystem() {
 	window = MercuryWindow::MakeWindow();
-	Renderer::InitOpenGL();
+	Renderer::Init();
 }
 
 void BeginFrame() {
 	window->PumpMessages();
-	RENDERER->Clear();
-	RENDERER->BeginFrame();
+	RENDERER()->Clear();
+	RENDERER()->BeginFrame();
 }
 
 int32_t RenderThreadLoop() {
@@ -149,14 +149,15 @@ void submit_for_render_threaded(uint8_t viewport_idx, HgCamera* camera, HgScene 
 }
 
 void quick_render(uint8_t viewport_idx, HgCamera* camera, HgElement* e) {
+	float wsm[16];
 	RenderData* rd = e->renderData();
 	//	if (rd->shader) VCALL(rd->shader, enable);
-	RENDERER->Viewport(viewport_idx);
+	RENDERER()->Viewport(viewport_idx);
 
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
-
-	rd->shader->uploadMatrices(e->getWorldSpaceMatrix(), Renderer::projection_matrix, Renderer::view_matrix);
+	e->getWorldSpaceMatrix().store(wsm);
+	rd->shader->uploadMatrices(wsm, Renderer::ProjectionMatrix, Renderer::ViewMatrix);
 	//	setLocalUniforms(&e->orientation, &e->position, e->scale);
 
 	rd->render();
@@ -175,11 +176,11 @@ int main()
 	StartWindowSystem();
 
 	if (stereo_view) {
-		RENDERER->setup_viewports(1280, 480);
+		RENDERER()->setup_viewports(1280, 480);
 		//		Perspective2(60, 1280.0 / 480.0, 0.1f, 100.0f, projection);
 	}
 	else {
-		RENDERER->setup_viewports(640, 480);
+		RENDERER()->setup_viewports(640, 480);
 	}
 
 	Perspective2(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
