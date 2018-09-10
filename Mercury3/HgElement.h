@@ -240,9 +240,9 @@ void RegisterElementType(const char* c, factory_clbk);
 #endif
 
 #ifdef _MSC_VER
-#define REGISTER_GLOBAL_DESTROY( func ) \
-	__pragma(comment(linker, "/export:_GLOBAL_DESTROY"#func)); \
-	void GLOBAL_DESTROY##func() { ##func(); }
+//#define REGISTER_GLOBAL_DESTROY( func ) \
+	//__pragma(comment(linker, "/export:_GLOBAL_DESTROY"#func)); \
+	//void GLOBAL_DESTROY##func() { ##func(); }
 #else
 #define REGISTER_LINKTIME( func ) \
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }
