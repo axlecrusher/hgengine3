@@ -17,11 +17,6 @@ typedef struct header {
 static model_data LoadModel(const char* filename) {
 	header head;
 	model_data r;
-	r.vertices = NULL;
-	r.indices = NULL;
-
-	vbo_layout_vnut* buffer1 = NULL;
-	uint16_t* buffer2 = NULL;
 
 	FILE* f = NULL;
 	errno_t err = fopen_s(&f, filename, "rb");
@@ -37,43 +32,56 @@ static model_data LoadModel(const char* filename) {
 		return r;
 	}
 
-	if (head.vertex_count > 65535) {
-		fprintf(stderr, "Too many vertices for \"%s\"\n", filename);
-		fclose(f);
-		return r;
-	}
+	//if (head.vertex_count > 65535) {
+	//	fprintf(stderr, "Too many vertices for \"%s\"\n", filename);
+	//	fclose(f);
+	//	return r;
+	//}
 
-	if (head.index_count > 1000000) {
+	int sizeOfIndices = 0;
+	void* indexBuffer = nullptr;
+
+	std::shared_ptr<uint32_t[]> indices32;
+	std::shared_ptr<uint16_t[]> indices16;
+
+	if (head.index_count > 50000000) {
 		fprintf(stderr, "Too many indices for \"%s\"\n", filename);
 		fclose(f);
 		return r;
 	}
 
-	buffer1 = (vbo_layout_vnut*)malloc(sizeof(*buffer1)*head.vertex_count);
-	buffer2 = (uint16_t*)malloc(sizeof(*buffer2)*head.index_count);
+	if (head.vertex_count > 65535) {
+		indices32 = std::shared_ptr<uint32_t[]>(new uint32_t[head.index_count]);
+		indexBuffer = indices32.get();
+		sizeOfIndices = sizeof(uint32_t);
+	}
+	else {
+		indices16 = std::shared_ptr<uint16_t[]>(new uint16_t[head.index_count]);
+		indexBuffer = indices16.get();
+		sizeOfIndices = sizeof(uint16_t);
+	}
 
-	read = fread(buffer1, sizeof(*buffer1), head.vertex_count, f);
+	auto vertices = std::shared_ptr<vbo_layout_vnut[]>(new vbo_layout_vnut[head.vertex_count]);
+
+	read = fread(vertices.get(), sizeof(*vertices.get()), head.vertex_count, f);
 	if (read != head.vertex_count) {
 		fprintf(stderr, "Error, %d vertices expected, read %zd", head.vertex_count, read);
-		free(buffer1);
-		free(buffer2);
 		fclose(f);
 		return r;
 	}
 
-	read = fread(buffer2, sizeof(*buffer2), head.index_count, f);
+	read = fread(indexBuffer, sizeOfIndices, head.index_count, f);
 	if (read != head.index_count) {
 		fprintf(stderr, "Error, %d indices expected, read %zd", head.index_count, read);
-		free(buffer1);
-		free(buffer2);
 		fclose(f);
 		return r;
 	}
 
 	fclose(f);
 
-	r.vertices = buffer1;
-	r.indices = buffer2;
+	r.indices16 = indices16;
+	r.indices32 = indices32;
+	r.vertices = vertices;
 	r.vertex_count = head.vertex_count;
 	r.index_count = head.index_count;
 
@@ -88,32 +96,6 @@ static std::shared_ptr<RenderData> init_render_data() {
 
 static void updateClbk(HgElement* e, uint32_t tdelta) {
 	//	printf("cube\n");
-}
-
-model_data::model_data()
-	:vertices(nullptr), indices(nullptr), element(nullptr)
-{
-
-}
-model_data::~model_data() {
-	if (vertices) free(vertices);
-	if (indices) free(indices);
-
-	vertices = nullptr;
-	indices = nullptr;
-}
-
-model_data::model_data(model_data && other) {
-	memcpy(this, &other, sizeof(model_data));
-	other.vertices = nullptr;
-	other.indices = nullptr;
-}
-
-model_data& model_data::operator=(model_data && other) {
-	memcpy(this, &other, sizeof(model_data));
-	other.vertices = nullptr;
-	other.indices = nullptr;
-	return *this;
 }
 
 static void destroy(HgElement* e) {
@@ -147,7 +129,8 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 	element->flags.destroy = true;
 
 	model_data mdl( LoadModel(filename) );
-	if (mdl.vertices == NULL || mdl.indices == NULL) return -1;
+	if (mdl.vertices == nullptr ||
+		(mdl.indices16 == nullptr)&&(mdl.indices32 == nullptr)) return -1;
 
 	/*
 	for (int i = 0; i < mdl.vertex_count; i++) {
@@ -161,12 +144,18 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 	rd->hgVbo( staticVboVNUT );
 	rd->vertex_count = mdl.vertex_count;
 	rd->index_count = mdl.index_count;
-	rd->vbo_offset = staticVboVNUT->add_data(mdl.vertices, rd->vertex_count);
+	rd->vbo_offset = staticVboVNUT->add_data(mdl.vertices.get(), rd->vertex_count);
 	//free(mdl.vertices);
 
 //	mrd->index_count = mdl.index_count;
-	rd->indexVbo( HgVbo::Create<uint16_t>() );
-	rd->index_offset = rd->indexVbo()->add_data(mdl.indices, mdl.index_count);
+	if (mdl.indices16 != nullptr) {
+		rd->indexVbo(HgVbo::Create<uint16_t>());
+		rd->index_offset = rd->indexVbo()->add_data(mdl.indices16.get(), mdl.index_count);
+	}
+	else if (mdl.indices32 != nullptr) {
+		rd->indexVbo(HgVbo::Create<uint32_t>());
+		rd->index_offset = rd->indexVbo()->add_data(mdl.indices32.get(), mdl.index_count);
+	}
 
 	rd->renderFunction = render;
 

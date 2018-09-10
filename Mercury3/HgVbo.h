@@ -39,6 +39,7 @@ enum VBO_TYPE : uint8_t {
 	VBO_VNUT,
 	VBO_INDEX8,
 	VBO_INDEX16,
+	VBO_INDEX32,
 	VBO_COLOR8
 };
 

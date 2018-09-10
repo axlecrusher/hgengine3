@@ -53,6 +53,11 @@ namespace HgVbo {
 	}
 
 	template<>
+	std::unique_ptr<IHgVbo> Create<uint32_t>() {
+		return std::move(vbo_from_api_type<uint32_t>());
+	}
+
+	template<>
 	std::unique_ptr<IHgVbo> Create<color>() {
 		return std::move(vbo_from_api_type<color>());
 	}

@@ -68,7 +68,7 @@ public:
 	uint32_t index_count;
 
 	uint32_t vbo_offset;
-	uint16_t vertex_count;
+	uint32_t vertex_count;
 
 	BlendMode blendMode;
 	RenderFlags renderFlags;

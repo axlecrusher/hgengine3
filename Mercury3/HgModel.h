@@ -8,14 +8,12 @@
 
 class model_data {
 public:
-	model_data();
-	~model_data();
+	model_data() :element(nullptr) {}
+	~model_data() = default;
 
-	model_data(model_data && other);
-	model_data& operator=(model_data&& other);
-
-	vbo_layout_vnut* vertices;
-	uint16_t* indices;
+	std::shared_ptr<vbo_layout_vnut[]> vertices;
+	std::shared_ptr<uint16_t[]> indices16;
+	std::shared_ptr<uint32_t[]> indices32;
 	uint32_t vertex_count;
 	uint32_t index_count;
 
@@ -26,6 +24,10 @@ public:
 
 	static bool load_ini(HgElement* element, std::string filename);
 	static bool load_ini(HgElement* element, const IniLoader::Contents& ini);
+
+private:
+
+
 
 };
 

@@ -46,6 +46,7 @@ public:
 		if (std::is_same<T, vbo_layout_vnut>::value) { return VBO_VNUT; }
 		if (std::is_same<T, uint8_t>::value) { return VBO_INDEX8; }
 		if (std::is_same<T, uint16_t>::value) { return VBO_INDEX16; }
+		if (std::is_same<T, uint32_t>::value) { return VBO_INDEX32; }
 		if (std::is_same<T, color>::value) { return VBO_COLOR8; }
 		return VBO_TYPE_INVALID;
 	}
@@ -224,6 +225,12 @@ inline void OGLvbo<uint16_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_of
 }
 
 template<>
+inline void OGLvbo<uint32_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
+	const size_t offset = sizeof(uint32_t)*idx_offset; //offset into indice buffer
+	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_INT, (void*)offset, vertex_offset);
+}
+
+template<>
 inline void OGLvbo<uint8_t>::draw_instanced(const RenderData* rd) {
 	const size_t offset = rd->index_offset * sizeof(uint16_t); //offset into indice buffer
 	glDrawElementsInstanced(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount);
@@ -233,6 +240,12 @@ template<>
 inline void OGLvbo<uint16_t>::draw_instanced(const RenderData* rd) {
 	const size_t offset = rd->index_offset * sizeof(uint16_t); //offset into indice buffer
 	glDrawElementsInstanced(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount);
+}
+
+template<>
+inline void OGLvbo<uint32_t>::draw_instanced(const RenderData* rd) {
+	const size_t offset = rd->index_offset * sizeof(uint32_t); //offset into indice buffer
+	glDrawElementsInstanced(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount);
 }
 
 //8 bit index
@@ -251,6 +264,19 @@ inline void OGLvbo<uint8_t>::sendToGPU() {
 //16 bit index
 template<>
 inline void OGLvbo<uint16_t>::sendToGPU() {
+	if (handle.vbo_id == 0) {
+		GLuint buf_id;
+		glGenBuffers(1, &buf_id);
+		handle.vbo_id = buf_id;
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
+}
+
+//32 bit index
+template<>
+inline void OGLvbo<uint32_t>::sendToGPU() {
 	if (handle.vbo_id == 0) {
 		GLuint buf_id;
 		glGenBuffers(1, &buf_id);
@@ -289,6 +315,12 @@ inline void OGLvbo<uint8_t>::bind() {
 //16 bit index
 template<>
 inline void OGLvbo<uint16_t>::bind() {
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
+}
+
+//16 bit index
+template<>
+inline void OGLvbo<uint32_t>::bind() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
 }
 
