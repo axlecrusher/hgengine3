@@ -88,7 +88,7 @@ public:
 	virtual ~IHgVbo() {}
 
 	//	Copy data straight into VBO. Ensure that data, is using the correct vbo layout for your data
-	virtual uint32_t add_data(void* data, uint16_t vertex_count) = 0;
+	virtual uint32_t add_data(void* data, uint32_t count) = 0;
 
 	//	Clear data from RAM. Will not upload new data to GPU until new data is added.
 	virtual void clear() = 0;

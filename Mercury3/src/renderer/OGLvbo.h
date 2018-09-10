@@ -12,8 +12,8 @@ public:
 	OGLvbo();
 	virtual ~OGLvbo();
 
-	inline uint32_t add_data(void* data, uint16_t vertex_count) {
-		uint32_t r = m_mem.add_data((T*)data, vertex_count);
+	inline uint32_t add_data(void* data, uint32_t count) {
+		uint32_t r = m_mem.add_data((T*)data, count);
 		needsUpdate = true;
 		return r;
 	}
