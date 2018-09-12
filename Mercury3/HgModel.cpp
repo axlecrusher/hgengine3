@@ -13,22 +13,32 @@ typedef struct header {
 	uint32_t vertex_count, index_count;
 } header;
 
-
-static model_data LoadModel(const char* filename) {
-	header head;
-	model_data r;
+std::unique_ptr<FILE, decltype(&fclose)> open(const char* filename) {
+	std::unique_ptr<FILE, decltype(&fclose)> ret(nullptr,fclose);
 
 	FILE* f = NULL;
 	errno_t err = fopen_s(&f, filename, "rb");
 	if (err != 0) {
 		fprintf(stderr, "Unable to open file \"%s\"\n", filename);
-		return r;
+	}
+	else {
+		ret = std::unique_ptr<FILE, decltype(&fclose)>(f,fclose);
 	}
 
+	return ret;
+}
+
+static model_data LoadModel(const char* filename) {
+	header head;
+	model_data r;
+
+	auto file = open(filename);
+	if (file == nullptr) return r;
+
+	auto f = file.get();
 	size_t read = fread(&head, sizeof(head), 1, f);
 	if (read != 1) {
 		fprintf(stderr, "Unable to read file header for \"%s\"\n", filename);
-		fclose(f);
 		return r;
 	}
 
@@ -46,7 +56,6 @@ static model_data LoadModel(const char* filename) {
 
 	if (head.index_count > 50000000) {
 		fprintf(stderr, "Too many indices for \"%s\"\n", filename);
-		fclose(f);
 		return r;
 	}
 
@@ -66,18 +75,14 @@ static model_data LoadModel(const char* filename) {
 	read = fread(vertices.get(), sizeof(*vertices.get()), head.vertex_count, f);
 	if (read != head.vertex_count) {
 		fprintf(stderr, "Error, %d vertices expected, read %zd", head.vertex_count, read);
-		fclose(f);
 		return r;
 	}
 
 	read = fread(indexBuffer, sizeOfIndices, head.index_count, f);
 	if (read != head.index_count) {
 		fprintf(stderr, "Error, %d indices expected, read %zd", head.index_count, read);
-		fclose(f);
 		return r;
 	}
-
-	fclose(f);
 
 	r.indices16 = indices16;
 	r.indices32 = indices32;
