@@ -78,13 +78,11 @@ static void cube_render(RenderData* rd) {
 static void SetupRenderData() {
 	crd = OGLRenderData::Create();
 
-	crd->vertex_count = NUM_ARRAY_ELEMENTS(raw_cube_data);
-	crd->hgVbo(staticVboVNUT);
-	crd->vbo_offset = staticVboVNUT->add_data(raw_cube_data, crd->vertex_count);
-	crd->index_count = NUM_ARRAY_ELEMENTS(cube_indices);
+	auto rec = HgVbo::GenerateFrom(raw_cube_data, NUM_ARRAY_ELEMENTS(raw_cube_data));
+	crd->VertexVboRecord(rec);
 
-	crd->index_offset = staticIndice8->add_data(cube_indices, crd->index_count);
-	crd->indexVbo(staticIndice8);
+	auto iRec = HgVbo::GenerateFrom(cube_indices, NUM_ARRAY_ELEMENTS(cube_indices));
+	crd->indexVboRecord(iRec);
 }
 
 void* change_to_cube(HgElement* element) {

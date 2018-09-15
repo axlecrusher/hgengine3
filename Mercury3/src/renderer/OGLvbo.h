@@ -27,7 +27,7 @@ public:
 			draw_instanced(rd);
 		}
 		else {
-			draw_vbo(rd->index_count, rd->vbo_offset, rd->index_offset);
+			draw_vbo(rd->indexVboRecord().Count(), rd->VertexVboRecord().Offset(), rd->indexVboRecord().Offset());
 		}
 	}
 	virtual void* getBuffer() { return m_mem.getBuffer(); }
@@ -232,20 +232,26 @@ inline void OGLvbo<uint32_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_of
 
 template<>
 inline void OGLvbo<uint8_t>::draw_instanced(const RenderData* rd) {
-	const size_t offset = rd->index_offset * sizeof(uint16_t); //offset into indice buffer
-	glDrawElementsInstanced(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount);
+	const auto idx_offset = rd->indexVboRecord().Offset();
+	const auto idx_count = rd->indexVboRecord().Count();
+	const size_t offset = idx_offset * sizeof(uint16_t); //offset into indice buffer
+	glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount);
 }
 
 template<>
 inline void OGLvbo<uint16_t>::draw_instanced(const RenderData* rd) {
-	const size_t offset = rd->index_offset * sizeof(uint16_t); //offset into indice buffer
-	glDrawElementsInstanced(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount);
+	const auto idx_offset = rd->indexVboRecord().Offset();
+	const auto idx_count = rd->indexVboRecord().Count();
+	const size_t offset = idx_offset * sizeof(uint16_t); //offset into indice buffer
+	glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount);
 }
 
 template<>
 inline void OGLvbo<uint32_t>::draw_instanced(const RenderData* rd) {
-	const size_t offset = rd->index_offset * sizeof(uint32_t); //offset into indice buffer
-	glDrawElementsInstanced(GL_TRIANGLES, rd->index_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount);
+	const auto idx_offset = rd->indexVboRecord().Offset();
+	const auto idx_count = rd->indexVboRecord().Count();
+	const size_t offset = idx_offset * sizeof(uint32_t); //offset into indice buffer
+	glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount);
 }
 
 //8 bit index

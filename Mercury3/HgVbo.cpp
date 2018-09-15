@@ -62,9 +62,3 @@ namespace HgVbo {
 		return std::move(vbo_from_api_type<color>());
 	}
 }
-
-std::shared_ptr<IHgVbo> staticVbo = HgVbo::Create<vbo_layout_vc>();
-std::shared_ptr<IHgVbo> staticVboVNU = HgVbo::Create<vbo_layout_vnu>();
-std::shared_ptr<IHgVbo> staticVboVNUT = HgVbo::Create<vbo_layout_vnut>();
-std::shared_ptr<IHgVbo> staticIndice8 = HgVbo::Create<uint8_t>();
-std::shared_ptr<IHgVbo> staticIndice16 = HgVbo::Create<uint16_t>();

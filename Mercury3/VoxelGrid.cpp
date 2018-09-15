@@ -66,17 +66,11 @@ static void SetupRenderData() {
 	//crd = (OGLRenderData*)RenderData::Create();
 	crd = RenderData::Create();
 
-	crd->vertex_count = data.vertex_count;
-	crd->hgVbo(staticVboVNUT);
-	crd->vbo_offset = staticVboVNUT->add_data(voxelGridVertices.get(), crd->vertex_count);
+	auto rec = HgVbo::GenerateFrom(voxelGridVertices.get(), data.vertex_count);
+	crd->VertexVboRecord(rec);
 
-//	crd->indices.data = indices;
-	crd->index_count = data.index_count;
-//	rd->indices.owns_ptr = 1;
-	crd->indexVbo( HgVbo::Create<uint16_t>() );
-	crd->indexVbo()->add_data(indices.get(), data.index_count);
-
-//	crd->renderFunction = render;
+	auto iRec = HgVbo::GenerateFrom(indices.get(), data.index_count);
+	crd->indexVboRecord(iRec);
 }
 
 void change_to_voxelGrid(HgElement* element) {

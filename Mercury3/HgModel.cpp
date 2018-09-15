@@ -146,20 +146,16 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 		printf("%f %f %f %f\n",x, y, z, w);
 	}
 */
-	rd->hgVbo( staticVboVNUT );
-	rd->vertex_count = mdl.vertex_count;
-	rd->index_count = mdl.index_count;
-	rd->vbo_offset = staticVboVNUT->add_data(mdl.vertices.get(), rd->vertex_count);
-	//free(mdl.vertices);
+	auto record = HgVbo::GenerateFrom(mdl.vertices.get(), mdl.vertex_count);
+	rd->VertexVboRecord(record);
 
-//	mrd->index_count = mdl.index_count;
 	if (mdl.indices16 != nullptr) {
-		rd->indexVbo(HgVbo::Create<uint16_t>());
-		rd->index_offset = rd->indexVbo()->add_data(mdl.indices16.get(), mdl.index_count);
+		auto iRec = HgVbo::GenerateUniqueFrom(mdl.indices16.get(), mdl.index_count);
+		rd->indexVboRecord(iRec);
 	}
 	else if (mdl.indices32 != nullptr) {
-		rd->indexVbo(HgVbo::Create<uint32_t>());
-		rd->index_offset = rd->indexVbo()->add_data(mdl.indices32.get(), mdl.index_count);
+		auto iRec = HgVbo::GenerateUniqueFrom(mdl.indices32.get(), mdl.index_count);
+		rd->indexVboRecord(iRec);
 	}
 
 	rd->renderFunction = render;

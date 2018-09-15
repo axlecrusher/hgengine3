@@ -114,13 +114,44 @@ protected:
 	BUFFER_USE_TYPE m_useType;
 };
 
+class HgVboRecord {
+public:
+	HgVboRecord()
+		: m_offset(0), m_count(0)
+	{}
+
+	HgVboRecord(std::shared_ptr<IHgVbo>& v, uint32_t o, uint32_t c)
+	: m_vbo(v), m_offset(o), m_count(c)
+	{}
+
+	std::shared_ptr<IHgVbo>& Vbo() { return m_vbo; }
+	uint32_t Offset() const { return m_offset; }
+	uint32_t Count() const { return m_count; }
+
+private:
+	std::shared_ptr<IHgVbo> m_vbo;
+	uint32_t m_offset;
+	uint32_t m_count;
+};
+
 namespace HgVbo {
 	//Factory Function
-	template<typename T> std::unique_ptr<IHgVbo> Create();
-}
+	template<typename T>
+	std::unique_ptr<IHgVbo> Create();
 
-extern std::shared_ptr<IHgVbo> staticVbo;
-extern std::shared_ptr<IHgVbo> staticVboVNU;
-extern std::shared_ptr<IHgVbo> staticVboVNUT;
-extern std::shared_ptr<IHgVbo> staticIndice8;
-extern std::shared_ptr<IHgVbo> staticIndice16;
+	template<typename T>
+	HgVboRecord GenerateUniqueFrom(T* data, uint32_t count) {
+		std::shared_ptr<IHgVbo> vbo = Create<T>();
+		auto offset = vbo->add_data(data, count);
+		return HgVboRecord(vbo, offset, count);
+	}
+
+	template<typename T>
+	HgVboRecord GenerateFrom(T* data, uint32_t count) {
+		static std::shared_ptr<IHgVbo> vbo = Create<T>();
+		auto offset = vbo->add_data(data, count);
+		return HgVboRecord(vbo, offset , count);
+	}
+
+
+}

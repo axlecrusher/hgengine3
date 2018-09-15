@@ -154,7 +154,7 @@ public:
 		inline HgElementLogic& logic() { return *(m_logic.get()); }
 
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
-		void updateGpuTextures();
+		//void updateGpuTextures();
 
 		inline void setParent(HgElement* parent) { m_parent = parent; }
 		HgElement* getParent() const { return m_parent; }
@@ -191,6 +191,8 @@ private:
 	friend HgElementLogic;
 	friend model_data;
 };
+
+typedef HgElement HgEntity;
 
 //Transform point p into world space of HgElement e
 point toWorldSpace(const HgElement* e, const point* p);
