@@ -42,7 +42,7 @@ public:
 
 //		size_t instanceCount = m_items.count();
 		//renderData->instanceCount = instanceCount;
-		renderData->instanceCount = m_instanceCount;
+		renderData->instanceCount = (uint32_t)m_instanceCount;
 		renderData->gpuBuffer = &m_instanceData;
 
 		//enqueue first one found. hope it shares render data

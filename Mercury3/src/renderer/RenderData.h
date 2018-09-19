@@ -49,18 +49,18 @@ public:
 
 	indiceRenderFunc renderFunction; // could store VBO_TYPE instead and make a single function do all the rendering?
 
-	inline IHgVbo* hgVbo() { return m_vertexVboRecord.Vbo().get(); }
-	inline IHgVbo* indexVbo() { return m_indexVboRecord.Vbo().get(); }
-	inline IHgVbo* colorVbo() { return m_colorVbo.get(); }
+	IHgVbo* hgVbo() { return m_vertexVbo.VboRec().Vbo().get(); }
+	IHgVbo* indexVbo() { return m_indexVbo.VboRec().Vbo().get(); }
+	IHgVbo* colorVbo() { return m_colorVbo.VboRec().Vbo().get(); }
 
-	inline void VertexVboRecord(HgVboRecord vbo_rec) { m_vertexVboRecord = vbo_rec; }
-	inline const HgVboRecord& VertexVboRecord() const { return m_vertexVboRecord; }
+	void VertexVboRecord(const VboIndex& vbo_index) { m_vertexVbo = vbo_index; }
+	const HgVboRecord& VertexVboRecord() const { return m_vertexVbo.VboRec(); }
 
-	inline void indexVboRecord(HgVboRecord vbo_rec) { m_indexVboRecord = vbo_rec; }
-	inline const HgVboRecord& indexVboRecord() const { return m_indexVboRecord; }
+	void indexVboRecord(const VboIndex& vbo_index) { m_indexVbo = vbo_index; }
+	const HgVboRecord& indexVboRecord() const { return m_indexVbo.VboRec(); }
 
-	inline void colorVbo(std::shared_ptr<IHgVbo>& vbo) { m_colorVbo = vbo; }
-	inline void colorVbo(std::unique_ptr<IHgVbo>& vbo) { m_colorVbo = std::move(vbo); }
+	void colorVbo(const VboIndex& vbo_index) { m_colorVbo = vbo_index; }
+	//inline void colorVbo(std::unique_ptr<IHgVbo>& vbo) { m_colorVbo = std::move(vbo); }
 
 	void updateGpuTextures();
 
@@ -77,12 +77,9 @@ public:
 
 private:
 	//We need to be able to support multiple VBOs without hardcoding more here.
-	//std::shared_ptr<IHgVbo> m_hgVbo;
-	HgVboRecord m_vertexVboRecord;
-	HgVboRecord m_indexVboRecord;
-
-	//std::shared_ptr<IHgVbo> m_indexVbo;
-	std::shared_ptr<IHgVbo> m_colorVbo;
+	VboIndex m_vertexVbo;
+	VboIndex m_indexVbo;
+	VboIndex m_colorVbo;
 };
 
 typedef std::shared_ptr<RenderData> RenderDataPtr;

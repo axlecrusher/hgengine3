@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <HgTypes.h>
 
+#include <vector>
+
 //#include <HgTypes.h>
 //#include <oglDisplay.h>
 //#include <assert.h>
@@ -134,23 +136,82 @@ private:
 	uint32_t m_count;
 };
 
+class VboIndex {
+public:
+	typedef uint32_t VboIndexType;
+
+	VboIndex() : m_idx(0)
+	{}
+
+	~VboIndex();
+	VboIndex(const VboIndex& o);
+	VboIndex& operator=(VboIndex other) noexcept;
+	VboIndex(VboIndex&& other) noexcept;
+
+	VboIndexType Index() const { return m_idx-1; }
+
+	HgVboRecord& VboRec() const;
+private:
+	void Decrement();
+	void Increment();
+
+	explicit VboIndex(VboIndexType idx) : m_idx(idx+1)
+	{}
+
+	void Index(VboIndexType idx) { m_idx = idx+1; }
+
+	VboIndexType m_idx;
+
+	friend class VboManager;
+};
+
+class VboManager {
+public:
+	typedef uint32_t VboIndexType;
+	VboIndex InsertVboRecord(HgVboRecord& vboRec);
+
+	const HgVboRecord& GetVboRecord(const VboIndex& x) const { return m_vboRecords[x.Index()]; }
+	HgVboRecord& GetVboRecord(const VboIndex& x) { return m_vboRecords[x.Index()]; }
+
+	static VboManager& Singleton() { return singleton; }
+
+private:
+	void IncrementRecordCount(const VboIndex& x);
+	void DecrementRecordCount(const VboIndex& x);
+
+	std::vector< HgVboRecord > m_vboRecords;
+	std::vector< uint32_t > m_useCount;
+	std::vector< uint32_t > m_unusedVboRecords;
+
+	static VboManager singleton;
+	friend class VboIndex;
+};
+
 namespace HgVbo {
 	//Factory Function
 	template<typename T>
 	std::unique_ptr<IHgVbo> Create();
 
 	template<typename T>
-	HgVboRecord GenerateUniqueFrom(T* data, uint32_t count) {
+	VboIndex GenerateUniqueFrom(T* data, uint32_t count) {
+		//std::shared_ptr<IHgVbo> vbo = Create<T>();
+		//auto offset = vbo->add_data(data, count);
+		//return HgVboRecord(vbo, offset, count);
+
 		std::shared_ptr<IHgVbo> vbo = Create<T>();
 		auto offset = vbo->add_data(data, count);
-		return HgVboRecord(vbo, offset, count);
+		return VboManager::Singleton().InsertVboRecord(HgVboRecord(vbo, offset, count));
 	}
 
 	template<typename T>
-	HgVboRecord GenerateFrom(T* data, uint32_t count) {
+	VboIndex GenerateFrom(T* data, uint32_t count) {
+		//static std::shared_ptr<IHgVbo> vbo = Create<T>();
+		//auto offset = vbo->add_data(data, count);
+		//return HgVboRecord(vbo, offset, count);
+
 		static std::shared_ptr<IHgVbo> vbo = Create<T>();
 		auto offset = vbo->add_data(data, count);
-		return HgVboRecord(vbo, offset , count);
+		return VboManager::Singleton().InsertVboRecord(HgVboRecord(vbo, offset, count));
 	}
 
 

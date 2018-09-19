@@ -232,24 +232,27 @@ inline void OGLvbo<uint32_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_of
 
 template<>
 inline void OGLvbo<uint8_t>::draw_instanced(const RenderData* rd) {
-	const auto idx_offset = rd->indexVboRecord().Offset();
-	const auto idx_count = rd->indexVboRecord().Count();
+	const auto& vbo_rec = rd->indexVboRecord();
+	const auto idx_offset = vbo_rec.Offset();
+	const auto idx_count = vbo_rec.Count();
 	const size_t offset = idx_offset * sizeof(uint16_t); //offset into indice buffer
 	glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount);
 }
 
 template<>
 inline void OGLvbo<uint16_t>::draw_instanced(const RenderData* rd) {
-	const auto idx_offset = rd->indexVboRecord().Offset();
-	const auto idx_count = rd->indexVboRecord().Count();
+	const auto& vbo_rec = rd->indexVboRecord();
+	const auto idx_offset = vbo_rec.Offset();
+	const auto idx_count = vbo_rec.Count();
 	const size_t offset = idx_offset * sizeof(uint16_t); //offset into indice buffer
 	glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount);
 }
 
 template<>
 inline void OGLvbo<uint32_t>::draw_instanced(const RenderData* rd) {
-	const auto idx_offset = rd->indexVboRecord().Offset();
-	const auto idx_count = rd->indexVboRecord().Count();
+	const auto& vbo_rec = rd->indexVboRecord();
+	const auto idx_offset = vbo_rec.Offset();
+	const auto idx_count = vbo_rec.Count();
 	const size_t offset = idx_offset * sizeof(uint32_t); //offset into indice buffer
 	glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount);
 }
