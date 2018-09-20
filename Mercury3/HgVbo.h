@@ -158,7 +158,7 @@ private:
 	explicit VboIndex(VboIndexType idx) : m_idx(idx+1)
 	{}
 
-	void Index(VboIndexType idx) { m_idx = idx+1; }
+	//void Index(VboIndexType idx) { m_idx = idx+1; }
 
 	VboIndexType m_idx;
 
@@ -167,7 +167,7 @@ private:
 
 class VboManager {
 public:
-	typedef uint32_t VboIndexType;
+	typedef VboIndex::VboIndexType VboIndexType;
 	VboIndex InsertVboRecord(HgVboRecord& vboRec);
 
 	const HgVboRecord& GetVboRecord(const VboIndex& x) const { return m_vboRecords[x.Index()]; }

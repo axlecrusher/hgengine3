@@ -22,11 +22,12 @@ public:
 	virtual void Clear() = 0;
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
-
-	inline RendererType Type() const { return m_type; }
+	virtual void setRenderAttributes(BlendMode blendMode, RenderFlags flags) = 0;
 	virtual void Viewport(uint8_t idx) = 0;
 
+	RendererType Type() const { return m_type; }
 	void setup_viewports(uint16_t width, uint16_t height);
+
 protected:
 	RendererType m_type;
 

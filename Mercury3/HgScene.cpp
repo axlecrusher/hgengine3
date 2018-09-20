@@ -61,7 +61,7 @@ uint32_t HgScene::getNewElement(HgElement** element) {
 			chunk->set_used(l);
 			e->init();
 			used_count++;
-			e->setScene(this);
+			//e->setScene(this);
 			*element = e;
 			return i;
 		}

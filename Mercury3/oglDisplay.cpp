@@ -29,55 +29,9 @@ char *UniformString[] = {
 	NULL
 };
 
-void setRenderAttributes(BlendMode blendMode, RenderFlags flags) {
-	//if (_currentBlendMode == blendMode) return;
-	//_currentBlendMode = blendMode;
-
-	switch (blendMode) {
-	case BLEND_NORMAL:
-		//glDepthMask(GL_TRUE);
-		glDisable(GL_BLEND);
-//		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		break;
-	case BLEND_ADDITIVE:
-//		glDepthMask(GL_FALSE);
-		glEnable (GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		break;
-	case BLEND_ALPHA:
-//		glDepthMask(GL_TRUE);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		break;
-	}
-
-	if ((flags & FACE_CULLING)>0) {
-		glEnable(GL_CULL_FACE);
-	}
-	else {
-		glDisable(GL_CULL_FACE);
-	}
-
-	if ((flags & DEPTH_WRITE)>0) {
-		glDepthMask(GL_TRUE);
-	}
-	else {
-  		glDepthMask(GL_FALSE);
-	}
-}
-
-void default_render(RenderData* rd) {
-	setRenderAttributes(rd->blendMode, rd->renderFlags);
-	rd->hgVbo()->use();
-	if (rd->colorVbo() != nullptr) rd->colorVbo()->use();
-	rd->indexVbo()->use();
-	rd->indexVbo()->draw(rd);
-}
-
 OGLRenderData::OGLRenderData()
 	:RenderData()
 {
-	renderFunction = default_render;
 	memset(textureID, 0, sizeof(textureID));
 	init();
 }

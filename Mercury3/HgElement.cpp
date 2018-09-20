@@ -26,8 +26,6 @@ void HgElement::init()
 	m_logic = nullptr;
 	m_renderData = nullptr;
 
-	m_extendedData = std::make_unique<HgElementExtended>();
-
 	m_parent = nullptr;
 	m_updateNumber = 0;
 }

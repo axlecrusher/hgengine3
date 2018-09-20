@@ -1,9 +1,10 @@
 #include <RenderData.h>
+#include <RenderBackend.h>
 
 RenderData::newRenderDataCallback RenderData::Create = nullptr;
 
 RenderData::RenderData()
-	:blendMode(BlendMode::BLEND_NORMAL), renderFunction(nullptr),
+	:blendMode(BlendMode::BLEND_NORMAL),
 	renderFlags(RenderFlags(FACE_CULLING | DEPTH_WRITE)), instanceCount(0)
 	, gpuBuffer(nullptr)
 {
@@ -13,6 +14,14 @@ RenderData::RenderData()
 RenderData::~RenderData()
 {
 	destroy();
+}
+
+void RenderData::render() {
+	RENDERER()->setRenderAttributes(blendMode, renderFlags);
+	hgVbo()->use();
+	if (colorVbo() != nullptr) colorVbo()->use();
+	indexVbo()->use();
+	indexVbo()->draw(this);
 }
 
 void RenderData::destroy() {

@@ -95,7 +95,6 @@ static model_data LoadModel(const char* filename) {
 
 static std::shared_ptr<RenderData> init_render_data() {
 	auto rd = OGLRenderData::Create();
-//	rd->baseRender.renderFunc = model_render;
 	return rd;
 }
 
@@ -111,19 +110,6 @@ static void* change_to_model(HgElement* element) {
 	//create an instance of the render data for all triangles to share
 	element->setRenderData( init_render_data() ); //this needs to be per model instance if the model is animated
 	return nullptr;
-}
-
-static void render(RenderData* rd) {
-	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
-	rd->hgVbo()->use();
-//	d->colorVbo->use();
-
-	rd->indexVbo()->use();
-
-	setRenderAttributes(rd->blendMode, rd->renderFlags);
-
-	rd->indexVbo()->draw(rd);
-	//	draw_index_vbo(d->indexVbo, d->vbo_offset);
 }
 
 int8_t model_data::load(HgElement* element, const char* filename) {
@@ -158,10 +144,7 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 		rd->indexVboRecord(iRec);
 	}
 
-	rd->renderFunction = render;
-
 	element->flags.destroy = false;
-	//CLEAR_FLAG(element, HGE_DESTROY);
 
 	return 0;
 }

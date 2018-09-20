@@ -83,3 +83,40 @@ void OGLBackend::Viewport(uint8_t idx) {
 	glScissor(vp.x, vp.y, vp.width, vp.height);
 	glEnable(GL_SCISSOR_TEST);
 }
+
+void OGLBackend::setRenderAttributes(BlendMode blendMode, RenderFlags flags) {
+	//if (_currentBlendMode == blendMode) return;
+	//_currentBlendMode = blendMode;
+
+	switch (blendMode) {
+	case BLEND_NORMAL:
+		//glDepthMask(GL_TRUE);
+		glDisable(GL_BLEND);
+		//		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	case BLEND_ADDITIVE:
+		//		glDepthMask(GL_FALSE);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		break;
+	case BLEND_ALPHA:
+		//		glDepthMask(GL_TRUE);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	}
+
+	if ((flags & FACE_CULLING) > 0) {
+		glEnable(GL_CULL_FACE);
+	}
+	else {
+		glDisable(GL_CULL_FACE);
+	}
+
+	if ((flags & DEPTH_WRITE) > 0) {
+		glDepthMask(GL_TRUE);
+	}
+	else {
+		glDepthMask(GL_FALSE);
+	}
+}

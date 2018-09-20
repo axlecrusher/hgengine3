@@ -47,19 +47,6 @@ public:
 	GLuint textureID[HgTexture::TEXTURE_TYPE_COUNT]; //zero ID to stop rendering
 };
 
-void default_render(RenderData* rd);
-
-//void destroy_render_data_ogl(struct RenderData* render_data);
-//void ogl_destroy_renderData();
-
-//void ogl_render_renderData(RenderData* rd);
-
-
-//void setBlendMode(BlendMode blendMode);
-void setRenderAttributes(BlendMode blendMode, RenderFlags flags);
-
 inline std::shared_ptr<RenderData> new_renderData_ogl() { return std::make_shared<OGLRenderData>(); }
-
-//inline OGLRenderData* getOglRenderData(HgElement* e) { return (OGLRenderData*)e->renderData(); }
 
 uint32_t ogl_updateTextureData(HgTexture* tex);

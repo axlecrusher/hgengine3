@@ -43,18 +43,6 @@ model_data generateVoxelVBO(uint8_t x, uint8_t y) {
 	return std::move(data);
 }
 
-//Draw vertices directly. We aren't using indices here,
-static void render(RenderData* rd) {
-	//Special render call, uses uint16_t as indices rather than uint8_t that the rest of the engine uses
-	//OGLRenderData *d = (OGLRenderData*)rd;
-
-	setRenderAttributes(rd->blendMode, rd->renderFlags);
-
-	rd->hgVbo()->use();
-	rd->indexVbo()->use();
-	rd->indexVbo()->draw(rd);
-}
-
 static void SetupRenderData() {
 	model_data data;
 	if (voxelGridVertices == NULL) {

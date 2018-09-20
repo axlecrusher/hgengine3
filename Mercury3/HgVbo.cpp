@@ -12,7 +12,7 @@
 //static void* _currentVbo;
 
 VboManager VboManager::singleton;
-HgVboRecord emptyRec; // >:(
+static HgVboRecord emptyRec; // >:(
 
 VboIndex VboManager::InsertVboRecord(HgVboRecord& vboRec) {
 	VboIndexType index;

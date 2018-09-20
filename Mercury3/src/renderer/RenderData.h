@@ -37,17 +37,14 @@ public:
 	RenderData();
 	virtual ~RenderData();
 
-	inline void render() {
-		renderFunction(this);
-	}
+	void render();
+
 	void destroy();
 	void init();
 	virtual void clearTextureIDs() = 0;
 	virtual void setTexture(const HgTexture* t) = 0;
 
 	HgShader* shader;
-
-	indiceRenderFunc renderFunction; // could store VBO_TYPE instead and make a single function do all the rendering?
 
 	IHgVbo* hgVbo() { return m_vertexVbo.VboRec().Vbo().get(); }
 	IHgVbo* indexVbo() { return m_indexVbo.VboRec().Vbo().get(); }

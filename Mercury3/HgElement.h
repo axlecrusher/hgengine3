@@ -44,15 +44,15 @@ protected:
 	HgElement* element; //just a weak pointer back to the parent
 };
 
-class HgElementExtended {
-public:
-	//HgElement* owner; //what is this for?
-	//std::vector< HgTexture::TexturePtr > textures;
-
-	HgScene* m_scene; //Scene that element is a member of
-
-	bool m_ownRenderData;
-};
+//class HgElementExtended {
+//public:
+//	//HgElement* owner; //what is this for?
+//	//std::vector< HgTexture::TexturePtr > textures;
+//
+//	HgScene* m_scene; //Scene that element is a member of
+//
+//	bool m_ownRenderData;
+//};
 
 struct PositionalData {
 	//position, and rotation are in global coordinate system
@@ -165,7 +165,7 @@ public:
 		RenderData* renderData() { return m_renderData.get(); }
 		RenderDataPtr& getRenderDataPtr() { return m_renderData; }
 
-		inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
+		//inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 
 		HgMath::mat4f computeWorldSpaceMatrix(bool scale = true, bool rotation = true, bool translation = true) const;
 
@@ -183,10 +183,6 @@ private:
 	std::unique_ptr<HgElementLogic> m_logic;
 	//std::weak_ptr<HgElement> m_parent;
 	HgElement* m_parent; //checked every update.
-
-	/*	Storage for data that we don't need to access frequently and thus may not be cached.
-		This should not be accessed on every update or render. */
-	std::unique_ptr<HgElementExtended> m_extendedData;
 
 	friend HgElementLogic;
 	friend model_data;

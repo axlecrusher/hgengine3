@@ -68,13 +68,6 @@ static void destroy(HgElement* e) {
 	e->destroy();
 }
 
-//Draw vertices directly. We aren't using indices here,
-static void cube_render(RenderData* rd) {
-	setRenderAttributes(rd->blendMode, rd->renderFlags);
-	rd->hgVbo()->use();
-	rd->hgVbo()->draw(rd);
-}
-
 static void SetupRenderData() {
 	crd = OGLRenderData::Create();
 
