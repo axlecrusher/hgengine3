@@ -194,7 +194,7 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 		if (tmp != nullptr) {
 
 			renderData->textures.push_back(std::move(tmp));
-			renderData->updateTextures = true;
+			renderData->updateTextures(true);
 		}
 	}
 
@@ -203,7 +203,7 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 		auto tmp = HgTexture::acquire(specularTexture, HgTexture::SPECULAR);
 		if (tmp != nullptr) {
 			renderData->textures.push_back(std::move(tmp));
-			renderData->updateTextures = true;
+			renderData->updateTextures(true);
 		}
 	}
 
@@ -212,7 +212,7 @@ bool model_data::load_ini(HgElement* element, const IniLoader::Contents& content
 		auto tmp = HgTexture::acquire(normalTexture, HgTexture::NORMAL);
 		if (tmp != nullptr) {
 			renderData->textures.push_back(std::move(tmp));
-			renderData->updateTextures = true;
+			renderData->updateTextures(true);
 		}
 	}
 

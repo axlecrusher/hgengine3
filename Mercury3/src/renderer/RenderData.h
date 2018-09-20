@@ -22,17 +22,32 @@ enum BlendMode : uint8_t {
 	BLEND_INVALID = 0xFF
 };
 
-enum RenderFlags : uint8_t {
-	NONE = 0,
-	FACE_CULLING = 1,
-	DEPTH_WRITE = 2
-};
+//enum RenderFlags : uint8_t {
+//	NONE = 0,
+//	FACE_CULLING = 1,
+//	DEPTH_WRITE = 2
+//};
 
 class RenderData {
+private:
+	//We need to be able to support multiple VBOs without hardcoding more here.
+	VboIndex m_vertexVbo;
+	VboIndex m_indexVbo;
+	VboIndex m_colorVbo;
+
 public:
 	typedef std::shared_ptr<RenderData>(*newRenderDataCallback)();
-	typedef void(*indiceRenderFunc)(RenderData* rd);
+	//typedef void(*indiceRenderFunc)(RenderData* rd);
 	static newRenderDataCallback Create;
+	
+	struct Flags {
+		Flags() : FACE_CULLING(true), DEPTH_WRITE(true), updateTextures(false)
+		{}
+
+		bool FACE_CULLING : 1;
+		bool DEPTH_WRITE : 1;
+		bool updateTextures : 1;
+	};
 
 	RenderData();
 	virtual ~RenderData();
@@ -43,8 +58,6 @@ public:
 	void init();
 	virtual void clearTextureIDs() = 0;
 	virtual void setTexture(const HgTexture* t) = 0;
-
-	HgShader* shader;
 
 	IHgVbo* hgVbo() { return m_vertexVbo.VboRec().Vbo().get(); }
 	IHgVbo* indexVbo() { return m_indexVbo.VboRec().Vbo().get(); }
@@ -60,23 +73,22 @@ public:
 	//inline void colorVbo(std::unique_ptr<IHgVbo>& vbo) { m_colorVbo = std::move(vbo); }
 
 	void updateGpuTextures();
+	bool updateTextures() const { return renderFlags.updateTextures; }
+	void updateTextures(bool t) { renderFlags.updateTextures = t; }
 
-	BlendMode blendMode;
-	RenderFlags renderFlags;
+	uint32_t instanceCount;
+
+	HgShader* shader;
+
+	//RenderFlags renderFlags;
 
 	//std::shared_ptr<IHgGPUBuffer> gpuBuffer;
 	IHgGPUBuffer* gpuBuffer;
 
-	uint32_t instanceCount;
-
 	std::vector< HgTexture::TexturePtr > textures;
-	bool updateTextures;
 
-private:
-	//We need to be able to support multiple VBOs without hardcoding more here.
-	VboIndex m_vertexVbo;
-	VboIndex m_indexVbo;
-	VboIndex m_colorVbo;
+	BlendMode blendMode;
+	Flags renderFlags;
 };
 
 typedef std::shared_ptr<RenderData> RenderDataPtr;

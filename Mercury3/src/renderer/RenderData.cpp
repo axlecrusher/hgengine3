@@ -4,8 +4,7 @@
 RenderData::newRenderDataCallback RenderData::Create = nullptr;
 
 RenderData::RenderData()
-	:blendMode(BlendMode::BLEND_NORMAL),
-	renderFlags(RenderFlags(FACE_CULLING | DEPTH_WRITE)), instanceCount(0)
+	:blendMode(BlendMode::BLEND_NORMAL), instanceCount(0)
 	, gpuBuffer(nullptr)
 {
 

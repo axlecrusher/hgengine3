@@ -18,7 +18,7 @@ public:
 	void EndFrame();
 	void Viewport(uint8_t idx);
 
-	void setRenderAttributes(BlendMode blendMode, RenderFlags flags);
+	void setRenderAttributes(BlendMode blendMode, RenderData::Flags flags);
 };
 
 extern OGLBackend oglRenderer;

@@ -84,7 +84,7 @@ void OGLBackend::Viewport(uint8_t idx) {
 	glEnable(GL_SCISSOR_TEST);
 }
 
-void OGLBackend::setRenderAttributes(BlendMode blendMode, RenderFlags flags) {
+void OGLBackend::setRenderAttributes(BlendMode blendMode, RenderData::Flags flags) {
 	//if (_currentBlendMode == blendMode) return;
 	//_currentBlendMode = blendMode;
 
@@ -106,14 +106,14 @@ void OGLBackend::setRenderAttributes(BlendMode blendMode, RenderFlags flags) {
 		break;
 	}
 
-	if ((flags & FACE_CULLING) > 0) {
+	if (flags.FACE_CULLING) {
 		glEnable(GL_CULL_FACE);
 	}
 	else {
 		glDisable(GL_CULL_FACE);
 	}
 
-	if ((flags & DEPTH_WRITE) > 0) {
+	if (flags.DEPTH_WRITE) {
 		glDepthMask(GL_TRUE);
 	}
 	else {

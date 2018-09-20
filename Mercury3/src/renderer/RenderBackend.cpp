@@ -44,9 +44,9 @@ static void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, Ren
 	RENDERER()->Viewport(viewport_idx);
 
 	//load texture data to GPU here. Can this be made to be done right after loading the image data, regardless of thread?
-	if (renderData->updateTextures) {
+	if (renderData->updateTextures()) {
 		renderData->updateGpuTextures();
-		renderData->updateTextures = false;
+		renderData->updateTextures(false);
 	}
 
 	HgShader* shader = renderData->shader;

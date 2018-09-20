@@ -22,7 +22,7 @@ public:
 	virtual void Clear() = 0;
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
-	virtual void setRenderAttributes(BlendMode blendMode, RenderFlags flags) = 0;
+	virtual void setRenderAttributes(BlendMode blendMode, RenderData::Flags flags) = 0;
 	virtual void Viewport(uint8_t idx) = 0;
 
 	RendererType Type() const { return m_type; }
