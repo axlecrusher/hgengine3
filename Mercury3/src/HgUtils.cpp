@@ -5,6 +5,10 @@
 
 #include <Windows.h>
 #include <stdio.h>
+#include <HgMessaging.h>
+
+#include <MercuryWindow.h>
+#include <RenderBackend.h>
 
 static int SymnumCheck(const char * path, const char * name, void * location, long size)
 {
@@ -21,6 +25,12 @@ namespace ENGINE {
 	void InitEngine() {
 		EnumberateSymbols();
 		SetRealtimePriority();
+		InitMessageSystem();
+	}
+	
+	void StartWindowSystem() {
+		MercuryWindow::MakeWindow();
+		Renderer::Init();
 	}
 
 	void EnumberateSymbols() {

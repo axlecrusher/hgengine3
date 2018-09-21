@@ -56,6 +56,10 @@ Win32Window::Win32Window(const MString& title, int width, int height, int bits, 
 	GenPixelType();
 	SetPixelType();
 	CreateRenderingContext();
+
+	if (fullscreen) {
+		ChangeDisplaySettings();
+	}
 }
 
 Win32Window::~Win32Window()
@@ -115,6 +119,10 @@ void Win32Window::GenWindow()
 	dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	dwStyle = WS_OVERLAPPEDWINDOW;
 
+	if (m_fullscreen) {
+		dwStyle = WS_POPUP;
+	}
+
 	rect.left=(long)0;
 	rect.right=(long)m_width;
 	rect.top=(long)0;
@@ -154,6 +162,52 @@ void Win32Window::GenWindow()
 	SetWindowPos( m_hwnd, HWND_TOP, 0, 0, diffx + m_width, diffy + m_height, 0 );
 
 //	wglSwapInterval(0);
+}
+
+void Win32Window::ChangeDisplaySettings() {
+	DEVMODE screenSettings;
+	memset(&screenSettings, 0, sizeof(screenSettings));
+	screenSettings.dmSize = sizeof(screenSettings);
+	screenSettings.dmPelsWidth = m_width;
+	screenSettings.dmPelsHeight = m_height;
+	screenSettings.dmBitsPerPel = m_bits;
+	screenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+	DWORD dwFlags = 0;
+	dwFlags = m_fullscreen ? CDS_FULLSCREEN | dwFlags : dwFlags;
+
+	auto r = ::ChangeDisplaySettings(&screenSettings, dwFlags);
+
+	char* error_msg = nullptr;
+
+	switch (r) {
+	case DISP_CHANGE_SUCCESSFUL:
+		break;
+	case DISP_CHANGE_BADDUALVIEW:
+		error_msg = "The settings change was unsuccessful because the system is DualView capable.";
+		break;
+	case DISP_CHANGE_BADFLAGS:
+		error_msg = "An invalid set of flags was passed in.";
+		break;
+	case DISP_CHANGE_BADMODE:
+		error_msg = "The graphics mode is not supported.";
+		break;
+	case DISP_CHANGE_BADPARAM:
+		error_msg = "An invalid parameter was passed in.This can include an invalid flag or combination of flags.";
+		break;
+	case DISP_CHANGE_FAILED:
+		error_msg = "The display driver failed the specified graphics mode.";
+		break;
+	case DISP_CHANGE_NOTUPDATED:
+		error_msg = "Unable to write settings to the registry.";
+		break;
+	case DISP_CHANGE_RESTART:
+		error_msg = "The computer must be restarted for the graphics mode to work.";
+		break;
+	}
+	if (error_msg != nullptr) {
+		fprintf(stderr, "Failed to change screen mode: %s\n", error_msg);
+	}
 }
 
 void Win32Window::SetPixelType()

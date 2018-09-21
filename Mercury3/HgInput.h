@@ -16,4 +16,11 @@ extern HgMouseInput MOUSE_INPUT;
 
 #ifdef __cplusplus
 }
+
+namespace ENGINE {
+	namespace INPUT {
+		void PumpMessages();
+	}
+}
+
 #endif

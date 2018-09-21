@@ -5,6 +5,7 @@
 
 namespace ENGINE {
 	void InitEngine();
+	void StartWindowSystem();
 	void EnumberateSymbols();
 	void SetRealtimePriority();
 }
