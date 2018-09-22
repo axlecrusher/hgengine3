@@ -44,25 +44,16 @@ volatile int8_t needRender = 1;
 
 #define EYE_DISTANCE -0.07f
 
-//uint8_t KeyDownMap[512];
-
-MercuryWindow* window = NULL;
-
 #define USE_RENDER_THREAD 0
 
-void StartWindowSystem() {
-	window = MercuryWindow::MakeWindow();
-	Renderer::Init();
-}
-
 void BeginFrame() {
-	window->PumpMessages();
+	ENGINE::INPUT::PumpMessages();
 	RENDERER()->Clear();
 	RENDERER()->BeginFrame();
 }
 
 int32_t RenderThreadLoop() {
-	MercuryWindow* w = window;
+	MercuryWindow* w = MercuryWindow::GetCurrentWindow();
 
 	uint8_t stop_frame = 0;
 	while (1) {
@@ -108,7 +99,7 @@ int32_t RenderThreadLoop() {
 }
 
 DWORD WINAPI StartRenderThread(LPVOID lpParam) {
-	StartWindowSystem();
+	ENGINE::StartWindowSystem();
 	return RenderThreadLoop();
 }
 
@@ -169,21 +160,31 @@ void vertex_print(const vertex* v) {
 
 int main()
 {
-	ENGINE::InitEngine();
-
 	stereo_view = false;
 
-	StartWindowSystem();
+	ENGINE::InitEngine();
+	ENGINE::StartWindowSystem();
+
+	auto window = MercuryWindow::GetCurrentWindow();
+
+	int width = window->CurrentWidth();
+	int height = window->CurrentHeight();
 
 	if (stereo_view) {
-		RENDERER()->setup_viewports(1280, 480);
-		//		Perspective2(60, 1280.0 / 480.0, 0.1f, 100.0f, projection);
+		RENDERER()->setup_viewports(width, height);
+		double renderWidth = width / 2.0;
+		double renderHeight = height;
+		Perspective2(60, renderWidth / renderHeight, 0.1f, 100.0f, projection);
 	}
 	else {
-		RENDERER()->setup_viewports(640, 480);
+		RENDERER()->setup_viewports(width, height);
+		double renderWidth = width;
+		double renderHeight = height;
+		double aspect = renderWidth / renderHeight;
+		Perspective2(60, aspect, 0.1f, 100.0f, projection);
+		//auto tmp = HgMath::mat4f::perspective(60*DEG_RAD, aspect, 0.1f, 100.0f);
+		//tmp.store(projection);
 	}
-
-	Perspective2(60, 640.0 / 480.0, 0.1f, 100.0f, projection);
 
 	uint8_t s = sizeof(HgElement);
 	printf("element size %d\n", s);
