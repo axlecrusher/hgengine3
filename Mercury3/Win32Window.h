@@ -5,6 +5,8 @@
 #include <MercuryWindow.h>
 //#include <MScopedArray.h>
 
+#include <HgInput.h>
+
 extern bool stereo_view;
 
 ///Win32 Window Driver
@@ -18,9 +20,13 @@ public:
 
 	static MercuryWindow* GenWin32Window();
 	virtual void* GetProcAddress(const MString& x);
-	static uint16_t ConvertScancode( size_t scanin );
-
+	//static uint16_t ConvertScancode( size_t scanin );
+	static ENGINE::INPUT::KeyCodes ConvertScancode2(size_t virtualKey);
+	
 private:
+	LONG_PTR ChangeStyle(DWORD dwStyle);
+	void TryFullscreen();
+
 	bool IsKeyRepeat(size_t c);
 	static LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -30,7 +36,7 @@ private:
 	void CreateRenderingContext();
 	void GenPixelType();
 
-	void ChangeDisplaySettings();
+	bool ChangeDisplaySettings();
 
 	HWND m_hwnd; //window handle
 	HDC m_hdc; //device handle
@@ -39,6 +45,7 @@ private:
 
 	WNDCLASSEX m_wndclass;
 	HINSTANCE m_hInstance;
+	DWORD m_dwStyle;
 
 	ATOM m_windowAtom;
 

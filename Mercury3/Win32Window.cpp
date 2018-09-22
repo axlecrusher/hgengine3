@@ -29,7 +29,7 @@ MercuryWindow* Win32Window::GenWin32Window()
 {
 	if (stereo_view)
 		return new Win32Window("Mercury3", 1280, 480, 24, 16, false);
-	return new Win32Window("Mercury3", 640, 480, 24, 16, false);
+	return new Win32Window("Mercury3", 1920, 1080, 24, 16, true);
 }
 
 template<typename STRTYPE>
@@ -105,7 +105,7 @@ static Win32Window* windowInstances[1] = { 0 };
 void Win32Window::GenWindow()
 {
 	DWORD dwExStyle; // Window Extended Style
-	DWORD dwStyle;	// Window Style
+	//DWORD dwStyle;	// Window Style
 	RECT rect;
 
 	m_windowAtom = RegisterClassEx( &m_wndclass );
@@ -117,16 +117,25 @@ void Win32Window::GenWindow()
 	}
 
 	dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
-	dwStyle = WS_OVERLAPPEDWINDOW;
 
-	if (m_fullscreen) {
-		dwStyle = WS_POPUP;
-	}
+	//if (m_fullscreen) {
+	//	dwStyle = WS_POPUP; //required for fullscreen
+	//}
 
 	rect.left=(long)0;
-	rect.right=(long)m_width;
+	rect.right=(long)m_requestedWidth;
 	rect.top=(long)0;
-	rect.bottom=(long)m_height;	
+	rect.bottom=(long)m_requestedHeight;	
+
+	//store default window style values
+	m_dwStyle = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	m_dwStyle |= WS_OVERLAPPEDWINDOW; //windowed mode
+
+	auto dwStyle = m_dwStyle;
+
+	if (m_fullscreen) {
+		dwStyle = WS_POPUP; //required for fullscreen
+	}
 
 	AdjustWindowRectEx(&rect, dwStyle, FALSE, dwExStyle);
 
@@ -134,10 +143,10 @@ void Win32Window::GenWindow()
 		dwExStyle,
 		(LPCWSTR)m_windowAtom,
 		m_winTitle,
-		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | dwStyle,
+		dwStyle,
 		0, 0,
-		m_width,
-		m_height,
+		m_requestedWidth,
+		m_requestedHeight,
 		NULL,
 		NULL,
 		m_hInstance,
@@ -157,19 +166,33 @@ void Win32Window::GenWindow()
 
 	//Resize windows so it's actually as big as we want, not minus borders.s
 	GetClientRect( m_hwnd, &rect );
-	int diffx = m_width - rect.right;
-	int diffy = m_height - rect.bottom;
-	SetWindowPos( m_hwnd, HWND_TOP, 0, 0, diffx + m_width, diffy + m_height, 0 );
+	int diffx = m_requestedWidth - rect.right;
+	int diffy = m_requestedHeight - rect.bottom;
+	SetWindowPos( m_hwnd, HWND_TOP, 0, 0, diffx + m_requestedWidth, diffy + m_requestedHeight, 0 );
+
+	GetClientRect(m_hwnd, &rect);
+	m_currentWidth = rect.right;
+	m_currentHeight = rect.bottom;
 
 //	wglSwapInterval(0);
 }
 
-void Win32Window::ChangeDisplaySettings() {
+LONG_PTR Win32Window::ChangeStyle(DWORD dwStyle) {
+	auto oldStyle = SetWindowLongPtr(m_hwnd, GWL_STYLE, dwStyle);
+
+	ShowWindow(m_hwnd, SW_SHOW);	//needed after SetWindowLongPtr
+	SetForegroundWindow(m_hwnd);	// Slightly Higher Priority
+	SetFocus(m_hwnd);				// Sets Keyboard Focus To The Window
+
+	return oldStyle;
+}
+
+bool Win32Window::ChangeDisplaySettings() {
 	DEVMODE screenSettings;
 	memset(&screenSettings, 0, sizeof(screenSettings));
 	screenSettings.dmSize = sizeof(screenSettings);
-	screenSettings.dmPelsWidth = m_width;
-	screenSettings.dmPelsHeight = m_height;
+	screenSettings.dmPelsWidth = m_requestedWidth;
+	screenSettings.dmPelsHeight = m_requestedHeight;
 	screenSettings.dmBitsPerPel = m_bits;
 	screenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
@@ -179,6 +202,7 @@ void Win32Window::ChangeDisplaySettings() {
 	auto r = ::ChangeDisplaySettings(&screenSettings, dwFlags);
 
 	char* error_msg = nullptr;
+	bool ret = true;
 
 	switch (r) {
 	case DISP_CHANGE_SUCCESSFUL:
@@ -207,7 +231,29 @@ void Win32Window::ChangeDisplaySettings() {
 	}
 	if (error_msg != nullptr) {
 		fprintf(stderr, "Failed to change screen mode: %s\n", error_msg);
+		ret = false;
 	}
+
+	RECT rect;
+	GetClientRect(m_hwnd, &rect);
+	m_currentWidth = rect.right;
+	m_currentHeight = rect.bottom;
+
+	return ret;
+}
+
+void Win32Window::TryFullscreen() {
+	DWORD dwStyle = m_dwStyle;
+	if (m_fullscreen) {
+		dwStyle = WS_POPUP;
+	}
+
+	auto oldStyle = ChangeStyle(dwStyle);
+
+	//if (m_fullscreen) {
+		ChangeDisplaySettings();
+	//}
+	//maybe chake back to old settings if not fullscreen
 }
 
 void Win32Window::SetPixelType()
@@ -287,35 +333,37 @@ bool Win32Window::PumpMessages()
 		{
 			RECT rect;
 			GetWindowRect(m_hwnd, &rect);
-			SetCursorPos( rect.left + m_width/2, rect.top + m_height/2 );
+			SetCursorPos( rect.left + m_currentWidth/2, rect.top + m_currentHeight/2 );
 		}
 		
 	}
 
 	while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
 	{
-		RECT rect;
-		GetClientRect( m_hwnd, &rect );
-		m_width = rect.right;
-		m_height = rect.bottom;
-
 		if ( InFocus() )
 		{
 			switch( message.message )
 			{
+			//case WM_MINMAXINFO:
+			//	break;
+			case WM_CHAR:
+				//probably useful for typing purposes
+				break;
+			case WM_SYSKEYDOWN:
 			case WM_KEYDOWN:
 				{
 					if ( IsKeyRepeat(message.lParam) ) break;
-//					printf("event %d\n", ConvertScancode(message.lParam));
-					uint16_t x = ConvertScancode(message.lParam);
+					auto x = ConvertScancode2(message.wParam);
 					KeyDownMap[x] = 1;
+					printf("key: 0x%x\n", message.wParam);
 //					KeyboardInput::ProcessKeyInput( ConvertScancode( message.lParam ), true, false);
 				}
 				break;
+			case WM_SYSKEYUP:
 			case WM_KEYUP:
 				{
 					if ( IsKeyRepeat(message.lParam) ) break;
-					uint16_t x = ConvertScancode(message.lParam);
+					auto x = ConvertScancode2(message.wParam);
 					KeyDownMap[x] = 0;
 //					KeyboardInput::ProcessKeyInput( ConvertScancode( message.lParam ), false, false);
 				}
@@ -338,8 +386,8 @@ bool Win32Window::PumpMessages()
 					if( GlobalMouseGrabbed_Set )
 					{
 						int x, y;
-						x = m_width/2 - px;
-						y = m_height/2 - py;
+						x = m_currentWidth/2 - px;
+						y = m_currentHeight/2 - py;
 
 
 						if (x!=0 || y!=0) //prevent recursive XWarp
@@ -352,8 +400,8 @@ bool Win32Window::PumpMessages()
 							//							MouseInput::ProcessMouseInput(x, y, left, right, center, su, sd, true);
 							lastx = x; lasty = y;
 							
-							pos.x = m_width/2;
-							pos.y = m_height/2;
+							pos.x = m_currentWidth/2;
+							pos.y = m_currentHeight/2;
 							ClientToScreen(m_hwnd, &pos );
 							SetCursorPos( pos.x, pos.y);
 							if( bWasCursorVisible )
@@ -392,7 +440,7 @@ bool Win32Window::PumpMessages()
 //				MouseInput::ProcessMouseInput( lastx, lasty, GetBit(message.wParam,MK_LBUTTON), 
 //					GetBit(message.wParam,MK_RBUTTON), GetBit(message.wParam,MK_MBUTTON), 0, 0, false);
 				break;
-			case 0x020A: //Not-too-well-documented mouse wheel.
+			case WM_MOUSEHWHEEL: //Not-too-well-documented mouse wheel.
 			{
 				short cx = short(message.wParam>>16);
 //				MouseInput::ProcessMouseInput( lastx, lasty, GetBit(message.wParam,MK_LBUTTON), 
@@ -403,9 +451,13 @@ bool Win32Window::PumpMessages()
 			}
 			}
 		}
+
 		TranslateMessage(&message);				// Translate The Message
-		DispatchMessage(&message);				// Dispatch The Message
+		if (message.message != WM_SYSKEYDOWN && message.message != WM_SYSKEYUP) {
+			DispatchMessage(&message);				// Dispatch The Message
+		}
 	}
+	KeyDownMap[0] = 0;
 	return true;
 }
 
@@ -417,115 +469,271 @@ void* Win32Window::GetProcAddress(const MString& x)
 bool Win32Window::IsKeyRepeat(size_t c)
 {
 //	printf("count %d\n", (c&65535));
-	return (c&65535) > 1;
+	return (c&0xffff) > 1;
 }
 
-uint16_t Win32Window::ConvertScancode( size_t scanin )
+ENGINE::INPUT::KeyCodes Win32Window::ConvertScancode2(size_t virtualKey)
 {
-//	Specifies the scan code. The value depends on the OEM.
-	scanin = (scanin>>16)&511;
-	switch( scanin )
-	{
-	case 1: return 27;      //esc
-	case 0: return '0';
-	case 41: return 97;     //`
-	case 14: return 8;      //backspace
-	case 87: return 292;    //F11
-	case 88: return 293;    //F12
-	case 12: return 45;     //-
-	case 13: return 61;     //=
-	case 43: return 92;     //backslash
-	case 15: return 9;      //tab
-	case 58: return 15;     //Caps lock
-	case 42: return 160;    //[lshift]
-	case 54: return 161;    //[rshift]
+	using namespace ENGINE::INPUT;
 
-	case 30: return 'a';
-	case 48: return 'b';
-	case 46: return 'c';
-	case 32: return 'd';
-	case 18: return 'e';
-	case 33: return 'f';
-	case 34: return 'g';
-	case 35: return 'h';
-	case 23: return 'i';
-	case 36: return 'j';
-	case 37: return 'k';	
-	case 38: return 'l';	
-	case 50: return 'm';	
-	case 49: return 'n';	
-	case 24: return 'o';	
-	case 25: return 'p';	
-	case 16: return 'q';	
-	case 19: return 'r';	
-	case 31: return 's';	
-	case 20: return 't';	
-	case 22: return 'u';	
-	case 47: return 'v';	
-	case 17: return 'w';	
-	case 45: return 'x';	
-	case 21: return 'y';	
-	case 44: return 'z';	
-
-	case 39: return 59;	//;
-	case 40: return 39;	//'
-	case 51: return 44;	//,
-	case 52: return 46;	//.
-	case 53: return 47;	// /
-
-	case 328: return 273;	//arrow keys: up
-	case 331: return 276;	//arrow keys: left
-	case 333: return 275;	//arrow keys: right
-	case 336: return 274;	//arrow keys: down
-//STOPPED HERE
-	case 29: return 162;	//left ctrl
-	case 347: return 91;	//left super (aka win)
-	case 64: return 164;	//left alt
-	case 57: return 32;	//space bar
-	case 108: return 165;	//right alt
-	case 134: return 91;	//right super (aka win)
-	case 349: return 93;	//menu
-	case 285: return 268;	//right control
-	
-	case 107: return 316;	//Print Screen
-	//case 78: scroll lock
-	case 127: return 19;	//Pause
-	case 118: return 277;	//Insert
-	case 110: return 278;	//Home
-	case 112: return 280;	//Page Up
-	case 119: return 127;	//Delete
-	case 115: return 279;	//End
-	case 117: return 181;	//Page Down
-	
-	//case 77: Num Lock (not mapped)
-	case 106: return 267;	//Keypad /
-	case 63: return 268;	//Keypad *
-	case 82: return 269;	//Keypad -
-	case 79: return 263;	//Keypad 7
-	case 80: return 264;	//Keypad 8
-	case 81: return 265;	//Keypad 9
-	case 86: return 270;	//Keypad +
-	case 83: return 260;	//Keypad 4
-	case 84: return 261;	//Keypad 5
-	case 85: return 262;	//Keypad 6
-//	case 87: return 257;	//Keypad 1
-//	case 88: return 258;	//Keypad 2
-	case 89: return 259;	//Keypad 3
-//	case 36:		//Enter
-	case 104: return 13;	//Keypad enter
-	case 90: return 260;	//Keypad 0
-	case 91: return 266;	//Keypad .
-	
-	default:
-		// numbers
-		if( scanin >= 10 && scanin <= 18 )
-			return (uint16_t)(scanin + ( (short)'1' - 10 ));
-		// f1 -- f10
-		if( scanin >= 67 && scanin <= 76 )
-			return (uint16_t)(scanin + ( 282 - 67 ));
-		return (uint16_t)scanin;
+	//numbers
+	if (virtualKey >= 0x30 && virtualKey <= 0x39) {
+		const auto t = virtualKey - 0x30;
+		return (KeyCodes)(KeyCodes::KEY_0 + t);
 	}
+
+	//letters
+	if (virtualKey >= 0x41 && virtualKey <= 0x5A) {
+		const auto t = virtualKey - 0x41;
+		return (KeyCodes)(KeyCodes::KEY_A + t);
+	}
+
+	switch (virtualKey) {
+	case VK_LBUTTON:			break;
+	case VK_RBUTTON:			break;
+	case VK_CANCEL:				break;
+	case VK_MBUTTON:			break;
+	case VK_XBUTTON1:			break;
+	case VK_XBUTTON2:			break;
+	case VK_BACK:				return KeyCodes::KEY_BACKSPACE;
+	case VK_TAB:				return KeyCodes::KEY_TAB;
+	case VK_CLEAR:				return KeyCodes::KEY_CLEAR;
+	case VK_RETURN:				return KeyCodes::KEY_ENTER;
+	case VK_SHIFT:				return KeyCodes::KEY_SHIFT;
+	case VK_CONTROL:			return KeyCodes::KEY_CONTROL;
+	case VK_MENU:				return KeyCodes::KEY_ALT;
+	case VK_PAUSE:				return KeyCodes::KEY_PAUSE;
+	case VK_CAPITAL:			return KeyCodes::KEY_CAPS;
+	case VK_ESCAPE:				return KeyCodes::KEY_ESCAPE;
+	case VK_CONVERT:			break;
+	case VK_NONCONVERT:			break;
+	case VK_ACCEPT:				break;
+	case VK_MODECHANGE:			break;
+	case VK_SPACE:				return KeyCodes::KEY_SPACE;
+	case VK_PRIOR:				return KeyCodes::KEY_PAGEUP;
+	case VK_NEXT:				return KeyCodes::KEY_PAGEDOWN;
+	case VK_END:				return KeyCodes::KEY_END;
+	case VK_HOME:				return KeyCodes::KEY_HOME;
+	case VK_LEFT:				return KeyCodes::KEY_LEFTARROW;
+	case VK_UP:					return KeyCodes::KEY_UPARROW;
+	case VK_RIGHT:				return KeyCodes::KEY_RIGHTARROW;
+	case VK_DOWN:				return KeyCodes::KEY_DOWNARROW;
+	case VK_SELECT:				return KeyCodes::KEY_SELECT;
+	case VK_PRINT:				return KeyCodes::KEY_PRINT;
+	case VK_EXECUTE:			return KeyCodes::KEY_EXE;
+	case VK_SNAPSHOT:			return KeyCodes::KEY_PRINTSCREEN;
+	case VK_INSERT:				return KeyCodes::KEY_INSERT;
+	case VK_DELETE:				return KeyCodes::KEY_DELETE;
+	case VK_HELP:				return KeyCodes::KEY_HELP;
+	case VK_LWIN:				return KeyCodes::KEY_LWINDOWS;
+	case VK_RWIN:				return KeyCodes::KEY_RWINDOWS;
+	case VK_APPS:				break;
+	case VK_SLEEP:				break;
+	case VK_NUMPAD0:			return KeyCodes::KEY_NUM0;
+	case VK_NUMPAD1:			return KeyCodes::KEY_NUM1;
+	case VK_NUMPAD2:			return KeyCodes::KEY_NUM2;
+	case VK_NUMPAD3:			return KeyCodes::KEY_NUM3;
+	case VK_NUMPAD4:			return KeyCodes::KEY_NUM4;
+	case VK_NUMPAD5:			return KeyCodes::KEY_NUM5;
+	case VK_NUMPAD6:			return KeyCodes::KEY_NUM6;
+	case VK_NUMPAD7:			return KeyCodes::KEY_NUM7;
+	case VK_NUMPAD8:			return KeyCodes::KEY_NUM8;
+	case VK_NUMPAD9:			return KeyCodes::KEY_NUM9;
+	case VK_MULTIPLY:			return KeyCodes::KEY_MULTIPLY;
+	case VK_ADD:				return KeyCodes::KEY_ADD;
+	case VK_SEPARATOR:			break;
+	case VK_SUBTRACT:			return KeyCodes::KEY_SUBTRACT;
+	case VK_DECIMAL:			return KeyCodes::KEY_DECIMAL;
+	case VK_DIVIDE:				return KeyCodes::KEY_DIVIDE;
+	case VK_F1:					return KeyCodes::KEY_F1;
+	case VK_F2:					return KeyCodes::KEY_F2;
+	case VK_F3:					return KeyCodes::KEY_F3;
+	case VK_F4:					return KeyCodes::KEY_F4;
+	case VK_F5:					return KeyCodes::KEY_F5;
+	case VK_F6:					return KeyCodes::KEY_F6;
+	case VK_F7:					return KeyCodes::KEY_F7;
+	case VK_F8:					return KeyCodes::KEY_F8;
+	case VK_F9:					return KeyCodes::KEY_F9;
+	case VK_F10:				return KeyCodes::KEY_F10;
+	case VK_F11:				return KeyCodes::KEY_F11;
+	case VK_F12:				return KeyCodes::KEY_F12;
+	case VK_F13:				return KeyCodes::KEY_F13;
+	case VK_F14:				return KeyCodes::KEY_F14;
+	case VK_F15:				return KeyCodes::KEY_F15;
+	case VK_F16:				return KeyCodes::KEY_F16;
+	case VK_F17:				return KeyCodes::KEY_F17;
+	case VK_F18:				return KeyCodes::KEY_F18;
+	case VK_F19:				return KeyCodes::KEY_F19;
+	case VK_F20:				return KeyCodes::KEY_F20;
+	case VK_F21:				return KeyCodes::KEY_F21;
+	case VK_F22:				return KeyCodes::KEY_F22;
+	case VK_F23:				return KeyCodes::KEY_F23;
+	case VK_F24:				return KeyCodes::KEY_F24;
+	case VK_NUMLOCK:			return KeyCodes::KEY_NUMLOCK;
+	case VK_SCROLL:				return KeyCodes::KEY_SCROLLLOCK;
+	case VK_LSHIFT:				return KeyCodes::KEY_LSHIFT;
+	case VK_RSHIFT:				return KeyCodes::KEY_RSHIFT;
+	case VK_LCONTROL:			return KeyCodes::KEY_LCONTROL;
+	case VK_RCONTROL:			return KeyCodes::KEY_RCONTROL;
+	case VK_LMENU:				break;
+	case VK_RMENU:				break;
+	case VK_BROWSER_BACK:		break;
+	case VK_BROWSER_FORWARD:	break;
+	case VK_BROWSER_REFRESH:	break;
+	case VK_BROWSER_STOP:		break;
+	case VK_BROWSER_SEARCH:		break;
+	case VK_BROWSER_FAVORITES:	break;
+	case VK_BROWSER_HOME:		break;
+	case VK_VOLUME_MUTE:		break;
+	case VK_VOLUME_DOWN:		break;
+	case VK_VOLUME_UP:			break;
+	case VK_MEDIA_NEXT_TRACK:	break;
+	case VK_MEDIA_PREV_TRACK:	break;
+	case VK_MEDIA_STOP:			break;
+	case VK_MEDIA_PLAY_PAUSE:	break;
+	case VK_LAUNCH_MAIL:		break;
+	case VK_LAUNCH_MEDIA_SELECT:break;
+	case VK_LAUNCH_APP1:		break;
+	case VK_LAUNCH_APP2:		break;
+	case VK_OEM_1:				return KeyCodes::KEY_SEMICOLON;
+	case VK_OEM_PLUS:			return KeyCodes::KEY_PLUS;
+	case VK_OEM_COMMA:			return KeyCodes::KEY_COMMA;
+	case VK_OEM_MINUS:			return KeyCodes::KEY_MINUS;
+	case VK_OEM_PERIOD:			return KeyCodes::KEY_PERIOD;
+	case VK_OEM_2:				return KeyCodes::KEY_QUESTIONMARK;
+	case VK_OEM_3:				return KeyCodes::KEY_TILDE;
+	case VK_OEM_4:				return KeyCodes::KEY_L_BRACKET;
+	case VK_OEM_5:				return KeyCodes::KEY_PIPE;
+	case VK_OEM_6:				return KeyCodes::KEY_R_BRACKET;
+	case VK_OEM_7:				return KeyCodes::KEY_QUOTE;
+	case VK_OEM_8:				break;
+	case VK_OEM_102:			break;
+	case VK_PROCESSKEY:			break;
+	case VK_ATTN:				break;
+	case VK_CRSEL:				break;
+	case VK_EXSEL:				break;
+	case VK_EREOF:				break;
+	case VK_PLAY:				break;
+	case VK_ZOOM:				break;
+	case VK_NONAME:				break;
+	case VK_PA1:				break;
+	case VK_OEM_CLEAR:			break;
+	}
+
+	return KeyCodes::KEY_UNKNOWN;
 }
+//
+//uint16_t Win32Window::ConvertScancode( size_t scanin )
+//{
+//	using namespace ENGINE::INPUT;
+//
+////	Specifies the scan code. The value depends on the OEM.
+//	scanin = (scanin>>16)&511;
+//
+//	//printf("")
+//
+//	switch( scanin )
+//	{
+//	case 1: return KeyCodes::KEY_ESCAPE;      //esc
+//	case 0: return KeyCodes::KEY_0;
+//	case 41: return 97;     //`
+//	case 14: return 8;      //backspace
+//	case 87: return 292;    //F11
+//	case 88: return 293;    //F12
+//	case 12: return 45;     //-
+//	case 13: return 61;     //=
+//	case 43: return 92;     //backslash
+//	case 15: return 9;      //tab
+//	case 58: return 15;     //Caps lock
+//	case 42: return 160;    //[lshift]
+//	case 54: return 161;    //[rshift]
+//
+//	case 30: return 'a';
+//	case 48: return 'b';
+//	case 46: return 'c';
+//	case 32: return 'd';
+//	case 18: return 'e';
+//	case 33: return 'f';
+//	case 34: return 'g';
+//	case 35: return 'h';
+//	case 23: return 'i';
+//	case 36: return 'j';
+//	case 37: return 'k';	
+//	case 38: return 'l';	
+//	case 50: return 'm';	
+//	case 49: return 'n';	
+//	case 24: return 'o';	
+//	case 25: return 'p';	
+//	case 16: return 'q';	
+//	case 19: return 'r';	
+//	case 31: return 's';	
+//	case 20: return 't';	
+//	case 22: return 'u';	
+//	case 47: return 'v';	
+//	case 17: return 'w';	
+//	case 45: return 'x';	
+//	case 21: return 'y';	
+//	case 44: return 'z';	
+//
+//	case 39: return 59;	//;
+//	case 40: return 39;	//'
+//	case 51: return 44;	//,
+//	case 52: return 46;	//.
+//	case 53: return 47;	// /
+//
+//	case 328: return 273;	//arrow keys: up
+//	case 331: return 276;	//arrow keys: left
+//	case 333: return 275;	//arrow keys: right
+//	case 336: return 274;	//arrow keys: down
+////STOPPED HERE
+//	case 29: return 162;	//left ctrl
+//	case 347: return 91;	//left super (aka win)
+//	case 64: return KeyCodes::KEY_L_ALT;	//left alt
+//	case 57: return 32;	//space bar
+//	case 108: return KeyCodes::KEY_R_ALT;	//right alt
+//	case 134: return 91;	//right super (aka win)
+//	case 349: return 93;	//menu
+//	case 285: return 268;	//right control
+//	
+//	case 107: return 316;	//Print Screen
+//	//case 78: scroll lock
+//	case 127: return 19;	//Pause
+//	case 118: return 277;	//Insert
+//	case 110: return 278;	//Home
+//	case 112: return 280;	//Page Up
+//	case 119: return 127;	//Delete
+//	case 115: return 279;	//End
+//	case 117: return 181;	//Page Down
+//	
+//	//case 77: Num Lock (not mapped)
+//	case 106: return 267;	//Keypad /
+//	case 63: return 268;	//Keypad *
+//	case 82: return 269;	//Keypad -
+//	case 79: return 263;	//Keypad 7
+//	case 80: return 264;	//Keypad 8
+//	case 81: return 265;	//Keypad 9
+//	case 86: return 270;	//Keypad +
+//	case 83: return 260;	//Keypad 4
+//	case 84: return 261;	//Keypad 5
+//	case 85: return 262;	//Keypad 6
+////	case 87: return 257;	//Keypad 1
+////	case 88: return 258;	//Keypad 2
+//	case 89: return 259;	//Keypad 3
+////	case 36:		//Enter
+//	case 104: return 13;	//Keypad enter
+//	case 90: return 260;	//Keypad 0
+//	case 91: return 266;	//Keypad .
+//	
+//	default:
+//		// numbers
+//		if( scanin >= 10 && scanin <= 18 )
+//			return (uint16_t)(scanin + ( (short)'1' - 10 ));
+//		// f1 -- f10
+//		if( scanin >= 67 && scanin <= 76 )
+//			return (uint16_t)(scanin + ( 282 - 67 ));
+//		return (uint16_t)scanin;
+//	}
+//}
 
 LRESULT CALLBACK Win32Window::WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -549,6 +757,7 @@ LRESULT CALLBACK Win32Window::WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam
 //		return 0;
 		break;
 	}
+
 	return DefWindowProc(hWnd,uMsg,wParam,lParam);
 }
 

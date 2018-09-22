@@ -1,15 +1,37 @@
 #include "MercuryWindow.h"
 //#include "MercuryMessageManager.h"
 
+#include <HgInput.h>
+
 MercuryWindow::MercuryWindow(const MString& title, int width, int height, int bits, int depthBits, bool fullscreen)
-	:m_title(title), m_width(width), m_height(height), m_bits(bits), m_depthBits(depthBits), m_fullscreen(fullscreen),
-	m_iLastMouseX(0),m_iLastMouseY(0),m_inFocus(false), m_close(false)
+	:m_title(title), m_requestedWidth(width), m_requestedHeight(height), m_bits(bits), m_depthBits(depthBits), m_fullscreen(fullscreen),
+	m_iLastMouseX(0),m_iLastMouseY(0),m_inFocus(false), m_close(false), m_altEnter(false),
+	m_currentWidth(0), m_currentHeight(0)
 {
 //	MESSAGEMAN.GetValue( "Input.CursorGrabbed" )->SetBool( true );
 }
 
 MercuryWindow::~MercuryWindow()
 {
+}
+
+void MercuryWindow::ScanForKeystrokes() {
+	using namespace ENGINE::INPUT;
+
+	bool alt_enter = ScanForKeyCombo(KeyCodes::KEY_ALT, KeyCodes::KEY_ENTER);
+	if (alt_enter && !m_altEnter) {
+		ToggleFullscreen(!m_fullscreen);
+	}
+	m_altEnter = alt_enter; //remember last combo so that we can filter repeats
+
+	if (ScanForKeyCombo(KeyCodes::KEY_ALT, KeyCodes::KEY_F4)) {
+		m_close = true;
+	}
+}
+
+void MercuryWindow::ToggleFullscreen(bool fullscreen) {
+	m_fullscreen = fullscreen;
+	TryFullscreen();
 }
 
 MercuryWindow* MercuryWindow::m_windowInstance;

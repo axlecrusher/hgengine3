@@ -10,6 +10,8 @@
 #include <MercuryWindow.h>
 #include <RenderBackend.h>
 
+#include <HgInput.h>
+
 static int SymnumCheck(const char * path, const char * name, void * location, long size)
 {
 	if (strncmp(name, "REGISTER", 8) == 0)
@@ -26,6 +28,8 @@ namespace ENGINE {
 		EnumberateSymbols();
 		SetRealtimePriority();
 		InitMessageSystem();
+
+		memset(KeyDownMap, 0, sizeof(uint8_t)*KeyDownMap_length);
 	}
 	
 	void StartWindowSystem() {

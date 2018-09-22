@@ -28,19 +28,26 @@ public:
 	
 	virtual void* GetProcAddress(const MString& x) = 0;
 	
-	inline int Width() const { return m_width; }
-	inline int Height() const { return m_height; }
+	inline int CurrentWidth() const { return m_currentWidth; }
+	inline int CurrentHeight() const { return m_currentHeight; }
 
 	inline bool InFocus() const { return m_inFocus; }
 
 	bool m_close;
+	void ScanForKeystrokes();
+
+	void ToggleFullscreen(bool fullscreen);
+
 protected:
+	virtual void TryFullscreen() = 0;
+
 //	static MercuryWindow* (*genWindowClbk)(void);
 	static Callback0R< MercuryWindow* > genWindowClbk;
 	static MercuryWindow* m_windowInstance;
 	
 	MString m_title;
-	int m_width, m_height;
+	int m_currentWidth, m_currentHeight;
+	int m_requestedWidth, m_requestedHeight;
 	uint8_t m_bits, m_depthBits;
 	bool m_fullscreen;
 
@@ -48,6 +55,8 @@ protected:
 	int m_iLastMouseY;
 
 	bool m_inFocus;
+
+	bool m_altEnter;
 
 };
 
