@@ -160,6 +160,8 @@ void vertex_print(const vertex* v) {
 
 int main()
 {
+	using namespace ENGINE::INPUT;
+
 	stereo_view = false;
 
 	ENGINE::InitEngine();
@@ -225,6 +227,11 @@ int main()
 	model_data::load_ini(teapot, "teapot.ini");
 	teapot->origin(teapot->origin().x(2).z(3).y(1));
 	
+	HgElement* statue = NULL;
+	scene.getNewElement(&statue);
+	model_data::load_ini(statue, "statue.ini");
+	statue->origin(statue->origin().x(2).z(3).y(1));
+
 	uint32_t i;
 	{
 		HgElement* element = NULL;
@@ -349,15 +356,15 @@ int main()
 		if (dtime.msec() > 0) {
 			vector3 v;
 
-			if (KeyDownMap['w']) v.z(v.z() - 1.0f);
-			if (KeyDownMap['s']) v.z(v.z() + 1.0f);
-			if (KeyDownMap['a']) v.x(v.x() - 1.0f);
-			if (KeyDownMap['d']) v.x(v.x() + 1.0f);
-			if (KeyDownMap['r']) {
+			if (KeyDownMap[KeyCodes::KEY_W]) v.z(v.z() - 1.0f);
+			if (KeyDownMap[KeyCodes::KEY_S]) v.z(v.z() + 1.0f);
+			if (KeyDownMap[KeyCodes::KEY_A]) v.x(v.x() - 1.0f);
+			if (KeyDownMap[KeyCodes::KEY_D]) v.x(v.x() + 1.0f);
+			if (KeyDownMap[KeyCodes::KEY_R]) {
 				mouse_x = 0; mouse_y = -42;
 			}
 
-			if (KeyDownMap[' ']) {
+			if (KeyDownMap[KeyCodes::KEY_SPACE]) {
 				//				printf("fire!\n");
 				//fire(&scene);
 			}

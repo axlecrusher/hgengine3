@@ -320,6 +320,7 @@ bool Win32Window::SwapBuffers()
 
 bool Win32Window::PumpMessages()
 {
+	using namespace ENGINE::INPUT;
 	static int lastx, lasty;
 	static bool bWasCursorVisible;
 	MSG message;
@@ -437,7 +438,10 @@ bool Win32Window::PumpMessages()
 			case WM_RBUTTONUP:
 			case WM_MBUTTONDOWN:
 			case WM_MBUTTONUP:
-//				MouseInput::ProcessMouseInput( lastx, lasty, GetBit(message.wParam,MK_LBUTTON), 
+				KeyDownMap[KeyCodes::KEY_C_MOUSE] = message.wParam & MK_MBUTTON;
+				KeyDownMap[KeyCodes::KEY_L_MOUSE] = message.wParam & MK_LBUTTON;
+				KeyDownMap[KeyCodes::KEY_R_MOUSE] = message.wParam & MK_RBUTTON;
+				//				MouseInput::ProcessMouseInput( lastx, lasty, GetBit(message.wParam,MK_LBUTTON), 
 //					GetBit(message.wParam,MK_RBUTTON), GetBit(message.wParam,MK_MBUTTON), 0, 0, false);
 				break;
 			case WM_MOUSEHWHEEL: //Not-too-well-documented mouse wheel.
@@ -489,10 +493,10 @@ ENGINE::INPUT::KeyCodes Win32Window::ConvertScancode2(size_t virtualKey)
 	}
 
 	switch (virtualKey) {
-	case VK_LBUTTON:			break;
-	case VK_RBUTTON:			break;
+	case VK_LBUTTON:			return KeyCodes::KEY_R_MOUSE;
+	case VK_RBUTTON:			return KeyCodes::KEY_L_MOUSE;
 	case VK_CANCEL:				break;
-	case VK_MBUTTON:			break;
+	case VK_MBUTTON:			return KeyCodes::KEY_C_MOUSE;
 	case VK_XBUTTON1:			break;
 	case VK_XBUTTON2:			break;
 	case VK_BACK:				return KeyCodes::KEY_BACKSPACE;
