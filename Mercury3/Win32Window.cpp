@@ -355,7 +355,7 @@ bool Win32Window::PumpMessages()
 				{
 					if ( IsKeyRepeat(message.lParam) ) break;
 					auto x = ConvertScancode2(message.wParam);
-					KeyDownMap[x] = 1;
+					KeyDownMap[x] = true;
 					printf("key: 0x%x\n", message.wParam);
 //					KeyboardInput::ProcessKeyInput( ConvertScancode( message.lParam ), true, false);
 				}
@@ -365,7 +365,7 @@ bool Win32Window::PumpMessages()
 				{
 					if ( IsKeyRepeat(message.lParam) ) break;
 					auto x = ConvertScancode2(message.wParam);
-					KeyDownMap[x] = 0;
+					KeyDownMap[x] = false;
 //					KeyboardInput::ProcessKeyInput( ConvertScancode( message.lParam ), false, false);
 				}
 				break;
@@ -438,9 +438,9 @@ bool Win32Window::PumpMessages()
 			case WM_RBUTTONUP:
 			case WM_MBUTTONDOWN:
 			case WM_MBUTTONUP:
-				KeyDownMap[KeyCodes::KEY_C_MOUSE] = message.wParam & MK_MBUTTON;
-				KeyDownMap[KeyCodes::KEY_L_MOUSE] = message.wParam & MK_LBUTTON;
-				KeyDownMap[KeyCodes::KEY_R_MOUSE] = message.wParam & MK_RBUTTON;
+				KeyDownMap[KeyCodes::KEY_C_MOUSE] = (message.wParam & MK_MBUTTON > 0);
+				KeyDownMap[KeyCodes::KEY_L_MOUSE] = (message.wParam & MK_LBUTTON > 0);
+				KeyDownMap[KeyCodes::KEY_R_MOUSE] = (message.wParam & MK_RBUTTON > 0);
 				//				MouseInput::ProcessMouseInput( lastx, lasty, GetBit(message.wParam,MK_LBUTTON), 
 //					GetBit(message.wParam,MK_RBUTTON), GetBit(message.wParam,MK_MBUTTON), 0, 0, false);
 				break;
@@ -461,7 +461,7 @@ bool Win32Window::PumpMessages()
 			DispatchMessage(&message);				// Dispatch The Message
 		}
 	}
-	KeyDownMap[0] = 0;
+	KeyDownMap[0] = false;
 	return true;
 }
 

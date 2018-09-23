@@ -29,7 +29,7 @@ namespace ENGINE {
 		SetRealtimePriority();
 		InitMessageSystem();
 
-		memset(KeyDownMap, 0, sizeof(uint8_t)*KeyDownMap_length);
+		memset(KeyDownMap, 0, sizeof(bool)*KeyDownMap_length);
 	}
 	
 	void StartWindowSystem() {

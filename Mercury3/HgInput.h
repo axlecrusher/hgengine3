@@ -1,13 +1,13 @@
 #pragma once
 #include <stdint.h>
 
+#define KeyDownMap_length 512
+extern bool KeyDownMap[];
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-#define KeyDownMap_length 512
-extern uint8_t KeyDownMap[];
 
 typedef struct HgMouseInput {
 	int16_t dx, dy;
@@ -23,6 +23,9 @@ namespace ENGINE {
 		enum KeyCodes
 		{
 			KEY_UNKNOWN,
+			KEY_L_MOUSE,
+			KEY_R_MOUSE,
+			KEY_C_MOUSE,
 			KEY_BACKSPACE,
 			KEY_TAB,
 			KEY_CLEAR,

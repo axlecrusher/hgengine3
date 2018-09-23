@@ -8,7 +8,7 @@
 //make threadsafe?
 
 
-uint8_t KeyDownMap[KeyDownMap_length];
+bool KeyDownMap[KeyDownMap_length];
 HgMouseInput MOUSE_INPUT;
 
 namespace ENGINE {
