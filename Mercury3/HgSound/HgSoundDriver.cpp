@@ -16,20 +16,18 @@ namespace HgSound {
 	PlayingSound::ptr Driver::play(SoundAsset::ptr& asset, HgTime startOffset) {
 		if (asset == nullptr) return nullptr;
 
-		struct playStruct tmp;
-		tmp.sound = asset->play();
-		tmp.startOffset = startOffset;
-		tmp.sound->jumpToTime(startOffset);
+		auto sound = asset->play();
+		sound->jumpToTime(startOffset);
 
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_mutex);
-			m_playingSounds.insert(std::make_pair(tmp.get(), tmp));
+			m_playingSounds.insert(std::make_pair(sound.get(), sound));
 		}
-		return std::move(tmp);
+		return std::move(sound);
 	}
 
 	void Driver::stop(PlayingSound::ptr& playingAsset) {
-		struct playStruct playingSound;
+		PlayingSound::ptr playingSound;
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			auto it = m_playingSounds.find(playingAsset.get());
