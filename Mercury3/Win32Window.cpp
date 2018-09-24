@@ -29,7 +29,7 @@ MercuryWindow* Win32Window::GenWin32Window()
 {
 	if (stereo_view)
 		return new Win32Window("Mercury3", 1280, 480, 24, 16, false);
-	return new Win32Window("Mercury3", 1920, 1080, 24, 16, true);
+	return new Win32Window("Mercury3", 800, 600, 24, 16, false);
 }
 
 template<typename STRTYPE>
@@ -251,7 +251,11 @@ void Win32Window::TryFullscreen() {
 	auto oldStyle = ChangeStyle(dwStyle);
 
 	//if (m_fullscreen) {
-		ChangeDisplaySettings();
+		bool r = ChangeDisplaySettings();
+		if (!r) {
+			m_fullscreen = !m_fullscreen;
+			ChangeStyle(oldStyle);
+		}
 	//}
 	//maybe chake back to old settings if not fullscreen
 }
