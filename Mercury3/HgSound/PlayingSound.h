@@ -1,6 +1,8 @@
 #pragma once
 
 #include <HgSound/SoundAsset.h>
+#include <HgTimer.h>
+#include <algorithm>
 
 namespace HgSound {
 	class PlayingSound {
@@ -21,6 +23,15 @@ namespace HgSound {
 		//playbackEndedFunc callback will be called from a thread
 		inline void setEventPlaybackEnded(const playbackEndedFunc& clbk) { m_playbackEndedClbk = clbk; }
 		inline void eventPlaybackEnded() { if (m_playbackEndedClbk) m_playbackEndedClbk(m_sound); }
+
+		void jumpToTime(HgTime t) {
+			auto sound = m_sound.get();
+			uint64_t msec = t.msec();
+			auto s = msec * sound->sampleRate() * sound->channels();
+			s /= 1000;
+			m_nextSample = std::min(s, sound->totalSamples());
+		}
+
 	private:
 		float m_volume;
 

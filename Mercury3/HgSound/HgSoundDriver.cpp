@@ -13,10 +13,14 @@ namespace HgSound {
 
 	std::unique_ptr<HgSound::Driver> Driver::Create() { return std::make_unique<HgSound::LibSoundIoDriver>(); }
 	
-	PlayingSound::ptr Driver::play(SoundAsset::ptr asset) {
+	PlayingSound::ptr Driver::play(SoundAsset::ptr& asset, HgTime startOffset) {
 		if (asset == nullptr) return nullptr;
 
-		PlayingSound::ptr tmp = asset->play();
+		struct playStruct tmp;
+		tmp.sound = asset->play();
+		tmp.startOffset = startOffset;
+		tmp.sound->jumpToTime(startOffset);
+
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			m_playingSounds.insert(std::make_pair(tmp.get(), tmp));
@@ -24,8 +28,8 @@ namespace HgSound {
 		return std::move(tmp);
 	}
 
-	void Driver::stop(PlayingSound::ptr playingAsset) {
-		PlayingSound::ptr playingSound;
+	void Driver::stop(PlayingSound::ptr& playingAsset) {
+		struct playStruct playingSound;
 		{
 			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			auto it = m_playingSounds.find(playingAsset.get());

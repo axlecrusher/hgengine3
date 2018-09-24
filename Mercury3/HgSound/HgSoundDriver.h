@@ -6,6 +6,7 @@
 #include <HgSound/PlayingSound.h>
 
 #include <mutex>
+#include <HgTimer.h>
 
 namespace HgSound {
 	class Driver {
@@ -16,8 +17,14 @@ namespace HgSound {
 
 		virtual void start() = 0;
 
-		PlayingSound::ptr play(SoundAsset::ptr asset);
-		void stop(PlayingSound::ptr playingAsset);
+		PlayingSound::ptr play(SoundAsset::ptr& asset, HgTime startOffset);
+
+		PlayingSound::ptr play(SoundAsset::ptr& asset) {
+			const auto zero = HgTime::msec(0);
+			return play(asset, zero);
+		}
+
+		void stop(PlayingSound::ptr& playingAsset);
 
 		static std::unique_ptr<HgSound::Driver> Create();
 

@@ -20,6 +20,8 @@ namespace HgSound {
 		uint8_t channels() const { return m_channels; }
 		uint64_t totalSamples() const { return m_totalSamples; }
 
+		auto sampleRate() const { return m_sampleRate; }
+
 	private:
 		std::string m_path;
 		float* m_data;
