@@ -360,7 +360,7 @@ bool Win32Window::PumpMessages()
 					if ( IsKeyRepeat(message.lParam) ) break;
 					auto x = ConvertScancode2(message.wParam);
 					KeyDownMap[x] = true;
-					printf("key: 0x%x\n", message.wParam);
+					//printf("key: 0x%x\n", message.wParam);
 //					KeyboardInput::ProcessKeyInput( ConvertScancode( message.lParam ), true, false);
 				}
 				break;

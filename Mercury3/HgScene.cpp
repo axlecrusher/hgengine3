@@ -106,6 +106,17 @@ void HgScene::update(HgTime dtime) {
 			removeElement(i);
 			continue;
 		}
+	}
+}
+
+
+
+void HgScene::EnqueueForRender() {
+	uint32_t updateNumber = nextUpdateNumber();
+	uint32_t maxCount = maxItems();
+	for (uint32_t i = 0; i < maxCount; ++i) {
+		if (!isUsed(i)) continue;
+		HgElement* e = get_element(i);
 
 		//I would like to move this out of here for a more perminent, solution
 		//where the vectors don't need to be rebuild every time
@@ -114,10 +125,6 @@ void HgScene::update(HgTime dtime) {
 		}
 
 	}
-	//	if ((CHECK_FLAG(e, HGE_HIDDEN) == 0) && (submit_for_render != nullptr)) {
-	//		submit_for_render(e);
-	//	}
-	//}
 }
 
 #include <map>

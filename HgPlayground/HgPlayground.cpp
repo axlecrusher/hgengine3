@@ -414,15 +414,7 @@ int main()
 		Renderer::opaqueElements.clear();
 		Renderer::transparentElements.clear();
 
-		uint32_t maxCount = scene.maxItems();
-		for (uint32_t i = 0; i < maxCount; ++i) {
-			if (!scene.isUsed(i)) continue;
-			HgElement* e = scene.get_element(i);
-			if (!e->flags.hidden) {
-				Renderer::Enqueue(*e);
-			}
-		}
-
+		scene.EnqueueForRender();
 		Engine::EnqueueForRender(Engine::collections());
 
 		//render below
