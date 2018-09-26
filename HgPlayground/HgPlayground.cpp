@@ -40,8 +40,6 @@ HgCamera camera[3];
 
 HANDLE endOfRenderFrame = NULL;
 
-volatile int8_t needRender = 1;
-
 #define EYE_DISTANCE -0.07f
 
 #define USE_RENDER_THREAD 0
@@ -75,8 +73,6 @@ int32_t RenderThreadLoop() {
 
 			free(x);
 		}
-
-		needRender = 1;
 
 		//		w->SwapBuffers();
 
@@ -340,112 +336,106 @@ int main()
 	int16_t mouse_x, mouse_y;
 	mouse_x = mouse_y = 0;
 
+	HgTime accumulatedTime;
+	const HgTime timeStep = HgTime::msec(8); // about 120 ups
+
 	gameTimer.start();
-	while (1 && !window->m_close) {
-		HgTime time = gameTimer.getElasped();
-		HgTime dtime = time - last_time;
+	while (!window->m_close) {
+		const HgTime time = gameTimer.getElasped();
+		accumulatedTime += time - last_time;
 		last_time = time;
 
-//		if (dtime > 17) {
-//			printf("time %d\n", dtime);
-//		}
-#if (!USE_RENDER_THREAD)
-		BeginFrame();
-#endif
+		if (accumulatedTime.msec() > 100) {
+			accumulatedTime = HgTime::msec(100);
+		}
 
-		if (dtime.msec() > 0) {
-			vector3 v;
+		bool doRender = false;
 
-			if (KeyDownMap[KeyCodes::KEY_W]) v.z(v.z() - 1.0f);
-			if (KeyDownMap[KeyCodes::KEY_S]) v.z(v.z() + 1.0f);
-			if (KeyDownMap[KeyCodes::KEY_A]) v.x(v.x() - 1.0f);
-			if (KeyDownMap[KeyCodes::KEY_D]) v.x(v.x() + 1.0f);
-			if (KeyDownMap[KeyCodes::KEY_R]) {
-				mouse_x = 0; mouse_y = -42;
+		//update loop
+		while (accumulatedTime >= timeStep) {
+			accumulatedTime -= timeStep;
+			doRender = true;
+
+			if (timeStep.msec() > 0) {
+				vector3 v;
+
+				if (KeyDownMap[KeyCodes::KEY_W]) v.z(v.z() - 1.0f);
+				if (KeyDownMap[KeyCodes::KEY_S]) v.z(v.z() + 1.0f);
+				if (KeyDownMap[KeyCodes::KEY_A]) v.x(v.x() - 1.0f);
+				if (KeyDownMap[KeyCodes::KEY_D]) v.x(v.x() + 1.0f);
+				if (KeyDownMap[KeyCodes::KEY_R]) {
+					mouse_x = 0; mouse_y = -42;
+				}
+
+				if (KeyDownMap[KeyCodes::KEY_SPACE]) {
+					//				printf("fire!\n");
+					//fire(&scene);
+				}
+
+				//			if (v.components.z > 0) DebugBreak();
+
+				v = v.normal().rotate(camera->orientation.conjugate());
+				float scale = (1.0f / 1000.0f) * timeStep.msec();
+				v = v.normal().scale(scale);
+				camera->move(v);
+
+				mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
+				mouse_y = (MOUSE_INPUT.dy + mouse_y) % 2000;
+
+				using namespace HgMath;
+				camera->FreeRotate(angle::deg((-MOUSE_INPUT.dx / 2000.0f) * 360), angle::deg((-MOUSE_INPUT.dy / 2000.0f) * 360));
+
+				MOUSE_INPUT.dx = 0;
+				MOUSE_INPUT.dy = 0;
 			}
 
-			if (KeyDownMap[KeyCodes::KEY_SPACE]) {
-				//				printf("fire!\n");
-				//fire(&scene);
+			grid->position(point(camera->position).y(0));
+
+			{
+				HgElement* element = tris[0];
+				const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
+				element->orientation(orientation);
+				teapot->orientation(orientation.conjugate());
+
+				for (i = 0; i < ANI_TRIS; i++) {
+					tris[i]->orientation(element->orientation());
+				}
 			}
 
-			//			if (v.components.z > 0) DebugBreak();
+			scene.update(timeStep);
 
-			v = v.normal().rotate(camera->orientation.conjugate());
-			float scale = (1.0f / 1000.0f) * dtime.msec();
-			v = v.normal().scale(scale);
-			camera->move(v);
-
-			mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
-			mouse_y = (MOUSE_INPUT.dy + mouse_y) % 2000;
-
-			using namespace HgMath;
-			camera->FreeRotate(angle::deg((-MOUSE_INPUT.dx / 2000.0f) * 360), angle::deg((-MOUSE_INPUT.dy / 2000.0f) * 360));
-
-			MOUSE_INPUT.dx = 0;
-			MOUSE_INPUT.dy = 0;
 		}
 
-		if (needRender > 0) {
-			do_render = needRender;
-			needRender = 0;
-		}
+		if (doRender) {
+			BeginFrame();
 
-		grid->position(point(camera->position).y(0));
+			camera[1] = camera[0];
+			camera[1].position.x(camera[1].position.x() - EYE_DISTANCE * 0.5f);
+			camera[2] = camera[0];
+			camera[2].position.x(camera[1].position.x() + EYE_DISTANCE * 0.5f);
 
-		{
-			HgElement* element = tris[0];
-			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
-			element->orientation(orientation);
-			teapot->orientation(orientation.conjugate());
+			Renderer::opaqueElements.clear();
+			Renderer::transparentElements.clear();
 
-			for (i = 0; i < ANI_TRIS; i++) {
-				tris[i]->orientation(element->orientation());
+			scene.EnqueueForRender();
+			Engine::EnqueueForRender(Engine::collections());
+
+			//render below
+			const auto projection_matrix = HgMath::mat4f(projection);
+
+			if (stereo_view) {
+				Renderer::Render(1, camera + 1, projection_matrix); //eye 1
+				Renderer::Render(2, camera + 2, projection_matrix); //eye 2
 			}
+			else
+			{
+				Renderer::Render(0, camera, projection_matrix);
+			}
+
+			window->SwapBuffers();
+			InterlockedAdd(&itrctr, 1);
+			doRender = false;
 		}
-
-		camera[1] = camera[0];
-		camera[1].position.x(camera[1].position.x() - EYE_DISTANCE * 0.5f);
-		camera[2] = camera[0];
-		camera[2].position.x(camera[1].position.x() + EYE_DISTANCE * 0.5f);
-
-		scene.update(dtime);
-
-		Renderer::opaqueElements.clear();
-		Renderer::transparentElements.clear();
-
-		scene.EnqueueForRender();
-		Engine::EnqueueForRender(Engine::collections());
-
-		//render below
-		const auto projection_matrix = HgMath::mat4f(projection);
-
-		if(stereo_view) {
-			Renderer::Render(1, camera + 1, projection_matrix); //eye 1
-			Renderer::Render(2, camera + 2, projection_matrix); //eye 2
-		}
-		else
-		{
-			Renderer::Render(0, camera, projection_matrix);
-		}
-
-		window->SwapBuffers();
-
-		InterlockedAdd(&itrctr, 1);
-
-		do_render = 0;
-
-		//		Sleep(1);
-
-#if  (USE_RENDER_THREAD)
-		DWORD dwWaitResult = WaitForSingleObject(
-			endOfRenderFrame, // event handle
-			INFINITE);    // indefinite wait
-
-		ResetEvent(endOfRenderFrame);
-#else
-		needRender = 1;
-#endif
 	}
 
 	return 0;
