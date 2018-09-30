@@ -19,8 +19,7 @@ namespace HgSound {
 
 	Driver::~Driver()
 	{
-		m_stop = true;
-		m_thread.join();
+		stop();
 	}
 
 	static void startAudioLoop(Driver* driver) {
@@ -32,8 +31,11 @@ namespace HgSound {
 	}
 
 	void Driver::stop() {
+		//signal stop, wake thread from wait, wait for thread to join
 		m_stop = true;
 		continueExecution();
+		if (m_thread.joinable())
+			m_thread.join();
 	}
 
 	void Driver::audioLoop(Driver* driver) {
