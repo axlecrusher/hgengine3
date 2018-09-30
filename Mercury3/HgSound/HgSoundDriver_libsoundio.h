@@ -13,8 +13,7 @@ namespace HgSound {
 		LibSoundIoDriver();
 		~LibSoundIoDriver();
 		void Init();
-
-		void start() {}
+		void start();
 	private:
 		typedef std::unique_ptr<SoundIo, decltype(&soundio_destroy)> soundio_ptr;
 		typedef std::unique_ptr<SoundIoDevice, decltype(&soundio_device_unref)> device_ptr;

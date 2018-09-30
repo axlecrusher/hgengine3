@@ -3,18 +3,35 @@
 
 namespace HgSound {
 
+	enum errorEnum {
+		ERR_UNDERFLOW,
+		ERR_UNRECOVERABLE_STREAM,
+		ERR_SMALL_WRITE
+	};
+
+	void handleError(errorEnum x, int err) {
+		switch (x) {
+		case ERR_UNRECOVERABLE_STREAM:
+			fprintf(stderr, "unrecoverable stream error: %s\n", soundio_strerror(err));
+			break;
+		case ERR_SMALL_WRITE:
+			fprintf(stderr, "small write: %d\n", err);
+			break;
+		}
+	}
+
 
 	static void underflow_callback(struct SoundIoOutStream *outstream) {
 		static int count = 0;
 		fprintf(stderr, "underflow %d\n", count++);
 	}
 
-//	static volatile bool want_pause = false;
+	//	static volatile bool want_pause = false;
 
-//	static void(*write_sample)(char *ptr, double sample);
+	//	static void(*write_sample)(char *ptr, double sample);
 
-	//different sound devices may require different buffer sizes.
-	//10ms appears too small for blutooth devices.
+		//different sound devices may require different buffer sizes.
+		//10ms appears too small for blutooth devices.
 	const int32_t Driver::samples = 441; //for each channel, 10ms
 
 	inline void write_sample_float32le(char *ptr, float sample) {
@@ -33,50 +50,44 @@ namespace HgSound {
 		int err;
 
 		LibSoundIoDriver* driver = (LibSoundIoDriver*)outstream->userdata;
-		if (!driver->m_initialized) return;
-
-
-		//mixAudio probably should be moved out of write_callback into its own thread
-		//as write_callback needs to be fast. Will need some kind of thread sync.
-		//should probably also double buffer mixed audio. Or have a larger circular buffer
-		//with a moving play head. New playing audio could be mixed in at the play
-		//head for low latency.
-		driver->mixAudio();
+		//if (!driver->m_initialized) return;
 
 		int frame_count = LibSoundIoDriver::samples;
 
-				const struct SoundIoChannelLayout *layout = &outstream->layout;
+		const struct SoundIoChannelLayout *layout = &outstream->layout;
 		if ((err = soundio_outstream_begin_write(outstream, &areas, &frame_count))) {
-			fprintf(stderr, "unrecoverable stream error: %s\n", soundio_strerror(err));
+			handleError(ERR_UNRECOVERABLE_STREAM, err);
 			return;
 		}
 
 		if (frame_count < LibSoundIoDriver::samples) {
-			fprintf(stderr, "small write: %s\n", soundio_strerror(err));
+			handleError(ERR_SMALL_WRITE, frame_count);
 		}
 
-		uint32_t counterx = 0;
+
+		const auto buffer = driver->m_buffer.frontBuffer();
 		const int channel_count = layout->channel_count;
+		const auto stepSize = areas[0].step;
+
+		int counterx = 0;
 		for (int frame = 0; frame < frame_count; frame++) {
 			for (int channel = 0; channel < channel_count; channel++) {
-				write_sample_float32le(areas[channel].ptr, driver->m_buffer[counterx++]);
-				areas[channel].ptr += areas[channel].step;
+				write_sample_float32le(areas[channel].ptr, buffer[counterx++]);
+				areas[channel].ptr += stepSize;
 			}
 		}
 
 		if ((err = soundio_outstream_end_write(outstream))) {
 			if (err == SoundIoErrorUnderflow)
+			{
+			}
+			else {
+				handleError(ERR_UNRECOVERABLE_STREAM, err);
 				return;
-			fprintf(stderr, "unrecoverable stream error: %s\n", soundio_strerror(err));
-			return;
+			}
 		}
 
-		/*
-		double out_latency;
-		soundio_outstream_get_latency(outstream, &out_latency);
-		printf("latency %f\n", out_latency);
-		*/
-		//	soundio_outstream_pause(outstreamw, want_pause); //what is this for?
+		driver->continueExecution();
 	}
 
 
@@ -88,9 +99,6 @@ namespace HgSound {
 		outstream = nullptr;
 		device = nullptr;
 		soundio = nullptr;
-
-		if (m_buffer != nullptr) delete[] m_buffer;
-		m_buffer = nullptr;
 	}
 
 	void LibSoundIoDriver::Init() {
@@ -133,7 +141,7 @@ namespace HgSound {
 		outstream->write_callback = LibSoundIoDriver::write_callback;
 		outstream->underflow_callback = underflow_callback;
 		outstream->name = NULL;
-		double latency = 100;
+		double latency = 1.0 / 100.0;
 		int sample_rate = 44100;
 		outstream->software_latency = latency;
 		outstream->sample_rate = sample_rate;
@@ -141,7 +149,7 @@ namespace HgSound {
 		if (soundio_device_supports_format(device.get(), SoundIoFormatFloat32LE)) {
 			outstream->format = SoundIoFormatFloat32LE;
 			fprintf(stderr, "SoundIoFormatFloat32LE\n");
-//			write_sample = write_sample_float32le;
+			//			write_sample = write_sample_float32le;
 		}
 		//else if (soundio_device_supports_format(device.get(), SoundIoFormatS16LE)) {
 		//	outstream->format = SoundIoFormatS16LE;
@@ -153,8 +161,8 @@ namespace HgSound {
 		}
 
 		uint8_t channels = 2; //stereo
-		m_bufferSize = channels*samples;
-		m_buffer = new float[m_bufferSize](); //allocate and init to 0
+		m_bufferSize = channels * samples;
+		m_buffer.allocate(m_bufferSize); //allocate and init to 0
 
 		//Move to after buffer init?
 		if ((err = soundio_outstream_open(outstream.get()))) {
@@ -165,18 +173,22 @@ namespace HgSound {
 
 		if (outstream->layout_error)
 			fprintf(stderr, "unable to set channel layout: %s\n", soundio_strerror(outstream->layout_error));
-		if ((err = soundio_outstream_start(outstream.get()))) {
-			fprintf(stderr, "unable to start device: %s\n", soundio_strerror(err));
-			return;
-		}
-
-
 
 		this->soundio = std::move(soundio);
 		this->device = std::move(device);
 		this->outstream = std::move(outstream);
 
-		m_initialized = true;
+		//m_initialized = true;
 	}
 
+	void LibSoundIoDriver::start() {
+		Driver::start();
+
+		int err;
+
+		if ((err = soundio_outstream_start(outstream.get()))) {
+			fprintf(stderr, "unable to start device: %s\n", soundio_strerror(err));
+			return;
+		}
+	}
 }
