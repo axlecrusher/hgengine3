@@ -233,18 +233,14 @@ int main()
 		HgElement* element = NULL;
 
 		if (create_element("triangle", &scene, &element) > 0) {
-			auto tmp = element->position();
-			tmp.x(1.5f);
-			tmp.z(1.0f);
-			element->position(tmp);
+			const auto tmp = element->position();
+			element->position(tmp.x(1.5f).z(1.0f));
 			//	toQuaternion2(0, 0, 90, &element->orientation);
 		}
 
 		if (create_element("triangle", &scene, &element) > 0) {
-			auto tmp = element->position();
-			tmp.x(0.0f);
-			tmp.z(-2.0f);
-			element->position(tmp);
+			const auto tmp = element->position();
+			element->position(tmp.x(0.0f).z(-2.0f));
 			//	toQuaternion2(45,0,0,&element->orientation);
 		}
 
