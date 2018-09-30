@@ -12,7 +12,7 @@ std::unique_ptr<HgSound::Driver> SOUND;
 namespace HgSound {
 	std::unique_ptr<HgSound::Driver> Driver::Create() { return std::make_unique<HgSound::LibSoundIoDriver>(); }
 
-	Driver::Driver() : m_bufferSize(0), m_stop(false), m_continueMixing(false)
+	Driver::Driver() : m_bufferSize(0), m_stop(false)
 		//, m_initialized(false)
 	{
 	}
@@ -43,17 +43,6 @@ namespace HgSound {
 			driver->mixAudio();
 			driver->wait();
 		}
-	}
-
-	void Driver::wait() {
-		m_continueMixing = false;
-		std::unique_lock<std::mutex> lock(m_conditionMutex);
-		while (!canContinue() && !m_stop) m_condition.wait(lock);
-	}
-
-	void Driver::continueExecution() {
-		m_continueMixing = true;
-		m_condition.notify_one();
 	}
 
 	PlayingSound::ptr Driver::play(SoundAsset::ptr& asset, HgTime startOffset) {

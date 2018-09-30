@@ -32,7 +32,7 @@ namespace HgSound {
 
 		//different sound devices may require different buffer sizes.
 		//10ms appears too small for blutooth devices.
-	const int32_t Driver::samples = 441; //for each channel, 10ms
+	const int32_t Driver::samples = 441*2; //for each channel, 10ms
 
 	inline void write_sample_float32le(char *ptr, float sample) {
 		float *buf = (float *)ptr;
@@ -87,6 +87,8 @@ namespace HgSound {
 			}
 		}
 
+		double latency;
+		soundio_outstream_get_latency(outstream, &latency);
 		driver->continueExecution();
 	}
 

@@ -9,7 +9,7 @@
 #include <HgTimer.h>
 #include <DoubleBuffer.h>
 #include <thread>
-#include <condition_variable>
+#include <ConditionalWait.h>
 
 namespace HgSound {
 	class Driver {
@@ -35,7 +35,7 @@ namespace HgSound {
 		static std::unique_ptr<HgSound::Driver> Create();
 		static void audioLoop(Driver* driver);
 
-		void continueExecution();
+		void continueExecution() { m_wait.resume(); }
 	protected:
 		const static int32_t samples;
 
@@ -46,8 +46,7 @@ namespace HgSound {
 
 	private:
 		void audioLoop();
-		void wait();
-		bool canContinue() const { return m_continueMixing;  }
+		void wait() { m_wait.wait(); }
 		void InsertPlayingSound(PlayingSound::ptr& sound);
 		PlayingSound::ptr RemovePlayingSound(PlayingSound::ptr& sound);
 
@@ -57,9 +56,7 @@ namespace HgSound {
 		std::map<const PlayingSound*, PlayingSound::ptr> m_playingSounds;
 		std::recursive_mutex m_mutex;
 
-		std::atomic<bool> m_continueMixing;
-		std::mutex m_conditionMutex;
-		std::condition_variable m_condition;
+		ConditionalWait m_wait;
 	};
 }
 
