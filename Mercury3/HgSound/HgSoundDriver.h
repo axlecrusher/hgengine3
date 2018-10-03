@@ -76,10 +76,8 @@ namespace HgSound {
 			return;
 		}
 
-		const bool destSmaller = dest.size() < src.size();
-
-		//copy smallery array into larger array
-		if (destSmaller) {
+		//copy smaller array into larger array
+		if (dest.size() < src.size()) {
 			//if destination smaller, copy it into src and swap
 			src.reserve(src.size() + dest.size());
 			src.insert(src.end(), dest.begin(), dest.end());
