@@ -15,6 +15,8 @@ namespace HgSound {
 	Driver::Driver() : m_bufferSize(0), m_stop(false)
 		//, m_initialized(false)
 	{
+		m_playingSounds.reserve(32);
+		//m_tmpSounds.reserve(32);
 	}
 
 	Driver::~Driver()
@@ -62,20 +64,32 @@ namespace HgSound {
 	void Driver::InsertPlayingSound(PlayingSound::ptr& sound)
 	{
 		std::lock_guard<std::recursive_mutex> lock(m_mutex);
-		m_playingSounds.insert(std::make_pair(sound.get(), sound));
+		m_playingSounds.push_back(sound);
 	}
 
 	PlayingSound::ptr Driver::RemovePlayingSound(PlayingSound::ptr& sound) {
 		PlayingSound::ptr playingSound;
-		std::lock_guard<std::recursive_mutex> lock(m_mutex);
-		auto it = m_playingSounds.find(sound.get());
-		if (it != m_playingSounds.end())
-		{
-			playingSound = it->second;
-			m_playingSounds.erase(it);
-			return playingSound;
+		PlayingSoundList playingSounds, tmpList;
+
+		atomic_swap(m_playingSounds, playingSounds, m_mutex);
+
+		const auto count = playingSounds.size();
+		tmpList.reserve(count);
+
+		for (int i = 0; i < count; ++i) {
+			auto& playing = playingSounds[i];
+			if (playing.get() != sound.get()) {
+				tmpList.push_back(std::move(playing));
+			}
+			else {
+				playingSound = playing;
+			}
 		}
-		return nullptr;
+
+		//preserve any playing sounds that were added during this function call
+		atomic_concat(tmpList, m_playingSounds, m_mutex);
+
+		return playingSound;
 	}
 
 	void Driver::stopPlayback(PlayingSound::ptr& playingAsset) {
@@ -87,6 +101,7 @@ namespace HgSound {
 
 	void Driver::mixAudio() {
 		//if (!m_initialized) return;
+		PlayingSoundList playingSounds, tmpList;
 
 		const int32_t total_samples = samples * 2; //stereo
 
@@ -96,21 +111,25 @@ namespace HgSound {
 			buffer[i] = 0.0f;
 		}
 
-		{
-			//figure out how to make this lock smaller...
-			//the iterators make it hard to do
-			std::lock_guard<std::recursive_mutex> lock(m_mutex);
-			for (auto it = m_playingSounds.begin(); it != m_playingSounds.end();) {
-				auto this_iter = it++;
-				auto playing = this_iter->second;
-				playing->getSamples(total_samples, buffer);
-				if (playing->isFinished()) {
-					//can cause recursive mutex if receiver of event plays new audio.
-					playing->eventPlaybackEnded();
-					m_playingSounds.erase(this_iter);
-				}
+		//swap into local playingSounds so we don't have to worry about locking for a long time 
+		atomic_swap(playingSounds, m_playingSounds, m_mutex);
+
+		const auto count = playingSounds.size();
+		tmpList.reserve(count);
+
+		for (int i = 0; i < count; ++i) {
+			auto& playing = playingSounds[i];
+			playing->getSamples(total_samples, buffer);
+			if (playing->isFinished()) {
+				playing->eventPlaybackEnded();
+			}
+			else {
+				tmpList.push_back(std::move(playing));
 			}
 		}
+
+		//preserve any playing sounds that were added during this function call
+		atomic_concat(tmpList, m_playingSounds, m_mutex);
 
 		for (int32_t i = 0; i < total_samples; ++i) {
 			buffer[i] *= 0.1f;

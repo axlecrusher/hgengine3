@@ -53,11 +53,43 @@ namespace HgSound {
 		bool m_stop;
 		std::thread m_thread;
 
-		std::map<const PlayingSound*, PlayingSound::ptr> m_playingSounds;
+		typedef std::vector<PlayingSound::ptr> PlayingSoundList;
+		std::vector< PlayingSound::ptr> m_playingSounds;
+		//std::vector< PlayingSound::ptr> m_tmpSounds; //accumulates still playing sounds
 		std::recursive_mutex m_mutex;
 
 		ConditionalWait m_wait;
 	};
+
+	template<typename T>
+	void atomic_swap(T &x, T& y, std::recursive_mutex& mutex) {
+		std::lock_guard<std::recursive_mutex> lock(mutex);
+		std::swap(x, y);
+	}
+
+	template<typename T>
+	void atomic_concat(std::vector<T> &src, std::vector<T>& dest, std::recursive_mutex& mutex) {
+		std::lock_guard<std::recursive_mutex> lock(mutex);
+
+		if (dest.size() == 0) {
+			std::swap(src, dest);
+			return;
+		}
+
+		const bool destSmaller = dest.size() < src.size();
+
+		//copy smallery array into larger array
+		if (destSmaller) {
+			//if destination smaller, copy it into src and swap
+			src.reserve(src.size() + dest.size());
+			src.insert(src.end(), dest.begin(), dest.end());
+			std::swap(dest, src);
+		}
+		else {
+			dest.reserve(src.size() + dest.size());
+			dest.insert(dest.end(), src.begin(), src.end());
+		}
+	}
 }
 
 extern std::unique_ptr<HgSound::Driver> SOUND;
