@@ -42,7 +42,6 @@ namespace HgSound {
 		void mixAudio();
 
 		DoubleBuffer<float> m_buffer;
-		uint32_t m_bufferSize;
 
 	private:
 		void audioLoop();

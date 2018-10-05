@@ -12,7 +12,7 @@ std::unique_ptr<HgSound::Driver> SOUND;
 namespace HgSound {
 	std::unique_ptr<HgSound::Driver> Driver::Create() { return std::make_unique<HgSound::LibSoundIoDriver>(); }
 
-	Driver::Driver() : m_bufferSize(0), m_stop(false)
+	Driver::Driver() : m_stop(false)
 		//, m_initialized(false)
 	{
 		m_playingSounds.reserve(32);

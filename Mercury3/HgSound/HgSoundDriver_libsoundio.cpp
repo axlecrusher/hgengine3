@@ -65,7 +65,11 @@ namespace HgSound {
 		}
 
 
-		const auto buffer = driver->m_buffer.frontBuffer();
+		//const auto buffer = driver->m_buffer.frontBuffer();
+		driver->m_buffer.swapFrontBuffers();
+		const auto buffer = driver->m_buffer.isolatedFrontBuffer();
+		driver->continueExecution();
+		
 		const int channel_count = layout->channel_count;
 		const auto stepSize = areas[0].step;
 
@@ -89,7 +93,7 @@ namespace HgSound {
 
 		double latency;
 		soundio_outstream_get_latency(outstream, &latency);
-		driver->continueExecution();
+		//driver->continueExecution();
 	}
 
 
@@ -163,8 +167,8 @@ namespace HgSound {
 		}
 
 		uint8_t channels = 2; //stereo
-		m_bufferSize = channels * samples;
-		m_buffer.allocate(m_bufferSize); //allocate and init to 0
+		const uint32_t bufferSize = channels * samples;
+		m_buffer.allocate(bufferSize); //allocate and init to 0
 
 		//Move to after buffer init?
 		if ((err = soundio_outstream_open(outstream.get()))) {
