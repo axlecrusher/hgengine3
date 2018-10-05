@@ -33,7 +33,7 @@ namespace HgSound {
 		void stopPlayback(PlayingSound::ptr& playingAsset);
 
 		static std::unique_ptr<HgSound::Driver> Create();
-		static void audioLoop(Driver* driver);
+		void mixingLoop();
 
 		void continueExecution() { m_wait.resume(); }
 	protected:
@@ -44,6 +44,7 @@ namespace HgSound {
 		DoubleBuffer<float> m_buffer;
 
 	private:
+		auto PlayingSounds();
 		void audioLoop();
 		void wait() { m_wait.wait(); }
 		void InsertPlayingSound(PlayingSound::ptr& sound);

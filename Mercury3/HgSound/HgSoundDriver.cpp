@@ -24,12 +24,8 @@ namespace HgSound {
 		stop();
 	}
 
-	static void startAudioLoop(Driver* driver) {
-		Driver::audioLoop(driver);
-	}
-
 	void Driver::start() {
-		m_thread = std::thread(startAudioLoop, this);
+		m_thread = std::thread([](Driver* driver) { driver->mixingLoop(); }, this);
 	}
 
 	void Driver::stop() {
@@ -40,10 +36,10 @@ namespace HgSound {
 			m_thread.join();
 	}
 
-	void Driver::audioLoop(Driver* driver) {
-		while (!driver->m_stop) {
-			driver->mixAudio();
-			driver->wait();
+	void Driver::mixingLoop() {
+		while (!m_stop) {
+			mixAudio();
+			wait();
 		}
 	}
 
@@ -68,28 +64,15 @@ namespace HgSound {
 	}
 
 	PlayingSound::ptr Driver::RemovePlayingSound(PlayingSound::ptr& sound) {
-		PlayingSound::ptr playingSound;
-		PlayingSoundList playingSounds, tmpList;
+		PlayingSound::ptr ret;
+		std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
-		atomic_swap(m_playingSounds, playingSounds, m_mutex);
-
-		const auto count = playingSounds.size();
-		tmpList.reserve(count);
-
-		for (int i = 0; i < count; ++i) {
-			auto& playing = playingSounds[i];
-			if (playing.get() != sound.get()) {
-				tmpList.push_back(std::move(playing));
-			}
-			else {
-				playingSound = playing;
-			}
+		auto it = std::find(m_playingSounds.begin(), m_playingSounds.end(), sound);
+		if (it != m_playingSounds.end()) {
+			ret = *it;
+			m_playingSounds.erase(it);
 		}
-
-		//preserve any playing sounds that were added during this function call
-		atomic_concat(tmpList, m_playingSounds, m_mutex);
-
-		return playingSound;
+ 		return ret;
 	}
 
 	void Driver::stopPlayback(PlayingSound::ptr& playingAsset) {
@@ -99,9 +82,17 @@ namespace HgSound {
 		}
 	}
 
+	auto Driver::PlayingSounds() {
+		std::lock_guard<std::recursive_mutex> lock(m_mutex);
+		return PlayingSoundList(m_playingSounds);
+	}
+
 	void Driver::mixAudio() {
 		//if (!m_initialized) return;
-		PlayingSoundList playingSounds, tmpList;
+
+		//copy m_playing sounds because other threads could be add and removing
+		//while we are trying to mix sounds
+		PlayingSoundList playingSounds = PlayingSounds();
 
 		const int32_t total_samples = samples * 2; //stereo
 
@@ -111,25 +102,12 @@ namespace HgSound {
 			buffer[i] = 0.0f;
 		}
 
-		//swap into local playingSounds so we don't have to worry about locking for a long time 
-		atomic_swap(playingSounds, m_playingSounds, m_mutex);
-
-		const auto count = playingSounds.size();
-		tmpList.reserve(count);
-
-		for (int i = 0; i < count; ++i) {
-			auto& playing = playingSounds[i];
+		for (auto& playing : playingSounds) {
 			playing->getSamples(total_samples, buffer);
 			if (playing->isFinished()) {
-				playing->eventPlaybackEnded();
-			}
-			else {
-				tmpList.push_back(std::move(playing));
+				stopPlayback(playing); //remove sound and call eventPlaybackEnded
 			}
 		}
-
-		//preserve any playing sounds that were added during this function call
-		atomic_concat(tmpList, m_playingSounds, m_mutex);
 
 		for (int32_t i = 0; i < total_samples; ++i) {
 			buffer[i] *= 0.1f;
