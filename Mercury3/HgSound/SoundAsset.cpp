@@ -8,15 +8,8 @@ namespace HgSound {
 
 	AssetManager<SoundAsset> SoundAsset::soundAssets;
 
-	SoundAsset::SoundAsset() : m_data(nullptr), m_channels(0), m_sampleRate(0), m_totalSamples(0)
+	SoundAsset::SoundAsset() : m_channels(0), m_sampleRate(0), m_totalSamples(0)
 	{
-	}
-
-
-	SoundAsset::~SoundAsset()
-	{
-		if (m_data) delete[] m_data;
-		m_data = nullptr;
 	}
 
 	SoundAsset::ptr SoundAsset::acquire(const std::string& path) {
@@ -41,9 +34,8 @@ namespace HgSound {
 		m_totalSamples = totalSampleCount; //includes all channels
 		m_sampleCount = totalSampleCount / channels;
 
-		if (m_data) delete[] m_data;
-		m_data = new float[totalSampleCount]; //new respects float alignment requirements
-		memcpy(m_data, pSampleData, sizeof(float)*totalSampleCount);
+		m_data = std::make_unique<float[]>(totalSampleCount); //respects float alignment requirements
+		memcpy(m_data.get(), pSampleData, sizeof(float)*totalSampleCount);
 		drwav_free(pSampleData);
 
 		return true;

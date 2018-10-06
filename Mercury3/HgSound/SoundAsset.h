@@ -12,11 +12,10 @@ namespace HgSound {
 		typedef AssetManager<SoundAsset>::AssetPtr ptr;
 
 		SoundAsset();
-		~SoundAsset();
 
 		static SoundAsset::ptr acquire(const std::string& path);
 
-		float* data() const { return m_data; }
+		float* data() const { return m_data.get(); }
 		uint8_t channels() const { return m_channels; }
 		uint64_t totalSamples() const { return m_totalSamples; }
 
@@ -24,7 +23,7 @@ namespace HgSound {
 
 	private:
 		std::string m_path;
-		float* m_data;
+		std::unique_ptr<float[]> m_data;
 		uint8_t m_channels;
 		uint16_t m_sampleRate;
 		uint64_t m_totalSamples; //all channels
