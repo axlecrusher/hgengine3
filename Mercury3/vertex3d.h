@@ -146,6 +146,11 @@ namespace HgMath {
 		inline T* raw() { return xyz; }
 		inline const T* raw() const { return xyz; }
 
+		vertex center(const vertex& rhs) const {
+			const auto v = *this - rhs;
+			return rhs + v.scale(0.5);
+		}
+
 	private:
 		T xyz[fcount];
 	};

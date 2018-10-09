@@ -24,6 +24,9 @@ typedef struct AABB {
 
 	//right top
 	vertex3f rt;
+
+	vertex3f center() const { return rt.center(lb); }
+
 } AABB;
 
 class BoundingBoxes {
@@ -33,6 +36,8 @@ public:
 	void setBoxes(const AABB* bc, uint32_t count);
 	void setBoxes(std::unique_ptr<AABB[]>& bc, uint32_t count);
 	void cast_ray(const vector3& ray, const vector3& pos, void(*intersectClbk)(const aabb_result& result, void* userData), void* userData) const;
+
+	const AABB& getAABB(uint32_t idx) const { return bounding_boxes[idx]; }
 
 private:
 	aabb_result cast_ray(const vector3f& dirfrac, const vector3f& pos, const AABB& bb) const ;
