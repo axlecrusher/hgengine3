@@ -9,6 +9,8 @@
 
 
 bool KeyDownMap[KeyDownMap_length];
+bool KeyRepeatMap[KeyDownMap_length];
+
 HgMouseInput MOUSE_INPUT;
 
 namespace ENGINE {
@@ -31,6 +33,10 @@ namespace ENGINE {
 			}
 
 			return !others;
+		}
+
+		bool isKeyDown(KeyCodes key, bool ignoreRepeat) {
+			return KeyDownMap[key] && !(KeyRepeatMap[key] && ignoreRepeat);
 		}
 	}
 }

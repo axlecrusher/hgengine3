@@ -343,6 +343,10 @@ bool Win32Window::PumpMessages()
 		
 	}
 
+	for (int i = 0; i < KeyDownMap_length; ++i) {
+		KeyRepeatMap[i] = KeyDownMap[i];
+	}
+
 	while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
 	{
 		if ( InFocus() )
@@ -357,8 +361,8 @@ bool Win32Window::PumpMessages()
 			case WM_SYSKEYDOWN:
 			case WM_KEYDOWN:
 				{
-					if ( IsKeyRepeat(message.lParam) ) break;
-					auto x = ConvertScancode2(message.wParam);
+					if (IsKeyRepeat(message.lParam)) break;
+					const auto x = ConvertScancode2(message.wParam);
 					KeyDownMap[x] = true;
 					//printf("key: 0x%x\n", message.wParam);
 //					KeyboardInput::ProcessKeyInput( ConvertScancode( message.lParam ), true, false);
@@ -368,8 +372,9 @@ bool Win32Window::PumpMessages()
 			case WM_KEYUP:
 				{
 					if ( IsKeyRepeat(message.lParam) ) break;
-					auto x = ConvertScancode2(message.wParam);
+					const auto x = ConvertScancode2(message.wParam);
 					KeyDownMap[x] = false;
+					KeyRepeatMap[x] = false;
 //					KeyboardInput::ProcessKeyInput( ConvertScancode( message.lParam ), false, false);
 				}
 				break;

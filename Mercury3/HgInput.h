@@ -3,6 +3,8 @@
 
 #define KeyDownMap_length 512
 extern bool KeyDownMap[];
+extern bool KeyRepeatMap[];
+
 
 #ifdef __cplusplus
 extern "C"
@@ -150,6 +152,7 @@ namespace ENGINE {
 
 		void PumpMessages();
 		bool ScanForKeyCombo(KeyCodes key1, KeyCodes key2);
+		bool isKeyDown(KeyCodes key, bool ignoreRepeat = false);
 	}
 }
 
