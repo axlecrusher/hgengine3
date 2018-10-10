@@ -77,10 +77,11 @@ HgMath::mat4f HgElement::computeWorldSpaceMatrix(bool applyScale, bool applyRota
 
 
 //Transform point p into world space of HgElement e
-point toWorldSpace(const HgElement* e, const point* p) {
-	vector3 v1 = (*p - e->origin()).scale(e->scale()).rotate(e->orientation()) + e->position();
-	return v1;
-}
+//I'm not 100% sure this matches the functionality of computeWorldSpaceMatrix so remove for now
+//point toWorldSpace(const HgElement* e, const point* p) {
+//	vector3 v1 = (*p - e->origin()).scale(e->scale()).rotate(e->orientation()) + e->position();
+//	return v1;
+//}
 
 namespace Engine {
 	std::vector<IUpdatableCollection*>& collections() {

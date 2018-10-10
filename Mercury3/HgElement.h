@@ -191,7 +191,7 @@ private:
 typedef HgElement HgEntity;
 
 //Transform point p into world space of HgElement e
-point toWorldSpace(const HgElement* e, const point* p);
+//point toWorldSpace(const HgElement* e, const point* p);
 
 class IUpdatableCollection;
 
