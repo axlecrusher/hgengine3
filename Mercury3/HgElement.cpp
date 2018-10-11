@@ -7,13 +7,13 @@
 
 #include <str_utils.h>
 #include <HgMath.h>
-#include <map>
+#include <unordered_map>
 
 #include <HgTimer.h>
 
 #include <UpdatableCollection.h>
 
-std::map<std::string, factory_clbk> element_factories;
+std::unordered_map<std::string, factory_clbk> element_factories;
 
 void RegisterElementType(const char* c, factory_clbk factory) {
 	element_factories[c] = factory;

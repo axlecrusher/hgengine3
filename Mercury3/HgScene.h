@@ -66,7 +66,7 @@ uint8_t create_element(char* type, HgScene* scene, HgElement** element);
 
 //class HgScene;
 
-extern std::map<std::string, factory_clbk> element_factories;
+extern std::unordered_map<std::string, factory_clbk> element_factories;
 
 template<typename T>
 T* create_element(char* type, HgScene* scene, HgElement** element) {

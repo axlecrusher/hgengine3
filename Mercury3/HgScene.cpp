@@ -127,9 +127,6 @@ void HgScene::EnqueueForRender() {
 	}
 }
 
-#include <map>
-extern std::map<std::string, factory_clbk> element_factories;
-
 uint8_t create_element(char* type, HgScene* scene, HgElement** element) {
 //	uint32_t idx = hgelement_get_type_index(type);
 
