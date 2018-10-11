@@ -42,7 +42,8 @@ enum VBO_TYPE : uint8_t {
 	VBO_INDEX8,
 	VBO_INDEX16,
 	VBO_INDEX32,
-	VBO_COLOR8
+	VBO_COLOR8,
+	VBO_COLOR16
 };
 
 enum BUFFER_USE_TYPE : uint8_t {
@@ -54,7 +55,7 @@ enum BUFFER_USE_TYPE : uint8_t {
 //Vertex,Color
 typedef struct vbo_layout_vc {
 	vertex v;
-	color c;
+	color8 c;
 } vbo_layout_vc;
 
 

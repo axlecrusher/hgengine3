@@ -47,7 +47,8 @@ public:
 		if (std::is_same<T, uint8_t>::value) { return VBO_INDEX8; }
 		if (std::is_same<T, uint16_t>::value) { return VBO_INDEX16; }
 		if (std::is_same<T, uint32_t>::value) { return VBO_INDEX32; }
-		if (std::is_same<T, color>::value) { return VBO_COLOR8; }
+		if (std::is_same<T, color8>::value) { return VBO_COLOR8; }
+		if (std::is_same<T, color16>::value) { return VBO_COLOR16; }
 		return VBO_TYPE_INVALID;
 	}
 
@@ -297,7 +298,7 @@ inline void OGLvbo<uint32_t>::sendToGPU() {
 }
 
 template<>
-inline void OGLvbo<color>::sendToGPU() {
+inline void OGLvbo<color8>::sendToGPU() {
 	if (handle.vbo_id == 0) {
 		GLuint buf_id;
 		glGenBuffers(1, &buf_id);
@@ -334,7 +335,7 @@ inline void OGLvbo<uint32_t>::bind() {
 }
 
 template<>
-inline void OGLvbo<color>::bind() {
+inline void OGLvbo<color8>::bind() {
 	glBindBuffer(GL_ARRAY_BUFFER, handle.vbo_id);
 	glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
 	glEnableVertexAttribArray(L_COLOR);

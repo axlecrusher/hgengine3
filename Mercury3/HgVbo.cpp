@@ -101,8 +101,13 @@ namespace HgVbo {
 	}
 
 	template<>
-	std::unique_ptr<IHgVbo> Create<color>() {
-		return std::move(vbo_from_api_type<color>());
+	std::unique_ptr<IHgVbo> Create<color8>() {
+		return std::move(vbo_from_api_type<color8>());
+	}
+
+	template<>
+	std::unique_ptr<IHgVbo> Create<color16>() {
+		return std::move(vbo_from_api_type<color16>());
 	}
 }
 
