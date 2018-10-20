@@ -5,7 +5,7 @@
 
 #include <Windows.h>
 #include <stdio.h>
-#include <HgMessaging.h>
+//#include <HgMessaging.h>
 
 #include <MercuryWindow.h>
 #include <RenderBackend.h>
@@ -27,7 +27,7 @@ namespace ENGINE {
 	void InitEngine() {
 		EnumberateSymbols();
 		SetRealtimePriority();
-		InitMessageSystem();
+//		InitMessageSystem();
 
 		memset(KeyDownMap, 0, sizeof(bool)*KeyDownMap_length);
 	}
