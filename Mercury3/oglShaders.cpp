@@ -42,11 +42,11 @@ void useShaderProgram(GLuint id) {
 //	printf("shader %d\n", id);
 }
 
-static char* read_from_disk(const char* path) {
+static std::string read_from_disk(const char* path) {
+	std::string source;
 	FILE* f = fopen(path, "r");
 	if (f == NULL) {
-		assert(f);
-		return NULL;
+		return source;
 	}
 
 	fseek(f, 0, SEEK_END);
@@ -65,13 +65,10 @@ static char* read_from_disk(const char* path) {
 		return str;
 	}
 
-	size = bytes_read;
-	char* realloc_ptr = (char*)realloc(str, size+1);
-	assert(realloc_ptr != NULL);
-	str = realloc_ptr;
-	str[size] = 0;
+	source = std::string(str, bytes_read);
+	free(str);
 
-	return str;
+	return source;
 }
 
 static GLuint compile_shader(const char* str, GLuint shader_type) {

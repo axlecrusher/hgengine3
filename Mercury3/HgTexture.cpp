@@ -116,6 +116,10 @@ bool HgTexture::load_internal(const std::string& path) {
 	char filecode[4];
 	m_path = path;
 	FILE *f = fopen(path.c_str(), "rb");
+	if (f == nullptr) {
+		fprintf(stderr, "Unable to open file \"%s\"", path.c_str());
+		return false;
+	}
 
 	fread(filecode, 1, 4, f);
 	if (strncmp(filecode, "DDS ", 4) != 0) {

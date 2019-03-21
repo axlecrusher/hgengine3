@@ -351,6 +351,7 @@ bool Win32Window::PumpMessages()
 	{
 		if ( InFocus() )
 		{
+//			printf("message %d\n", message.message);
 			switch( message.message )
 			{
 			//case WM_MINMAXINFO:
