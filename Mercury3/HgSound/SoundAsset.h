@@ -17,9 +17,14 @@ namespace HgSound {
 
 		float* data() const { return m_data.get(); }
 		uint8_t channels() const { return m_channels; }
+
+		//total number of samples across all channels
 		uint64_t totalSamples() const { return m_totalSamples; }
 
+		//samples per second
 		auto sampleRate() const { return m_sampleRate; }
+
+		std::shared_ptr<PlayingSound> newPlayingInstance() { return play(); }
 
 	private:
 		std::string m_path;

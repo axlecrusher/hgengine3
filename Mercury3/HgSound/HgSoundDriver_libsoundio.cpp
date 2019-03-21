@@ -97,7 +97,7 @@ namespace HgSound {
 	}
 
 
-	LibSoundIoDriver::LibSoundIoDriver() : Driver() {
+	LibSoundIoDriver::LibSoundIoDriver() : m_initialized(false), Driver() {
 	}
 
 	LibSoundIoDriver::~LibSoundIoDriver() {
@@ -107,12 +107,12 @@ namespace HgSound {
 		soundio = nullptr;
 	}
 
-	void LibSoundIoDriver::Init() {
+	bool LibSoundIoDriver::Init() {
 		auto soundio = soundio_ptr(soundio_create(), soundio_destroy);
 
 		if (!soundio) {
 			fprintf(stderr, "out of memory\n");
-			return;
+			return false;
 		}
 
 		auto sound_ptr = soundio.get();
@@ -120,7 +120,7 @@ namespace HgSound {
 
 		if (err) {
 			fprintf(stderr, "Unable to connect to sound backend: %s\n", soundio_strerror(err));
-			return;
+			return false;
 		}
 
 		fprintf(stderr, "Sound backend: %s\n", soundio_backend_name(soundio->current_backend));
@@ -129,18 +129,18 @@ namespace HgSound {
 		int selected_device_index = soundio_default_output_device_index(sound_ptr);
 		if (selected_device_index < 0) {
 			fprintf(stderr, "Output device not found\n");
-			return;
+			return false;
 		}
 
 		auto device = device_ptr(soundio_get_output_device(sound_ptr, selected_device_index), soundio_device_unref);
 		if (!device) {
 			fprintf(stderr, "out of memory\n");
-			return;
+			return false;
 		}
 		fprintf(stderr, "Sound output device: %s\n", device->name);
 		if (device->probe_error) {
 			fprintf(stderr, "Cannot probe device: %s\n", soundio_strerror(device->probe_error));
-			return;
+			return false;
 		}
 
 		auto outstream = outstream_ptr(soundio_outstream_create(device.get()), soundio_outstream_destroy);
@@ -163,7 +163,7 @@ namespace HgSound {
 		//}
 		else {
 			fprintf(stderr, "No suitable device format available.\n");
-			return;
+			return false;
 		}
 
 		uint8_t channels = 2; //stereo
@@ -173,7 +173,7 @@ namespace HgSound {
 		//Move to after buffer init?
 		if ((err = soundio_outstream_open(outstream.get()))) {
 			fprintf(stderr, "unable to open device: %s", soundio_strerror(err));
-			return;
+			return false;
 		}
 		fprintf(stderr, "Software latency: %f\n", outstream->software_latency);
 
@@ -184,17 +184,27 @@ namespace HgSound {
 		this->device = std::move(device);
 		this->outstream = std::move(outstream);
 
-		//m_initialized = true;
+		m_initialized = true;
+
+		return true;
 	}
 
-	void LibSoundIoDriver::start() {
-		Driver::start();
+	bool LibSoundIoDriver::start() {
+		bool success = Driver::start();
+
+		if (!m_initialized)
+		{
+			fprintf(stderr, "LibSoundIoDriver uninitialized\n");
+			return false;
+		}
 
 		int err;
 
 		if ((err = soundio_outstream_start(outstream.get()))) {
 			fprintf(stderr, "unable to start device: %s\n", soundio_strerror(err));
-			return;
+			return false;
 		}
+
+		return success;
 	}
 }

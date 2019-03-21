@@ -16,16 +16,18 @@ namespace HgSound {
 	public:
 		Driver();
 		virtual ~Driver();
-		virtual void Init() = 0;
+		virtual bool Init() = 0;
 
 		//start audio decoding and mixing thread
-		virtual void start();
+		virtual bool start();
 
-		PlayingSound::ptr play(SoundAsset::ptr& asset, HgTime startOffset);
+		virtual void threadLoop() = 0;
 
-		PlayingSound::ptr play(SoundAsset::ptr& asset) {
+		virtual void play(PlayingSound::ptr& sound, HgTime startOffset);
+
+		void play(PlayingSound::ptr& sound) {
 			const auto zero = HgTime::msec(0);
-			return play(asset, zero);
+			return play(sound, zero);
 		}
 
 		void stop();
@@ -39,15 +41,16 @@ namespace HgSound {
 	protected:
 		const static int32_t samples;
 
+		bool stopping() { return m_stop; }
 		void mixAudio();
 
 		DoubleBuffer<float> m_buffer;
+		void InsertPlayingSound(PlayingSound::ptr& sound);
 
 	private:
 		auto PlayingSounds();
 		void audioLoop();
 		void wait() { m_wait.wait(); }
-		void InsertPlayingSound(PlayingSound::ptr& sound);
 		PlayingSound::ptr RemovePlayingSound(PlayingSound::ptr& sound);
 
 		bool m_stop;

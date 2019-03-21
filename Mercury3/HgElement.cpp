@@ -22,7 +22,7 @@ void RegisterElementType(const char* c, factory_clbk factory) {
 
 void HgElement::init()
 {
-	m_renderData = NULL;
+	m_renderData = nullptr;
 	m_logic = nullptr;
 	m_renderData = nullptr;
 

@@ -2,7 +2,7 @@
 
 #include <string>
 #include <memory>
-#include <map>
+#include <unordered_map>
 
 #include <mutex>
 
@@ -69,6 +69,6 @@ private:
 	}
 
 	bool is_valid;
-	std::map< const std::string, std::weak_ptr<T> > m_map;
+	std::unordered_map< std::string, std::weak_ptr<T> > m_map;
 	std::recursive_mutex m_mutex;
 };

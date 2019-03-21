@@ -223,10 +223,13 @@ int main()
 	model_data::load_ini(teapot, "teapot.ini");
 	teapot->origin(teapot->origin().x(2).z(3).y(1));
 	
-	HgElement* statue = NULL;
-	scene.getNewElement(&statue);
-	model_data::load_ini(statue, "statue.ini");
-	statue->origin(statue->origin().x(2).z(3).y(1));
+	for (int i = 0; i < 4; ++i) {
+		HgElement* statue = NULL;
+		scene.getNewElement(&statue);
+		model_data::load_ini(statue, "statue.ini");
+		statue->origin(statue->origin().x(2).z(3).y(1));
+		statue->position(statue->position().x(i));
+	}
 
 	uint32_t i;
 	{
@@ -402,6 +405,7 @@ int main()
 
 		}
 
+		doRender = true;
 		if (doRender) {
 			BeginFrame();
 

@@ -18,7 +18,7 @@ namespace HgSound {
 		void stop();
 
 		inline void setVolume(float x) { m_volume = x; }
-		inline float volume(float x) const { return m_volume; }
+		inline float volume() const { return m_volume; }
 
 		//playbackEndedFunc callback will be called from a thread
 		inline void setEventPlaybackEnded(const playbackEndedFunc& clbk) { m_playbackEndedClbk = clbk; }
@@ -31,6 +31,8 @@ namespace HgSound {
 			s /= 1000;
 			m_nextSample = std::min(s, sound->totalSamples());
 		}
+
+		inline SoundAsset::ptr getSoundAsset() { return m_sound; }
 
 	private:
 		float m_volume;

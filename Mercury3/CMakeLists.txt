@@ -15,6 +15,13 @@ file(GLOB RENDERERSRC
 
 source_group("RenderBackend" FILES ${RENDERERSRC})
 
+file(GLOB CORE_ENGINESOURCES
+	"src/core/*.h"
+	"src/core/*.cpp"
+)
+
+source_group("Core" FILES ${CORE_ENGINESOURCES})
+
 file(GLOB ENGINESOURCES
 	"*.cpp"
 	"*.h"
@@ -36,7 +43,7 @@ if(MSVC)
     set(WIDECHAR "/Zc:wchar_t")
 endif()
 
-add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC})
+add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC} ${CORE_ENGINESOURCES})
 target_compile_options(hgengine PRIVATE ${WIDECHAR})
 
 target_include_directories(hgengine PUBLIC "./")
@@ -47,3 +54,4 @@ target_include_directories(hgengine PUBLIC "src/ogl/")
 target_include_directories(hgengine PUBLIC "src/renderer/")
 target_include_directories(hgengine PUBLIC "lib/libsoundio/")
 target_include_directories(hgengine PUBLIC "src/renderer/")
+target_include_directories(hgengine PUBLIC "src/core")

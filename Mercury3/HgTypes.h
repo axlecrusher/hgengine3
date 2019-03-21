@@ -51,6 +51,9 @@ typedef vertex3f vector3f;
 	typedef struct tangent {
 		float x, y, z, w;
 	} tangent;
+
+	typedef vector3f velocity;
+
 //#ifdef __cplusplus
 //}
 //#endif

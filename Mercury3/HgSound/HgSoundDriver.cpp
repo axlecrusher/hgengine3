@@ -6,11 +6,15 @@
 #include <memory>
 
 #include <HgSound\HgSoundDriver_libsoundio.h>
+#include <HgSound\HgSoundDriver_xaudio2.h>
 
 std::unique_ptr<HgSound::Driver> SOUND;
 
 namespace HgSound {
-	std::unique_ptr<HgSound::Driver> Driver::Create() { return std::make_unique<HgSound::LibSoundIoDriver>(); }
+	std::unique_ptr<HgSound::Driver> Driver::Create()
+	{
+		return std::make_unique<HgSound::XAudio2::XAudio2Driver>();
+	}
 
 	Driver::Driver() : m_stop(false)
 		//, m_initialized(false)
@@ -24,8 +28,9 @@ namespace HgSound {
 		stop();
 	}
 
-	void Driver::start() {
-		m_thread = std::thread([](Driver* driver) { driver->mixingLoop(); }, this);
+	bool Driver::start() {
+		m_thread = std::thread([](Driver* driver) { driver->threadLoop(); }, this);
+		return true;
 	}
 
 	void Driver::stop() {
@@ -43,18 +48,15 @@ namespace HgSound {
 		}
 	}
 
-	PlayingSound::ptr Driver::play(SoundAsset::ptr& asset, HgTime startOffset) {
-		if (asset == nullptr) return nullptr;
+	void Driver::play(PlayingSound::ptr& sound, HgTime startOffset) {
+		if (sound == nullptr) return;
 
-		auto sound = asset->play();
-		if (sound == nullptr) return nullptr;
-		const int32_t total_samples = samples * 2; //stereo
-
+		auto asset = sound->getSoundAsset();
+		const int32_t total_samples = samples * asset->channels(); //stereo
 
 		sound->jumpToTime(startOffset);
 		//sound->getSamples(total_samples, m_buffer);
 		InsertPlayingSound(sound);
-		return std::move(sound);
 	}
 
 	void Driver::InsertPlayingSound(PlayingSound::ptr& sound)

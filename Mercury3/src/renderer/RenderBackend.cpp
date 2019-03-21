@@ -79,9 +79,11 @@ void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f
 void Renderer::Enqueue(HgElement& e) {
 	auto worldSpaceMatrix = e.computeWorldSpaceMatrix();
 	if (e.flags.transparent) {
+		//order by distance back to front?
 		Renderer::transparentElements.emplace_back(worldSpaceMatrix, e.getRenderDataPtr());
 	}
 	else {
+		//order by distance front to back?
 		Renderer::opaqueElements.emplace_back(worldSpaceMatrix, e.getRenderDataPtr());
 	}
 }

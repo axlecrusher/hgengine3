@@ -12,8 +12,8 @@ namespace HgSound {
 	public:
 		LibSoundIoDriver();
 		~LibSoundIoDriver();
-		void Init();
-		void start();
+		bool Init();
+		bool start();
 	private:
 		typedef std::unique_ptr<SoundIo, decltype(&soundio_destroy)> soundio_ptr;
 		typedef std::unique_ptr<SoundIoDevice, decltype(&soundio_device_unref)> device_ptr;
@@ -24,6 +24,8 @@ namespace HgSound {
 		outstream_ptr outstream{ nullptr,soundio_outstream_destroy };
 
 		static void write_callback(struct SoundIoOutStream *outstream, int frame_count_min, int frame_count_max);
+
+		bool m_initialized;
 	};
 
 }
