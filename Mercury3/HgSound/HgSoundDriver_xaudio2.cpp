@@ -229,6 +229,12 @@ Voice XAudio2Driver::xplay(PlayingSound::ptr& sound)
 void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 {
 	auto asset = sound->getSoundAsset();
+	if (asset->getNumChannels() > 1)
+	{
+		std::cerr << "Can not play multichannel sound in 3D. Mono Only. " << std::endl;
+		return;
+	}
+
 	Voice v = xplay(sound);
 
 	X3DAUDIO_EMITTER x_emitter = { 0 };
