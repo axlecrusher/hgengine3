@@ -119,9 +119,9 @@ void fire(HgScene* scene) {
 	create_element("basic_projectile", scene, &element);
 
 	Projectile *pd = dynamic_cast<Projectile*>(&element->logic());
-	pd->direction = camera->projectRay();
-	element->orientation(camera->orientation.conjugate());
-	element->position(camera->position);
+	pd->direction = camera->getForward();
+	element->orientation(camera->getWorldSpaceOrientation().conjugate());
+	element->position(camera->getWorldSpacePosition());
 }
 
 void(*submit_for_render)(uint8_t viewport_idx, HgCamera* camera, HgElement* e);
@@ -197,12 +197,16 @@ int main()
 	//	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
 	//	Perspective2(60, 320.0 / 480.0, 0.1f, 100.0f, projection);
 	using namespace HgMath;
-	camera[0].position.z(1.5f);
-	camera[0].position.y(2.0f);
-	camera[0].setOrientation(quaternion::fromEuler(angle::deg(15), angle::ZERO, angle::ZERO) );
+	const auto position = camera[0].getWorldSpacePosition().z(1.5f).y(2.0f);
+	camera[0].setWorldSpacePosition(position);
+	camera[0].setWorldSpaceOrientation(quaternion::fromEuler(angle::deg(15), angle::ZERO, angle::ZERO) );
 
-	camera[1] = camera[0];
-	camera[1].position.x(camera[1].position.x() + EYE_DISTANCE);
+	{
+		camera[1] = camera[0];
+		auto tmp = camera[1].getWorldSpacePosition();
+		tmp.x(tmp.x() + EYE_DISTANCE); //i don't think this is correct. I think that you have to rotate a (1,0,0) vector by the orientation and then scale by eye distance and add to position
+		camera[1].setWorldSpacePosition(tmp);
+	}
 
 	//	MatrixMultiply4f(projection, camera, view);
 
@@ -362,9 +366,7 @@ int main()
 				if (KeyDownMap[KeyCodes::KEY_S]) v.z(v.z() + 1.0f);
 				if (KeyDownMap[KeyCodes::KEY_A]) v.x(v.x() - 1.0f);
 				if (KeyDownMap[KeyCodes::KEY_D]) v.x(v.x() + 1.0f);
-				if (KeyDownMap[KeyCodes::KEY_R]) {
-					mouse_x = 0; mouse_y = -42;
-				}
+
 
 				if (KeyDownMap[KeyCodes::KEY_SPACE]) {
 					//				printf("fire!\n");
@@ -373,22 +375,28 @@ int main()
 
 				//			if (v.components.z > 0) DebugBreak();
 
-				v = v.normal().rotate(camera->orientation.conjugate());
+				v = v.normal().rotate(camera->getWorldSpaceOrientation());
 				float scale = (1.0f / 1000.0f) * timeStep.msec();
 				v = v.normal().scale(scale);
-				camera->move(v);
+				camera[0].move(v);
 
 				mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
 				mouse_y = (MOUSE_INPUT.dy + mouse_y) % 2000;
 
 				using namespace HgMath;
-				camera->FreeRotate(angle::deg((-MOUSE_INPUT.dx / 2000.0f) * 360), angle::deg((-MOUSE_INPUT.dy / 2000.0f) * 360));
+				camera->FreeRotate(angle::deg((MOUSE_INPUT.dx / 2000.0f) * 360), angle::deg((MOUSE_INPUT.dy / 2000.0f) * 360));
 
+				if (KeyDownMap[KeyCodes::KEY_R]) {
+					auto q = quaternion::fromEuler(angle::deg(0), angle::deg(0), angle::deg(0));
+					camera->setWorldSpaceOrientation(q);
+					point zero(0,1,0);
+					camera->setWorldSpacePosition(zero);
+				}
 				MOUSE_INPUT.dx = 0;
 				MOUSE_INPUT.dy = 0;
 			}
 
-			grid->position(point(camera->position).y(0));
+			grid->position(point(camera->getWorldSpacePosition()).y(0));
 
 			{
 				HgElement* element = tris[0];
@@ -410,9 +418,9 @@ int main()
 			BeginFrame();
 
 			camera[1] = camera[0];
-			camera[1].position.x(camera[1].position.x() - EYE_DISTANCE * 0.5f);
+//			camera[1].position.x(camera[1].position.x() - EYE_DISTANCE * 0.5f);
 			camera[2] = camera[0];
-			camera[2].position.x(camera[1].position.x() + EYE_DISTANCE * 0.5f);
+//			camera[2].position.x(camera[1].position.x() + EYE_DISTANCE * 0.5f);
 
 			Renderer::opaqueElements.clear();
 			Renderer::transparentElements.clear();

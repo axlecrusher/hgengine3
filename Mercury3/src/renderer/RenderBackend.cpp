@@ -65,7 +65,7 @@ static void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, Ren
 
 void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f& projection) {
 	ProjectionMatrix = projection;
-	ViewMatrix = camera->toMatrix();
+	ViewMatrix = camera->toViewMatrix();
 
 	for (auto& renderInstance : opaqueElements) {
 		submit_for_render_serial(viewportIdx, camera, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix);
