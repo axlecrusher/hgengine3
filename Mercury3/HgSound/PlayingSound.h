@@ -3,6 +3,7 @@
 #include <HgSound/SoundAsset.h>
 #include <HgTimer.h>
 #include <algorithm>
+#include <Emitter.h>
 
 namespace HgSound {
 	class PlayingSound {
@@ -34,11 +35,19 @@ namespace HgSound {
 
 		inline SoundAsset::ptr getSoundAsset() { return m_sound; }
 
+		//Used for 3D sound
+		const Emitter& getEmitter() const { return m_emitter; }
+
+		//set 3D sound emitter
+		void setEmitter(const Emitter& e) { m_emitter = e; }
+
 	private:
 		float m_volume;
 
 		SoundAsset::ptr m_sound;
 		uint64_t m_nextSample; //next sample to play
 		playbackEndedFunc m_playbackEndedClbk;
+
+		HgSound::Emitter m_emitter; //mutex needed?
 	};
 }

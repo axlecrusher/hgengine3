@@ -281,13 +281,6 @@ int main()
 			//element->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 		}
 
-		auto testSound = HgSound::SoundAsset::acquire("song.wav");
-		auto snd = testSound->newPlayingInstance();
-		snd->setVolume(0.5);
-		HgSound::Emitter emitter;
-		emitter.setPosition(element->position());
-		SOUND->play3d(snd, emitter);
-
 //		element->position.
 
 		if (create_element("voxelGrid", &scene, &element) > 0) {
@@ -309,15 +302,20 @@ int main()
 	}
 
 
-	{
-		HgElement* element = NULL;
-		if (create_element("cube", &scene, &element) > 0) {
-			element->scale(0.3);
-			element->position(point(0, 3, 0));
-			element->inheritParentScale(false);
-			element->setParent(teapot);
-		}
+	HgElement* teapotSquare = NULL;
+	if (create_element("cube", &scene, &teapotSquare) > 0) {
+		teapotSquare->scale(0.3);
+		teapotSquare->position(point(0, 3, 0));
+		teapotSquare->inheritParentScale(false);
+		teapotSquare->setParent(teapot);
 	}
+
+	auto testSound = HgSound::SoundAsset::acquire("song.wav");
+	auto snd = testSound->newPlayingInstance();
+	snd->setVolume(0.5);
+	HgSound::Emitter emitter;
+	emitter.setPosition(teapotSquare->position());
+	SOUND->play3d(snd, emitter);
 
 	HANDLE thread1 = CreateThread(NULL, 0, &PrintCtr, NULL, 0, NULL);
 
@@ -425,6 +423,11 @@ int main()
 				const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
 				element->orientation(orientation);
 				teapot->orientation(orientation.conjugate());
+
+				HgSound::Emitter emitter = snd->getEmitter();
+				emitter.setPosition(teapotSquare->computeWorldSpacePosition());
+				snd->setEmitter(emitter);
+
 
 				for (i = 0; i < ANI_TRIS; i++) {
 					tris[i]->orientation(element->orientation());

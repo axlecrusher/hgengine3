@@ -140,12 +140,19 @@ void XAudio2Driver::update3DAudio()
 	memset(&x_listener, 0, sizeof(X3DAUDIO_LISTENER));
 	updateListener(getListener(), x_listener);
 
+	//X3DAUDIO_EMITTER x_emitter;
+	//memset(&x_emitter, 0, sizeof(X3DAUDIO_EMITTER));
+
+
+
 	for (auto& voice : m_voices)
 	{
 		if (voice.voice3d)
 		{
 			auto& voice3d = voice.voice3d;
 			auto& DSPSettings = voice3d->dsp_settings;
+
+			updateEmitter(voice.sound->getEmitter(), voice3d->emitter);
 
 			X3DAudioCalculate(m_xaudio3d, &x_listener, &voice3d->emitter,
 				X3DAUDIO_CALCULATE_MATRIX |
@@ -271,6 +278,8 @@ void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 	v3d->dsp_settings = DSPSettings;
 	v3d->emitter = x_emitter;
 	v.voice3d = v3d;
+
+	sound->setEmitter(emitter);
 
 	InsertVoice(v);
 }
