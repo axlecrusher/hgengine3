@@ -16,7 +16,7 @@ namespace HgSound {
 		static SoundAsset::ptr acquire(const std::string& path);
 
 		float* data() const { return m_data.get(); }
-		uint8_t channels() const { return m_channels; }
+		uint8_t getNumChannels() const { return m_channels; }
 
 		//total number of samples across all channels
 		uint64_t totalSamples() const { return m_totalSamples; }

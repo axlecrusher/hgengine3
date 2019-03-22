@@ -74,7 +74,12 @@ HgMath::mat4f HgElement::computeWorldSpaceMatrix(bool applyScale, bool applyRota
 	return modelMatrix;
 }
 
-
+point HgElement::computeWorldSpacePosition() const
+{
+	const vector3f p;
+	const auto matrix = computeWorldSpaceMatrix();
+	return matrix * p;
+}
 
 //Transform point p into world space of HgElement e
 //I'm not 100% sure this matches the functionality of computeWorldSpaceMatrix so remove for now

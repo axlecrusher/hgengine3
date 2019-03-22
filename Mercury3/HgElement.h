@@ -168,6 +168,7 @@ public:
 		//inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 
 		HgMath::mat4f computeWorldSpaceMatrix(bool scale = true, bool rotation = true, bool translation = true) const;
+		point computeWorldSpacePosition() const;
 
 		inline void inheritParentScale(bool x) { flags.inheritParentScale = x; }
 		inline void inheritParentRotation(bool x) { flags.inheritParentRotation = x; }

@@ -33,6 +33,8 @@
 #include <math/vector.h>
 #include <InstancedCollection.h>
 
+#include <HgSoundDriver.h>
+
 float projection[16];
 
 extern viewport view_port[];
@@ -184,6 +186,12 @@ int main()
 		//tmp.store(projection);
 	}
 
+	SOUND = HgSound::Driver::Create();
+	if (SOUND->Init())
+	{
+		SOUND->start();
+	}
+
 	uint8_t s = sizeof(HgElement);
 	printf("element size %d\n", s);
 	printf("vertex size %zd\n", sizeof(vertex));
@@ -265,6 +273,20 @@ int main()
 				//element->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 			}
 		}
+
+		if (create_element("cube", &scene, &element) > 0) {
+			element->position(point(2,2,-2));
+			element->scale(0.3f);
+			element->renderData()->shader = HgShader::acquire("basic_light2_v.glsl", "basic_light2_f.glsl");
+			//element->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
+		}
+
+		auto testSound = HgSound::SoundAsset::acquire("song.wav");
+		auto snd = testSound->newPlayingInstance();
+		snd->setVolume(0.5);
+		HgSound::Emitter emitter;
+		emitter.setPosition(element->position());
+		SOUND->play3d(snd, emitter);
 
 //		element->position.
 
@@ -421,6 +443,12 @@ int main()
 //			camera[1].position.x(camera[1].position.x() - EYE_DISTANCE * 0.5f);
 			camera[2] = camera[0];
 //			camera[2].position.x(camera[1].position.x() + EYE_DISTANCE * 0.5f);
+
+			HgSound::Listener listener;
+			listener.setPosition(camera[0].getWorldSpacePosition());
+			listener.setForward(camera[0].getForward());
+			listener.setUp(camera[0].getUp());
+			SOUND->setListener(listener);
 
 			Renderer::opaqueElements.clear();
 			Renderer::transparentElements.clear();

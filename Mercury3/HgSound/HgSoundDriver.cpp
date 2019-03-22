@@ -52,7 +52,7 @@ namespace HgSound {
 		if (sound == nullptr) return;
 
 		auto asset = sound->getSoundAsset();
-		const int32_t total_samples = samples * asset->channels(); //stereo
+		const int32_t total_samples = samples * asset->getNumChannels(); //stereo
 
 		sound->jumpToTime(startOffset);
 		//sound->getSamples(total_samples, m_buffer);

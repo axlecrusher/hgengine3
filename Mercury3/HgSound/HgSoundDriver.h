@@ -11,6 +11,8 @@
 #include <thread>
 #include <ConditionalWait.h>
 
+#include <Emitter.h>
+
 namespace HgSound {
 	class Driver {
 	public:
@@ -25,6 +27,8 @@ namespace HgSound {
 
 		virtual void play(PlayingSound::ptr& sound, HgTime startOffset);
 
+		virtual void play3d(PlayingSound::ptr& sound, const Emitter& emitter) = 0;
+
 		void play(PlayingSound::ptr& sound) {
 			const auto zero = HgTime::msec(0);
 			return play(sound, zero);
@@ -38,6 +42,10 @@ namespace HgSound {
 		void mixingLoop();
 
 		void continueExecution() { m_wait.resume(); }
+
+		Listener getListener() const { return m_listener; }
+		void setListener(const Listener& l) { m_listener = l; }
+
 	protected:
 		const static int32_t samples;
 
@@ -62,6 +70,8 @@ namespace HgSound {
 		std::recursive_mutex m_mutex;
 
 		ConditionalWait m_wait;
+
+		Listener m_listener;
 	};
 
 	template<typename T>

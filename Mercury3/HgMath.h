@@ -54,6 +54,12 @@ namespace HgMath {
 
 		inline T rad() const { return m_radians; }
 		static inline angle_template<T> rad(T x) { angle_template<T> tmp; tmp.m_radians = x; return tmp; }
+
+		angle_template<T> operator-() {
+			auto tmp = *this;
+			tmp.m_radians = -tmp.m_radians;
+			return tmp;
+		}
 	private:
 		T m_radians;
 	};

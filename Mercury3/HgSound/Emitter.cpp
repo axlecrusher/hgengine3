@@ -3,13 +3,4 @@
 
 namespace HgSound {
 
-	Emitter::Emitter()
-	{
-	}
-
-
-	Emitter::~Emitter()
-	{
-	}
-
 }

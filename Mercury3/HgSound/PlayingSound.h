@@ -27,7 +27,7 @@ namespace HgSound {
 		void jumpToTime(HgTime t) {
 			auto sound = m_sound.get();
 			uint64_t msec = t.msec();
-			auto s = msec * sound->sampleRate() * sound->channels();
+			auto s = msec * sound->sampleRate() * sound->getNumChannels();
 			s /= 1000;
 			m_nextSample = std::min(s, sound->totalSamples());
 		}
