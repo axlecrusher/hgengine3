@@ -14,6 +14,8 @@ XAudio2Driver::XAudio2Driver() : m_initialized(false), Driver() {
 
 XAudio2Driver::~XAudio2Driver()
 {
+	stop(); //stop audio thread
+
 	if (m_xaudioEngine)
 	{
 		m_xaudioEngine->Release();
