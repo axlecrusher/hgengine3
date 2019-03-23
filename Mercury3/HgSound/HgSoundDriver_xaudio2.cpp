@@ -159,12 +159,14 @@ void XAudio2Driver::update3DAudio()
 
 	for (auto& voice : m_voices)
 	{
+		auto& sound = voice.sound;
+
 		if (voice.voice3d)
 		{
 			auto& voice3d = voice.voice3d;
 			auto& DSPSettings = voice3d->dsp_settings;
 
-			updateEmitter(voice.sound->getEmitter(), voice3d->emitter);
+			updateEmitter(sound->getEmitter(), voice3d->emitter);
 
 			X3DAudioCalculate(m_xaudio3d, &x_listener, &voice3d->emitter,
 				X3DAUDIO_CALCULATE_MATRIX |
@@ -176,7 +178,6 @@ void XAudio2Driver::update3DAudio()
 			voice.xaudioVoice->SetFrequencyRatio(DSPSettings.DopplerFactor);
 		}
 
-		auto& sound = voice.sound;
 		voice.xaudioVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
 	}
 }

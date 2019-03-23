@@ -5,6 +5,9 @@
 #include <algorithm>
 #include <Emitter.h>
 
+#include <atomic>
+#include <GuardedType.h>
+
 namespace HgSound {
 	class PlayingSound {
 	public:
@@ -36,18 +39,17 @@ namespace HgSound {
 		inline SoundAsset::ptr getSoundAsset() { return m_sound; }
 
 		//Used for 3D sound
-		const Emitter& getEmitter() const { return m_emitter; }
+		const Emitter getEmitter() const { return m_emitter; }
 
 		//set 3D sound emitter
 		void setEmitter(const Emitter& e) { m_emitter = e; }
 
 	private:
-		float m_volume;
+		std::atomic<float> m_volume;
+		GuardedType<HgSound::Emitter> m_emitter; //is there a way to do this without a mutex?
 
 		SoundAsset::ptr m_sound;
 		uint64_t m_nextSample; //next sample to play
 		playbackEndedFunc m_playbackEndedClbk;
-
-		HgSound::Emitter m_emitter; //mutex needed?
 	};
 }
