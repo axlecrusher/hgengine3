@@ -55,7 +55,7 @@ std::unique_ptr<HgSound::IDriver> Create()
 		auto asset = sound->getSoundAsset();
 		const int32_t total_samples = samples * asset->getNumChannels(); //stereo
 
-		sound->jumpToTime(startOffset);
+//		sound->jumpToTime(startOffset);
 		//sound->getSamples(total_samples, m_buffer);
 		InsertPlayingSound(sound);
 	}
@@ -110,10 +110,10 @@ std::unique_ptr<HgSound::IDriver> Create()
 		}
 
 		for (auto& playing : playingSounds) {
-			playing->getSamples(total_samples, buffer);
-			if (playing->isFinished()) {
+//FIXME			playing->getSamples(total_samples, buffer);
+//FIXME			if (playing->isFinished()) {
 				stopPlayback(playing.get()); //remove sound and call eventPlaybackEnded
-			}
+//			}
 		}
 
 		for (int32_t i = 0; i < total_samples; ++i) {
