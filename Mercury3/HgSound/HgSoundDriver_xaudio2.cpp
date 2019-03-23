@@ -6,24 +6,22 @@
 namespace HgSound {
 namespace XAudio2 {
 
-XAudio2Driver::XAudio2Driver() : m_initialized(false), Driver() {
+//lower volume to allow for more voices
+static const float VolumeMultiplier = 0.1;
+
+XAudio2Driver::XAudio2Driver() : m_initialized(false), IDriver() {
 	m_xaudioEngine = nullptr;
 	m_masteringVoice = nullptr;
 	m_voices.reserve(32);
+	m_stop = false;
 }
 
 XAudio2Driver::~XAudio2Driver()
 {
-	stop(); //stop audio thread
-
-	if (m_xaudioEngine)
-	{
-		m_xaudioEngine->Release();
-		m_xaudioEngine = nullptr;
-	}
+	shutdown(); //stop audio thread
 }
 
-bool XAudio2Driver::Init() {
+bool XAudio2Driver::init() {
 	HRESULT hr;
 	hr = XAudio2Create(&m_xaudioEngine, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	if (hr != S_OK)
@@ -56,15 +54,29 @@ bool XAudio2Driver::Init() {
 }
 
 bool XAudio2Driver::start() {
-	bool success = Driver::start();
-
-	return success;
-	return false;
+	//bool success = Driver::start();
+	m_thread = std::thread([](XAudio2Driver* driver) { driver->threadLoop(); }, this);
+	return true;
 }
+
+void XAudio2Driver::shutdown()
+{
+	//signal stop, wake thread from wait, wait for thread to join
+	m_stop = true;
+	if (m_thread.joinable())
+		m_thread.join();
+
+	if (m_xaudioEngine)
+	{
+		m_xaudioEngine->Release();
+		m_xaudioEngine = nullptr;
+	}
+}
+
 
 void XAudio2Driver::threadLoop()
 {
-	while (!stopping())
+	while (!m_stop)
 	{
 		Sleep(10);
 
@@ -82,7 +94,7 @@ void XAudio2Driver::processDestroyQueue()
 	for (auto clbk : tmp)
 	{
 		auto voice = RemoveVoice(clbk);
-		voice.voice->DestroyVoice();
+		voice.xaudioVoice->DestroyVoice();
 		voice.sound->eventPlaybackEnded();
 	}
 }
@@ -93,7 +105,7 @@ void XAudio2Driver::updateVoices()
 	for (auto& voice : m_voices)
 	{
 		auto sound = voice.sound;
-		voice.voice->SetVolume(sound->volume() * 0.1);
+		voice.xaudioVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
 	}
 
 }
@@ -160,29 +172,37 @@ void XAudio2Driver::update3DAudio()
 				X3DAUDIO_CALCULATE_LPF_DIRECT,
 				&DSPSettings);
 
-			voice.voice->SetOutputMatrix(m_masteringVoice, DSPSettings.SrcChannelCount, DSPSettings.DstChannelCount, DSPSettings.pMatrixCoefficients);
-			voice.voice->SetFrequencyRatio(DSPSettings.DopplerFactor);
+			voice.xaudioVoice->SetOutputMatrix(m_masteringVoice, DSPSettings.SrcChannelCount, DSPSettings.DstChannelCount, DSPSettings.pMatrixCoefficients);
+			voice.xaudioVoice->SetFrequencyRatio(DSPSettings.DopplerFactor);
 		}
+
+		auto& sound = voice.sound;
+		voice.xaudioVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
 	}
 }
 
 void XAudio2Driver::play(PlayingSound::ptr& sound, HgTime startOffset)
 {
-	Voice v = xplay(sound);
+	Voice v = initVoice(sound);
 	InsertVoice(v);
 	startVoicePlaying(v);
 }
 
 void XAudio2Driver::startVoicePlaying(Voice& v)
 {
-	auto hr = v.voice->Start(0);
+	auto hr = v.xaudioVoice->Start(0);
 	if (hr != S_OK)
 	{
 		std::cerr << "Failed to start playing sound: " << hr << std::endl;
 	}
 }
 
-Voice XAudio2Driver::xplay(PlayingSound::ptr& sound)
+static void xaudioVoiceDeleter(IXAudio2SourceVoice* p)
+{
+	p->DestroyVoice();
+}
+
+Voice XAudio2Driver::initVoice(PlayingSound::ptr& sound)
 {
 	Voice v;
 
@@ -216,6 +236,8 @@ Voice XAudio2Driver::xplay(PlayingSound::ptr& sound)
 		return v;
 	}
 
+//	auto sourceVoice = std::shared_ptr<IXAudio2SourceVoice>(pSourceVoice, xaudioVoiceDeleter);
+
 	hr = pSourceVoice->SubmitSourceBuffer(&buffer);
 	if (hr != S_OK)
 	{
@@ -223,14 +245,11 @@ Voice XAudio2Driver::xplay(PlayingSound::ptr& sound)
 		return v;
 	}
 
-	pSourceVoice->SetVolume(sound->volume() * 0.1);
+	pSourceVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
 
-	v.voice = pSourceVoice;
+	v.xaudioVoice = pSourceVoice;
 	v.callback = voiceCallback;
 	v.sound = sound;
-
-//	InsertVoice(v);
-//	InsertPlayingSound(sound);
 
 	return v;
 }
@@ -244,17 +263,17 @@ void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 		return;
 	}
 
-	Voice v = xplay(sound);
+	Voice v = initVoice(sound);
 
 	X3DAUDIO_EMITTER x_emitter = { 0 };
 	x_emitter.ChannelCount = asset->getNumChannels();
-	x_emitter.CurveDistanceScaler = 100000.0;
+	x_emitter.CurveDistanceScaler = 30.0f;
 
 	X3DAUDIO_DSP_SETTINGS DSPSettings = { 0 };
 	DSPSettings.SrcChannelCount = asset->getNumChannels(); //number emitter channels
 	DSPSettings.DstChannelCount = m_masteringVoiceDetails.InputChannels; //destination voice channels
-	FLOAT32 * matrix = new FLOAT32[DSPSettings.SrcChannelCount*DSPSettings.DstChannelCount]; //SrcChannelCount * DstChannelCount
-	DSPSettings.pMatrixCoefficients = matrix;
+	std::unique_ptr<FLOAT32[]> matrix(new FLOAT32[DSPSettings.SrcChannelCount*DSPSettings.DstChannelCount]); //SrcChannelCount * DstChannelCount
+	DSPSettings.pMatrixCoefficients = matrix.get();
 
 	updateEmitter(emitter, x_emitter);
 
@@ -268,8 +287,8 @@ void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 		X3DAUDIO_CALCULATE_LPF_DIRECT,
 		&DSPSettings);
 
-	v.voice->SetOutputMatrix(m_masteringVoice, DSPSettings.SrcChannelCount, DSPSettings.DstChannelCount, DSPSettings.pMatrixCoefficients);
-	v.voice->SetFrequencyRatio(DSPSettings.DopplerFactor);
+	v.xaudioVoice->SetOutputMatrix(m_masteringVoice, DSPSettings.SrcChannelCount, DSPSettings.DstChannelCount, DSPSettings.pMatrixCoefficients);
+	v.xaudioVoice->SetFrequencyRatio(DSPSettings.DopplerFactor);
 	//pSFXSourceVoice->SetOutputMatrix(pSubmixVoice, 1, 1, &DSPSettings.ReverbLevel);
 
 	startVoicePlaying(v);
@@ -277,6 +296,7 @@ void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 	auto v3d = std::make_shared<Voice3D>();
 	v3d->dsp_settings = DSPSettings;
 	v3d->emitter = x_emitter;
+	v3d->pMatrixCoefficients = matrix.release();
 	v.voice3d = v3d;
 
 	sound->setEmitter(emitter);
@@ -293,18 +313,33 @@ void XAudio2Driver::InsertVoice(Voice& v)
 Voice XAudio2Driver::RemoveVoice(VoiceCallback* x)
 {
 	std::lock_guard<std::mutex> lock(m_callbackMtx);
+
 	Voice ret;
-	for (auto& voice : m_voices)
+	auto itr = std::find(m_voices.begin(), m_voices.end(), x);
+	if (itr != m_voices.end())
 	{
-		if (voice.callback.get() == x)
-		{
-			ret = voice;
-			voice = m_voices.back();
-			m_voices.pop_back();
-			return ret;
-		}
+		ret = *itr;
+		*itr = m_voices.back();
+//		std::iter_swap(itr, m_voices.back());
+		m_voices.pop_back();
 	}
 	return ret;
+}
+
+
+void XAudio2Driver::stopPlayback(const PlayingSound* sound)
+{
+	std::lock_guard<std::mutex> lock(m_callbackMtx);
+	auto itr = std::find(m_voices.begin(), m_voices.end(), sound);
+
+	if (itr != m_voices.end())
+	{
+		auto& voice = *itr;
+//		voice.xaudioVoice->Stop();
+		voice.xaudioVoice->DestroyVoice();
+		*itr = m_voices.back();
+		m_voices.pop_back();
+	}
 }
 
 void VoiceCallback::OnStreamEnd()

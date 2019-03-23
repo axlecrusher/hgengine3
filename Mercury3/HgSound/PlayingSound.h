@@ -19,7 +19,7 @@ namespace HgSound {
 		void stop();
 
 		inline void setVolume(float x) { m_volume = x; }
-		inline float volume() const { return m_volume; }
+		inline float getVolume() const { return m_volume; }
 
 		//playbackEndedFunc callback will be called from a thread
 		inline void setEventPlaybackEnded(const playbackEndedFunc& clbk) { m_playbackEndedClbk = clbk; }

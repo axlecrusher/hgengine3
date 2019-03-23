@@ -8,13 +8,14 @@
 #include <HgSound\HgSoundDriver_libsoundio.h>
 #include <HgSound\HgSoundDriver_xaudio2.h>
 
-std::unique_ptr<HgSound::Driver> SOUND;
+std::unique_ptr<HgSound::IDriver> SOUND;
 
 namespace HgSound {
-	std::unique_ptr<HgSound::Driver> Driver::Create()
-	{
-		return std::make_unique<HgSound::XAudio2::XAudio2Driver>();
-	}
+
+std::unique_ptr<HgSound::IDriver> Create()
+{
+	return std::make_unique<HgSound::XAudio2::XAudio2Driver>();
+}
 
 	Driver::Driver() : m_stop(false)
 		//, m_initialized(false)
@@ -25,7 +26,7 @@ namespace HgSound {
 
 	Driver::~Driver()
 	{
-		stop();
+		shutdown();
 	}
 
 	bool Driver::start() {
@@ -33,7 +34,7 @@ namespace HgSound {
 		return true;
 	}
 
-	void Driver::stop() {
+	void Driver::shutdown() {
 		//signal stop, wake thread from wait, wait for thread to join
 		m_stop = true;
 		continueExecution();
@@ -65,11 +66,15 @@ namespace HgSound {
 		m_playingSounds.push_back(sound);
 	}
 
-	PlayingSound::ptr Driver::RemovePlayingSound(PlayingSound::ptr& sound) {
+	PlayingSound::ptr Driver::RemovePlayingSound(const PlayingSound* sound) {
 		PlayingSound::ptr ret;
 		std::lock_guard<std::recursive_mutex> lock(m_mutex);
 
-		auto it = std::find(m_playingSounds.begin(), m_playingSounds.end(), sound);
+//		auto it = std::find(m_playingSounds.begin(), m_playingSounds.end(), sound);
+		auto it = std::find_if(m_playingSounds.begin(), m_playingSounds.end(),
+			[sound](auto ptr) { return ptr.get() == sound;}
+		);
+
 		if (it != m_playingSounds.end()) {
 			ret = *it;
 			m_playingSounds.erase(it);
@@ -77,7 +82,7 @@ namespace HgSound {
  		return ret;
 	}
 
-	void Driver::stopPlayback(PlayingSound::ptr& playingAsset) {
+	void Driver::stopPlayback(const PlayingSound* playingAsset) {
 		PlayingSound::ptr playingSound = RemovePlayingSound(playingAsset);
 		if (playingSound != nullptr) {
 			playingSound->eventPlaybackEnded();
@@ -107,7 +112,7 @@ namespace HgSound {
 		for (auto& playing : playingSounds) {
 			playing->getSamples(total_samples, buffer);
 			if (playing->isFinished()) {
-				stopPlayback(playing); //remove sound and call eventPlaybackEnded
+				stopPlayback(playing.get()); //remove sound and call eventPlaybackEnded
 			}
 		}
 

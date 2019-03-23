@@ -14,6 +14,45 @@
 #include <Emitter.h>
 
 namespace HgSound {
+
+class IDriver
+{
+public:
+	IDriver()
+	{}
+
+	virtual ~IDriver()
+	{}
+
+	virtual bool init() = 0;
+
+	virtual bool start() = 0;
+
+	virtual void shutdown() = 0;
+
+	virtual void play(PlayingSound::ptr& sound, HgTime startOffset) = 0;
+
+	virtual void play3d(PlayingSound::ptr& sound, const Emitter& emitter) = 0;
+
+	void play(PlayingSound::ptr& sound) {
+		const auto zero = HgTime::msec(0);
+		return play(sound, zero);
+	}
+
+	virtual void stopPlayback(const PlayingSound* sound) = 0;
+
+	Listener getListener() const { return m_listener; }
+	void setListener(const Listener& l) { m_listener = l; }
+
+private:
+
+	Listener m_listener;
+};
+
+std::unique_ptr<HgSound::IDriver> Create();
+
+//Driver is very closely tied to how libsoundio is expected to work. just rework
+//into libsoundio driver
 	class Driver {
 	public:
 		Driver();
@@ -34,11 +73,10 @@ namespace HgSound {
 			return play(sound, zero);
 		}
 
-		void stop();
+		void shutdown();
 
-		void stopPlayback(PlayingSound::ptr& playingAsset);
+		virtual void stopPlayback(const PlayingSound* sound);
 
-		static std::unique_ptr<HgSound::Driver> Create();
 		void mixingLoop();
 
 		void continueExecution() { m_wait.resume(); }
@@ -59,7 +97,7 @@ namespace HgSound {
 		auto PlayingSounds();
 		void audioLoop();
 		void wait() { m_wait.wait(); }
-		PlayingSound::ptr RemovePlayingSound(PlayingSound::ptr& sound);
+		PlayingSound::ptr RemovePlayingSound(const PlayingSound* sound);
 
 		bool m_stop;
 		std::thread m_thread;
@@ -103,4 +141,4 @@ namespace HgSound {
 	}
 }
 
-extern std::unique_ptr<HgSound::Driver> SOUND;
+extern std::unique_ptr<HgSound::IDriver> SOUND;

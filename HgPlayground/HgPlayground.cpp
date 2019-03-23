@@ -186,8 +186,8 @@ int main()
 		//tmp.store(projection);
 	}
 
-	SOUND = HgSound::Driver::Create();
-	if (SOUND->Init())
+	SOUND = HgSound::Create();
+	if (SOUND->init())
 	{
 		SOUND->start();
 	}
@@ -235,13 +235,13 @@ int main()
 	model_data::load_ini(teapot, "teapot.ini");
 	teapot->origin(teapot->origin().x(2).z(3).y(1));
 	
-	for (int i = 0; i < 4; ++i) {
-		HgElement* statue = NULL;
-		scene.getNewElement(&statue);
-		model_data::load_ini(statue, "statue.ini");
-		statue->origin(statue->origin().x(2).z(3).y(1));
-		statue->position(statue->position().x(i));
-	}
+	//for (int i = 0; i < 4; ++i) {
+	//	HgElement* statue = NULL;
+	//	scene.getNewElement(&statue);
+	//	model_data::load_ini(statue, "statue.ini");
+	//	statue->origin(statue->origin().x(2).z(3).y(1));
+	//	statue->position(statue->position().x(i));
+	//}
 
 	uint32_t i;
 	{
@@ -389,8 +389,7 @@ int main()
 
 
 				if (KeyDownMap[KeyCodes::KEY_SPACE]) {
-					//				printf("fire!\n");
-					//fire(&scene);
+					snd->stop();
 				}
 
 				//			if (v.components.z > 0) DebugBreak();

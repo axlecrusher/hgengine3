@@ -1,4 +1,5 @@
 #include <HgSound/PlayingSound.h>
+#include <HgSoundDriver.h>
 
 namespace HgSound {
 
@@ -23,5 +24,6 @@ namespace HgSound {
 	}
 
 	void PlayingSound::stop() {
+		SOUND->stopPlayback(this);
 	}
 }

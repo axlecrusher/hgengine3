@@ -4,6 +4,8 @@
 #include <xaudio2.h>
 #include <x3daudio.h>
 
+#include <ProtectedVector.h>
+
 namespace HgSound {
 namespace XAudio2 {
 
@@ -51,54 +53,44 @@ struct Voice3D
 
 struct Voice
 {
-	IXAudio2SourceVoice* voice;
+	Voice()
+		:xaudioVoice(nullptr)
+	{}
+
+	inline bool operator==(const VoiceCallback* rhs) const { return callback.get() == rhs; }
+	inline bool operator<(const VoiceCallback* rhs) const { return callback.get() < rhs; }
+
+	inline bool operator==(const PlayingSound* rhs) const { return sound.get() == rhs; }
+	inline bool operator<(const PlayingSound* rhs) const { return sound.get() < rhs; }
+
+	IXAudio2SourceVoice* xaudioVoice;
+//	std::shared_ptr<IXAudio2SourceVoice> xaudioVoice;
 	std::shared_ptr<VoiceCallback> callback;
 	PlayingSound::ptr sound;
 	std::shared_ptr<Voice3D> voice3d;
 };
 
-template<typename T>
-class ProtectedVector
-{
-public:
-	typedef  std::vector<T> vectorType;
-	void push_back(T& x)
-	{
-		std::lock_guard<std::mutex> lock(m_mutex);
-		m_values.push_back(x);
-	}
-
-	void swap(std::vector<T>& v)
-	{
-		std::lock_guard<std::mutex> lock(m_mutex);
-		m_values.swap(v);
-	}
-
-private:
-	std::mutex m_mutex;
-	std::vector<T> m_values;
-};
-
-class XAudio2Driver : public Driver {
+class XAudio2Driver : public HgSound::IDriver {
 public:
 	XAudio2Driver();
 	~XAudio2Driver();
-	virtual bool Init();
+	virtual bool init();
 	virtual bool start();
-
-	virtual void threadLoop();
+	virtual void shutdown();
 
 	virtual void play(PlayingSound::ptr& sound, HgTime startOffset);
 	virtual void play3d(PlayingSound::ptr& sound, const Emitter& emitter);
-
-	void InsertVoice(Voice& v);
+	virtual void stopPlayback(const PlayingSound* sound);
 
 	void queueDestroy(VoiceCallback* x) { m_toDestroy.push_back(x); }
 
 private:
-	Voice xplay(PlayingSound::ptr& sound);
+	void threadLoop();
+	Voice initVoice(PlayingSound::ptr& sound);
 
+	void InsertVoice(Voice& v);
 	Voice RemoveVoice(VoiceCallback* x);
+
 	void processDestroyQueue();
 	void updateVoices();
 	void update3DAudio();
@@ -117,6 +109,9 @@ private:
 	std::vector<Voice> m_voices; //mutex protect
 
 	ProtectedVector<VoiceCallback*> m_toDestroy;
+
+	bool m_stop;
+	std::thread m_thread;
 };
 }
 }
