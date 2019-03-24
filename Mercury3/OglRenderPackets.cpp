@@ -13,7 +13,7 @@ int8_t draw_render_packet(const render_packet* p) {
 //	glUniform3f(U_CAMERA_POS, p->camera.position.components.x, p->camera.position.components.y, p->camera.position.components.z);
 //	RenderData* rd = p->element->m_renderData;
 
-//	HgElement* e = p->scene->elements + p->element_idx;
+//	HgEntity* e = p->scene->elements + p->element_idx;
 	RenderData* rd = p->renderData;
 	rd->shader->enable();
 //	VCALL(rd->shader, enable);

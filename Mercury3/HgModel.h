@@ -17,13 +17,13 @@ public:
 	uint32_t vertex_count;
 	uint32_t index_count;
 
-	HgElement *element;
+	HgEntity *element;
 
 
-	static int8_t load(HgElement* element, const char* filename);
+	static int8_t load(HgEntity* element, const char* filename);
 
-	static bool load_ini(HgElement* element, std::string filename);
-	static bool load_ini(HgElement* element, const IniLoader::Contents& ini);
+	static bool load_ini(HgEntity* element, std::string filename);
+	static bool load_ini(HgEntity* element, const IniLoader::Contents& ini);
 
 private:
 
@@ -32,8 +32,8 @@ private:
 };
 
 //model_data LoadModel(const char* filename);
-//class HgElement;
+//class HgEntity;
 
 
-//void change_to_model(HgElement* element);
-//void model_create(HgElement* element);
+//void change_to_model(HgEntity* element);
+//void model_create(HgEntity* element);

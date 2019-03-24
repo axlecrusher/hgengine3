@@ -28,7 +28,7 @@ static Projectile& CreateProjectile() {
 
 Projectile::Projectile()
 {
-	element.init();
+	m_entity.init();
 }
 
 void Projectile::update(HgTime tdelta) {
@@ -36,24 +36,24 @@ void Projectile::update(HgTime tdelta) {
 
 		if (total_time >= HgTime::msec(3000)) {
 //			printf("set destroy\n");
-			element.flags.destroy = true;
+			m_entity.flags.destroy = true;
 			ProjectileCollection().remove(*this);
 			return;
 		}
 
 		float tmp = tdelta.msec() * projectileMsecSpeed;
 		vector3 r = direction.scale(tmp);
-		element.position(element.position() + r);
+		m_entity.position(m_entity.position() + r);
 }
 
-static void* generate_projectile(HgElement* element) {
+static void* generate_projectile(HgEntity* element) {
 	//element->setLogic(std::make_unique<Projectile>());
 	Projectile& p = CreateProjectile();
 	//p.setElement(element);
 
 	//p.getElement().init();
 
-	change_to_triangle(&p.getElement());
+	change_to_triangle(&p.getEntity());
 	return &p;
 }
 

@@ -45,7 +45,7 @@ void RenderData::updateGpuTextures() {
 			HgTexture::TextureType type = texture->getType();
 		}
 
-		//FIXME: Share texture pointers can cause a problem here. Texture may be updated by another HgElement.
+		//FIXME: Share texture pointers can cause a problem here. Texture may be updated by another HgEntity.
 		//refactor into HgTexture making callback into renderData to set texture IDs.
 		//NOTE: Not sure this applies anymore. HgTexture is pretty immutable after creation.
 		setTexture(texture.get());

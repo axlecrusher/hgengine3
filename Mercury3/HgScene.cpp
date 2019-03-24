@@ -50,34 +50,34 @@ void HgScene::init()
 	allocate_chunk();
 }
 
-uint32_t HgScene::getNewElement(HgElement** element) {
+uint32_t HgScene::getNewEntity(HgEntity** entity) {
 	uint16_t h, l;
 	for (uint32_t i = 0;; ++i) {
 		decode_index(i, &h, &l);
 		if (h >= chunks.size()) break;
 		if (!chunks[h]->isUsed(l)) {
 			SceneChunk* chunk = chunks[h].get();
-			HgElement* e = &chunk->elements[l];
+			HgEntity* e = &chunk->entites[l];
 			chunk->set_used(l);
 			e->init();
 			used_count++;
 			//e->setScene(this);
-			*element = e;
+			*entity = e;
 			return i;
 		}
 	}
 
 	allocate_chunk();
-	return getNewElement(element);
+	return getNewEntity(entity);
 }
 
-void HgScene::removeElement(uint32_t i) {
+void HgScene::removeEntity(uint32_t i) {
 	//	printf("do destroy\n");
 	uint16_t h, l;
 	decode_index(i, &h, &l);
 	if (chunks[h]->isUsed(l)) {
-		HgElement* e = get_element(i);
-//		printf("Destroying element of type: %s\n", hgelement_get_type_str(e));
+		HgEntity* e = get_entity(i);
+//		printf("Destroying element of type: %s\n", HgEntity_get_type_str(e));
 		e->destroy();
 		chunks[h]->clear_used(l);
 		used_count--;
@@ -94,7 +94,7 @@ void HgScene::update(HgTime dtime) {
 	uint32_t maxCount = maxItems();
 	for (uint32_t i = 0; i < maxCount; ++i) {
 		if (!isUsed(i)) continue;
-		HgElement* e = get_element(i);
+		HgEntity* e = get_entity(i);
 
 		if ((dtime.msec() > 0) && e->needsUpdate(updateNumber)) {
 			e->update(dtime, updateNumber);
@@ -103,7 +103,7 @@ void HgScene::update(HgTime dtime) {
 		/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash!*/
 		//shared_ptr my way out of this?
 		if (e->flags.destroy) {
-			removeElement(i);
+			removeEntity(i);
 			continue;
 		}
 	}
@@ -116,7 +116,7 @@ void HgScene::EnqueueForRender() {
 	uint32_t maxCount = maxItems();
 	for (uint32_t i = 0; i < maxCount; ++i) {
 		if (!isUsed(i)) continue;
-		HgElement* e = get_element(i);
+		HgEntity* e = get_entity(i);
 
 		//I would like to move this out of here for a more perminent, solution
 		//where the vectors don't need to be rebuild every time
@@ -127,18 +127,18 @@ void HgScene::EnqueueForRender() {
 	}
 }
 
-uint8_t create_element(char* type, HgScene* scene, HgElement** element) {
-//	uint32_t idx = hgelement_get_type_index(type);
+uint8_t create_entity(char* type, HgScene* scene, HgEntity** entity) {
+//	uint32_t idx = HgEntity_get_type_index(type);
 
-	auto factory = element_factories.find(type);
+	auto factory = entity_factories.find(type);
 
-	if (factory == element_factories.end()) {
+	if (factory == entity_factories.end()) {
 		fprintf(stderr, "Unable to find element type \"%s\"\n", type);
 		return 0;
 	}
 	factory_clbk clbk = factory->second;
-	scene->getNewElement(element);
-	clbk(*element);
+	scene->getNewEntity(entity);
+	clbk(*entity);
 
 	//find element type creator
 //	(*element)->vptr_idx = idx;
@@ -150,14 +150,14 @@ uint8_t create_element(char* type, HgScene* scene, HgElement** element) {
 void scene_clearUpdate(HgScene* scene) {
 	uint32_t i = 0;
 	for (i = 0; i < scene->_size; ++i) {
-		HgElement* e = get_element(scene, i);
+		HgEntity* e = get_element(scene, i);
 		CLEAR_FLAG(e, HGE_UPDATED);
 	}
 }
 */
 /* using this iterator is just as fast as manually using a for loop */
 /*
-HgElement* scene_next_element(HgScene_iterator* itr) {
+HgEntity* scene_next_element(HgScene_iterator* itr) {
 	uint32_t x;
 	for (x = itr->_current; x < itr->s->_size; ++x) {
 		if (IS_USED(itr->s, HGE_USED) > 0) {

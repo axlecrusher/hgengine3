@@ -98,21 +98,21 @@ static std::shared_ptr<RenderData> init_render_data() {
 	return rd;
 }
 
-static void updateClbk(HgElement* e, uint32_t tdelta) {
+static void updateClbk(HgEntity* e, uint32_t tdelta) {
 	//	printf("cube\n");
 }
 
-static void destroy(HgElement* e) {
+static void destroy(HgEntity* e) {
 	e->destroy();
 }
 
-static void* change_to_model(HgElement* element) {
+static void* change_to_model(HgEntity* element) {
 	//create an instance of the render data for all triangles to share
 	element->setRenderData( init_render_data() ); //this needs to be per model instance if the model is animated
 	return nullptr;
 }
 
-int8_t model_data::load(HgElement* element, const char* filename) {
+int8_t model_data::load(HgEntity* element, const char* filename) {
 	change_to_model(element);
 
 	OGLRenderData* rd = (OGLRenderData*)element->renderData();
@@ -149,12 +149,12 @@ int8_t model_data::load(HgElement* element, const char* filename) {
 	return 0;
 }
 
-bool model_data::load_ini(HgElement* element, std::string filename) {
+bool model_data::load_ini(HgEntity* element, std::string filename) {
 	IniLoader::Contents contents = IniLoader::parse(filename);
 	return load_ini(element, contents);
 }
 
-bool model_data::load_ini(HgElement* element, const IniLoader::Contents& contents) {
+bool model_data::load_ini(HgEntity* element, const IniLoader::Contents& contents) {
 	change_to_model(element);
 
 	float scale = 1;

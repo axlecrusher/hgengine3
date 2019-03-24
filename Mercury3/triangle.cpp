@@ -41,12 +41,12 @@ std::shared_ptr<RenderData> triangle_init_render_data() {
 	return trd;
 }
 
-void change_to_triangle(HgElement* element) {
+void change_to_triangle(HgEntity* element) {
 	//create an instance of the render data for all triangles to share
 	element->setRenderData( triangle_init_render_data());
 }
 
-static void* triangle_factory(HgElement* e) {
+static void* triangle_factory(HgEntity* e) {
 	change_to_triangle(e);
 	return nullptr;
 }

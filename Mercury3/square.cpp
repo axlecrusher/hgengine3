@@ -35,7 +35,7 @@ static uint8_t indices[] = {
 	0,1,2,2,3,0
 };
 
-static void destroy(HgElement* e) {
+static void destroy(HgEntity* e) {
 	e->destroy();
 }
 
@@ -58,7 +58,7 @@ static std::shared_ptr<RenderData> init_render_data() {
 	return trd;
 }
 
-static void* change_to_square(HgElement* element) {
+static void* change_to_square(HgEntity* element) {
 	//create an instance of the render data for all triangles to share
 	element->setRenderData( init_render_data() );
 	return nullptr;

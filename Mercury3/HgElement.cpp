@@ -13,14 +13,14 @@
 
 #include <UpdatableCollection.h>
 
-std::unordered_map<std::string, factory_clbk> element_factories;
+std::unordered_map<std::string, factory_clbk> entity_factories;
 
 void RegisterElementType(const char* c, factory_clbk factory) {
-	element_factories[c] = factory;
+	entity_factories[c] = factory;
 }
 
 
-void HgElement::init()
+void HgEntity::init()
 {
 	m_renderData = nullptr;
 	m_logic = nullptr;
@@ -30,17 +30,17 @@ void HgElement::init()
 	m_updateNumber = 0;
 }
 
-HgElement::~HgElement() {
+HgEntity::~HgEntity() {
 	destroy();
 }
 
-void HgElement::destroy()
+void HgEntity::destroy()
 {
 	m_logic.reset();
 	m_renderData.reset();
 }
 
-HgMath::mat4f HgElement::computeWorldSpaceMatrix(bool applyScale, bool applyRotation, bool applyTranslation) const {
+HgMath::mat4f HgEntity::computeWorldSpaceMatrix(bool applyScale, bool applyRotation, bool applyTranslation) const {
 	//translate to origin, scale, rotate, apply local translation, apply parent transforms
 	HgMath::mat4f modelMatrix;
 	const auto origin_vec = -vectorial::vec3f(origin().raw());
@@ -74,16 +74,16 @@ HgMath::mat4f HgElement::computeWorldSpaceMatrix(bool applyScale, bool applyRota
 	return modelMatrix;
 }
 
-point HgElement::computeWorldSpacePosition() const
+point HgEntity::computeWorldSpacePosition() const
 {
 	const vector3f p;
 	const auto matrix = computeWorldSpaceMatrix();
 	return matrix * p;
 }
 
-//Transform point p into world space of HgElement e
+//Transform point p into world space of HgEntity e
 //I'm not 100% sure this matches the functionality of computeWorldSpaceMatrix so remove for now
-//point toWorldSpace(const HgElement* e, const point* p) {
+//point toWorldSpace(const HgEntity* e, const point* p) {
 //	vector3 v1 = (*p - e->origin()).scale(e->scale()).rotate(e->orientation()) + e->position();
 //	return v1;
 //}

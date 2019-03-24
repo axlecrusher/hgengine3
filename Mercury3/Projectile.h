@@ -15,6 +15,6 @@ private:
 };
 
 /*
-void projectile_create(HgElement* element);
-void change_to_projectile(HgElement* element);
+void projectile_create(HgEntity* element);
+void change_to_projectile(HgEntity* element);
 */

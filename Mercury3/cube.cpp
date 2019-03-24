@@ -64,7 +64,7 @@ static auto Collection = InstancedCollection<RotatingCube::RotatingCube, Rotatin
 //instanced render data
 static std::shared_ptr<RenderData> crd;
 
-static void destroy(HgElement* e) {
+static void destroy(HgEntity* e) {
 	e->destroy();
 }
 
@@ -78,11 +78,11 @@ static void SetupRenderData() {
 	crd->indexVboRecord(iRec);
 }
 
-void* change_to_cube(HgElement* element) {
+void* change_to_cube(HgEntity* entity) {
 	//create an instance of the render data for all triangles to share
 	if (crd == nullptr) SetupRenderData();
 
-	element->setRenderData(crd);
+	entity->setRenderData(crd);
 	return nullptr;
 }
 
@@ -94,12 +94,12 @@ namespace RotatingCube {
 			m_age -= HgTime::msec(10000);
 		}
 		const quaternion rotation = quaternion::fromEuler(angle::ZERO, angle::deg(m_age.msec() / 27.777777777777777777777777777778), angle::ZERO);
-		getElement().orientation(rotation);
+		getEntity().orientation(rotation);
 		instanceData->rotation = rotation;
 	}
 
 	void RotatingCube::init() {
-		HgElement* e = &getElement();
+		HgEntity* e = &getEntity();
 		change_to_cube(e);
 	}
 
@@ -113,7 +113,7 @@ namespace RotatingCube {
 	}
 }
 
-static void* generate_rotating_cube(HgElement* element) {
+static void* generate_rotating_cube(HgEntity* element) {
 	RotatingCube::RotatingCube& p = RotatingCube::RotatingCube::Generate();
 	p.init();
 	return &p;

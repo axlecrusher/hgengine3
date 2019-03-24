@@ -12,11 +12,11 @@
 #include <HgScene.h>
 
 /* render_packet should contain everything that is needed to render.
-This is to decouple render data from HgElement data and update loops.
+This is to decouple render data from HgEntity data and update loops.
 WHen the update loop is running async to the render thread, it is entirely possible
-for HgElement to be deleted before its last state was rendered.  Rendering should
+for HgEntity to be deleted before its last state was rendered.  Rendering should
 be possible with render_packet, unless something in RenderData was destroyed when
-deleting HgElement.
+deleting HgEntity.
 */
 typedef struct render_packet {
 	point position;
@@ -24,7 +24,7 @@ typedef struct render_packet {
 	HgCamera camera;
 	float scale;
 	
-//	HgElement* element;
+//	HgEntity* element;
 //	uint16_t element_idx;
 //	HgScene* scene;
 	RenderData* renderData;
@@ -37,5 +37,5 @@ volatile uint32_t hgRenderQueue_length();
 void hgRenderQueue_push(render_packet* p);
 render_packet* hgRenderQueue_pop();
 
-render_packet* create_render_packet(HgElement* e, uint8_t viewport_idx, HgCamera* camera, HgScene* scene, uint16_t idx);
+render_packet* create_render_packet(HgEntity* e, uint8_t viewport_idx, HgCamera* camera, HgScene* scene, uint16_t idx);
 

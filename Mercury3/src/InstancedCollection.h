@@ -26,7 +26,7 @@ public:
 		gpuStruct* instanceDataPtr = m_instanceData.getBuffer();
 		for (auto itr = begin(); itr != end(); itr++) {
 			itr->T::update(dtime, instanceDataPtr); //avoid vtable lookup
-			if (!itr->getElement().flags.destroy) {
+			if (!itr->getEntity().flags.destroy) {
 				instanceDataPtr += stride;
 				m_instanceCount++;
 			}
@@ -47,7 +47,7 @@ public:
 
 		//enqueue first one found. hope it shares render data
 		for (auto itr = begin(); itr != end(); itr++) {
-			auto& e = itr->getElement();
+			auto& e = itr->getEntity();
 			if (!e.flags.hidden) {
 				Renderer::Enqueue(e);
 				return;

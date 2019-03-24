@@ -61,14 +61,14 @@ static void SetupRenderData() {
 	crd->indexVboRecord(iRec);
 }
 
-void change_to_voxelGrid(HgElement* element) {
+void change_to_voxelGrid(HgEntity* element) {
 	//create an instance of the render data for all triangles to share
 	if (crd == nullptr) SetupRenderData();
 
 	element->setRenderData( crd );
 }
 
-void* voxelGrid_create(HgElement* element) {
+void* voxelGrid_create(HgEntity* element) {
 //	element->position.components.x = 0.0f;
 //	element->position.components.y = 0.0f;
 //	element->position.components.z = 0.0f;

@@ -6,7 +6,7 @@
 
 class Player {
 private:
-	HgElement m_element;
+	HgEntity m_element;
 	//SpacialData m_spacial;
 	vector3 m_direction;
 public:
@@ -21,8 +21,8 @@ public:
 
 	inline vector3 direction() const { return m_direction; }
 
-	inline const HgElement& element() const { return m_element; }
-	inline HgElement& element() { return m_element; }
+	inline const HgEntity& element() const { return m_element; }
+	inline HgEntity& element() { return m_element; }
 
 private:
 	void computeDirection() {

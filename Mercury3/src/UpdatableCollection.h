@@ -41,7 +41,7 @@ public:
 		if (empty()) return;
 
 		for (auto itr = begin(); itr != end(); itr++) {
-			auto& e = itr->getElement();
+			auto& e = itr->getEntity();
 			if (!e.flags.hidden) {
 				Renderer::Enqueue(e);
 			}

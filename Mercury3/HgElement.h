@@ -15,7 +15,7 @@
 //#include <HgVbo.h>
 #include <RenderData.h>
 
-enum HgElementFlag {
+enum HgEntityFlag {
 	HGE_USED = 0x01, //used in scene graph
 	HGE_ACTIVE = 0x02,
 	HGE_HIDDEN = 0x04,
@@ -27,26 +27,26 @@ enum HgElementFlag {
 
 //extern float* _projection;
 
-class HgElement;
+class HgEntity;
 class model_data;
 class HgScene;
 
-class HgElementLogic {
+class HgEntityLogic {
 public:
-	HgElementLogic() : element(nullptr) {}
-	virtual ~HgElementLogic() {}
+	HgEntityLogic() : element(nullptr) {}
+	virtual ~HgEntityLogic() {}
 	virtual void update(HgTime tdelta) = 0;
 
-	inline void setElement(HgElement* x) { element = x; }
-	inline HgElement& getElement() { return *element; }
-	inline const HgElement& getElement() const { return *element; }
+	inline void setElement(HgEntity* x) { element = x; }
+	inline HgEntity& getElement() { return *element; }
+	inline const HgEntity& getElement() const { return *element; }
 protected:
-	HgElement* element; //just a weak pointer back to the parent
+	HgEntity* element; //just a weak pointer back to the parent
 };
 
-//class HgElementExtended {
+//class HgEntityExtended {
 //public:
-//	//HgElement* owner; //what is this for?
+//	//HgEntity* owner; //what is this for?
 //	//std::vector< HgTexture::TexturePtr > textures;
 //
 //	HgScene* m_scene; //Scene that element is a member of
@@ -108,17 +108,17 @@ public:
 /* NOTES: Try to avoid pointers, especially on 64 bit.
 The entity that allocates memory for render data should
 be responsible for destroying it. This is more clear than
-having HgElement free render data by default and then
+having HgEntity free render data by default and then
 handling special cases.
 */
-class HgElement {
+class HgEntity {
 private:
 	SpacialData m_spacialData; //local transormations
 public:
 		ElementFlags flags;
 
-		HgElement() : m_updateNumber(0), m_renderData(nullptr) {}
-		~HgElement();
+		HgEntity() : m_updateNumber(0), m_renderData(nullptr) {}
+		~HgEntity();
 
 		void init();
 		void destroy();
@@ -150,16 +150,16 @@ public:
 			m_logic->update(dtime);
 		}
 
-		inline void setLogic(std::unique_ptr<HgElementLogic> logic) { m_logic = std::move(logic); m_logic->setElement(this); }
-		inline HgElementLogic& logic() { return *(m_logic.get()); }
+		inline void setLogic(std::unique_ptr<HgEntityLogic> logic) { m_logic = std::move(logic); m_logic->setElement(this); }
+		inline HgEntityLogic& logic() { return *(m_logic.get()); }
 
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
 		//void updateGpuTextures();
 
-		inline void setParent(HgElement* parent) { m_parent = parent; }
-		HgElement* getParent() const { return m_parent; }
+		inline void setParent(HgEntity* parent) { m_parent = parent; }
+		HgEntity* getParent() const { return m_parent; }
 
-		inline void setChild(HgElement* child) { child->setParent(this); }
+		inline void setChild(HgEntity* child) { child->setParent(this); }
 
 		inline void setRenderData(std::shared_ptr<RenderData>& rd) { m_renderData = rd; }
 		RenderData* renderData() { return m_renderData.get(); }
@@ -181,18 +181,18 @@ private:
 	std::shared_ptr<RenderData> m_renderData;
 
 	uint32_t m_updateNumber;
-	std::unique_ptr<HgElementLogic> m_logic;
-	//std::weak_ptr<HgElement> m_parent;
-	HgElement* m_parent; //checked every update.
+	std::unique_ptr<HgEntityLogic> m_logic;
+	//std::weak_ptr<HgEntity> m_parent;
+	HgEntity* m_parent; //checked every update.
 
-	friend HgElementLogic;
+	friend HgEntityLogic;
 	friend model_data;
 };
 
-typedef HgElement HgEntity;
+typedef HgEntity HgEntity;
 
-//Transform point p into world space of HgElement e
-//point toWorldSpace(const HgElement* e, const point* p);
+//Transform point p into world space of HgEntity e
+//point toWorldSpace(const HgEntity* e, const point* p);
 
 class IUpdatableCollection;
 
@@ -204,7 +204,7 @@ namespace Engine {
 
 extern RenderData* (*new_RenderData)();
 
-typedef void*(*factory_clbk)(HgElement* e);
+typedef void*(*factory_clbk)(HgEntity* e);
 
 void RegisterElementType(const char* c, factory_clbk);
 
