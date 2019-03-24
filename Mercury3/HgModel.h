@@ -8,7 +8,7 @@
 
 class model_data {
 public:
-	model_data() :element(nullptr) {}
+	model_data() :entity(nullptr) {}
 	~model_data() = default;
 
 	std::shared_ptr<vbo_layout_vnut[]> vertices;
@@ -17,13 +17,13 @@ public:
 	uint32_t vertex_count;
 	uint32_t index_count;
 
-	HgEntity *element;
+	HgEntity *entity;
 
 
-	static int8_t load(HgEntity* element, const char* filename);
+	static int8_t load(HgEntity* entity, const char* filename);
 
-	static bool load_ini(HgEntity* element, std::string filename);
-	static bool load_ini(HgEntity* element, const IniLoader::Contents& ini);
+	static bool load_ini(HgEntity* entity, std::string filename);
+	static bool load_ini(HgEntity* entity, const IniLoader::Contents& ini);
 
 private:
 

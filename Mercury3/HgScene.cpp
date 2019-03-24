@@ -77,7 +77,7 @@ void HgScene::removeEntity(uint32_t i) {
 	decode_index(i, &h, &l);
 	if (chunks[h]->isUsed(l)) {
 		HgEntity* e = get_entity(i);
-//		printf("Destroying element of type: %s\n", HgEntity_get_type_str(e));
+//		printf("Destroying entity of type: %s\n", HgEntity_get_type_str(e));
 		e->destroy();
 		chunks[h]->clear_used(l);
 		used_count--;
@@ -100,7 +100,7 @@ void HgScene::update(HgTime dtime) {
 			e->update(dtime, updateNumber);
 		}
 
-		/* FIXME: WARNING!!! if this loop is running async to the render thread, element deletion can cause a crash!*/
+		/* FIXME: WARNING!!! if this loop is running async to the render thread, entity deletion can cause a crash!*/
 		//shared_ptr my way out of this?
 		if (e->flags.destroy) {
 			removeEntity(i);
@@ -133,38 +133,12 @@ uint8_t create_entity(char* type, HgScene* scene, HgEntity** entity) {
 	auto factory = entity_factories.find(type);
 
 	if (factory == entity_factories.end()) {
-		fprintf(stderr, "Unable to find element type \"%s\"\n", type);
+		fprintf(stderr, "Unable to find entity type \"%s\"\n", type);
 		return 0;
 	}
 	factory_clbk clbk = factory->second;
 	scene->getNewEntity(entity);
 	clbk(*entity);
 
-	//find element type creator
-//	(*element)->vptr_idx = idx;
-//	VCALL_IDX((*element), create);
-
 	return 1;
 }
-/*
-void scene_clearUpdate(HgScene* scene) {
-	uint32_t i = 0;
-	for (i = 0; i < scene->_size; ++i) {
-		HgEntity* e = get_element(scene, i);
-		CLEAR_FLAG(e, HGE_UPDATED);
-	}
-}
-*/
-/* using this iterator is just as fast as manually using a for loop */
-/*
-HgEntity* scene_next_element(HgScene_iterator* itr) {
-	uint32_t x;
-	for (x = itr->_current; x < itr->s->_size; ++x) {
-		if (IS_USED(itr->s, HGE_USED) > 0) {
-			itr->_current=x;
-			return &itr->s->elements[x];
-		}
-	}
-	return NULL;
-}
-*/

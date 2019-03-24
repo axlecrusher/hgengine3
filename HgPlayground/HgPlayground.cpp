@@ -116,14 +116,14 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 #define ANI_TRIS 400
 
 void fire(HgScene* scene) {
-	HgEntity* element = NULL;
+	HgEntity* entity = NULL;
 
-	create_entity("basic_projectile", scene, &element);
+	create_entity("basic_projectile", scene, &entity);
 
-	Projectile *pd = dynamic_cast<Projectile*>(&element->logic());
+	Projectile *pd = dynamic_cast<Projectile*>(&entity->logic());
 	pd->direction = camera->getForward();
-	element->orientation(camera->getWorldSpaceOrientation().conjugate());
-	element->position(camera->getWorldSpacePosition());
+	entity->orientation(camera->getWorldSpaceOrientation().conjugate());
+	entity->position(camera->getWorldSpacePosition());
 }
 
 void(*submit_for_render)(uint8_t viewport_idx, HgCamera* camera, HgEntity* e);
@@ -193,7 +193,7 @@ int main()
 	}
 
 	uint8_t s = sizeof(HgEntity);
-	printf("element size %d\n", s);
+	printf("entity size %d\n", s);
 	printf("vertex size %zd\n", sizeof(vertex));
 	printf("render_packet size %zd\n", sizeof(render_packet));
 	printf("render data size %zd\n", sizeof(RenderData));
@@ -245,56 +245,56 @@ int main()
 
 	uint32_t i;
 	{
-		HgEntity* element = NULL;
+		HgEntity* entity = NULL;
 
-		if (create_entity("triangle", &scene, &element) > 0) {
-			const auto tmp = element->position();
-			element->position(tmp.x(1.5f).z(1.0f));
-			//	toQuaternion2(0, 0, 90, &element->orientation);
+		if (create_entity("triangle", &scene, &entity) > 0) {
+			const auto tmp = entity->position();
+			entity->position(tmp.x(1.5f).z(1.0f));
+			//	toQuaternion2(0, 0, 90, &entity->orientation);
 		}
 
-		if (create_entity("triangle", &scene, &element) > 0) {
-			const auto tmp = element->position();
-			element->position(tmp.x(0.0f).z(-2.0f));
-			//	toQuaternion2(45,0,0,&element->orientation);
+		if (create_entity("triangle", &scene, &entity) > 0) {
+			const auto tmp = entity->position();
+			entity->position(tmp.x(0.0f).z(-2.0f));
+			//	toQuaternion2(45,0,0,&entity->orientation);
 		}
 
 		for (i = 0; i < ANI_TRIS; i++) {
-			if (create_entity("cube", &scene, &element) > 0) {
-				tris[i] = element;
+			if (create_entity("cube", &scene, &entity) > 0) {
+				tris[i] = entity;
 				//			gravity.indices[i] = tris[i];
 				//		shape_create_triangle(element);
 				float x = (i % 20)*1.1f;
 				float z = (i / 20)*1.1f;
 				;
-				element->position(point(-10.0f + x, 5.0f, -2.0f - z));
-				element->scale(0.3f); 
-				element->renderData()->shader = HgShader::acquire("basic_light2_v.glsl", "basic_light2_f.glsl");
-				//element->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
+				entity->position(point(-10.0f + x, 5.0f, -2.0f - z));
+				entity->scale(0.3f); 
+				entity->renderData()->shader = HgShader::acquire("basic_light2_v.glsl", "basic_light2_f.glsl");
+				//entity->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 			}
 		}
 
-		if (create_entity("cube", &scene, &element) > 0) {
-			element->position(point(2,2,-2));
-			element->scale(0.3f);
-			element->renderData()->shader = HgShader::acquire("basic_light2_v.glsl", "basic_light2_f.glsl");
-			//element->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
+		if (create_entity("cube", &scene, &entity) > 0) {
+			entity->position(point(2,2,-2));
+			entity->scale(0.3f);
+			entity->renderData()->shader = HgShader::acquire("basic_light2_v.glsl", "basic_light2_f.glsl");
+			//entity->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 		}
 
-//		element->position.
+//		entity->position.
 
-		if (create_entity("voxelGrid", &scene, &element) > 0) {
-			//		element->scale = 100.0f;
-			element->position().z(-10);
-			//		toQuaternion2(0, -90, 0, &element->orientation);
-			element->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+		if (create_entity("voxelGrid", &scene, &entity) > 0) {
+			//		entity->scale = 100.0f;
+			entity->position().z(-10);
+			//		toQuaternion2(0, -90, 0, &entity->orientation);
+			entity->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
 		}
 	}
 
 	HgEntity* grid = NULL;
 	if (create_entity("square", &scene, &grid) > 0) {
 		grid->scale(100.0f);
-		//element->position().z(-4);
+		//entity->position().z(-4);
 		grid->orientation(quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO));
 		grid->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
 		grid->renderData()->blendMode = BLEND_ADDITIVE;
@@ -418,9 +418,9 @@ int main()
 			grid->position(point(camera->getWorldSpacePosition()).y(0));
 
 			{
-				HgEntity* element = tris[0];
+				HgEntity* entity = tris[0];
 				const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
-				element->orientation(orientation);
+				entity->orientation(orientation);
 				teapot->orientation(orientation.conjugate());
 
 				HgSound::Emitter emitter = snd->getEmitter();
@@ -429,7 +429,7 @@ int main()
 
 
 				for (i = 0; i < ANI_TRIS; i++) {
-					tris[i]->orientation(element->orientation());
+					tris[i]->orientation(entity->orientation());
 				}
 			}
 

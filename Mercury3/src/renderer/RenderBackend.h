@@ -52,11 +52,11 @@ namespace Renderer {
 	//Must happen after window is created;
 	void Init();
 
-	extern std::vector<RenderInstance> opaqueElements;
-	extern std::vector<RenderInstance> transparentElements;
+	extern std::vector<RenderInstance> opaqueEntities;
+	extern std::vector<RenderInstance> transparentEntities;
 
 	void Render(uint8_t stereo_view, HgCamera* camera, const HgMath::mat4f& projection);
-	void Enqueue(HgElement& e);
+	void Enqueue(HgEntity& e);
 
 	extern HgMath::mat4f ProjectionMatrix;
 	extern HgMath::mat4f ViewMatrix;

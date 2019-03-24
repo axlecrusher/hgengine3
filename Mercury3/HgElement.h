@@ -33,15 +33,15 @@ class HgScene;
 
 class HgEntityLogic {
 public:
-	HgEntityLogic() : element(nullptr) {}
+	HgEntityLogic() : m_entity(nullptr) {}
 	virtual ~HgEntityLogic() {}
 	virtual void update(HgTime tdelta) = 0;
 
-	inline void setElement(HgEntity* x) { element = x; }
-	inline HgEntity& getElement() { return *element; }
-	inline const HgEntity& getElement() const { return *element; }
+	inline void setEntity(HgEntity* x) { m_entity = x; }
+	inline HgEntity& getEntityt() { return *m_entity; }
+	inline const HgEntity& getEntity() const { return *m_entity; }
 protected:
-	HgEntity* element; //just a weak pointer back to the parent
+	HgEntity* m_entity; //just a weak pointer back to the parent
 };
 
 //class HgEntityExtended {
@@ -49,7 +49,7 @@ protected:
 //	//HgEntity* owner; //what is this for?
 //	//std::vector< HgTexture::TexturePtr > textures;
 //
-//	HgScene* m_scene; //Scene that element is a member of
+//	HgScene* m_scene; //Scene that entity is a member of
 //
 //	bool m_ownRenderData;
 //};
@@ -62,8 +62,8 @@ struct PositionalData {
 	uint8_t flags; //1
 };
 
-struct ElementFlags {
-	ElementFlags() :
+struct EntityFlags {
+	EntityFlags() :
 		used(false), active(false), hidden(false), updated(false),
 		destroy(false), /*update_textures(false),*/ transparent(false),
 		inheritParentScale(true), inheritParentRotation(true),
@@ -115,7 +115,7 @@ class HgEntity {
 private:
 	SpacialData m_spacialData; //local transormations
 public:
-		ElementFlags flags;
+		EntityFlags flags;
 
 		HgEntity() : m_updateNumber(0), m_renderData(nullptr) {}
 		~HgEntity();
@@ -150,7 +150,7 @@ public:
 			m_logic->update(dtime);
 		}
 
-		inline void setLogic(std::unique_ptr<HgEntityLogic> logic) { m_logic = std::move(logic); m_logic->setElement(this); }
+		inline void setLogic(std::unique_ptr<HgEntityLogic> logic) { m_logic = std::move(logic); m_logic->setEntity(this); }
 		inline HgEntityLogic& logic() { return *(m_logic.get()); }
 
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
@@ -206,9 +206,9 @@ extern RenderData* (*new_RenderData)();
 
 typedef void*(*factory_clbk)(HgEntity* e);
 
-void RegisterElementType(const char* c, factory_clbk);
+void RegisterEntityType(const char* c, factory_clbk);
 
-#define REGISTER_ELEMENT_TYPE(str) TestRegistration(str);
+#define REGISTER_ENTITY_TYPE(str) TestRegistration(str);
 
 // Check windows
 #if _WIN32 || _WIN64
@@ -231,8 +231,8 @@ void RegisterElementType(const char* c, factory_clbk);
 
 #ifdef _MSC_VER
 #define REGISTER_LINKTIME( func, factory ) \
-	__pragma(comment(linker,"/export:"##LINKER_PREFIX##"REGISTER_ELEMENT"#func)); \
-	extern "C" { void REGISTER_ELEMENT##func() { RegisterElementType(#func,factory); } }
+	__pragma(comment(linker,"/export:"##LINKER_PREFIX##"REGISTER_ENTITY"#func)); \
+	extern "C" { void REGISTER_ENTITY##func() { RegisterEntityType(#func,factory); } }
 #else
 #define REGISTER_LINKTIME( func ) \
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }

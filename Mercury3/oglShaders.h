@@ -46,7 +46,7 @@ class HgOglShader : public HgShader {
 
 		/* Perhaps shader uniforms should be stored locally per instance of a shader and then
 		sent to the video driver when the shader instance is enabled.
-		Currently shaders are essentially global and shared across any element that needs a specific shader.
+		Currently shaders are essentially global and shared across any entity that needs a specific shader.
 		We could make the shader binary shared but keep unform variables on a per instance basis and load
 		them as we process through different instances.
 

@@ -113,7 +113,7 @@ namespace RotatingCube {
 	}
 }
 
-static void* generate_rotating_cube(HgEntity* element) {
+static void* generate_rotating_cube(HgEntity* entity) {
 	RotatingCube::RotatingCube& p = RotatingCube::RotatingCube::Generate();
 	p.init();
 	return &p;

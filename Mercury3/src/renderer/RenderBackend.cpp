@@ -7,8 +7,8 @@ namespace Renderer {
 	HgMath::mat4f ProjectionMatrix;
 	HgMath::mat4f ViewMatrix;
 
-	std::vector<RenderInstance> opaqueElements;
-	std::vector<RenderInstance> transparentElements;
+	std::vector<RenderInstance> opaqueEntities;
+	std::vector<RenderInstance> transparentEntities;
 
 	void Init() {
 		RENDERER()->Init();
@@ -67,23 +67,23 @@ void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f
 	ProjectionMatrix = projection;
 	ViewMatrix = camera->toViewMatrix();
 
-	for (auto& renderInstance : opaqueElements) {
+	for (auto& renderInstance : opaqueEntities) {
 		submit_for_render_serial(viewportIdx, camera, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix);
 	}
 
-	for (auto& renderInstance : transparentElements) {
+	for (auto& renderInstance : transparentEntities) {
 		submit_for_render_serial(viewportIdx, camera, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix);
 	}
 }
 
-void Renderer::Enqueue(HgElement& e) {
+void Renderer::Enqueue(HgEntity& e) {
 	auto worldSpaceMatrix = e.computeWorldSpaceMatrix();
 	if (e.flags.transparent) {
 		//order by distance back to front?
-		Renderer::transparentElements.emplace_back(worldSpaceMatrix, e.getRenderDataPtr());
+		Renderer::transparentEntities.emplace_back(worldSpaceMatrix, e.getRenderDataPtr());
 	}
 	else {
 		//order by distance front to back?
-		Renderer::opaqueElements.emplace_back(worldSpaceMatrix, e.getRenderDataPtr());
+		Renderer::opaqueEntities.emplace_back(worldSpaceMatrix, e.getRenderDataPtr());
 	}
 }

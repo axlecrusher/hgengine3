@@ -58,9 +58,9 @@ static std::shared_ptr<RenderData> init_render_data() {
 	return trd;
 }
 
-static void* change_to_square(HgEntity* element) {
+static void* change_to_square(HgEntity* entity) {
 	//create an instance of the render data for all triangles to share
-	element->setRenderData( init_render_data() );
+	entity->setRenderData( init_render_data() );
 	return nullptr;
 }
 

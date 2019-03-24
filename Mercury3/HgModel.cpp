@@ -106,18 +106,18 @@ static void destroy(HgEntity* e) {
 	e->destroy();
 }
 
-static void* change_to_model(HgEntity* element) {
+static void* change_to_model(HgEntity* entity) {
 	//create an instance of the render data for all triangles to share
-	element->setRenderData( init_render_data() ); //this needs to be per model instance if the model is animated
+	entity->setRenderData( init_render_data() ); //this needs to be per model instance if the model is animated
 	return nullptr;
 }
 
-int8_t model_data::load(HgEntity* element, const char* filename) {
-	change_to_model(element);
+int8_t model_data::load(HgEntity* entity, const char* filename) {
+	change_to_model(entity);
 
-	OGLRenderData* rd = (OGLRenderData*)element->renderData();
+	OGLRenderData* rd = (OGLRenderData*)entity->renderData();
 
-	element->flags.destroy = true;
+	entity->flags.destroy = true;
 
 	model_data mdl( LoadModel(filename) );
 	if (mdl.vertices == nullptr ||
@@ -144,18 +144,18 @@ int8_t model_data::load(HgEntity* element, const char* filename) {
 		rd->indexVboRecord(iRec);
 	}
 
-	element->flags.destroy = false;
+	entity->flags.destroy = false;
 
 	return 0;
 }
 
-bool model_data::load_ini(HgEntity* element, std::string filename) {
+bool model_data::load_ini(HgEntity* entity, std::string filename) {
 	IniLoader::Contents contents = IniLoader::parse(filename);
-	return load_ini(element, contents);
+	return load_ini(entity, contents);
 }
 
-bool model_data::load_ini(HgEntity* element, const IniLoader::Contents& contents) {
-	change_to_model(element);
+bool model_data::load_ini(HgEntity* entity, const IniLoader::Contents& contents) {
+	change_to_model(entity);
 
 	float scale = 1;
 	vector3 origin;
@@ -176,14 +176,14 @@ bool model_data::load_ini(HgEntity* element, const IniLoader::Contents& contents
 	const std::string& specularTexture = contents.getValue("material", "speculartexture");
 	const std::string& normalTexture = contents.getValue("material", "normaltexture");
 
-	if (model_data::load(element, modelFilename.c_str()) < 0) return false;
+	if (model_data::load(entity, modelFilename.c_str()) < 0) return false;
 
-	element->scale(scale);
-	element->origin(origin.scale(1.0f/scale));
-	element->position(position);
-	element->orientation(orientation);
+	entity->scale(scale);
+	entity->origin(origin.scale(1.0f/scale));
+	entity->position(position);
+	entity->orientation(orientation);
 
-	auto renderData = element->renderData();
+	auto renderData = entity->renderData();
 
 	if (!vertexShader.empty() && !fragmentShader.empty())
 		renderData->shader = HgShader::acquire(vertexShader.c_str(), fragmentShader.c_str());

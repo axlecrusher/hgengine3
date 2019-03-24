@@ -41,9 +41,9 @@ std::shared_ptr<RenderData> triangle_init_render_data() {
 	return trd;
 }
 
-void change_to_triangle(HgEntity* element) {
+void change_to_triangle(HgEntity* entity) {
 	//create an instance of the render data for all triangles to share
-	element->setRenderData( triangle_init_render_data());
+	entity->setRenderData( triangle_init_render_data());
 }
 
 static void* triangle_factory(HgEntity* e) {

@@ -15,7 +15,7 @@
 
 std::unordered_map<std::string, factory_clbk> entity_factories;
 
-void RegisterElementType(const char* c, factory_clbk factory) {
+void RegisterEntityType(const char* c, factory_clbk factory) {
 	entity_factories[c] = factory;
 }
 

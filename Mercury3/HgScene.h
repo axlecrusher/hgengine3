@@ -8,8 +8,8 @@
 #include <HgTimer.h>
 
 /* HgScene could be reworked into a linked list (or array of pointers to list items) with each
-list item containing 512 elements and a used map. We could still index into the linked list
-by using the first 9 least significant bits to represent 512 elements. The last 7 MSB could
+list item containing 512 entities and a used map. We could still index into the linked list
+by using the first 9 least significant bits to represent 512 entities. The last 7 MSB could
 index into the array of list items. This would allow both indexing and valid HgEntity
 pointers for the duration of program execution.
 */
@@ -33,7 +33,7 @@ class HgScene {
 		HgScene();
 		void init();
 
-		uint32_t getNewEntity(HgEntity** element);
+		uint32_t getNewEntity(HgEntity** entity);
 		void removeEntity(uint32_t i);
 
 		inline bool isUsed(uint32_t idx) {
@@ -79,7 +79,7 @@ T* create_entity(char* type, HgScene* scene, HgEntity** entity) {
 		return 0;
 	}
 	factory_clbk clbk = factory->second;
-	scene->getNewElement(entity);
+	scene->getNewEntity(entity);
 	return (T*)clbk(*entity);
 }
 
@@ -91,7 +91,7 @@ T* create_entity(char* type, HgScene* scene) {
 	auto factory = entity_factories.find(type);
 
 	if (factory == entity_factories.end()) {
-		fprintf(stderr, "Unable to find element type \"%s\"\n", type);
+		fprintf(stderr, "Unable to find entity type \"%s\"\n", type);
 		return 0;
 	}
 	factory_clbk clbk = factory->second;
