@@ -1,4 +1,4 @@
-#include <HgElement.h>
+#include <HgEntity.h>
 #include <stdlib.h>
 #include <stdio.h>
 

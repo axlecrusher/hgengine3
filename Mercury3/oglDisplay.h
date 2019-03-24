@@ -5,7 +5,7 @@
 #include <vertex.h>
 
 #include <RenderData.h>
-//#include <HgElement.h>
+//#include <HgEntity.h>
 
 #include <HgTypes.h>
 

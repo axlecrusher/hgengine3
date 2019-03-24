@@ -11,7 +11,7 @@
 #include <memory.h>
 
 #include <HgVbo.h>
-#include <HgElement.h>
+#include <HgEntity.h>
 #include <HgUtils.h>
 
 #include <InstancedCollection.h>

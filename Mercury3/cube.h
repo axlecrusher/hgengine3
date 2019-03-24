@@ -1,6 +1,6 @@
 #pragma once
 
-#include <HgElement.h>
+#include <HgEntity.h>
 #include <HgVbo.h>
 #include <InstancedCollection.h>
 

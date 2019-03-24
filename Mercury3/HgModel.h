@@ -1,7 +1,7 @@
 #pragma once
 
 #include <HgVbo.h>
-#include <HgElement.h>
+#include <HgEntity.h>
 
 #include <string>
 #include <IniLoader.h>

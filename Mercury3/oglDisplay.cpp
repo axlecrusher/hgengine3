@@ -1,7 +1,7 @@
 #include <oglDisplay.h>
 
 #include <stdlib.h>
-#include <HgElement.h>
+#include <HgEntity.h>
 #include <oglShaders.h>
 
 #include <string.h>

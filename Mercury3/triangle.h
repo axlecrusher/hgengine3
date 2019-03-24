@@ -1,6 +1,6 @@
 #pragma once
 
-#include <HgElement.h>
+#include <HgEntity.h>
 //#include <oglDisplay.h>
 
 //void shape_create_triangle(HgEntity* element);

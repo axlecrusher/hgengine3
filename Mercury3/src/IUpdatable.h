@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <HgTimer.h>
 
-#include <HgElement.h>
+#include <HgEntity.h>
 //class HgEntity;
 
 class IUpdatable {

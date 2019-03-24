@@ -4,7 +4,7 @@
 #include <quaternion.h>
 #include <stdint.h>
 
-#include <HgElement.h>
+#include <HgEntity.h>
 
 #include <HgTypes.h>
 #include <windows.h>

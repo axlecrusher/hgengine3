@@ -1,5 +1,5 @@
 #include <HgShader.h>
-#include <HgElement.h>
+#include <HgEntity.h>
 
 #include <stdint.h>
 #include <string.h>

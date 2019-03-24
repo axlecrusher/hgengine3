@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <vector>
 
-#include <HgElement.h>
+#include <HgEntity.h>
 
 enum RendererType {
 	OPENGL = 0,

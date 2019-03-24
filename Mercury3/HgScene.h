@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include <HgElement.h>
+#include <HgEntity.h>
 
 #include <HgTimer.h>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-//#include <HgElement.h>
+//#include <HgEntity.h>
 #include <IUpdatable.h>
 #include <HgTypes.h>
 

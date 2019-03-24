@@ -5,7 +5,7 @@
 #include <oglShaders.h>
 
 #include <HgMath.h>
-#include <HgElement.h>
+#include <HgEntity.h>
 #include <stdlib.h>
 
 #include <UpdatableCollection.h>

@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <HgElement.h>
+#include <HgEntity.h>
 #include <HgScene.h>
 #include <shapes.h>
 
