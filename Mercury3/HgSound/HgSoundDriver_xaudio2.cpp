@@ -343,6 +343,22 @@ void XAudio2Driver::stopPlayback(const PlayingSound* sound)
 	}
 }
 
+void XAudio2Driver::update()
+{
+	std::lock_guard<std::mutex> lock(m_callbackMtx);
+
+	for (auto& voice : m_voices)
+	{
+		auto entity = voice.sound->getEmittingEntity();
+		if (entity)
+		{
+			Emitter tmp = voice.sound->getEmitter();
+			tmp.setPosition( entity->computeWorldSpacePosition() );
+			voice.sound->setEmitter(tmp);
+		}
+	}
+}
+
 void VoiceCallback::OnStreamEnd()
 {
 	//std::cout << "stream ended" << std::endl;

@@ -8,6 +8,8 @@
 #include <atomic>
 #include <GuardedType.h>
 
+#include <HgEntity.h>
+
 namespace HgSound {
 	class PlayingSound {
 	public:
@@ -47,12 +49,17 @@ namespace HgSound {
 		//set 3D sound emitter
 		void setEmitter(const Emitter& e) { m_emitter = e; }
 
+		//Will setup sound to be emitted from an entity. 
+		Emitter EmitFromEntity(const HgEntity* e);
+		HgEntity* getEmittingEntity() const { return m_emittingEntity.getEntity(); }
+
 	private:
 		SoundAsset::ptr m_sound;
 		std::atomic<playbackEndedFunc> m_playbackEndedClbk;
 		std::atomic<float> m_volume;
 		GuardedType<HgSound::Emitter> m_emitter; //is there a way to do this without a mutex?
 
+		EntityLink m_emittingEntity;
 //		uint64_t m_nextSample; //next sample to play
 	};
 }

@@ -15,6 +15,8 @@
 //#include <HgVbo.h>
 #include <RenderData.h>
 
+#include <unordered_map>
+
 enum HgEntityFlag {
 	HGE_USED = 0x01, //used in scene graph
 	HGE_ACTIVE = 0x02,
@@ -104,6 +106,33 @@ public:
 	inline void scale(float s) { m_scale = s; }
 };
 
+typedef uint32_t EntityIdType;
+
+class EntityLocator
+{
+public:
+	void RegisterEntity(HgEntity* entity);
+	void RemoveEntity(HgEntity* entity);
+
+	HgEntity* Find(EntityIdType id) const;
+private:
+	std::unordered_map<EntityIdType, HgEntity*> entities;
+};
+
+class EntityLink
+{
+public:
+	EntityLink()
+		:m_entityId(0)
+	{}
+
+	HgEntity* getEntity() const;
+	bool isValid() const { return m_entityId > 0; }
+
+	void setEntityid(EntityIdType id) { m_entityId = id; }
+private:
+	EntityIdType m_entityId;
+};
 
 /* NOTES: Try to avoid pointers, especially on 64 bit.
 The entity that allocates memory for render data should
@@ -117,11 +146,19 @@ private:
 public:
 		EntityFlags flags;
 
-		HgEntity() : m_updateNumber(0), m_renderData(nullptr) {}
+		HgEntity()
+			: m_entityId(0), m_updateNumber(0), m_renderData(nullptr)
+		{}
+
 		~HgEntity();
+
+		HgEntity(const HgEntity &other) = delete;
+		HgEntity(HgEntity &&) = delete; //move constructor
 
 		void init();
 		void destroy();
+
+		inline uint32_t getEntityId() const { return m_entityId; }
 
 		inline const point origin() const { return m_spacialData.origin(); }
 		inline void origin(const point& p) { m_spacialData.origin(p); }
@@ -146,7 +183,8 @@ public:
 		inline void update(HgTime dtime, uint32_t updateNumber) {
 			m_updateNumber = updateNumber;
 			//require parents to be updated first
-			if ((m_parent != nullptr) && m_parent->needsUpdate(updateNumber)) m_parent->update(dtime, updateNumber);
+			auto parent = m_parent.getEntity();
+			if ((parent != nullptr) && parent->needsUpdate(updateNumber)) parent->update(dtime, updateNumber);
 			m_logic->update(dtime);
 		}
 
@@ -156,8 +194,8 @@ public:
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
 		//void updateGpuTextures();
 
-		inline void setParent(HgEntity* parent) { m_parent = parent; }
-		HgEntity* getParent() const { return m_parent; }
+		inline void setParent(HgEntity* parent) { m_parent.setEntityid(parent->getEntityId()); }
+//		HgEntity* getParent() const { return m_parent; }
 
 		inline void setChild(HgEntity* child) { child->setParent(this); }
 
@@ -174,8 +212,13 @@ public:
 		inline void inheritParentRotation(bool x) { flags.inheritParentRotation = x; }
 		inline void inheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
 
-
+		inline static HgEntity* Find(EntityIdType id) { return m_entityLocator.Find(id); }
 private:
+	static EntityIdType m_nextEntityId;
+	static EntityLocator m_entityLocator;
+
+
+	EntityIdType m_entityId;
 	inline bool hasLogic() const { return m_logic != nullptr; }
 
 	std::shared_ptr<RenderData> m_renderData;
@@ -183,13 +226,31 @@ private:
 	uint32_t m_updateNumber;
 	std::unique_ptr<HgEntityLogic> m_logic;
 	//std::weak_ptr<HgEntity> m_parent;
-	HgEntity* m_parent; //checked every update.
+//	HgEntity* m_parent; //checked every update.
+//	EntityIdType m_parentId;
+	EntityLink m_parent;
 
 	friend HgEntityLogic;
 	friend model_data;
 };
 
-typedef HgEntity HgEntity;
+class EntityCreated
+{
+public:
+	EntityCreated(HgEntity* e = nullptr)
+		:entity(e)
+	{}
+	HgEntity* entity;
+};
+
+class EntityDestroyed
+{
+public:
+	EntityDestroyed(HgEntity* e = nullptr)
+		:entity(e)
+	{}
+	HgEntity* entity;
+};
 
 //Transform point p into world space of HgEntity e
 //point toWorldSpace(const HgEntity* e, const point* p);

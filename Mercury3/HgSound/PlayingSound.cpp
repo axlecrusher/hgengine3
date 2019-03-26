@@ -27,4 +27,15 @@ namespace HgSound {
 	void PlayingSound::stop() {
 		SOUND->stopPlayback(this);
 	}
+
+	Emitter PlayingSound::EmitFromEntity(const HgEntity* e)
+	{
+		m_emittingEntity.setEntityid(e->getEntityId());
+
+		HgSound::Emitter emitter;
+		emitter.setPosition(e->position());
+		setEmitter(emitter);
+		return emitter;
+	}
+
 }

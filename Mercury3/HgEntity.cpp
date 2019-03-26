@@ -13,21 +13,72 @@
 
 #include <UpdatableCollection.h>
 
+#include <EventSystem.h>
+
 std::unordered_map<std::string, factory_clbk> entity_factories;
+
+EntityIdType HgEntity::m_nextEntityId = 1;
+
+EntityLocator HgEntity::m_entityLocator;
 
 void RegisterEntityType(const char* c, factory_clbk factory) {
 	entity_factories[c] = factory;
 }
 
 
+void EntityLocator::RegisterEntity(HgEntity* entity)
+{
+	auto id = entity->getEntityId();
+	if (id == 0) return;
+
+	entities[id] = entity;
+}
+
+void EntityLocator::RemoveEntity(HgEntity* entity)
+{
+	auto id = entity->getEntityId();
+	if (id == 0) return;
+
+	auto itr = entities.find(id);
+	if (itr != entities.end())
+	{
+		entities.erase(itr);
+	}
+}
+
+HgEntity* EntityLocator::Find(EntityIdType id) const
+{
+	HgEntity* entity = nullptr;
+	if (id > 0)
+	{
+		auto itr = entities.find(id);
+		if (itr != entities.end())
+		{
+			entity = itr->second;
+		}
+	}
+	return entity;
+}
+
 void HgEntity::init()
 {
+	if (getEntityId() > 0)
+	{
+		m_entityLocator.RemoveEntity(this);
+	}
+
 	m_renderData = nullptr;
 	m_logic = nullptr;
 	m_renderData = nullptr;
 
-	m_parent = nullptr;
+//	m_parent = nullptr;
+//	m_parentId = 0;
+	m_parent.setEntityid(0);
 	m_updateNumber = 0;
+
+	m_entityId = m_nextEntityId++;
+	m_entityLocator.RegisterEntity(this);
+	EventSystem::PublishEvent(EntityCreated(this));
 }
 
 HgEntity::~HgEntity() {
@@ -36,6 +87,7 @@ HgEntity::~HgEntity() {
 
 void HgEntity::destroy()
 {
+	EventSystem::PublishEvent(EntityDestroyed(this));
 	m_logic.reset();
 	m_renderData.reset();
 }
@@ -66,12 +118,19 @@ HgMath::mat4f HgEntity::computeWorldSpaceMatrix(bool applyScale, bool applyRotat
 		modelMatrix.value.w = tmp.value;
 	//}
 
-	if (m_parent) {
-		modelMatrix = m_parent->computeWorldSpaceMatrix(flags.inheritParentScale,
+	auto parent = m_parent.getEntity();
+	if (parent) {
+		modelMatrix = parent->computeWorldSpaceMatrix(flags.inheritParentScale,
 			flags.inheritParentRotation, flags.inheritParentTranslation) * modelMatrix;
 	}
 
 	return modelMatrix;
+}
+
+HgEntity* EntityLink::getEntity() const
+{
+	if (m_entityId == 0) return nullptr;
+	return HgEntity::Find(m_entityId);
 }
 
 point HgEntity::computeWorldSpacePosition() const
@@ -107,3 +166,7 @@ namespace Engine {
 		}
 	}
 }
+
+
+REGISTER_EVENT_TYPE(EntityCreated)
+REGISTER_EVENT_TYPE(EntityDestroyed)

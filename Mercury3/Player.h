@@ -10,6 +10,11 @@ private:
 	//SpacialData m_spacial;
 	vector3 m_direction;
 public:
+	Player()
+	{
+//		m_entity.init();
+	}
+
 	float speedMsec;
 	vector3 m_moveDirection;
 

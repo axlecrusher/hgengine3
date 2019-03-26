@@ -313,9 +313,7 @@ int main()
 	auto testSound = HgSound::SoundAsset::acquire("tone.wav");
 	auto snd = testSound->newPlayingInstance();
 	snd->setVolume(0.5);
-	HgSound::Emitter emitter;
-	emitter.setPosition(teapotSquare->position());
-	SOUND->play3d(snd, emitter);
+	SOUND->play3d(snd, snd->EmitFromEntity(teapotSquare));
 
 	HANDLE thread1 = CreateThread(NULL, 0, &PrintCtr, NULL, 0, NULL);
 
@@ -423,11 +421,6 @@ int main()
 				entity->orientation(orientation);
 				teapot->orientation(orientation.conjugate());
 
-				HgSound::Emitter emitter = snd->getEmitter();
-				emitter.setPosition(teapotSquare->computeWorldSpacePosition());
-				snd->setEmitter(emitter);
-
-
 				for (i = 0; i < ANI_TRIS; i++) {
 					tris[i]->orientation(entity->orientation());
 				}
@@ -436,6 +429,8 @@ int main()
 			scene.update(timeStep);
 
 		}
+
+		SOUND->update();
 
 		doRender = true;
 		if (doRender) {

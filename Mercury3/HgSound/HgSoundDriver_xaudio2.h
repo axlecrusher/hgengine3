@@ -82,6 +82,8 @@ public:
 	virtual void play3d(PlayingSound::ptr& sound, const Emitter& emitter);
 	virtual void stopPlayback(const PlayingSound* sound);
 
+	virtual void update();
+
 	void queueDestroy(VoiceCallback* x) { m_toDestroy.push_back(x); }
 
 private:

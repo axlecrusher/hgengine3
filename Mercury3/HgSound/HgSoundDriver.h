@@ -44,6 +44,9 @@ public:
 	Listener getListener() const { return m_listener; }
 	void setListener(const Listener& l) { m_listener = l; }
 
+	//perform update of playing sounds. Intended to run from within game loop
+	virtual void update() = 0;
+
 private:
 
 	Listener m_listener;
