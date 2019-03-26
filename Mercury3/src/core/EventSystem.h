@@ -92,20 +92,17 @@ public:
 	{
 		if (ptr != nullptr) EventObserver<T>::Unregister(ptr);
 	}
-private:
-	friend class RegistrationRecipts;
 };
 
 //Helps keep track of registrations. Makes cleanup easier.
 class RegistrationRecipts
 {
 public:
-	static void Insert(std::unique_ptr< IRecipt > r)
+	static void Insert(std::unique_ptr< IRecipt >& r)
 	{
 		auto recipts = getRecipts();
 		void* ptr = r->getPtr();
 		(*recipts)[ptr].push_back(std::move(r));
-		auto& tmp = (*recipts)[ptr];
 	}
 
 	static void RemoveAll(void* ptr)
@@ -126,9 +123,10 @@ public:
 		if (itr != recipts->end())
 		{
 			auto& vector = itr->second;
+
 			auto vitr = std::find_if(vector.begin(), vector.end(),
 				[](const auto& r) {
-					return dynamic_cast<RegistrationRecipt<T>*>(r.get()) != nullptr;
+					return dynamic_cast<RegistrationRecipt<T>*>(r.get()) != nullptr; //gross
 			});
 
 			if (vitr != vector.end())
@@ -142,13 +140,13 @@ public:
 	}
 
 private:
-
-	static std::unordered_map<void*, std::vector<std::unique_ptr< IRecipt >>>* getRecipts()
+	typedef std::unordered_map<void*, std::vector<std::unique_ptr< IRecipt >>> mapType;
+	static mapType* getRecipts()
 	{
-		static std::unordered_map<void*, std::vector<std::unique_ptr< IRecipt >>>* recipts = nullptr;
+		static mapType* recipts = nullptr;
 		if (recipts == nullptr)
 		{
-			recipts = new std::unordered_map<void*, std::vector<std::unique_ptr< IRecipt >>>();
+			recipts = new mapType();
 		}
 		return recipts;
 	}
@@ -167,7 +165,7 @@ inline void Register(void* ptr, std::function<void(const T&)> clbk)
 {
 	std::unique_ptr< IRecipt > recipt(new RegistrationRecipt<T>(ptr));
 	EventObserver<T>::Register(ptr, std::move(clbk));
-	RegistrationRecipts::Insert(std::move(recipt));
+	RegistrationRecipts::Insert(recipt);
 }
 
 template<typename T>
