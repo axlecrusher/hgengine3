@@ -160,7 +160,7 @@ int main()
 {
 	using namespace ENGINE::INPUT;
 
-	stereo_view = false;
+	stereo_view = true;
 
 	ENGINE::InitEngine();
 	ENGINE::StartWindowSystem();
@@ -437,9 +437,10 @@ int main()
 			BeginFrame();
 
 			camera[1] = camera[0];
-//			camera[1].position.x(camera[1].position.x() - EYE_DISTANCE * 0.5f);
+			camera[1].setWorldSpacePosition(ComputeStereoCameraPosition(camera[1], -EYE_DISTANCE * 0.5f));
+
 			camera[2] = camera[0];
-//			camera[2].position.x(camera[1].position.x() + EYE_DISTANCE * 0.5f);
+			camera[2].setWorldSpacePosition(ComputeStereoCameraPosition(camera[2], EYE_DISTANCE * 0.5f));
 
 			HgSound::Listener listener;
 			listener.setPosition(camera[0].getWorldSpacePosition());
