@@ -41,3 +41,6 @@ private:
 
 	vector3 initialDirection; //direction vector that rotations are relative to
 };
+
+
+vector3f ComputeStereoCameraPosition(const HgCamera& camera, float eyeOffsetFromCenter);

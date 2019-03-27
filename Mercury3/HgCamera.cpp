@@ -37,3 +37,10 @@ HgMath::mat4f HgCamera::toViewMatrix() const {
 
 	return ret;
 }
+
+vector3f ComputeStereoCameraPosition(const HgCamera& camera, float eyeOffsetFromCenter)
+{
+	const auto pos = camera.getWorldSpacePosition();
+	const auto rotatedX = vector3f::UNIT_X.rotate(camera.getWorldSpaceOrientation());
+	return pos + rotatedX.scale(eyeOffsetFromCenter);
+}
