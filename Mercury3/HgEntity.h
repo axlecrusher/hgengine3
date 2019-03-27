@@ -16,6 +16,7 @@
 #include <RenderData.h>
 
 #include <unordered_map>
+#include <ServiceLocator.h>
 
 enum HgEntityFlag {
 	HGE_USED = 0x01, //used in scene graph
@@ -106,7 +107,40 @@ public:
 	inline void scale(float s) { m_scale = s; }
 };
 
-typedef uint32_t EntityIdType;
+//typedef uint32_t EntityIdType;
+class EntityIdType
+{
+public:
+	EntityIdType(uint32_t id = 0)
+		:m_id(id)
+	{}
+
+	operator uint32_t() const { return m_id; }
+	EntityIdType& operator++() { ++m_id; return *this; } //pre
+	EntityIdType operator++(int)
+	{
+		auto tmp = *this;
+		++m_id;
+		return tmp;
+	}	//post
+
+	bool isValid() const { return m_id > 0; }
+private:
+	uint32_t m_id;
+};
+
+namespace std
+{
+template<> struct hash<EntityIdType>
+{
+	typedef EntityIdType argument_type;
+	typedef std::size_t result_type;
+	result_type operator()(argument_type const& s) const noexcept
+	{
+		return std::hash<uint32_t>{}(s);
+	}
+};
+}
 
 class EntityLocator
 {
@@ -119,19 +153,13 @@ private:
 	std::unordered_map<EntityIdType, HgEntity*> entities;
 };
 
-class EntityLink
+class ExtendedEntityData
 {
 public:
-	EntityLink()
-		:m_entityId(0)
-	{}
-
-	HgEntity* getEntity() const;
-	bool isValid() const { return m_entityId > 0; }
-
-	void setEntityid(EntityIdType id) { m_entityId = id; }
+	void setName(std::string name) { m_name = std::move(name); }
+	const std::string& getName() const { return m_name; }
 private:
-	EntityIdType m_entityId;
+	std::string m_name;
 };
 
 /* NOTES: Try to avoid pointers, especially on 64 bit.
@@ -147,7 +175,7 @@ public:
 		EntityFlags flags;
 
 		HgEntity()
-			: m_entityId(0), m_updateNumber(0), m_renderData(nullptr)
+			: m_updateNumber(0), m_renderData(nullptr)
 		{}
 
 		~HgEntity();
@@ -158,7 +186,7 @@ public:
 		void init();
 		void destroy();
 
-		inline uint32_t getEntityId() const { return m_entityId; }
+		inline EntityIdType getEntityId() const { return m_entityId; }
 
 		inline const point origin() const { return m_spacialData.origin(); }
 		inline void origin(const point& p) { m_spacialData.origin(p); }
@@ -183,7 +211,7 @@ public:
 		inline void update(HgTime dtime, uint32_t updateNumber) {
 			m_updateNumber = updateNumber;
 			//require parents to be updated first
-			auto parent = m_parent.getEntity();
+			auto parent = getParent();
 			if ((parent != nullptr) && parent->needsUpdate(updateNumber)) parent->update(dtime, updateNumber);
 			m_logic->update(dtime);
 		}
@@ -194,8 +222,13 @@ public:
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
 		//void updateGpuTextures();
 
-		inline void setParent(HgEntity* parent) { m_parent.setEntityid(parent->getEntityId()); }
-//		HgEntity* getParent() const { return m_parent; }
+		inline void setParent(HgEntity* parent) { m_parentId = parent->getEntityId(); }
+		
+		inline HgEntity* getParent() const
+		{
+			if (!m_parentId.isValid()) return nullptr;
+			return Find(m_parentId);
+		}
 
 		inline void setChild(HgEntity* child) { child->setParent(this); }
 
@@ -212,26 +245,21 @@ public:
 		inline void inheritParentRotation(bool x) { flags.inheritParentRotation = x; }
 		inline void inheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
 
-		inline static HgEntity* Find(EntityIdType id) { return m_entityLocator.Find(id); }
+		static HgEntity* Find(EntityIdType id);
 private:
-	static EntityIdType m_nextEntityId;
-	static EntityLocator m_entityLocator;
-
-
-	EntityIdType m_entityId;
 	inline bool hasLogic() const { return m_logic != nullptr; }
 
+	static EntityIdType m_nextEntityId;
+	static EntityLocator& Locator();
+
+	EntityIdType m_entityId;
+
 	std::shared_ptr<RenderData> m_renderData;
+	std::unique_ptr<HgEntityLogic> m_logic;
+	std::unique_ptr<ExtendedEntityData> m_extendedData;
 
 	uint32_t m_updateNumber;
-	std::unique_ptr<HgEntityLogic> m_logic;
-	//std::weak_ptr<HgEntity> m_parent;
-//	HgEntity* m_parent; //checked every update.
-//	EntityIdType m_parentId;
-	EntityLink m_parent;
-
-	friend HgEntityLogic;
-	friend model_data;
+	EntityIdType m_parentId;
 };
 
 class EntityCreated
@@ -246,10 +274,11 @@ public:
 class EntityDestroyed
 {
 public:
-	EntityDestroyed(HgEntity* e = nullptr)
-		:entity(e)
+	EntityDestroyed(HgEntity* e = nullptr, EntityIdType id = EntityIdType())
+		:entity(e), entityId(id)
 	{}
 	HgEntity* entity;
+	EntityIdType entityId;
 };
 
 //Transform point p into world space of HgEntity e

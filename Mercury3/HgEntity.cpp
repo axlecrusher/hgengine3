@@ -17,9 +17,7 @@
 
 std::unordered_map<std::string, factory_clbk> entity_factories;
 
-EntityIdType HgEntity::m_nextEntityId = 1;
-
-EntityLocator HgEntity::m_entityLocator;
+EntityIdType HgEntity::m_nextEntityId(1);
 
 void RegisterEntityType(const char* c, factory_clbk factory) {
 	entity_factories[c] = factory;
@@ -49,7 +47,7 @@ void EntityLocator::RemoveEntity(HgEntity* entity)
 HgEntity* EntityLocator::Find(EntityIdType id) const
 {
 	HgEntity* entity = nullptr;
-	if (id > 0)
+	if (id.isValid())
 	{
 		auto itr = entities.find(id);
 		if (itr != entities.end())
@@ -60,24 +58,35 @@ HgEntity* EntityLocator::Find(EntityIdType id) const
 	return entity;
 }
 
+EntityLocator& HgEntity::Locator()
+{
+	static EntityLocator locator;
+	return locator;
+}
+
+HgEntity* HgEntity::Find(EntityIdType id)
+{
+	return Locator().Find(id);
+}
+
+
 void HgEntity::init()
 {
-	if (getEntityId() > 0)
+	if (getEntityId().isValid())
 	{
-		m_entityLocator.RemoveEntity(this);
+		destroy();
 	}
 
 	m_renderData = nullptr;
 	m_logic = nullptr;
 	m_renderData = nullptr;
 
-//	m_parent = nullptr;
-//	m_parentId = 0;
-	m_parent.setEntityid(0);
+	m_parentId = EntityIdType();
 	m_updateNumber = 0;
 
 	m_entityId = m_nextEntityId++;
-	m_entityLocator.RegisterEntity(this);
+
+	Locator().RegisterEntity(this);
 	EventSystem::PublishEvent(EntityCreated(this));
 }
 
@@ -87,9 +96,14 @@ HgEntity::~HgEntity() {
 
 void HgEntity::destroy()
 {
-	EventSystem::PublishEvent(EntityDestroyed(this));
+	if (m_entityId.isValid())
+	{
+		EventSystem::PublishEvent(EntityDestroyed(this, m_entityId));
+	}
+	Locator().RemoveEntity(this);
 	m_logic.reset();
 	m_renderData.reset();
+	m_entityId = EntityIdType(); //reset id
 }
 
 HgMath::mat4f HgEntity::computeWorldSpaceMatrix(bool applyScale, bool applyRotation, bool applyTranslation) const {
@@ -118,19 +132,13 @@ HgMath::mat4f HgEntity::computeWorldSpaceMatrix(bool applyScale, bool applyRotat
 		modelMatrix.value.w = tmp.value;
 	//}
 
-	auto parent = m_parent.getEntity();
+	auto parent = getParent();
 	if (parent) {
 		modelMatrix = parent->computeWorldSpaceMatrix(flags.inheritParentScale,
 			flags.inheritParentRotation, flags.inheritParentTranslation) * modelMatrix;
 	}
 
 	return modelMatrix;
-}
-
-HgEntity* EntityLink::getEntity() const
-{
-	if (m_entityId == 0) return nullptr;
-	return HgEntity::Find(m_entityId);
 }
 
 point HgEntity::computeWorldSpacePosition() const

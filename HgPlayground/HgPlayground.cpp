@@ -2,7 +2,7 @@
 //
 
 //#include "stdafx.h"
-
+#include <HgEngine.h>
 #include <Win32Window.h>
 
 #include <stdio.h>
