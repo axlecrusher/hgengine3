@@ -279,16 +279,17 @@ private:
 class EntityCreated
 {
 public:
-	EntityCreated(HgEntity* e = nullptr)
+	EntityCreated(HgEntity* e, EntityIdType id)
 		:entity(e)
 	{}
 	HgEntity* entity;
+	EntityIdType entityId;
 };
 
 class EntityDestroyed
 {
 public:
-	EntityDestroyed(HgEntity* e = nullptr, EntityIdType id = EntityIdType())
+	EntityDestroyed(HgEntity* e, EntityIdType id)
 		:entity(e), entityId(id)
 	{}
 	HgEntity* entity;

@@ -92,7 +92,7 @@ void HgEntity::init()
 	m_entityId = m_nextEntityId++;
 
 	Locator().RegisterEntity(this);
-	EventSystem::PublishEvent(EntityCreated(this));
+	EventSystem::PublishEvent(EntityCreated(this, m_entityId));
 }
 
 HgEntity::~HgEntity() {
