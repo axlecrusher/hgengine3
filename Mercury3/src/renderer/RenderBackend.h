@@ -50,7 +50,11 @@ class RenderQueue
 {
 public:
 	void Enqueue(const HgEntity* entity);
+
+	//sorts queue on draw order for proper rendering
 	void Finalize();
+
+	//Clears existing queue
 	void Clear()
 	{
 		m_opaqueEntities.clear();

@@ -436,9 +436,9 @@ int main()
 			SOUND->setListener(listener);
 
 			renderQueue.Clear();
-
 			scene.EnqueueForRender(&renderQueue);
 			Engine::EnqueueForRender(Engine::collections(), &renderQueue);
+			renderQueue.Finalize();
 
 			//render below
 			const auto projection_matrix = HgMath::mat4f(projection);
