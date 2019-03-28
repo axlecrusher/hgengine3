@@ -73,10 +73,9 @@ namespace Renderer {
 	//Must happen after window is created;
 	void Init();
 
+	void Render(uint8_t viewportIdx, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection, RenderQueue* queue);
 	void Render(uint8_t stereo_view, HgCamera* camera, const HgMath::mat4f& projection, RenderQueue* queue);
 
-	extern HgMath::mat4f ProjectionMatrix;
-	extern HgMath::mat4f ViewMatrix;
 }
 
 RenderBackend* RENDERER();

@@ -137,21 +137,6 @@ void submit_for_render_threaded(uint8_t viewport_idx, HgCamera* camera, HgScene 
 	hgRenderQueue_push(create_render_packet(e, viewport_idx, camera + 0, s, idx)); //submit to renderer
 }
 
-void quick_render(uint8_t viewport_idx, HgCamera* camera, HgEntity* e) {
-	float wsm[16];
-	RenderData* rd = e->renderData();
-	//	if (rd->shader) VCALL(rd->shader, enable);
-	RENDERER()->Viewport(viewport_idx);
-
-	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
-	//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
-	e->computeWorldSpaceMatrix().store(wsm);
-	rd->shader->uploadMatrices(wsm, Renderer::ProjectionMatrix, Renderer::ViewMatrix);
-	//	setLocalUniforms(&e->orientation, &e->position, e->scale);
-
-	rd->render();
-}
-
 void vertex_print(const vertex* v) {
 	printf("%f %f %f\n", v->raw[0], v->raw[1], v->raw[2]);
 }

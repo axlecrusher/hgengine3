@@ -5,9 +5,6 @@
 #include <algorithm>
 
 namespace Renderer {
-	HgMath::mat4f ProjectionMatrix;
-	HgMath::mat4f ViewMatrix;
-
 	void Init() {
 		RENDERER()->Init();
 	}
@@ -38,7 +35,7 @@ void RenderBackend::setup_viewports(uint16_t width, uint16_t height) {
 	view_port[i].height = height;
 }
 
-static void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, RenderData* renderData, const float* worldSpaceMatrix) {
+static void submit_for_render_serial(uint8_t viewport_idx, RenderData* renderData, const float* worldSpaceMatrix, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection) {
 	RENDERER()->Viewport(viewport_idx);
 
 	//load texture data to GPU here. Can this be made to be done right after loading the image data, regardless of thread?
@@ -54,24 +51,28 @@ static void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, Ren
 		//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 		//shader->setGlobalUniforms(*camera);
 		//const auto spacial = e->getSpacialData();
-		shader->uploadMatrices(worldSpaceMatrix, Renderer::ProjectionMatrix, Renderer::ViewMatrix);
+		shader->uploadMatrices(worldSpaceMatrix, projection, viewMatrix);
 		shader->setLocalUniforms(*renderData);
 	}
 
 	renderData->render();
 }
 
-void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f& projection, RenderQueue* queue) {
-	ProjectionMatrix = projection;
-	ViewMatrix = camera->toViewMatrix();
-
+void Renderer::Render(uint8_t viewportIdx, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection, RenderQueue* queue)
+{
 	for (auto& renderInstance : queue->getOpaqueQueue()) {
-		submit_for_render_serial(viewportIdx, camera, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix);
+		submit_for_render_serial(viewportIdx, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix, viewMatrix, projection);
 	}
 
 	for (auto& renderInstance : queue->getTransparentQueue()) {
-		submit_for_render_serial(viewportIdx, camera, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix);
+		submit_for_render_serial(viewportIdx, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix, viewMatrix, projection);
 	}
+}
+
+void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f& projection, RenderQueue* queue)
+{
+	const auto viewMatrix = camera->toViewMatrix();
+	Render(viewportIdx, viewMatrix, projection, queue);
 }
 
 void RenderQueue::Enqueue(const HgEntity* e)
