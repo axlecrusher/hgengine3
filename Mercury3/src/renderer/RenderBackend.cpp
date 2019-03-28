@@ -76,16 +76,19 @@ void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f
 
 void RenderQueue::Enqueue(const HgEntity* e)
 {
-	const auto worldSpaceMatrix = e->computeWorldSpaceMatrix();
 	auto renderData = e->getRenderDataPtr();
+	if (renderData)
+	{
+		const auto worldSpaceMatrix = e->computeWorldSpaceMatrix();
 
-	if (renderData->renderFlags.transparent) {
-		//order by distance back to front?
-		m_transparentEntities.emplace_back(worldSpaceMatrix, renderData, e->getDrawOrder());
-	}
-	else {
-		//order by distance front to back?
-		m_opaqueEntities.emplace_back(worldSpaceMatrix, renderData, e->getDrawOrder());
+		if (renderData->renderFlags.transparent) {
+			//order by distance back to front?
+			m_transparentEntities.emplace_back(worldSpaceMatrix, renderData, e->getDrawOrder());
+		}
+		else {
+			//order by distance front to back?
+			m_opaqueEntities.emplace_back(worldSpaceMatrix, renderData, e->getDrawOrder());
+		}
 	}
 }
 
@@ -100,6 +103,6 @@ void RenderQueue::sort(std::vector<RenderInstance>& v)
 	std::sort(v.begin(), v.end(),
 		[](RenderInstance& a, RenderInstance& b)
 	{
-		return a.drawOrder > b.drawOrder;
+		return b.drawOrder > a.drawOrder;
 	});
 }
