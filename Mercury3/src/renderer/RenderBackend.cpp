@@ -85,7 +85,7 @@ void RenderQueue::Enqueue(const HgEntity* e)
 	}
 	else {
 		//order by distance front to back?
-		m_opaqueEntities.emplace_back(worldSpaceMatrix, renderData);
+		m_opaqueEntities.emplace_back(worldSpaceMatrix, renderData, e->getDrawOrder());
 	}
 }
 
