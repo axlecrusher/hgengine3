@@ -36,13 +36,34 @@ protected:
 };
 
 struct RenderInstance {
-	RenderInstance(const HgMath::mat4f& _worldSpaceMatrix, RenderDataPtr& rd)
-		:renderData(rd)
+	RenderInstance(const HgMath::mat4f& _worldSpaceMatrix, RenderDataPtr& rd, int8_t order = 0)
+		:renderData(rd), drawOrder(order)
 	{
 		_worldSpaceMatrix.store(worldSpaceMatrix);
 	}
 	float worldSpaceMatrix[16];
 	RenderDataPtr renderData;
+	int8_t drawOrder;
+};
+
+class RenderQueue
+{
+public:
+	void Enqueue(const HgEntity* entity);
+	void Finalize();
+	void Clear()
+	{
+		m_opaqueEntities.clear();
+		m_transparentEntities.clear();
+	}
+
+	const std::vector<RenderInstance>& getOpaqueQueue() const { return m_opaqueEntities; }
+	const std::vector<RenderInstance>& getTransparentQueue() const { return m_transparentEntities; }
+private:
+	void sort(std::vector<RenderInstance>& v);
+
+	std::vector<RenderInstance> m_opaqueEntities;
+	std::vector<RenderInstance> m_transparentEntities;
 };
 
 class HgCamera;
@@ -52,11 +73,7 @@ namespace Renderer {
 	//Must happen after window is created;
 	void Init();
 
-	extern std::vector<RenderInstance> opaqueEntities;
-	extern std::vector<RenderInstance> transparentEntities;
-
-	void Render(uint8_t stereo_view, HgCamera* camera, const HgMath::mat4f& projection);
-	void Enqueue(HgEntity& e);
+	void Render(uint8_t stereo_view, HgCamera* camera, const HgMath::mat4f& projection, RenderQueue* queue);
 
 	extern HgMath::mat4f ProjectionMatrix;
 	extern HgMath::mat4f ViewMatrix;

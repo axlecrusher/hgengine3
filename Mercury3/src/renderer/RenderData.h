@@ -41,12 +41,13 @@ public:
 	static newRenderDataCallback Create;
 	
 	struct Flags {
-		Flags() : FACE_CULLING(true), DEPTH_WRITE(true), updateTextures(false)
+		Flags() : FACE_CULLING(true), DEPTH_WRITE(true), updateTextures(false), transparent(false)
 		{}
 
 		bool FACE_CULLING : 1;
 		bool DEPTH_WRITE : 1;
 		bool updateTextures : 1;
+		bool transparent : 1;
 	};
 
 	RenderData();
@@ -92,3 +93,4 @@ public:
 };
 
 typedef std::shared_ptr<RenderData> RenderDataPtr;
+//typedef std::shared_ptr<const RenderData> RenderDataPtr_const;

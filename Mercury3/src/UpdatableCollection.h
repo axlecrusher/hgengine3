@@ -8,7 +8,7 @@
 class IUpdatableCollection {
 public:
 	virtual void update(HgTime dtime) = 0;
-	virtual void EnqueueForRender() = 0;
+	virtual void EnqueueForRender(RenderQueue* queue) = 0;
 };
 
 /* This is for data oriented processing. Large collections of objects can
@@ -37,13 +37,13 @@ public:
 		}
 	}
 
-	virtual void EnqueueForRender() final {
+	virtual void EnqueueForRender(RenderQueue* queue) final {
 		if (empty()) return;
 
 		for (auto itr = begin(); itr != end(); itr++) {
 			auto& e = itr->getEntity();
 			if (!e.flags.hidden) {
-				Renderer::Enqueue(e);
+				queue->Enqueue(&e);
 			}
 		}
 	}

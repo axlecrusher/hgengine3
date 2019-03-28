@@ -7,6 +7,8 @@
 
 #include <HgTimer.h>
 
+class RenderQueue;
+
 /* HgScene could be reworked into a linked list (or array of pointers to list items) with each
 list item containing 512 entities and a used map. We could still index into the linked list
 by using the first 9 least significant bits to represent 512 entities. The last 7 MSB could
@@ -50,7 +52,7 @@ class HgScene {
 		inline uint32_t nextUpdateNumber() { return ++m_updateCount; }
 
 		void update(HgTime dtime);
-		void EnqueueForRender();
+		void EnqueueForRender(RenderQueue* queue);
 
 //		void(*submit_for_render)(HgEntity* e);
 private:

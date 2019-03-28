@@ -360,6 +360,8 @@ int main()
 	HgTime accumulatedTime;
 	const HgTime timeStep = HgTime::msec(8); // about 120 ups
 
+	RenderQueue renderQueue;
+
 	gameTimer.start();
 	while (!window->m_close) {
 		const HgTime time = gameTimer.getElasped();
@@ -448,22 +450,21 @@ int main()
 			listener.setUp(camera[0].getUp());
 			SOUND->setListener(listener);
 
-			Renderer::opaqueEntities.clear();
-			Renderer::transparentEntities.clear();
+			renderQueue.Clear();
 
-			scene.EnqueueForRender();
-			Engine::EnqueueForRender(Engine::collections());
+			scene.EnqueueForRender(&renderQueue);
+			Engine::EnqueueForRender(Engine::collections(), &renderQueue);
 
 			//render below
 			const auto projection_matrix = HgMath::mat4f(projection);
 
 			if (stereo_view) {
-				Renderer::Render(1, camera + 1, projection_matrix); //eye 1
-				Renderer::Render(2, camera + 2, projection_matrix); //eye 2
+				Renderer::Render(1, camera + 1, projection_matrix, &renderQueue); //eye 1
+				Renderer::Render(2, camera + 2, projection_matrix, &renderQueue); //eye 2
 			}
 			else
 			{
-				Renderer::Render(0, camera, projection_matrix);
+				Renderer::Render(0, camera, projection_matrix, &renderQueue);
 			}
 
 			window->SwapBuffers();

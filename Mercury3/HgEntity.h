@@ -68,7 +68,7 @@ struct PositionalData {
 struct EntityFlags {
 	EntityFlags() :
 		used(false), active(false), hidden(false), updated(false),
-		destroy(false), /*update_textures(false),*/ transparent(false),
+		destroy(false), /*update_textures(false),*/
 		inheritParentScale(true), inheritParentRotation(true),
 		inheritParentTranslation(true)
 	{}
@@ -78,7 +78,6 @@ struct EntityFlags {
 	bool updated : 1;
 	bool destroy : 1;
 	//bool update_textures : 1;
-	bool transparent : 1;
 	bool inheritParentScale : 1;
 	bool inheritParentRotation : 1;
 	bool inheritParentTranslation : 1;
@@ -114,6 +113,12 @@ public:
 	EntityIdType(uint32_t id = 0)
 		:m_id(id)
 	{}
+
+	EntityIdType& operator=(const EntityIdType& rhs)
+	{
+		m_id = rhs.m_id;
+		return *this;
+	}
 
 	operator uint32_t() const { return m_id; }
 	EntityIdType& operator++() { ++m_id; return *this; } //pre
@@ -235,6 +240,7 @@ public:
 		inline void setRenderData(std::shared_ptr<RenderData>& rd) { m_renderData = rd; }
 		RenderData* renderData() { return m_renderData.get(); }
 		RenderDataPtr& getRenderDataPtr() { return m_renderData; }
+		const RenderDataPtr& getRenderDataPtr() const { return m_renderData; }
 
 		//inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 
@@ -245,6 +251,12 @@ public:
 		inline void inheritParentRotation(bool x) { flags.inheritParentRotation = x; }
 		inline void inheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
 
+		inline void setDrawOrder(int8_t order) { m_drawOrder = order; }
+		inline int8_t getDrawOrder() const { return m_drawOrder; }
+
+		inline void setName(const std::string& name) { m_extendedData->setName(name); }
+		inline std::string& getName() const { m_extendedData->getName(); }
+
 		static HgEntity* Find(EntityIdType id);
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }
@@ -254,12 +266,14 @@ private:
 
 	EntityIdType m_entityId;
 
-	std::shared_ptr<RenderData> m_renderData;
+	RenderDataPtr m_renderData;
 	std::unique_ptr<HgEntityLogic> m_logic;
 	std::unique_ptr<ExtendedEntityData> m_extendedData;
 
 	uint32_t m_updateNumber;
 	EntityIdType m_parentId;
+
+	int8_t m_drawOrder;
 };
 
 class EntityCreated
@@ -285,11 +299,12 @@ public:
 //point toWorldSpace(const HgEntity* e, const point* p);
 
 class IUpdatableCollection;
+class RenderQueue;
 
 namespace Engine {
 	std::vector<IUpdatableCollection*>& collections();
 	void updateCollections(HgTime dtime);
-	void EnqueueForRender(std::vector<IUpdatableCollection*>& c);
+	void EnqueueForRender(std::vector<IUpdatableCollection*>& c, RenderQueue* queue);
 }
 
 extern RenderData* (*new_RenderData)();

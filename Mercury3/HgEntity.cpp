@@ -81,8 +81,13 @@ void HgEntity::init()
 	m_logic = nullptr;
 	m_renderData = nullptr;
 
-	m_parentId = EntityIdType();
+	m_extendedData = std::make_unique<ExtendedEntityData>();
+
+	auto tmp = EntityIdType();
+	m_parentId = tmp;
 	m_updateNumber = 0;
+
+	m_drawOrder = 0;
 
 	m_entityId = m_nextEntityId++;
 
@@ -168,9 +173,9 @@ namespace Engine {
 		}
 	}
 
-	void EnqueueForRender(std::vector<IUpdatableCollection*>& c) {
+	void EnqueueForRender(std::vector<IUpdatableCollection*>& c, RenderQueue* queue) {
 		for (auto i : c) {
-			i->EnqueueForRender();
+			i->EnqueueForRender(queue);
 		}
 	}
 }

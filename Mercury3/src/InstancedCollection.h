@@ -37,7 +37,7 @@ public:
 		}
 	}
 
-	virtual void EnqueueForRender() final {
+	virtual void EnqueueForRender(RenderQueue* queue) final {
 		if (empty()) return;
 
 //		size_t instanceCount = m_items.count();
@@ -49,7 +49,7 @@ public:
 		for (auto itr = begin(); itr != end(); itr++) {
 			auto& e = itr->getEntity();
 			if (!e.flags.hidden) {
-				Renderer::Enqueue(e);
+				queue->Enqueue(&e);
 				return;
 			}
 		}

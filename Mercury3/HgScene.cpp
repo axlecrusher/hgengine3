@@ -111,7 +111,8 @@ void HgScene::update(HgTime dtime) {
 
 
 
-void HgScene::EnqueueForRender() {
+void HgScene::EnqueueForRender(RenderQueue* queue)
+{
 	uint32_t updateNumber = nextUpdateNumber();
 	uint32_t maxCount = maxItems();
 	for (uint32_t i = 0; i < maxCount; ++i) {
@@ -121,7 +122,7 @@ void HgScene::EnqueueForRender() {
 		//I would like to move this out of here for a more perminent, solution
 		//where the vectors don't need to be rebuild every time
 		if (!e->flags.hidden) { 
-			Renderer::Enqueue(*e);
+			queue->Enqueue(e);
 		}
 
 	}

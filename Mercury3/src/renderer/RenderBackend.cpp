@@ -2,13 +2,11 @@
 #include <OGLBackend.h>
 
 #include <oglDisplay.h>
+#include <algorithm>
 
 namespace Renderer {
 	HgMath::mat4f ProjectionMatrix;
 	HgMath::mat4f ViewMatrix;
-
-	std::vector<RenderInstance> opaqueEntities;
-	std::vector<RenderInstance> transparentEntities;
 
 	void Init() {
 		RENDERER()->Init();
@@ -63,27 +61,45 @@ static void submit_for_render_serial(uint8_t viewport_idx, HgCamera* camera, Ren
 	renderData->render();
 }
 
-void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f& projection) {
+void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f& projection, RenderQueue* queue) {
 	ProjectionMatrix = projection;
 	ViewMatrix = camera->toViewMatrix();
 
-	for (auto& renderInstance : opaqueEntities) {
+	for (auto& renderInstance : queue->getOpaqueQueue()) {
 		submit_for_render_serial(viewportIdx, camera, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix);
 	}
 
-	for (auto& renderInstance : transparentEntities) {
+	for (auto& renderInstance : queue->getTransparentQueue()) {
 		submit_for_render_serial(viewportIdx, camera, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix);
 	}
 }
 
-void Renderer::Enqueue(HgEntity& e) {
-	auto worldSpaceMatrix = e.computeWorldSpaceMatrix();
-	if (e.flags.transparent) {
+void RenderQueue::Enqueue(const HgEntity* e)
+{
+	const auto worldSpaceMatrix = e->computeWorldSpaceMatrix();
+	auto renderData = e->getRenderDataPtr();
+
+	if (renderData->renderFlags.transparent) {
 		//order by distance back to front?
-		Renderer::transparentEntities.emplace_back(worldSpaceMatrix, e.getRenderDataPtr());
+		m_transparentEntities.emplace_back(worldSpaceMatrix, renderData, e->getDrawOrder());
 	}
 	else {
 		//order by distance front to back?
-		Renderer::opaqueEntities.emplace_back(worldSpaceMatrix, e.getRenderDataPtr());
+		m_opaqueEntities.emplace_back(worldSpaceMatrix, renderData);
 	}
+}
+
+void RenderQueue::Finalize()
+{
+	sort(m_opaqueEntities);
+	sort(m_transparentEntities);
+}
+
+void RenderQueue::sort(std::vector<RenderInstance>& v)
+{
+	std::sort(v.begin(), v.end(),
+		[](RenderInstance& a, RenderInstance& b)
+	{
+		return a.drawOrder > b.drawOrder;
+	});
 }
