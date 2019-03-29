@@ -32,8 +32,8 @@ namespace ENGINE {
 		memset(KeyDownMap, 0, sizeof(bool)*KeyDownMap_length);
 	}
 	
-	void StartWindowSystem() {
-		MercuryWindow::MakeWindow();
+	void StartWindowSystem(uint16_t width, uint16_t height) {
+		MercuryWindow::MakeWindow(width, height);
 		Renderer::Init();
 	}
 

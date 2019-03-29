@@ -18,7 +18,7 @@ public:
 	virtual bool SwapBuffers();
 	virtual bool PumpMessages();
 
-	static MercuryWindow* GenWin32Window();
+	static MercuryWindow* GenWin32Window(uint16_t width, uint16_t height);
 	virtual void* GetProcAddress(const MString& x);
 	//static uint16_t ConvertScancode( size_t scanin );
 	static ENGINE::INPUT::KeyCodes ConvertScancode2(size_t virtualKey);

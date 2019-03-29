@@ -21,15 +21,14 @@ uint8_t GlobalMouseGrabbed_Set = 1;
 bool stereo_view;
 
 //LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //Window callback
-Callback0R< MercuryWindow* > MercuryWindow::genWindowClbk(Win32Window::GenWin32Window); //Register window generation callback
+//Callback0R< MercuryWindow* > MercuryWindow::genWindowClbk(Win32Window::GenWin32Window); //Register window generation callback
 //MercuryWindow* MercuryWindow::genWindowClbk = (void*)Win32Window::GenWin32Window;
+std::function<MercuryWindow*(uint16_t width, uint16_t height)> MercuryWindow::genWindowClbk(Win32Window::GenWin32Window);
 bool ACTIVE = false;
 
-MercuryWindow* Win32Window::GenWin32Window()
+MercuryWindow* Win32Window::GenWin32Window(uint16_t width, uint16_t height)
 {
-	if (stereo_view)
-		return new Win32Window("Mercury3", 1280, 480, 24, 16, false);
-	return new Win32Window("Mercury3", 800, 600, 24, 16, false);
+	return new Win32Window("Mercury3", width, height, 24, 16, false);
 }
 
 template<typename STRTYPE>

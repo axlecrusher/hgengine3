@@ -6,6 +6,7 @@
 //#include <MercuryStringUtil.h>
 #include <list>
 #include <Callback.h>
+#include <functional>
 
 class MercuryWindow
 {
@@ -13,8 +14,8 @@ public:
 	MercuryWindow(const MString& title, int width, int height, int bits, int depthBits, bool fullscreen);
 	virtual ~MercuryWindow();
 
-	inline static MercuryWindow* MakeWindow() {
-		MercuryWindow::m_windowInstance = genWindowClbk();
+	inline static MercuryWindow* MakeWindow(uint16_t width, uint16_t height) {
+		MercuryWindow::m_windowInstance = genWindowClbk(width, height);
 		return GetCurrentWindow();
 	}
 
@@ -42,7 +43,8 @@ protected:
 	virtual void TryFullscreen() = 0;
 
 //	static MercuryWindow* (*genWindowClbk)(void);
-	static Callback0R< MercuryWindow* > genWindowClbk;
+	static std::function<MercuryWindow*(uint16_t width, uint16_t height)> genWindowClbk;
+//	static Callback0R< MercuryWindow* > genWindowClbk;
 	static MercuryWindow* m_windowInstance;
 	
 	MString m_title;

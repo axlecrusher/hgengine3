@@ -19,7 +19,7 @@ SET_TARGET_PROPERTIES(hgplayground PROPERTIES LINK_FLAGS "/WHOLEARCHIVE:hgengine
 #SET_TARGET_PROPERTIES(hgplayground PROPERTIES LINK_FLAGS_RELEASE "/WHOLEARCHIVE:hgengine.lib")
 #SET_TARGET_PROPERTIES(hgplayground PROPERTIES LINK_FLAGS_DEBUG "/WHOLEARCHIVE:hgengine.lib")
 
-target_link_libraries (hgplayground LINK_PUBLIC hgengine ${GLEW_LIBRARY} ${OPENGL_gl_LIBRARY} ${DBGHELP_LIBRARY} ${SOUNDIO_LIB} xaudio2.lib)
+target_link_libraries (hgplayground LINK_PUBLIC hgengine ${GLEW_LIBRARY} ${OPENGL_gl_LIBRARY} ${DBGHELP_LIBRARY} ${SOUNDIO_LIB} xaudio2.lib ${OPENVR_LIB})
 
 include_directories(${GLEW_INCLUDE_DIRS})
 target_include_directories(hgengine PUBLIC "${HGENGINE_INCLUDES}/")
@@ -30,3 +30,4 @@ target_include_directories(hgengine PUBLIC "${HGENGINE_INCLUDES}/src/ogl/")
 target_include_directories(hgengine PUBLIC "${HGENGINE_INCLUDES}/src/renderer/")
 target_include_directories(hgengine PUBLIC "${HGENGINE_INCLUDES}/lib/libsoundio/")
 target_include_directories(hgengine PUBLIC "${HGENGINE_INCLUDES}/src/renderer/")
+target_include_directories(hgengine PUBLIC "${HGENGINE_INCLUDES}/lib/openvr/include/")

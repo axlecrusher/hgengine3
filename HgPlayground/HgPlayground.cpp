@@ -34,6 +34,8 @@
 #include <InstancedCollection.h>
 
 #include <HgSoundDriver.h>
+#include <IRenderTarget.h>
+#include <WindowRenderTarget.h>
 
 float projection[16];
 
@@ -96,10 +98,10 @@ int32_t RenderThreadLoop() {
 	}
 }
 
-DWORD WINAPI StartRenderThread(LPVOID lpParam) {
-	ENGINE::StartWindowSystem();
-	return RenderThreadLoop();
-}
+//DWORD WINAPI StartRenderThread(LPVOID lpParam) {
+//	ENGINE::StartWindowSystem();
+//	return RenderThreadLoop();
+//}
 
 volatile LONG itrctr;
 HgScene scene;
@@ -148,28 +150,12 @@ int main()
 	stereo_view = true;
 
 	ENGINE::InitEngine();
-	ENGINE::StartWindowSystem();
+
+	std::unique_ptr<IRenderTarget> renderTarget;
+	renderTarget = std::make_unique<WindowRenderTarget>();
+	renderTarget->Init();
 
 	auto window = MercuryWindow::GetCurrentWindow();
-
-	int width = window->CurrentWidth();
-	int height = window->CurrentHeight();
-
-	if (stereo_view) {
-		RENDERER()->setup_viewports(width, height);
-		double renderWidth = width / 2.0;
-		double renderHeight = height;
-		Perspective2(60, renderWidth / renderHeight, 0.1f, 100.0f, projection);
-	}
-	else {
-		RENDERER()->setup_viewports(width, height);
-		double renderWidth = width;
-		double renderHeight = height;
-		double aspect = renderWidth / renderHeight;
-		Perspective2(60, aspect, 0.1f, 100.0f, projection);
-		//auto tmp = HgMath::mat4f::perspective(60*DEG_RAD, aspect, 0.1f, 100.0f);
-		//tmp.store(projection);
-	}
 
 	SOUND = HgSound::Create();
 	if (SOUND->init())
@@ -440,17 +426,7 @@ int main()
 			Engine::EnqueueForRender(Engine::collections(), &renderQueue);
 			renderQueue.Finalize();
 
-			//render below
-			const auto projection_matrix = HgMath::mat4f(projection);
-
-			if (stereo_view) {
-				Renderer::Render(1, camera + 1, projection_matrix, &renderQueue); //eye 1
-				Renderer::Render(2, camera + 2, projection_matrix, &renderQueue); //eye 2
-			}
-			else
-			{
-				Renderer::Render(0, camera, projection_matrix, &renderQueue);
-			}
+			renderTarget->Render(camera, &renderQueue);
 
 			window->SwapBuffers();
 			InterlockedAdd(&itrctr, 1);
