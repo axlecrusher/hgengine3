@@ -5,9 +5,10 @@
 #include <RenderBackend.h>
 #include <Win32Window.h>
 
+#define EYE_DISTANCE -0.07f
+
 StereoCrossEye::StereoCrossEye()
 {
-	stereo_view = true;
 }
 
 void StereoCrossEye::Init()
@@ -30,6 +31,12 @@ void StereoCrossEye::Init()
 
 void StereoCrossEye::Render(HgCamera* camera, RenderQueue* queue)
 {
-	Renderer::Render(1, camera + 1, m_projection, queue); //eye 1
-	Renderer::Render(2, camera + 2, m_projection, queue); //eye 2
+	HgCamera left_eye = *camera;
+	left_eye.setWorldSpacePosition(ComputeStereoCameraPosition(left_eye, -EYE_DISTANCE * 0.5f));
+
+	HgCamera right_eye = *camera;
+	right_eye.setWorldSpacePosition(ComputeStereoCameraPosition(right_eye, EYE_DISTANCE * 0.5f));
+
+	Renderer::Render(1, left_eye.toViewMatrix(), m_projection, queue); //eye 1
+	Renderer::Render(2, right_eye.toViewMatrix(), m_projection, queue); //eye 2
 }

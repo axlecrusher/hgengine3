@@ -69,11 +69,11 @@ void Renderer::Render(uint8_t viewportIdx, const HgMath::mat4f& viewMatrix, cons
 	}
 }
 
-void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f& projection, RenderQueue* queue)
-{
-	const auto viewMatrix = camera->toViewMatrix();
-	Render(viewportIdx, viewMatrix, projection, queue);
-}
+//void Renderer::Render(uint8_t viewportIdx, HgCamera* camera, const HgMath::mat4f& projection, RenderQueue* queue)
+//{
+//	const auto viewMatrix = camera->toViewMatrix();
+//	Render(viewportIdx, viewMatrix, projection, queue);
+//}
 
 void RenderQueue::Enqueue(const HgEntity* e)
 {

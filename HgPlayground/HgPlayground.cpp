@@ -40,7 +40,7 @@
 float projection[16];
 
 extern viewport view_port[];
-HgCamera camera[3];
+HgCamera camera;
 
 HANDLE endOfRenderFrame = NULL;
 
@@ -123,9 +123,9 @@ void fire(HgScene* scene) {
 	create_entity("basic_projectile", scene, &entity);
 
 	Projectile *pd = dynamic_cast<Projectile*>(&entity->logic());
-	pd->direction = camera->getForward();
-	entity->orientation(camera->getWorldSpaceOrientation().conjugate());
-	entity->position(camera->getWorldSpacePosition());
+	pd->direction = camera.getForward();
+	entity->orientation(camera.getWorldSpaceOrientation().conjugate());
+	entity->position(camera.getWorldSpacePosition());
 }
 
 void(*submit_for_render)(uint8_t viewport_idx, HgCamera* camera, HgEntity* e);
@@ -146,8 +146,6 @@ void vertex_print(const vertex* v) {
 int main()
 {
 	using namespace ENGINE::INPUT;
-
-	stereo_view = true;
 
 	ENGINE::InitEngine();
 
@@ -176,18 +174,9 @@ int main()
 	//	Perspective2(60, 640.0/480.0, 0.1f, 100.0f,projection);
 	//	Perspective2(60, 320.0 / 480.0, 0.1f, 100.0f, projection);
 	using namespace HgMath;
-	const auto position = camera[0].getWorldSpacePosition().z(1.5f).y(2.0f);
-	camera[0].setWorldSpacePosition(position);
-	camera[0].setWorldSpaceOrientation(quaternion::fromEuler(angle::deg(15), angle::ZERO, angle::ZERO) );
-
-	{
-		camera[1] = camera[0];
-		auto tmp = camera[1].getWorldSpacePosition();
-		tmp.x(tmp.x() + EYE_DISTANCE); //i don't think this is correct. I think that you have to rotate a (1,0,0) vector by the orientation and then scale by eye distance and add to position
-		camera[1].setWorldSpacePosition(tmp);
-	}
-
-	//	MatrixMultiply4f(projection, camera, view);
+	const auto position = camera.getWorldSpacePosition().z(1.5f).y(2.0f);
+	camera.setWorldSpacePosition(position);
+	camera.setWorldSpaceOrientation(quaternion::fromEuler(angle::deg(15), angle::ZERO, angle::ZERO) );
 
 	print_matrix(projection);
 	printf("\n");
@@ -365,28 +354,28 @@ int main()
 
 				//			if (v.components.z > 0) DebugBreak();
 
-				v = v.normal().rotate(camera->getWorldSpaceOrientation());
+				v = v.normal().rotate(camera.getWorldSpaceOrientation());
 				float scale = (1.0f / 1000.0f) * timeStep.msec();
 				v = v.normal().scale(scale);
-				camera[0].move(v);
+				camera.move(v);
 
 				mouse_x = (MOUSE_INPUT.dx + mouse_x) % 2000;
 				mouse_y = (MOUSE_INPUT.dy + mouse_y) % 2000;
 
 				using namespace HgMath;
-				camera->FreeRotate(angle::deg((MOUSE_INPUT.dx / 2000.0f) * 360), angle::deg((MOUSE_INPUT.dy / 2000.0f) * 360));
+				camera.FreeRotate(angle::deg((MOUSE_INPUT.dx / 2000.0f) * 360), angle::deg((MOUSE_INPUT.dy / 2000.0f) * 360));
 
 				if (KeyDownMap[KeyCodes::KEY_R]) {
 					auto q = quaternion::fromEuler(angle::deg(0), angle::deg(0), angle::deg(0));
-					camera->setWorldSpaceOrientation(q);
+					camera.setWorldSpaceOrientation(q);
 					point zero(0,1,0);
-					camera->setWorldSpacePosition(zero);
+					camera.setWorldSpacePosition(zero);
 				}
 				MOUSE_INPUT.dx = 0;
 				MOUSE_INPUT.dy = 0;
 			}
 
-			grid->position(point(camera->getWorldSpacePosition()).y(0));
+			grid->position(point(camera.getWorldSpacePosition()).y(0));
 
 			{
 				HgEntity* entity = tris[0];
@@ -409,16 +398,10 @@ int main()
 		if (doRender) {
 			BeginFrame();
 
-			camera[1] = camera[0];
-			camera[1].setWorldSpacePosition(ComputeStereoCameraPosition(camera[1], -EYE_DISTANCE * 0.5f));
-
-			camera[2] = camera[0];
-			camera[2].setWorldSpacePosition(ComputeStereoCameraPosition(camera[2], EYE_DISTANCE * 0.5f));
-
 			HgSound::Listener listener;
-			listener.setPosition(camera[0].getWorldSpacePosition());
-			listener.setForward(camera[0].getForward());
-			listener.setUp(camera[0].getUp());
+			listener.setPosition(camera.getWorldSpacePosition());
+			listener.setForward(camera.getForward());
+			listener.setUp(camera.getUp());
 			SOUND->setListener(listener);
 
 			renderQueue.Clear();
@@ -426,7 +409,7 @@ int main()
 			Engine::EnqueueForRender(Engine::collections(), &renderQueue);
 			renderQueue.Finalize();
 
-			renderTarget->Render(camera, &renderQueue);
+			renderTarget->Render(&camera, &renderQueue);
 
 			window->SwapBuffers();
 			InterlockedAdd(&itrctr, 1);

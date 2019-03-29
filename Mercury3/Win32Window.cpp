@@ -18,8 +18,6 @@ extern "C" {
 
 uint8_t GlobalMouseGrabbed_Set = 1;
 
-bool stereo_view;
-
 //LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //Window callback
 //Callback0R< MercuryWindow* > MercuryWindow::genWindowClbk(Win32Window::GenWin32Window); //Register window generation callback
 //MercuryWindow* MercuryWindow::genWindowClbk = (void*)Win32Window::GenWin32Window;

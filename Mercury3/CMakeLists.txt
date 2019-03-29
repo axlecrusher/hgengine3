@@ -43,7 +43,7 @@ if(MSVC)
     set(WIDECHAR "/Zc:wchar_t")
 endif()
 
-add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC} ${CORE_ENGINESOURCES})
+add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC} ${CORE_ENGINESOURCES} ${OPENVR_LIB})
 target_compile_options(hgengine PRIVATE ${WIDECHAR})
 
 target_include_directories(hgengine PUBLIC "./")

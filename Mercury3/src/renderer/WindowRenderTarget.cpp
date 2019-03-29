@@ -32,5 +32,5 @@ void WindowRenderTarget::Init()
 
 void WindowRenderTarget::Render(HgCamera* camera, RenderQueue* queue)
 {
-	Renderer::Render(0, camera, m_projection, queue);
+	Renderer::Render(0, camera->toViewMatrix(), m_projection, queue);
 }

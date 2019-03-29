@@ -78,8 +78,6 @@ namespace Renderer {
 	void Init();
 
 	void Render(uint8_t viewportIdx, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection, RenderQueue* queue);
-	void Render(uint8_t stereo_view, HgCamera* camera, const HgMath::mat4f& projection, RenderQueue* queue);
-
 }
 
 RenderBackend* RENDERER();
