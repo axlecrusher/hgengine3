@@ -10,6 +10,7 @@
 #include <oglDisplay.h>
 
 #include <HgVbo.h>
+#include <OGLFramebuffer.h>
 
 //OGLBackend oglRenderer;
 
@@ -74,14 +75,19 @@ void OGLBackend::EndFrame() {
 
 }
 
-void OGLBackend::Viewport(uint8_t idx) {
-	if (idx == _currenViewPort_idx) return;
-	_currenViewPort_idx = idx;
+void OGLBackend::setViewport(const Viewport& vp) {
+	if (vp == m_currentViewport) return;
+	m_currentViewport = vp;
 
-	const viewport vp = view_port[idx];
 	glViewport(vp.x, vp.y, vp.width, vp.height);
 	glScissor(vp.x, vp.y, vp.width, vp.height);
 	glEnable(GL_SCISSOR_TEST);
+}
+
+std::unique_ptr<IFramebuffer> OGLBackend::CreateFrameBuffer()
+{
+	auto framebuffer = std::make_unique<OGLFramebuffer>();
+	return std::move(framebuffer);
 }
 
 void OGLBackend::setRenderAttributes(BlendMode blendMode, RenderData::Flags flags) {

@@ -101,7 +101,7 @@ render_packet* hgRenderQueue_pop() {
 	return rp;
 }
 
-render_packet* create_render_packet(HgEntity* e, uint8_t viewport_idx, HgCamera* camera, HgScene* scene, uint16_t idx) {
+render_packet* create_render_packet(HgEntity* e, const Viewport& vp, HgCamera* camera, HgScene* scene, uint16_t idx) {
 	render_packet* rp = new render_packet();
 //	RenderElement* rp = new RenderElement();
 
@@ -115,7 +115,7 @@ render_packet* create_render_packet(HgEntity* e, uint8_t viewport_idx, HgCamera*
 		rp->renderData = e->renderData();
 	}
 	rp->camera = *camera;
-	rp->viewport_idx = viewport_idx;
+	rp->viewport = vp;
 
 //	rp->element_idx = idx;
 //	rp->scene = scene;

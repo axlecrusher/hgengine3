@@ -11,6 +11,6 @@ public:
 	~IRenderTarget()
 	{}
 
-	virtual void Init() = 0;
+	virtual bool Init() = 0;
 	virtual void Render(HgCamera* camera, RenderQueue* queue) = 0;
 };

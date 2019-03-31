@@ -11,7 +11,7 @@ StereoCrossEye::StereoCrossEye()
 {
 }
 
-void StereoCrossEye::Init()
+bool StereoCrossEye::Init()
 {
 	ENGINE::StartWindowSystem(1280, 480);
 
@@ -22,11 +22,23 @@ void StereoCrossEye::Init()
 
 	float projection[16];
 
-	RENDERER()->setup_viewports(width, height);
+	//left eye
+	m_leftEyeVp.x = m_leftEyeVp.y = 0;
+	m_leftEyeVp.width = width / 2;
+	m_leftEyeVp.height = height;
+
+	//right eye
+	m_rightEyeVp.x = width / 2;
+	m_rightEyeVp.y = 0;
+	m_rightEyeVp.width = width / 2;
+	m_rightEyeVp.height = height;
+
 	double renderWidth = width / 2.0;
 	double renderHeight = height;
 	Perspective2(60, renderWidth / renderHeight, 0.1f, 100.0f, projection);
 	m_projection.load(projection);
+
+	return true;
 }
 
 void StereoCrossEye::Render(HgCamera* camera, RenderQueue* queue)
@@ -37,6 +49,6 @@ void StereoCrossEye::Render(HgCamera* camera, RenderQueue* queue)
 	HgCamera right_eye = *camera;
 	right_eye.setWorldSpacePosition(ComputeStereoCameraPosition(right_eye, EYE_DISTANCE * 0.5f));
 
-	Renderer::Render(1, left_eye.toViewMatrix(), m_projection, queue); //eye 1
-	Renderer::Render(2, right_eye.toViewMatrix(), m_projection, queue); //eye 2
+	Renderer::Render(m_leftEyeVp, left_eye.toViewMatrix(), m_projection, queue); //eye 1
+	Renderer::Render(m_rightEyeVp, right_eye.toViewMatrix(), m_projection, queue); //eye 2
 }

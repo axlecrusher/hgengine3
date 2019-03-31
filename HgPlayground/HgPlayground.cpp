@@ -39,7 +39,6 @@
 
 float projection[16];
 
-extern viewport view_port[];
 HgCamera camera;
 
 HANDLE endOfRenderFrame = NULL;
@@ -130,14 +129,14 @@ void fire(HgScene* scene) {
 
 void(*submit_for_render)(uint8_t viewport_idx, HgCamera* camera, HgEntity* e);
 
-void submit_for_render_threaded(uint8_t viewport_idx, HgCamera* camera, HgScene *s, uint32_t idx) {
-	if (s == NULL) {
-		hgRenderQueue_push(create_render_packet(NULL, 0, NULL, NULL, 0));
-		return;
-	}
-	HgEntity* e = s->get_entity(idx);
-	hgRenderQueue_push(create_render_packet(e, viewport_idx, camera + 0, s, idx)); //submit to renderer
-}
+//void submit_for_render_threaded(uint8_t viewport_idx, HgCamera* camera, HgScene *s, uint32_t idx) {
+//	if (s == NULL) {
+//		hgRenderQueue_push(create_render_packet(NULL, 0, NULL, NULL, 0));
+//		return;
+//	}
+//	HgEntity* e = s->get_entity(idx);
+//	hgRenderQueue_push(create_render_packet(e, viewport_idx, camera + 0, s, idx)); //submit to renderer
+//}
 
 void vertex_print(const vertex* v) {
 	printf("%f %f %f\n", v->raw[0], v->raw[1], v->raw[2]);

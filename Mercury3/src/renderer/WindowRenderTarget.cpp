@@ -9,7 +9,7 @@ WindowRenderTarget::WindowRenderTarget()
 
 }
 
-void WindowRenderTarget::Init()
+bool WindowRenderTarget::Init()
 {
 	ENGINE::StartWindowSystem(1920, 1080);
 
@@ -20,7 +20,9 @@ void WindowRenderTarget::Init()
 
 	float projection[16];
 
-	RENDERER()->setup_viewports(width, height);
+	m_windowViewport.width = width;
+	m_windowViewport.height = height;
+
 	double renderWidth = width;
 	double renderHeight = height;
 	double aspect = renderWidth / renderHeight;
@@ -28,9 +30,11 @@ void WindowRenderTarget::Init()
 	m_projection.load(projection);
 	//auto tmp = HgMath::mat4f::perspective(60*DEG_RAD, aspect, 0.1f, 100.0f);
 	//tmp.store(projection);
+
+	return true;
 }
 
 void WindowRenderTarget::Render(HgCamera* camera, RenderQueue* queue)
 {
-	Renderer::Render(0, camera->toViewMatrix(), m_projection, queue);
+	Renderer::Render(m_windowViewport, camera->toViewMatrix(), m_projection, queue);
 }

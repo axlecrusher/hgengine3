@@ -1,6 +1,7 @@
 #pragma once
 
 #include <IRenderTarget.h>
+#include <RenderBackend.h>
 
 class WindowRenderTarget : public IRenderTarget
 {
@@ -10,9 +11,10 @@ public:
 	~WindowRenderTarget()
 	{}
 
-	virtual void Init();
+	virtual bool Init();
 	virtual void Render(HgCamera* camera, RenderQueue* queue);
 
 private:
 	HgMath::mat4f m_projection;
+	Viewport m_windowViewport;
 };

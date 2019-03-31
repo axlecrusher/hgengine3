@@ -10,6 +10,7 @@
 #include <windows.h>
 
 #include <HgScene.h>
+#include <RenderBackend.h>
 
 /* render_packet should contain everything that is needed to render.
 This is to decouple render data from HgEntity data and update loops.
@@ -28,7 +29,8 @@ typedef struct render_packet {
 //	uint16_t element_idx;
 //	HgScene* scene;
 	RenderData* renderData;
-	uint8_t viewport_idx;
+	//uint8_t viewport_idx;
+	Viewport viewport;
 } render_packet;
 
 int8_t draw_render_packet(const render_packet* p);
@@ -37,5 +39,5 @@ volatile uint32_t hgRenderQueue_length();
 void hgRenderQueue_push(render_packet* p);
 render_packet* hgRenderQueue_pop();
 
-render_packet* create_render_packet(HgEntity* e, uint8_t viewport_idx, HgCamera* camera, HgScene* scene, uint16_t idx);
+render_packet* create_render_packet(HgEntity* e, const Viewport& vp, HgCamera* camera, HgScene* scene, uint16_t idx);
 

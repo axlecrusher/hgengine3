@@ -5,7 +5,7 @@
 #include <assert.h>
 
 int8_t draw_render_packet(const render_packet* p) {
-	RENDERER()->Viewport(p->viewport_idx);
+	RENDERER()->setViewport(p->viewport);
 
 
 //	_camera = &p->camera;

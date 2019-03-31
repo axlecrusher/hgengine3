@@ -15,28 +15,30 @@ RenderBackend* RENDERER() {
 	static RenderBackend* api = OGLBackend::Create();
 	return api;
 }
+//
+//void RenderBackend::setup_viewports(uint16_t width, uint16_t height) {
+//	uint8_t i = 0;
+//
+//	view_port[i].x = view_port[i].y = 0;
+//	view_port[i].width = width;
+//	view_port[i].height = height;
+//	++i;
+//
+//	//left eye
+//	view_port[i].x = view_port[i].y = 0;
+//	view_port[i].width = width / 2;
+//	view_port[i].height = height;
+//	++i;
+//
+//	//right eye
+//	view_port[i].x = width / 2;
+//	view_port[i].y = 0;
+//	view_port[i].width = width / 2;
+//	view_port[i].height = height;
+//}
 
-void RenderBackend::setup_viewports(uint16_t width, uint16_t height) {
-	uint8_t i = 0;
-
-	view_port[i].x = view_port[i].y = 0;
-	view_port[i].width = width;
-	view_port[i].height = height;
-	++i;
-
-	view_port[i].x = view_port[i].y = 0;
-	view_port[i].width = width / 2;
-	view_port[i].height = height;
-	++i;
-
-	view_port[i].x = width / 2;
-	view_port[i].y = 0;
-	view_port[i].width = width / 2;
-	view_port[i].height = height;
-}
-
-static void submit_for_render_serial(uint8_t viewport_idx, RenderData* renderData, const float* worldSpaceMatrix, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection) {
-	RENDERER()->Viewport(viewport_idx);
+static void submit_for_render_serial(const Viewport& vp, RenderData* renderData, const float* worldSpaceMatrix, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection) {
+	RENDERER()->setViewport(vp);
 
 	//load texture data to GPU here. Can this be made to be done right after loading the image data, regardless of thread?
 	if (renderData->updateTextures()) {
@@ -58,14 +60,14 @@ static void submit_for_render_serial(uint8_t viewport_idx, RenderData* renderDat
 	renderData->render();
 }
 
-void Renderer::Render(uint8_t viewportIdx, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection, RenderQueue* queue)
+void Renderer::Render(const Viewport& vp, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection, RenderQueue* queue)
 {
 	for (auto& renderInstance : queue->getOpaqueQueue()) {
-		submit_for_render_serial(viewportIdx, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix, viewMatrix, projection);
+		submit_for_render_serial(vp, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix, viewMatrix, projection);
 	}
 
 	for (auto& renderInstance : queue->getTransparentQueue()) {
-		submit_for_render_serial(viewportIdx, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix, viewMatrix, projection);
+		submit_for_render_serial(vp, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix, viewMatrix, projection);
 	}
 }
 

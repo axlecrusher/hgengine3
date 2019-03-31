@@ -16,7 +16,8 @@ public:
 	void Clear();
 	void BeginFrame();
 	void EndFrame();
-	void Viewport(uint8_t idx);
+	void setViewport(const Viewport& vp);
+	std::unique_ptr<IFramebuffer> CreateFrameBuffer();
 
 	void setRenderAttributes(BlendMode blendMode, RenderData::Flags flags);
 };

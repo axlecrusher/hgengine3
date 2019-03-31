@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <HgEntity.h>
+#include <IFramebuffer.h>
 
 enum RendererType {
 	OPENGL = 0,
@@ -11,8 +12,20 @@ enum RendererType {
 	DIRECTX
 };
 
-struct viewport {
-	uint16_t x, y, width, height;
+struct Viewport
+{
+	Viewport()
+		:x(0), y(0), width(0), height(0)
+	{}
+
+	bool operator==(const Viewport& rhs) const
+	{
+		return (x == rhs.x) && (y == rhs.y) && (width == rhs.width)
+			&& (height == rhs.height);
+	}
+
+	uint16_t x, y;
+	uint16_t width, height;
 };
 
 class RenderBackend {
@@ -23,16 +36,19 @@ public:
 	virtual void BeginFrame() = 0;
 	virtual void EndFrame() = 0;
 	virtual void setRenderAttributes(BlendMode blendMode, RenderData::Flags flags) = 0;
-	virtual void Viewport(uint8_t idx) = 0;
+	virtual void setViewport(const Viewport& vp) = 0;
+
+	virtual std::unique_ptr<IFramebuffer> CreateFrameBuffer() = 0;
 
 	RendererType Type() const { return m_type; }
-	void setup_viewports(uint16_t width, uint16_t height);
+	//void setup_viewports(uint16_t width, uint16_t height);
 
 protected:
 	RendererType m_type;
 
-	struct viewport view_port[3];
-	uint8_t _currenViewPort_idx = 0xFF;
+	Viewport m_currentViewport;
+	//struct viewport view_port[3];
+	//uint8_t _currenViewPort_idx = 0xFF;
 };
 
 struct RenderInstance {
@@ -77,7 +93,7 @@ namespace Renderer {
 	//Must happen after window is created;
 	void Init();
 
-	void Render(uint8_t viewportIdx, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection, RenderQueue* queue);
+	void Render(const Viewport& vp, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection, RenderQueue* queue);
 }
 
 RenderBackend* RENDERER();
