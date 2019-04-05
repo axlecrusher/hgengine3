@@ -9,7 +9,7 @@
 class OpenVRRenderTarget : public IRenderTarget
 {
 public:
-	OpenVRRenderTarget();
+	OpenVRRenderTarget(OpenVrProxy* openvr);
 
 	~OpenVRRenderTarget()
 	{}
@@ -26,7 +26,8 @@ private:
 
 	bool m_initalized;
 
-	OpenVrProxy m_openvr;
+//	OpenVrProxy m_openvr;
+	OpenVrProxy* m_openvr;
 
 	std::unique_ptr<IFramebuffer> m_leftEye;
 	std::unique_ptr<IFramebuffer> m_rightEye;
@@ -46,5 +47,23 @@ private:
 	Viewport m_framebufferViewport;
 
 	vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
-
+	vr::ETrackedDeviceClass m_deviceClass[vr::k_unMaxTrackedDeviceCount];
 };
+
+namespace Events
+{
+
+struct HMDPoseUpdated
+{
+	point position;
+	quaternion orientation;
+};
+
+struct VrControllerPoseUpdated
+{
+	point position;
+	quaternion orientation;
+	uint16_t deviceIndex;
+};
+
+}

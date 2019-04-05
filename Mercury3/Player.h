@@ -4,6 +4,8 @@
 #include <HgTypes.h>
 #include <HgMath.h>
 
+#include <EventSystem.h>
+
 class Player {
 private:
 	HgEntity m_entity;
@@ -13,6 +15,11 @@ public:
 	Player()
 	{
 //		m_entity.init();
+	}
+
+	~Player()
+	{
+		EventSystem::UnregisterAll(this);
 	}
 
 	float speedMsec;
@@ -34,6 +41,11 @@ private:
 		vector3 ray = { 0, 0, -1 }; //correct.
 		m_direction = ray.rotate(orientation()).normal();
 	}
+
+};
+
+class PlayerPositionUpdate
+{
 
 };
 

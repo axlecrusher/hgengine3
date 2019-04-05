@@ -6,11 +6,12 @@
 #include <Win32Window.h>
 
 #include <OGLFramebuffer.h>
+#include <EventSystem.h>
 
 #define EYE_DISTANCE -0.07f
 
-OpenVRRenderTarget::OpenVRRenderTarget()
-	:m_initalized(false)
+OpenVRRenderTarget::OpenVRRenderTarget(OpenVrProxy* openvr)
+	:m_openvr(openvr), m_initalized(false)
 {
 	m_HMDPose = vectorial::mat4f::identity();
 	m_projectionLeftEye = vectorial::mat4f::identity();
@@ -21,9 +22,12 @@ OpenVRRenderTarget::OpenVRRenderTarget()
 
 bool OpenVRRenderTarget::Init()
 {
-	if (!m_openvr.Init()) return false;
+//	if (!m_openvr->Init()) return false;
 
-	ENGINE::StartWindowSystem(800, 600);
+	auto strDriver = GetTrackedDeviceString(vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_TrackingSystemName_String);
+	auto strDisplay = GetTrackedDeviceString(vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SerialNumber_String);
+
+	ENGINE::StartWindowSystem(1920, 1080);
 
 	auto window = MercuryWindow::GetCurrentWindow();
 
@@ -38,10 +42,10 @@ bool OpenVRRenderTarget::Init()
 	double renderWidth = width;
 	double renderHeight = height;
 	double aspect = renderWidth / renderHeight;
-	Perspective2(60, aspect, 0.1f, 100.0f, projection);
+	Perspective2(60, aspect, 0.03f, 100.0f, projection);
 	m_projection.load(projection);
 
-	m_openvr.InitCompositor();
+	m_openvr->InitCompositor();
 	initEyeFramebuffers();
 
 	m_projectionLeftEye = getHMDProjectionEye(vr::Eye_Left);
@@ -55,7 +59,7 @@ bool OpenVRRenderTarget::Init()
 
 void OpenVRRenderTarget::initEyeFramebuffers()
 {
-	auto hmd = m_openvr.getDevice();
+	auto hmd = m_openvr->getDevice();
 	if (hmd == nullptr) return;
 
 	uint32_t width, height;
@@ -73,38 +77,43 @@ void OpenVRRenderTarget::initEyeFramebuffers()
 
 void OpenVRRenderTarget::updateHMD()
 {
-	if (!m_openvr.getDevice()) return;
+	auto hmd = m_openvr->getDevice();
+	if (hmd == nullptr) return;
 
 	vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
 
-	//m_iValidPoseCount = 0;
-	//m_strPoseClasses = "";
-	//for (int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice)
-	//{
-	//	if (m_rTrackedDevicePose[nDevice].bPoseIsValid)
-	//	{
-	//		m_iValidPoseCount++;
-	//		m_rmat4DevicePose[nDevice] = ConvertSteamVRMatrixToMatrix4(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
-	//		if (m_rDevClassChar[nDevice] == 0)
-	//		{
-	//			switch (m_pHMD->GetTrackedDeviceClass(nDevice))
-	//			{
-	//			case vr::TrackedDeviceClass_Controller:        m_rDevClassChar[nDevice] = 'C'; break;
-	//			case vr::TrackedDeviceClass_HMD:               m_rDevClassChar[nDevice] = 'H'; break;
-	//			case vr::TrackedDeviceClass_Invalid:           m_rDevClassChar[nDevice] = 'I'; break;
-	//			case vr::TrackedDeviceClass_GenericTracker:    m_rDevClassChar[nDevice] = 'G'; break;
-	//			case vr::TrackedDeviceClass_TrackingReference: m_rDevClassChar[nDevice] = 'T'; break;
-	//			default:                                       m_rDevClassChar[nDevice] = '?'; break;
-	//			}
-	//		}
-	//		m_strPoseClasses += m_rDevClassChar[nDevice];
-	//	}
-	//}
+	for (int nDevice = 1; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice)
+	{
+		if (m_rTrackedDevicePose[nDevice].bPoseIsValid)
+		{
+			const auto pose = ConvertToMat4f(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
+			if (m_deviceClass[nDevice] != vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid)
+			{
+				auto type = hmd->GetTrackedDeviceClass(nDevice);
+				m_deviceClass[nDevice] = type;
+			}
+
+			if (m_deviceClass[nDevice] == vr::ETrackedDeviceClass::TrackedDeviceClass_Controller)
+			{
+				Events::VrControllerPoseUpdated poseUpdated;
+				ConstructPositionOrientationFromVrDevice(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking, poseUpdated.position, poseUpdated.orientation);
+				poseUpdated.deviceIndex = nDevice;
+
+				EventSystem::PublishEvent(poseUpdated);
+			}
+		}
+	}
 
 	if (m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].bPoseIsValid)
 	{
 		m_HMDPose = ConvertToMat4f(m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
 		m_hmdCamera = ConstructCameraFromVrDevice(m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
+
+		Events::HMDPoseUpdated poseUpdated;
+		poseUpdated.position = m_hmdCamera.getWorldSpacePosition();
+		poseUpdated.orientation = m_hmdCamera.getWorldSpaceOrientation();
+
+		EventSystem::PublishEvent(poseUpdated);
 	}
 
 }
@@ -159,7 +168,7 @@ void OpenVRRenderTarget::Render(HgCamera* camera, RenderQueue* queue)
 
 HgMath::mat4f OpenVRRenderTarget::getHMDProjectionEye(vr::EVREye eye)
 {
-	auto hmd = m_openvr.getDevice();
+	auto hmd = m_openvr->getDevice();
 	if (!hmd) return HgMath::mat4f();
 
 	const vr::HmdMatrix44_t mat = hmd->GetProjectionMatrix(eye, 0.1, 100);
@@ -171,7 +180,7 @@ HgMath::mat4f OpenVRRenderTarget::getHMDProjectionEye(vr::EVREye eye)
 
 HgMath::mat4f OpenVRRenderTarget::getHMDPoseEye(vr::EVREye eye)
 {
-	auto hmd = m_openvr.getDevice();
+	auto hmd = m_openvr->getDevice();
 	if (!hmd) return HgMath::mat4f();
 
 	vr::HmdMatrix34_t mat = hmd->GetEyeToHeadTransform(eye);
@@ -181,3 +190,6 @@ HgMath::mat4f OpenVRRenderTarget::getHMDPoseEye(vr::EVREye eye)
 
 	return vectorial::transpose(ConvertToMat4f(mat));
 }
+
+REGISTER_EVENT_TYPE(Events::HMDPoseUpdated)
+REGISTER_EVENT_TYPE(Events::VrControllerPoseUpdated)
