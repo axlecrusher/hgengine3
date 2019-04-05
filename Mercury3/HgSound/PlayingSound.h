@@ -51,7 +51,7 @@ namespace HgSound {
 
 		//Will setup sound to be emitted from an entity. 
 		Emitter EmitFromEntity(const HgEntity* e);
-		HgEntity* getEmittingEntity() const { return m_emittingEntity.getEntity(); }
+		HgEntity* getEmittingEntity() const { return HgEntity::Find(m_emittingEntityId); }
 
 	private:
 		SoundAsset::ptr m_sound;
@@ -59,7 +59,7 @@ namespace HgSound {
 		std::atomic<float> m_volume;
 		GuardedType<HgSound::Emitter> m_emitter; //is there a way to do this without a mutex?
 
-		EntityLink m_emittingEntity;
+		EntityIdType m_emittingEntityId;
 //		uint64_t m_nextSample; //next sample to play
 	};
 }

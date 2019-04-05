@@ -30,7 +30,7 @@ namespace HgSound {
 
 	Emitter PlayingSound::EmitFromEntity(const HgEntity* e)
 	{
-		m_emittingEntity.setEntityid(e->getEntityId());
+		m_emittingEntityId = e->getEntityId();
 
 		HgSound::Emitter emitter;
 		emitter.setPosition(e->position());
