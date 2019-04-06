@@ -18,6 +18,8 @@ OpenVRRenderTarget::OpenVRRenderTarget(OpenVrProxy* openvr)
 	m_projectionRightEye = vectorial::mat4f::identity();
 	m_leftEyePos = vectorial::mat4f::identity();
 	m_rightEyePos = vectorial::mat4f::identity();
+
+	memset(m_deviceClass, 0, sizeof(m_deviceClass));
 }
 
 bool OpenVRRenderTarget::Init()
@@ -87,7 +89,7 @@ void OpenVRRenderTarget::updateHMD()
 		if (m_rTrackedDevicePose[nDevice].bPoseIsValid)
 		{
 			const auto pose = ConvertToMat4f(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
-			if (m_deviceClass[nDevice] != vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid)
+			if (m_deviceClass[nDevice] == vr::ETrackedDeviceClass::TrackedDeviceClass_Invalid)
 			{
 				auto type = hmd->GetTrackedDeviceClass(nDevice);
 				m_deviceClass[nDevice] = type;
