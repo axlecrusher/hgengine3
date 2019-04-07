@@ -85,9 +85,9 @@ struct EntityFlags {
 
 class SpacialData {
 private:
-	quaternion m_orientation; //16
-	vertex3f m_position; float m_scale; //16
-	vertex3f m_origin;
+	quaternion m_orientation; //16 bytes
+	vertex3f m_position; float m_scale; //16 bytes
+	vertex3f m_origin; //12 bytes
 public:
 	SpacialData() : m_scale(1.0f) {}
 
@@ -151,7 +151,7 @@ class EntityLocator
 {
 public:
 	void RegisterEntity(HgEntity* entity);
-	void RemoveEntity(HgEntity* entity);
+	void RemoveEntity(EntityIdType id);
 
 	HgEntity* Find(EntityIdType id) const;
 private:
@@ -174,11 +174,7 @@ having HgEntity free render data by default and then
 handling special cases.
 */
 class HgEntity {
-private:
-	SpacialData m_spacialData; //local transormations
 public:
-		EntityFlags flags;
-
 		HgEntity()
 			: m_updateNumber(0), m_renderData(nullptr)
 		{}
@@ -251,6 +247,7 @@ public:
 		inline void inheritParentRotation(bool x) { flags.inheritParentRotation = x; }
 		inline void inheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
 
+		//Lower numbers draw first. default draw order is 0
 		inline void setDrawOrder(int8_t order) { m_drawOrder = order; }
 		inline int8_t getDrawOrder() const { return m_drawOrder; }
 
@@ -264,16 +261,18 @@ private:
 	static EntityIdType m_nextEntityId;
 	static EntityLocator& Locator();
 
+	SpacialData m_spacialData; //local transormations
 	EntityIdType m_entityId;
 
 	RenderDataPtr m_renderData;
 	std::unique_ptr<HgEntityLogic> m_logic;
-	std::unique_ptr<ExtendedEntityData> m_extendedData;
+	std::unique_ptr<ExtendedEntityData> m_extendedData; //data we don't really care about and access infrequently
 
-	uint32_t m_updateNumber;
 	EntityIdType m_parentId;
-
+	uint32_t m_updateNumber;
 	int8_t m_drawOrder;
+public:
+	EntityFlags flags;
 };
 
 class EntityCreated

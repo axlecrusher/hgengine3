@@ -26,16 +26,15 @@ void RegisterEntityType(const char* c, factory_clbk factory) {
 
 void EntityLocator::RegisterEntity(HgEntity* entity)
 {
-	auto id = entity->getEntityId();
-	if (id == 0) return;
+	const auto id = entity->getEntityId();
+	if (!id.isValid()) return;
 
 	entities[id] = entity;
 }
 
-void EntityLocator::RemoveEntity(HgEntity* entity)
+void EntityLocator::RemoveEntity(EntityIdType id)
 {
-	auto id = entity->getEntityId();
-	if (id == 0) return;
+	if (!id.isValid()) return;
 
 	auto itr = entities.find(id);
 	if (itr != entities.end())
@@ -104,8 +103,8 @@ void HgEntity::destroy()
 	if (m_entityId.isValid())
 	{
 		EventSystem::PublishEvent(EntityDestroyed(this, m_entityId));
+		Locator().RemoveEntity(m_entityId);
 	}
-	Locator().RemoveEntity(this);
 	m_logic.reset();
 	m_renderData.reset();
 	m_entityId = EntityIdType(); //reset id
