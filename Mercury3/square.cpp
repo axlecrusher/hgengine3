@@ -44,7 +44,7 @@ static std::shared_ptr<RenderData> trd;
 
 
 static void SetupRenderData() {
-	trd = OGLRenderData::Create();
+	trd = RenderData::Create();
 
 	auto rec = HgVbo::GenerateFrom(raw_data, NUM_ARRAY_ELEMENTS(raw_data));
 	trd->VertexVboRecord(rec);

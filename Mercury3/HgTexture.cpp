@@ -6,7 +6,7 @@
 
 #include <vector>
 
-HgTexture::gpu_update_texture HgTexture::updateTextureFunc = NULL;
+HgTexture::gpuUpdateTextureFunction HgTexture::updateTextureFunc;
 AssetManager<HgTexture> HgTexture::imageMap;
 
 HgTexture::TexturePtr HgTexture::acquire(const std::string& path, TextureType type) {
@@ -31,12 +31,8 @@ void HgTexture::release(HgTexture* t) {
 HgTexture::HgTexture()
 {
 	data = nullptr;
-	m_width = m_height = 0;
 	gpuId = 0;
 	m_type = DIFFUSE;
-	m_format = HgTexture::format::UNKNOWN;
-	m_mipMapCount = 0;
-	m_linearSize = 0;
 }
 
 
@@ -50,10 +46,13 @@ bool HgTexture::stb_load(FILE* f) {
 	int x, y, fileChannels;
 //	stbi_set_flip_vertically_on_load(1);
 	data = stbi_load_from_file(f, &x, &y, &fileChannels, 0);
-	m_format = (HgTexture::format)fileChannels;
-	m_width = x;
-	m_height = y;
+	m_properties.format = (HgTexture::format)fileChannels;
+	m_properties.width = x;
+	m_properties.height = y;
 	fclose(f);
+
+
+
 	return data != NULL;
 }
 
@@ -89,13 +88,17 @@ bool HgTexture::dds_load(FILE* f) {
 	DDS_HEADER header;
 
 	fread(&header, 124, 1, f);
-	m_height = header.height;
-	m_width = header.width;
-	m_mipMapCount = header.mipMapCount;
-	m_linearSize = header.pitchOrLinearSize;
-	m_format = (HgTexture::format)header.ddspf.fourCC;
 
-	uint32_t size = m_mipMapCount > 1 ? m_linearSize * 2 : m_linearSize;
+	Properties p;
+
+	p.height = header.height;
+	p.width = header.width;
+	p.mipMapCount = header.mipMapCount;
+	p.format = (HgTexture::format)header.ddspf.fourCC;
+	m_properties = p;
+
+	const auto linearSize = header.pitchOrLinearSize;
+	const uint32_t size = p.mipMapCount > 1 ? linearSize * 2 : linearSize;
 
 	data = (unsigned char*)malloc(size);
 	fread(data, 1, size, f);
@@ -112,9 +115,9 @@ bool HgTexture::load(const std::string& path) {
 	return r;
 }
 
-bool HgTexture::load_internal(const std::string& path) {
+bool HgTexture::load_internal(std::string path) {
 	char filecode[4];
-	m_path = path;
+	m_path = std::move(path);
 	FILE *f = fopen(path.c_str(), "rb");
 	if (f == nullptr) {
 		fprintf(stderr, "Unable to open file \"%s\"", path.c_str());
@@ -133,7 +136,7 @@ bool HgTexture::load_internal(const std::string& path) {
 void HgTexture::sendToGPU()
 {
 //	gpuId = updateTextureFunc(m_width, m_height, m_channels, data);
+	setNeedsGPUUpdate(false);
 	gpuId = updateTextureFunc(this);
 	SAFE_FREE(data);
-	setNeedsGPUUpdate(false);
 }

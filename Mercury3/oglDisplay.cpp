@@ -29,12 +29,12 @@ char *UniformString[] = {
 	NULL
 };
 
-OGLRenderData::OGLRenderData()
-	:RenderData()
-{
-	memset(textureID, 0, sizeof(textureID));
-	init();
-}
+//OGLRenderData::OGLRenderData()
+//	:RenderData()
+//{
+//	memset(textureID, 0, sizeof(textureID));
+//	init();
+//}
 
 /*
 static GLint colorDepth(HgTexture::channels c) {
@@ -62,7 +62,9 @@ uint32_t ogl_updateTextureData(HgTexture* tex) {
 
 	GLint internal, format;
 
-	switch (tex->m_format) {
+	auto properties = tex->getProperties();
+
+	switch (properties.format) {
 	case HgTexture::format::GRAY:
 		internal = 0;
 		format = 0;
@@ -92,21 +94,21 @@ uint32_t ogl_updateTextureData(HgTexture* tex) {
 		break;
 	}
 
-	if (tex->m_format < 0xFF) {
-		glTexImage2D(GL_TEXTURE_2D, 0, internal, tex->m_width, tex->m_height, 0, format, GL_UNSIGNED_BYTE, tex->data);
+	if (properties.format < 0xFF) {
+		glTexImage2D(GL_TEXTURE_2D, 0, internal, properties.width, properties.height, 0, format, GL_UNSIGNED_BYTE, tex->getData());
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
 		unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
 		unsigned int offset = 0;
 
-		uint32_t width = tex->m_width;
-		uint32_t height = tex->m_height;
+		uint32_t width = properties.width;
+		uint32_t height = properties.height;
 
-		for (uint32_t level = 0; level < tex->m_mipMapCount && (width || height); ++level)
+		for (uint32_t level = 0; level < properties.mipMapCount && (width || height); ++level)
 		{
 			uint32_t size = ((width + 3) / 4)*((height + 3) / 4)*blockSize;
-			glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height, 0, size, tex->data + offset);
+			glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height, 0, size, tex->getData() + offset);
 
 			offset += size;
 			width /= 2;
@@ -118,11 +120,11 @@ uint32_t ogl_updateTextureData(HgTexture* tex) {
 	return id;
 }
 
-void OGLRenderData::clearTextureIDs() {
-	memset(textureID, 0, sizeof(textureID));
-}
-
-void OGLRenderData::setTexture(const HgTexture* t) {
-	HgTexture::TextureType type = t->getType();
-	textureID[type] = t->getGPUId();
-}
+//void OGLRenderData::clearTextureIDs() {
+//	memset(textureID, 0, sizeof(textureID));
+//}
+//
+//void OGLRenderData::setTexture(const HgTexture* t) {
+//	HgTexture::TextureType type = t->getType();
+//	textureID[type] = t->getGPUId();
+//}

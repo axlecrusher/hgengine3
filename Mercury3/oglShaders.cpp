@@ -243,35 +243,38 @@ void HgOglShader::uploadMatrices(const float* worldSpaceMatrix, const HgMath::ma
 
 
 void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
-	OGLRenderData* oglrd = (OGLRenderData*)&rd;
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);
-	if ((m_uniformLocations[U_DIFFUSE_TEXTURE] > -1) && (oglrd->textureID[HgTexture::DIFFUSE] > 0)) {
+	auto textId = rd.getGPUTextureHandle(HgTexture::DIFFUSE);
+	glBindTexture(GL_TEXTURE_2D, textId);
+	if ((m_uniformLocations[U_DIFFUSE_TEXTURE] > -1) && (textId > 0)) {
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);
 		glUniform1i(m_uniformLocations[U_DIFFUSE_TEXTURE], 0);
 	}
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
-	if ((m_uniformLocations[U_SPECULAR_TEXTURE] > -1) && (oglrd->textureID[HgTexture::SPECULAR] > 0)) {
+	textId = rd.getGPUTextureHandle(HgTexture::SPECULAR);
+	glBindTexture(GL_TEXTURE_2D, textId);
+	if ((m_uniformLocations[U_SPECULAR_TEXTURE] > -1) && (textId > 0)) {
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
 		glUniform1i(m_uniformLocations[U_SPECULAR_TEXTURE], 1);
 	}
 
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::NORMAL]);
-	if ((m_uniformLocations[U_NORMAL_TEXTURE] > -1) && (oglrd->textureID[HgTexture::NORMAL] > 0)) {
+	textId = rd.getGPUTextureHandle(HgTexture::NORMAL);
+	glBindTexture(GL_TEXTURE_2D, textId);
+	if ((m_uniformLocations[U_NORMAL_TEXTURE] > -1) && (textId > 0)) {
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
 		glUniform1i(m_uniformLocations[U_NORMAL_TEXTURE], 2);
 	}
 
 	glActiveTexture(GL_TEXTURE3);
-	if ((m_uniformLocations[U_BUFFER_OBJECT1] > -1) && (oglrd->gpuBuffer != nullptr)) {
-		OGLHgGPUBuffer* api = (OGLHgGPUBuffer*)oglrd->gpuBuffer->apiImpl();
-		if (oglrd->gpuBuffer->NeedsUpdate()) {
+	auto gpuBuffer = rd.gpuBuffer;
+	if ((m_uniformLocations[U_BUFFER_OBJECT1] > -1) && (gpuBuffer != nullptr)) {
+		OGLHgGPUBuffer* api = (OGLHgGPUBuffer*)gpuBuffer->apiImpl();
+		if (gpuBuffer->NeedsUpdate()) {
 			//api->OGLHgGPUBuffer::SendToGPU(oglrd->gpuBuffer.get()); //no vtable lookup
-			api->OGLHgGPUBuffer::SendToGPU(oglrd->gpuBuffer); //no vtable lookup
+			api->OGLHgGPUBuffer::SendToGPU(gpuBuffer); //no vtable lookup
 		}
 		api->OGLHgGPUBuffer::Bind(); //no vtable lookup
 		glUniform1i(m_uniformLocations[U_BUFFER_OBJECT1], 3);

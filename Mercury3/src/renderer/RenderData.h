@@ -36,10 +36,11 @@ private:
 	VboIndex m_colorVbo;
 
 public:
-	typedef std::shared_ptr<RenderData>(*newRenderDataCallback)();
+	//typedef std::shared_ptr<RenderData>(*newRenderDataCallback)();
 	//typedef void(*indiceRenderFunc)(RenderData* rd);
-	static newRenderDataCallback Create;
-	
+	//static newRenderDataCallback Create;
+	static std::shared_ptr<RenderData> Create() { return std::make_shared<RenderData>(); }
+
 	struct Flags {
 		Flags() : FACE_CULLING(true), DEPTH_WRITE(true), updateTextures(false), transparent(false)
 		{}
@@ -51,14 +52,14 @@ public:
 	};
 
 	RenderData();
-	virtual ~RenderData();
+	~RenderData();
 
 	void render();
 
 	void destroy();
 	void init();
-	virtual void clearTextureIDs() = 0;
-	virtual void setTexture(const HgTexture* t) = 0;
+	void clearTextureIDs();
+	void setTexture(const HgTexture* t);
 
 	IHgVbo* hgVbo() { return m_vertexVbo.VboRec().Vbo().get(); }
 	IHgVbo* indexVbo() { return m_indexVbo.VboRec().Vbo().get(); }
@@ -77,6 +78,8 @@ public:
 	bool updateTextures() const { return renderFlags.updateTextures; }
 	void updateTextures(bool t) { renderFlags.updateTextures = t; }
 
+	uint32_t getGPUTextureHandle(HgTexture::TextureType t) const { return m_gpuTextureHandles[t]; }
+
 	uint32_t instanceCount;
 
 	HgShader* shader;
@@ -90,6 +93,10 @@ public:
 
 	BlendMode blendMode;
 	Flags renderFlags;
+
+private:
+	uint32_t m_gpuTextureHandles[HgTexture::TEXTURE_TYPE_COUNT];
+
 };
 
 typedef std::shared_ptr<RenderData> RenderDataPtr;

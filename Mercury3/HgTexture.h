@@ -30,6 +30,17 @@ public:
 		TEXTURE_TYPE_COUNT
 	};
 
+	struct Properties
+	{
+		Properties()
+			: width(0), height(0), format(HgTexture::format::UNKNOWN), mipMapCount(0)
+		{}
+
+		format format;
+		uint16_t width, height;
+		uint8_t mipMapCount;
+	};
+
 	~HgTexture();
 
 	typedef void(*shared_ptr_delete)(HgTexture* t);
@@ -48,14 +59,18 @@ public:
 	void sendToGPU();
 	inline uint32_t getGPUId() const { return gpuId; }
 
-	typedef uint32_t(*gpu_update_texture)(HgTexture* texture);
-	static gpu_update_texture updateTextureFunc;
+	Properties getProperties() const { return m_properties; }
+
+	const unsigned char* getData() const { return data; }
+
+	using gpuUpdateTextureFunction = std::function<uint32_t(HgTexture*)>;
+	static gpuUpdateTextureFunction updateTextureFunc;
 private:
 	//use HgTexture::acquire to instantiate a texture
 	HgTexture();
 
 	bool load(const std::string& path);
-	bool load_internal(const std::string& path);
+	bool load_internal(std::string path);
 
 	inline void setType(TextureType texType) { m_type = texType; }
 
@@ -70,17 +85,15 @@ private:
 
 	std::string m_path;
 	unsigned char* data;
-	format m_format;
+
 	TextureType m_type;
-	uint16_t m_width, m_height;
+	Properties m_properties;
+
 	uint32_t gpuId;
 	bool needsUpdate;
-
-	unsigned char m_mipMapCount;
-	uint32_t m_linearSize;
 
 	static AssetManager<HgTexture> imageMap;
 	friend AssetManager<HgTexture>;
 
-	friend uint32_t ogl_updateTextureData(HgTexture* tex);
+	//friend uint32_t ogl_updateTextureData(HgTexture* tex);
 };

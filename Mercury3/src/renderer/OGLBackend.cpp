@@ -23,7 +23,7 @@ RenderBackend* OGLBackend::Create() {
 	static OGLBackend openglRenderer;
 
 	HgShader::Create = HgOglShader::Create;
-	RenderData::Create = new_renderData_ogl;
+	//RenderData::Create = new_renderData_ogl;
 	HgTexture::updateTextureFunc = ogl_updateTextureData;
 
 	return &openglRenderer;

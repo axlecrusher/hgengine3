@@ -1,13 +1,14 @@
 #include <RenderData.h>
 #include <RenderBackend.h>
 
-RenderData::newRenderDataCallback RenderData::Create = nullptr;
+//RenderData::newRenderDataCallback RenderData::Create = nullptr;
 
 RenderData::RenderData()
 	:blendMode(BlendMode::BLEND_NORMAL), instanceCount(0)
 	, gpuBuffer(nullptr)
 {
-
+	clearTextureIDs();
+	init();
 }
 
 RenderData::~RenderData()
@@ -35,11 +36,21 @@ void RenderData::init() {
 	shader = HgShader::acquire("test_vertex.glsl", "test_frag.glsl");
 }
 
+
+void RenderData::clearTextureIDs() {
+	memset(m_gpuTextureHandles, 0, sizeof(m_gpuTextureHandles));
+}
+
+void RenderData::setTexture(const HgTexture* t) {
+	const HgTexture::TextureType type = t->getType();
+	m_gpuTextureHandles[type] = t->getGPUId();
+}
+
 void RenderData::updateGpuTextures() {
 	clearTextureIDs();
 
-	for (auto itr = textures.begin(); itr != textures.end(); itr++) {
-		auto texture = *itr;
+	for (auto& texture : textures)
+	{
 		if (texture->NeedsGPUUpdate()) {
 			texture->sendToGPU();
 			HgTexture::TextureType type = texture->getType();

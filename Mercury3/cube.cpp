@@ -69,7 +69,7 @@ static void destroy(HgEntity* e) {
 }
 
 static void SetupRenderData() {
-	crd = OGLRenderData::Create();
+	crd = RenderData::Create();
 
 	auto rec = HgVbo::GenerateFrom(raw_cube_data, NUM_ARRAY_ELEMENTS(raw_cube_data));
 	crd->VertexVboRecord(rec);

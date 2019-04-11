@@ -19,6 +19,13 @@ public:
 	void setViewport(const Viewport& vp);
 	std::unique_ptr<IFramebuffer> CreateFrameBuffer();
 
+	enum EnabledState
+	{
+		UNKNOWN,
+		ENABLED,
+		DISABLED
+	};
+
 	void setRenderAttributes(BlendMode blendMode, RenderData::Flags flags);
 };
 

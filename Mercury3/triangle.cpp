@@ -23,7 +23,7 @@ static uint8_t indices[] = {
 };
 
 static void SetupRenderData() {
-	trd = OGLRenderData::Create();
+	trd = RenderData::Create();
 
 	vertices points;
 //	points.points.array = vv;

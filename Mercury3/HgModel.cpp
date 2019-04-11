@@ -94,7 +94,7 @@ static model_data LoadModel(const char* filename) {
 }
 
 static std::shared_ptr<RenderData> init_render_data() {
-	auto rd = OGLRenderData::Create();
+	auto rd = RenderData::Create();
 	return rd;
 }
 
@@ -115,7 +115,7 @@ static void* change_to_model(HgEntity* entity) {
 int8_t model_data::load(HgEntity* entity, const char* filename) {
 	change_to_model(entity);
 
-	OGLRenderData* rd = (OGLRenderData*)entity->renderData();
+	auto rd = entity->renderData();
 
 	entity->flags.destroy = true;
 

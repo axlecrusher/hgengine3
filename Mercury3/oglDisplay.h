@@ -35,18 +35,18 @@ enum UniformLocations {
 extern char *UniformString[];
 //extern float* _projection;
 
-class OGLRenderData : public RenderData {
-public:
-	inline static std::shared_ptr<RenderData> Create() { return RenderData::Create(); }
-	OGLRenderData();
-//	virtual void render();
+//class OGLRenderData : public RenderData {
+//public:
+//	inline static std::shared_ptr<RenderData> Create() { return RenderData::Create(); }
+//	OGLRenderData();
+////	virtual void render();
+//
+//	virtual void clearTextureIDs();
+//	virtual void setTexture(const HgTexture* t);
+//
+//	GLuint textureID[HgTexture::TEXTURE_TYPE_COUNT]; //zero ID to stop rendering
+//};
 
-	virtual void clearTextureIDs();
-	virtual void setTexture(const HgTexture* t);
-
-	GLuint textureID[HgTexture::TEXTURE_TYPE_COUNT]; //zero ID to stop rendering
-};
-
-inline std::shared_ptr<RenderData> new_renderData_ogl() { return std::make_shared<OGLRenderData>(); }
+//inline std::shared_ptr<RenderData> new_renderData_ogl() { return std::make_shared<OGLRenderData>(); }
 
 uint32_t ogl_updateTextureData(HgTexture* tex);
