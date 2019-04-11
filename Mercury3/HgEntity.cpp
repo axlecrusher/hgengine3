@@ -26,20 +26,24 @@ void RegisterEntityType(const char* c, factory_clbk factory) {
 
 void EntityLocator::RegisterEntity(HgEntity* entity)
 {
+	std::lock_guard<std::mutex> m_lock(m_mutex);
+
 	const auto id = entity->getEntityId();
 	if (!id.isValid()) return;
 
-	entities[id] = entity;
+	m_entities[id] = entity;
 }
 
 void EntityLocator::RemoveEntity(EntityIdType id)
 {
 	if (!id.isValid()) return;
 
-	auto itr = entities.find(id);
-	if (itr != entities.end())
+	std::lock_guard<std::mutex> m_lock(m_mutex);
+
+	auto itr = m_entities.find(id);
+	if (itr != m_entities.end())
 	{
-		entities.erase(itr);
+		m_entities.erase(itr);
 	}
 }
 
@@ -48,8 +52,10 @@ HgEntity* EntityLocator::Find(EntityIdType id) const
 	HgEntity* entity = nullptr;
 	if (id.isValid())
 	{
-		auto itr = entities.find(id);
-		if (itr != entities.end())
+		std::lock_guard<std::mutex> m_lock(m_mutex);
+
+		auto itr = m_entities.find(id);
+		if (itr != m_entities.end())
 		{
 			entity = itr->second;
 		}

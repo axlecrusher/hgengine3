@@ -17,6 +17,7 @@
 
 #include <unordered_map>
 #include <ServiceLocator.h>
+#include <GuardedType.h>
 
 enum HgEntityFlag {
 	HGE_USED = 0x01, //used in scene graph
@@ -155,7 +156,8 @@ public:
 
 	HgEntity* Find(EntityIdType id) const;
 private:
-	std::unordered_map<EntityIdType, HgEntity*> entities;
+	std::unordered_map<EntityIdType, HgEntity*> m_entities;
+	mutable std::mutex m_mutex;
 };
 
 class ExtendedEntityData
