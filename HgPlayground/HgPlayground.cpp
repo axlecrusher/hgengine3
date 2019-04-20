@@ -250,13 +250,19 @@ int main()
 		}
 	}
 
-	HgEntity* grid = NULL;
+	HgEntity* grid = nullptr;
 	if (create_entity("square", &scene, &grid) > 0) {
+		using namespace HgMath;
 		grid->scale(100.0f);
-		//entity->position().z(-4);
+		grid->position().z(-4);
 		grid->orientation(quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO));
 		grid->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
 		grid->renderData()->blendMode = BLEND_ADDITIVE;
+		grid->renderData()->renderFlags.transparent = true;
+		grid->renderData()->renderFlags.DEPTH_WRITE = false;
+		grid->setName("Grid");
+		grid->setDrawOrder(100);
+		//grid->flags.deptj
 		//	model_data d = LoadModel("test.hgmdl");
 	}
 
