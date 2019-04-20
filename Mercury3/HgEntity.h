@@ -115,6 +115,13 @@ public:
 		:m_id(id)
 	{}
 
+	EntityIdType(const EntityIdType&) = default;
+	EntityIdType(EntityIdType &&rhs)
+	{
+		m_id = rhs.m_id;
+		rhs.m_id = 0;
+	}
+
 	EntityIdType& operator=(const EntityIdType& rhs)
 	{
 		m_id = rhs.m_id;
@@ -184,7 +191,7 @@ public:
 		~HgEntity();
 
 		HgEntity(const HgEntity &other) = delete;
-		HgEntity(HgEntity &&) = delete; //move constructor
+		HgEntity(HgEntity &&); //move operator
 
 		void init();
 		void destroy();
@@ -219,7 +226,7 @@ public:
 			m_logic->update(dtime);
 		}
 
-		inline void setLogic(std::unique_ptr<HgEntityLogic> logic) { m_logic = std::move(logic); m_logic->setEntity(this); }
+		inline void setLogic(std::unique_ptr<HgEntityLogic> logic) { m_logic = std::move(logic); if (m_logic) m_logic->setEntity(this); }
 		inline HgEntityLogic& logic() { return *(m_logic.get()); }
 
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.

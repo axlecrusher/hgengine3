@@ -104,6 +104,25 @@ HgEntity::~HgEntity() {
 	destroy();
 }
 
+HgEntity::HgEntity(HgEntity &&rhs)
+{
+	m_spacialData = std::move(rhs.m_spacialData);
+	m_entityId = std::move(rhs.m_entityId);
+	m_renderData = std::move(rhs.m_renderData);
+	m_logic = std::move(rhs.m_logic);
+	m_extendedData = std::move(rhs.m_extendedData);
+	m_parentId = std::move(rhs.m_parentId);
+	m_updateNumber = std::move(rhs.m_updateNumber);
+	m_drawOrder = std::move(rhs.m_drawOrder);
+	flags = std::move(rhs.flags);
+
+	setLogic(std::move(m_logic)); //reset logic pointer
+	Locator().RegisterEntity(this);
+
+	rhs.destroy();
+}
+
+
 void HgEntity::destroy()
 {
 	if (m_entityId.isValid())
