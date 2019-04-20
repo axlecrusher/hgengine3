@@ -236,8 +236,10 @@ inline void OGLvbo<uint8_t>::draw_instanced(const RenderData* rd) {
 	const auto& vbo_rec = rd->indexVboRecord();
 	const auto idx_offset = vbo_rec.Offset();
 	const auto idx_count = vbo_rec.Count();
-	const size_t offset = idx_offset * sizeof(uint16_t); //offset into indice buffer
-	glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount);
+	const size_t offset = idx_offset * sizeof(uint8_t); //offset into indice buffer
+	const auto vetexOffest = rd->VertexVboRecord().Offset();
+	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, idx_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount, vetexOffest);
+	//glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount);
 }
 
 template<>
@@ -246,7 +248,9 @@ inline void OGLvbo<uint16_t>::draw_instanced(const RenderData* rd) {
 	const auto idx_offset = vbo_rec.Offset();
 	const auto idx_count = vbo_rec.Count();
 	const size_t offset = idx_offset * sizeof(uint16_t); //offset into indice buffer
-	glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount);
+	const auto vetexOffest = rd->VertexVboRecord().Offset();
+	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, idx_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount, vetexOffest);
+	//glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount);
 }
 
 template<>
@@ -255,7 +259,9 @@ inline void OGLvbo<uint32_t>::draw_instanced(const RenderData* rd) {
 	const auto idx_offset = vbo_rec.Offset();
 	const auto idx_count = vbo_rec.Count();
 	const size_t offset = idx_offset * sizeof(uint32_t); //offset into indice buffer
-	glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount);
+	const auto vetexOffest = rd->VertexVboRecord().Offset();
+	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount, vetexOffest);
+	//glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount);
 }
 
 //8 bit index
