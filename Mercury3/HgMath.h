@@ -48,9 +48,9 @@ namespace HgMath {
 		angle_template<T>() : m_radians(0) {}
 		static const angle_template<T> ZERO;
 
-		static inline angle_template<T> deg(T x) { angle_template<T> tmp; tmp.m_radians = (T)x*DEG_RAD; return tmp; }
+		static inline angle_template<T> deg(T x) { angle_template<T> tmp; tmp.m_radians = (T)(x*DEG_RAD); return tmp; }
 		//inline angle_template<T>& deg(T x) { m_radians = x*DEG_RAD; return *this; }
-		inline T deg() const { return (T)m_radians*RAD_DEG; }
+		inline T deg() const { return (T)(m_radians*RAD_DEG); }
 
 		inline T rad() const { return m_radians; }
 		static inline angle_template<T> rad(T x) { angle_template<T> tmp; tmp.m_radians = x; return tmp; }

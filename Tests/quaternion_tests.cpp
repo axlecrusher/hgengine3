@@ -120,6 +120,18 @@ namespace {
 		EXPECT_NEAR(r.z(), -0.6494001, 0.000001);
 	}
 
+	//TEST(QuaternionTest, fromEuler360) {
+	//	using namespace HgMath;
+
+	//	auto r1 = quaternion::fromEuler(angle::deg(0), angle::deg(0), angle::deg(0));
+	//	auto r2 = quaternion::fromEuler(angle::deg(360), angle::deg(0), angle::deg(0));
+
+	//	EXPECT_NEAR(r1.w(), r2.w(), 0.000001);
+	//	EXPECT_NEAR(r1.x(), r2.x(), 0.000001);
+	//	EXPECT_NEAR(r1.y(), r2.y(), 0.000001);
+	//	EXPECT_NEAR(r1.z(), r2.z(), 0.000001);
+	//}
+
 	TEST(QuaternionTest, toMatrix) {
 		using namespace HgMath;
 		const vector3 axis(12, 3, 31);
