@@ -22,7 +22,8 @@ namespace Cube {
 
 namespace RotatingCube {
 	struct gpuStruct {
-		quaternion rotation;
+		float matrix[16];
+//		quaternion rotation;
 	};
 
 	class RotatingCube : public IUpdatableInstance<gpuStruct> {
@@ -34,5 +35,6 @@ namespace RotatingCube {
 		void init();
 	private:
 		HgTime m_age;
+		HgTime m_rotationTime;
 	};
 }

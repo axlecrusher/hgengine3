@@ -49,6 +49,11 @@ public:
 		for (auto itr = begin(); itr != end(); itr++) {
 			auto& e = itr->getEntity();
 			if (!e.flags.hidden) {
+
+				auto& rd = e.getRenderDataPtr();
+				rd->instanceCount = (uint32_t)m_instanceCount;
+				rd->gpuBuffer = &m_instanceData;
+
 				queue->Enqueue(&e);
 				return;
 			}

@@ -37,6 +37,8 @@
 #include <IRenderTarget.h>
 #include <WindowRenderTarget.h>
 
+#include <cube.h>
+
 float projection[16];
 
 HgCamera camera;
@@ -181,8 +183,6 @@ int main()
 	printf("\n");
 
 	scene.init();
-	//	uint32_t tris[ANI_TRIS];
-	HgEntity* tris[ANI_TRIS];
 
 	GravityField gravity = { 0 };
 	allocate_space(&gravity, ANI_TRIS);
@@ -202,6 +202,7 @@ int main()
 	//	statue->position(statue->position().x(i));
 	//}
 
+	EntityIdType cubeId;
 	uint32_t i;
 	{
 		HgEntity* entity = NULL;
@@ -219,19 +220,18 @@ int main()
 		}
 
 		for (i = 0; i < ANI_TRIS; i++) {
-			if (create_entity("cube", &scene, &entity) > 0) {
-				tris[i] = entity;
-				//			gravity.indices[i] = tris[i];
-				//		shape_create_triangle(element);
-				float x = (i % 20)*1.1f;
-				float z = (i / 20)*1.1f;
-				;
-				entity->position(point(-10.0f + x, 5.0f, -2.0f - z));
-				entity->scale(0.3f); 
-				entity->renderData()->shader = HgShader::acquire("basic_light2_v.glsl", "basic_light2_f.glsl");
-				//entity->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
-			}
+			float x = (i % 20)*1.1f;
+			float z = (i / 20)*1.1f;
+
+			auto& rCube = RotatingCube::RotatingCube::Generate();
+			auto& entity = rCube.getEntity();
+			entity.position(point(-10.0f + x, 5.0f, -2.0f - z));
+			entity.scale(0.3f);
+			auto rd = entity.renderData();
+			rd->shader = HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl");
+			cubeId = rCube.getEntity().getEntityId();
 		}
+
 
 		if (create_entity("cube", &scene, &entity) > 0) {
 			entity->position(point(2,2,-2));
@@ -376,19 +376,11 @@ int main()
 
 			grid->position(point(camera.getWorldSpacePosition()).y(0));
 
-			{
-				HgEntity* entity = tris[0];
-				const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
-				entity->orientation(orientation);
-				teapot->orientation(orientation.conjugate());
-
-				for (i = 0; i < ANI_TRIS; i++) {
-					tris[i]->orientation(entity->orientation());
-				}
-			}
+			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
+			teapot->orientation(orientation.conjugate());
 
 			scene.update(timeStep);
-
+			Engine::updateCollections(timeStep);
 		}
 
 		SOUND->update();

@@ -90,17 +90,28 @@ namespace RotatingCube {
 	void RotatingCube::update(HgTime dt, gpuStruct* instanceData) {
 		using namespace HgMath;
 		m_age += dt;
-		if (m_age.msec() > 10000) {
-			m_age -= HgTime::msec(10000);
+
+		const double degTime = 360.0 / m_rotationTime.msec();
+
+		while (m_age > m_rotationTime) {
+			m_age -= m_rotationTime;
 		}
-		const quaternion rotation = quaternion::fromEuler(angle::ZERO, angle::deg(m_age.msec() / 27.777777777777777777777777777778), angle::ZERO);
+
+		const double deg = degTime * m_age.msec();
+		const quaternion rotation = quaternion::fromEuler(angle::ZERO, angle::deg(deg), angle::ZERO);
 		getEntity().orientation(rotation);
-		instanceData->rotation = rotation;
+		const auto mat = getEntity().computeWorldSpaceMatrix();
+		mat.store(instanceData->matrix);
 	}
 
 	void RotatingCube::init() {
 		HgEntity* e = &getEntity();
 		change_to_cube(e);
+
+		m_rotationTime = HgTime::msec(10000 + ((rand() % 10000) - 5000));
+
+		RenderDataPtr rd = std::make_shared<RenderData>(*crd);
+		e->setRenderData(rd);
 	}
 
 	RotatingCube& RotatingCube::Generate() {
@@ -109,13 +120,19 @@ namespace RotatingCube {
 			Engine::collections().push_back(&Collection());
 			init = true;
 		}
-		return Collection().newItem();
+		auto& colleciton = Collection();
+		auto& p = colleciton.newItem();
+		p.init();
+		colleciton.renderData = p.getEntity().getRenderDataPtr();
+		return p;
 	}
 }
 
 static void* generate_rotating_cube(HgEntity* entity) {
 	RotatingCube::RotatingCube& p = RotatingCube::RotatingCube::Generate();
 	p.init();
+	entity = &p.getEntity();
+	Collection().renderData = entity->getRenderDataPtr();
 	return &p;
 }
 
