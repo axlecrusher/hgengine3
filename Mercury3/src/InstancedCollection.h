@@ -52,12 +52,6 @@ public:
 			auto &e = itr->getEntity();
 			auto& rd = e.getRenderDataPtr();
 
-			//render data doesn't copy properly right now. just take the pointer
-			//*renderData = *rd;
-			renderData = rd;
-
-			renderData->instanceCount = (uint32_t)m_instanceCount;
-			renderData->gpuBuffer = &m_instanceData;
 			renderData->instanceCount = (uint32_t)m_instanceCount;
 			renderData->gpuBuffer = &m_instanceData;
 
