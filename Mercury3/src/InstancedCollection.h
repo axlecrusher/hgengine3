@@ -2,6 +2,7 @@
 
 #include <IUpdatable.h>
 #include <UpdatableCollection.h>
+#include <algorithm>
 
 template<typename T, typename gpuStruct, int stride>
 class InstancedCollection : public IUpdatableCollection {
@@ -9,6 +10,7 @@ public:
 	typedef typename SwissArray<T>::iterator iterator;
 
 	InstancedCollection() {
+		m_instanceCount = 0;
 	}
 
 	//InstancedCollection(uint32_t reserve) : m_items(reserve) {
@@ -38,25 +40,28 @@ public:
 	}
 
 	virtual void EnqueueForRender(RenderQueue* queue) final {
-		if (empty()) return;
+		if (empty() || m_instanceCount<1) return;
 
-//		size_t instanceCount = m_items.count();
-		//renderData->instanceCount = instanceCount;
-		renderData->instanceCount = (uint32_t)m_instanceCount;
-		renderData->gpuBuffer = &m_instanceData;
+		auto itr = std::find_if(begin(), end(), [](auto& x) {
+			auto& e = x.getEntity();
+			return e.flags.hidden == false;
+		});
 
-		//enqueue first one found. hope it shares render data
-		for (auto itr = begin(); itr != end(); itr++) {
-			auto& e = itr->getEntity();
-			if (!e.flags.hidden) {
+		if (itr != end())
+		{
+			auto &e = itr->getEntity();
+			auto& rd = e.getRenderDataPtr();
 
-				auto& rd = e.getRenderDataPtr();
-				rd->instanceCount = (uint32_t)m_instanceCount;
-				rd->gpuBuffer = &m_instanceData;
+			//render data doesn't copy properly right now. just take the pointer
+			//*renderData = *rd;
+			renderData = rd;
 
-				queue->Enqueue(&e);
-				return;
-			}
+			renderData->instanceCount = (uint32_t)m_instanceCount;
+			renderData->gpuBuffer = &m_instanceData;
+			renderData->instanceCount = (uint32_t)m_instanceCount;
+			renderData->gpuBuffer = &m_instanceData;
+
+			queue->Enqueue(renderData);
 		}
 	}
 
@@ -68,6 +73,15 @@ public:
 			auto data = std::make_unique<gpuStruct[]>(stride);
 			m_instanceData.AddData(data.get(), stride);
 		}
+		tmp.init();
+
+		//This is an instancing data structure.
+		//All instances need to share the same render data.
+		if (renderData == nullptr)
+			renderData = tmp.getEntity().getRenderDataPtr();
+
+		tmp.getEntity().setRenderData(renderData);
+
 		return tmp;
 	}
 

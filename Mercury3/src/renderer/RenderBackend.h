@@ -66,6 +66,7 @@ class RenderQueue
 {
 public:
 	void Enqueue(const HgEntity* entity);
+	void Enqueue(RenderDataPtr& rd);
 
 	//sorts queue on draw order for proper rendering
 	void Finalize();
@@ -80,6 +81,7 @@ public:
 	const std::vector<RenderInstance>& getOpaqueQueue() const { return m_opaqueEntities; }
 	const std::vector<RenderInstance>& getTransparentQueue() const { return m_transparentEntities; }
 private:
+	void Enqueue(RenderDataPtr& rd, const HgMath::mat4f& wsm, int8_t drawOrder);
 	void sort(std::vector<RenderInstance>& v);
 
 	std::vector<RenderInstance> m_opaqueEntities;

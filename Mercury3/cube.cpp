@@ -16,6 +16,7 @@
 
 #include <InstancedCollection.h>
 #include <cube.h>
+#include <HgEngine.h>
 
 vertex3f test__ = { 1.0,0.0,0.0 };
 
@@ -59,8 +60,6 @@ uint8_t cube_indices[36] = {
 	12, 22, 13,		15, 23, 16
 };
 
-static auto Collection = InstancedCollection<RotatingCube::RotatingCube, RotatingCube::gpuStruct, 1>::Collection;
-
 //instanced render data
 static std::shared_ptr<RenderData> crd;
 
@@ -87,6 +86,7 @@ void* change_to_cube(HgEntity* entity) {
 }
 
 namespace RotatingCube {
+
 	void RotatingCube::update(HgTime dt, gpuStruct* instanceData) {
 		using namespace HgMath;
 		m_age += dt;
@@ -113,27 +113,13 @@ namespace RotatingCube {
 		RenderDataPtr rd = std::make_shared<RenderData>(*crd);
 		e->setRenderData(rd);
 	}
-
-	RotatingCube& RotatingCube::Generate() {
-		static bool init = false;
-		if (init == false) {
-			Engine::collections().push_back(&Collection());
-			init = true;
-		}
-		auto& colleciton = Collection();
-		auto& p = colleciton.newItem();
-		p.init();
-		colleciton.renderData = p.getEntity().getRenderDataPtr();
-		return p;
-	}
 }
 
 static void* generate_rotating_cube(HgEntity* entity) {
-	RotatingCube::RotatingCube& p = RotatingCube::RotatingCube::Generate();
-	p.init();
-	entity = &p.getEntity();
-	Collection().renderData = entity->getRenderDataPtr();
-	return &p;
+	auto collection = Engine::getCollectionOf<RotatingCube::RotatingCube::InstanceCollection>();
+	auto& rCube = collection->newItem();
+	entity = &(rCube.getEntity());
+	return entity;
 }
 
 REGISTER_LINKTIME(rotating_cube, generate_rotating_cube);

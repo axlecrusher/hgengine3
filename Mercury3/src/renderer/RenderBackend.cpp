@@ -56,23 +56,39 @@ void Renderer::Render(const Viewport& vp, const HgMath::mat4f& viewMatrix, const
 //	Render(viewportIdx, viewMatrix, projection, queue);
 //}
 
+void RenderQueue::Enqueue(RenderDataPtr& renderData)
+{
+	if (renderData)
+	{
+		const auto worldSpaceMatrix = HgMath::mat4f::identity();
+		Enqueue(renderData, worldSpaceMatrix, 0);
+	}
+}
+
+
 void RenderQueue::Enqueue(const HgEntity* e)
 {
 	auto renderData = e->getRenderDataPtr();
 	if (renderData)
 	{
 		const auto worldSpaceMatrix = e->computeWorldSpaceMatrix();
-
-		if (renderData->renderFlags.transparent) {
-			//order by distance back to front?
-			m_transparentEntities.emplace_back(worldSpaceMatrix, renderData, e->getDrawOrder());
-		}
-		else {
-			//order by distance front to back?
-			m_opaqueEntities.emplace_back(worldSpaceMatrix, renderData, e->getDrawOrder());
-		}
+		Enqueue(renderData, worldSpaceMatrix, e->getDrawOrder());
 	}
 }
+
+void RenderQueue::Enqueue(RenderDataPtr& rd, const HgMath::mat4f& wsm, int8_t drawOrder)
+{
+	if (rd->renderFlags.transparent) {
+		//order by distance back to front?
+		m_transparentEntities.emplace_back(wsm, rd, drawOrder);
+	}
+	else {
+		//order by distance front to back?
+		m_opaqueEntities.emplace_back(wsm, rd, drawOrder);
+	}
+}
+
+
 
 void RenderQueue::Finalize()
 {

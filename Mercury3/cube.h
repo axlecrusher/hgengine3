@@ -28,7 +28,11 @@ namespace RotatingCube {
 
 	class RotatingCube : public IUpdatableInstance<gpuStruct> {
 	public:
-		static RotatingCube& RotatingCube::Generate();
+		using InstanceCollection = InstancedCollection<RotatingCube, gpuStruct, 1>;
+		using InstanceCollectionPtr = std::shared_ptr<InstanceCollection>;
+
+		//static RotatingCube& RotatingCube::Generate();
+		static InstanceCollectionPtr getInstanceCollection();
 
 		virtual void update(HgTime tdelta) {}; //ew
 		virtual void update(HgTime tdelta, gpuStruct* instanceData);

@@ -7,23 +7,19 @@
 #include <HgMath.h>
 #include <HgEntity.h>
 #include <stdlib.h>
+#include <HgEngine.h>
 
 #include <UpdatableCollection.h>
 
 float projectileMsecSpeed = 1.0f / 50.0f;
 
-static UpdatableCollection<Projectile>& ProjectileCollection() {
-	static UpdatableCollection<Projectile> collection;
-	return collection;
+static auto ProjectileCollection()
+{
+	return Engine::getCollectionOf<UpdatableCollection<Projectile>>();
 }
 
 static Projectile& CreateProjectile() {
-	static bool init = false;
-	if (init == false) {
-		Engine::collections().push_back(&ProjectileCollection());
-		init = true;
-	}
-	return ProjectileCollection().newItem();
+	return ProjectileCollection()->newItem();
 }
 
 Projectile::Projectile()
@@ -37,7 +33,7 @@ void Projectile::update(HgTime tdelta) {
 		if (total_time >= HgTime::msec(3000)) {
 //			printf("set destroy\n");
 			m_entity.flags.destroy = true;
-			ProjectileCollection().remove(*this);
+			ProjectileCollection()->remove(*this);
 			return;
 		}
 

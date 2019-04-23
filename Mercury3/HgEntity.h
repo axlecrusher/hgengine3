@@ -310,11 +310,6 @@ public:
 class IUpdatableCollection;
 class RenderQueue;
 
-namespace Engine {
-	std::vector<IUpdatableCollection*>& collections();
-	void updateCollections(HgTime dtime);
-	void EnqueueForRender(std::vector<IUpdatableCollection*>& c, RenderQueue* queue);
-}
 
 extern RenderData* (*new_RenderData)();
 

@@ -14,13 +14,12 @@
 #include <UpdatableCollection.h>
 
 #include <EventSystem.h>
-
-std::unordered_map<std::string, factory_clbk> entity_factories;
+#include <HgEngine.h>
 
 EntityIdType HgEntity::m_nextEntityId(1);
 
 void RegisterEntityType(const char* c, factory_clbk factory) {
-	entity_factories[c] = factory;
+	Engine::entity_factories[c] = factory;
 }
 
 
@@ -183,27 +182,6 @@ point HgEntity::computeWorldSpacePosition() const
 //	vector3 v1 = (*p - e->origin()).scale(e->scale()).rotate(e->orientation()) + e->position();
 //	return v1;
 //}
-
-namespace Engine {
-	std::vector<IUpdatableCollection*>& collections() {
-		static std::vector<IUpdatableCollection*> c;
-		return c;
-	}
-
-	void updateCollections(HgTime dtime) {
-		auto c = collections();
-		for (auto i : c) {
-			i->update(dtime);
-		}
-	}
-
-	void EnqueueForRender(std::vector<IUpdatableCollection*>& c, RenderQueue* queue) {
-		for (auto i : c) {
-			i->EnqueueForRender(queue);
-		}
-	}
-}
-
 
 REGISTER_EVENT_TYPE(EntityCreated)
 REGISTER_EVENT_TYPE(EntityDestroyed)

@@ -127,19 +127,3 @@ void HgScene::EnqueueForRender(RenderQueue* queue)
 
 	}
 }
-
-uint8_t create_entity(char* type, HgScene* scene, HgEntity** entity) {
-//	uint32_t idx = HgEntity_get_type_index(type);
-
-	auto factory = entity_factories.find(type);
-
-	if (factory == entity_factories.end()) {
-		fprintf(stderr, "Unable to find entity type \"%s\"\n", type);
-		return 0;
-	}
-	factory_clbk clbk = factory->second;
-	scene->getNewEntity(entity);
-	clbk(*entity);
-
-	return 1;
-}

@@ -37,8 +37,6 @@
 #include <IRenderTarget.h>
 #include <WindowRenderTarget.h>
 
-#include <cube.h>
-
 float projection[16];
 
 HgCamera camera;
@@ -118,16 +116,16 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 
 #define ANI_TRIS 400
 
-void fire(HgScene* scene) {
-	HgEntity* entity = NULL;
-
-	create_entity("basic_projectile", scene, &entity);
-
-	Projectile *pd = dynamic_cast<Projectile*>(&entity->logic());
-	pd->direction = camera.getForward();
-	entity->orientation(camera.getWorldSpaceOrientation().conjugate());
-	entity->position(camera.getWorldSpacePosition());
-}
+//void fire(HgScene* scene) {
+//	HgEntity* entity = NULL;
+//
+//	create_entity("basic_projectile", scene, &entity);
+//
+//	Projectile *pd = dynamic_cast<Projectile*>(&entity->logic());
+//	pd->direction = camera.getForward();
+//	entity->orientation(camera.getWorldSpaceOrientation().conjugate());
+//	entity->position(camera.getWorldSpacePosition());
+//}
 
 void(*submit_for_render)(uint8_t viewport_idx, HgCamera* camera, HgEntity* e);
 
@@ -207,13 +205,13 @@ int main()
 	{
 		HgEntity* entity = NULL;
 
-		if (create_entity("triangle", &scene, &entity) > 0) {
+		if (Engine::create_entity("triangle", &scene, &entity) > 0) {
 			const auto tmp = entity->position();
 			entity->position(tmp.x(1.5f).z(1.0f));
 			//	toQuaternion2(0, 0, 90, &entity->orientation);
 		}
 
-		if (create_entity("triangle", &scene, &entity) > 0) {
+		if (Engine::create_entity("triangle", &scene, &entity) > 0) {
 			const auto tmp = entity->position();
 			entity->position(tmp.x(0.0f).z(-2.0f));
 			//	toQuaternion2(45,0,0,&entity->orientation);
@@ -223,17 +221,19 @@ int main()
 			float x = (i % 20)*1.1f;
 			float z = (i / 20)*1.1f;
 
-			auto& rCube = RotatingCube::RotatingCube::Generate();
-			auto& entity = rCube.getEntity();
-			entity.position(point(-10.0f + x, 5.0f, -2.0f - z));
-			entity.scale(0.3f);
-			auto rd = entity.renderData();
-			rd->shader = HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl");
-			cubeId = rCube.getEntity().getEntityId();
+			HgEntity* entity = nullptr;
+			if (Engine::create_entity("rotating_cube", &entity) > 0)
+			{
+				entity->position(point(-10.0f + x, 5.0f, -2.0f - z));
+				entity->scale(0.3f);
+				auto rd = entity->renderData();
+				rd->shader = HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl");
+				cubeId = entity->getEntityId();
+			}
 		}
 
 
-		if (create_entity("cube", &scene, &entity) > 0) {
+		if (Engine::create_entity("cube", &scene, &entity) > 0) {
 			entity->position(point(2,2,-2));
 			entity->scale(0.3f);
 			entity->renderData()->shader = HgShader::acquire("basic_light2_v.glsl", "basic_light2_f.glsl");
@@ -242,7 +242,7 @@ int main()
 
 //		entity->position.
 
-		if (create_entity("voxelGrid", &scene, &entity) > 0) {
+		if (Engine::create_entity("voxelGrid", &scene, &entity) > 0) {
 			//		entity->scale = 100.0f;
 			entity->position().z(-10);
 			//		toQuaternion2(0, -90, 0, &entity->orientation);
@@ -251,7 +251,7 @@ int main()
 	}
 
 	HgEntity* grid = nullptr;
-	if (create_entity("square", &scene, &grid) > 0) {
+	if (Engine::create_entity("square", &scene, &grid) > 0) {
 		using namespace HgMath;
 		grid->scale(100.0f);
 		grid->position().z(-4);
@@ -268,7 +268,7 @@ int main()
 
 
 	HgEntity* teapotSquare = NULL;
-	if (create_entity("cube", &scene, &teapotSquare) > 0) {
+	if (Engine::create_entity("cube", &scene, &teapotSquare) > 0) {
 		teapotSquare->scale(0.3);
 		teapotSquare->position(point(0, 3, 0));
 		teapotSquare->inheritParentScale(false);

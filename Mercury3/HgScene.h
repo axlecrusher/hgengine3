@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include <HgEngine.h>
 #include <HgEntity.h>
 
 #include <HgTimer.h>
@@ -64,19 +65,13 @@ private:
 };
 
 
-uint8_t create_entity(char* type, HgScene* scene, HgEntity** entity);
-
-//class HgScene;
-
-extern std::unordered_map<std::string, factory_clbk> entity_factories;
-
 template<typename T>
 T* create_entity(char* type, HgScene* scene, HgEntity** entity) {
 	//	uint32_t idx = HgEntity_get_type_index(type);
 
-	auto factory = entity_factories.find(type);
+	auto factory = Engine::entity_factories.find(type);
 
-	if (factory == entity_factories.end()) {
+	if (factory == Engine::entity_factories.end()) {
 		fprintf(stderr, "Unable to find entity type \"%s\"\n", type);
 		return 0;
 	}
@@ -90,9 +85,9 @@ template<typename T>
 T* create_entity(char* type, HgScene* scene) {
 	//	uint32_t idx = HgEntity_get_type_index(type);
 
-	auto factory = entity_factories.find(type);
+	auto factory = Engine::entity_factories.find(type);
 
-	if (factory == entity_factories.end()) {
+	if (factory == Engine::entity_factories.end()) {
 		fprintf(stderr, "Unable to find entity type \"%s\"\n", type);
 		return 0;
 	}
