@@ -22,7 +22,6 @@ void RegisterEntityType(const char* c, factory_clbk factory) {
 	Engine::entity_factories[c] = factory;
 }
 
-
 void EntityLocator::RegisterEntity(HgEntity* entity)
 {
 	std::lock_guard<std::mutex> m_lock(m_mutex);

@@ -37,7 +37,7 @@ void EnqueueForRender(std::vector<std::shared_ptr<IUpdatableCollection>>& c, Ren
 	}
 }
 
-bool create_entity(char* type, HgScene* scene, HgEntity** entity)
+bool create_entity(char* type, ::HgScene* scene, HgEntity** entity)
 {
 	auto factory = entity_factories.find(type);
 

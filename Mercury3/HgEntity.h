@@ -19,6 +19,8 @@
 #include <ServiceLocator.h>
 #include <GuardedType.h>
 
+//#include <core/HgScene2.h>
+
 enum HgEntityFlag {
 	HGE_USED = 0x01, //used in scene graph
 	HGE_ACTIVE = 0x02,
@@ -342,6 +344,10 @@ void RegisterEntityType(const char* c, factory_clbk);
 #define REGISTER_LINKTIME( func, factory ) \
 	__pragma(comment(linker,"/export:"##LINKER_PREFIX##"REGISTER_ENTITY"#func)); \
 	extern "C" { void REGISTER_ENTITY##func() { RegisterEntityType(#func,factory); } }
+
+#define REGISTER_LINKTIME2( func, factory ) \
+	__pragma(comment(linker,"/export:"##LINKER_PREFIX##"REGISTER_ENTITY2"#func)); \
+	extern "C" { void REGISTER_ENTITY2##func() { Engine::HgScene::RegisterEntityFactory(#func,factory); } }
 #else
 #define REGISTER_LINKTIME( func ) \
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }

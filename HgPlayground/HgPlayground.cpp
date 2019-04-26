@@ -37,6 +37,8 @@
 #include <IRenderTarget.h>
 #include <WindowRenderTarget.h>
 
+#include <core/HgScene2.h>
+
 float projection[16];
 
 HgCamera camera;
@@ -182,6 +184,8 @@ int main()
 
 	scene.init();
 
+	Engine::HgScene scene2;
+
 	GravityField gravity = { 0 };
 	allocate_space(&gravity, ANI_TRIS);
 	gravity.scene = &scene;
@@ -222,7 +226,7 @@ int main()
 			float z = (i / 20)*1.1f;
 
 			HgEntity* entity = nullptr;
-			if (Engine::create_entity("rotating_cube", &entity) > 0)
+			if (scene2.create_entity("rotating_cube", &entity) > 0)
 			{
 				entity->position(point(-10.0f + x, 5.0f, -2.0f - z));
 				entity->scale(0.3f);
@@ -386,6 +390,7 @@ int main()
 			teapot->orientation(orientation.conjugate());
 
 			scene.update(timeStep);
+			scene2.update(timeStep);
 			Engine::updateCollections(timeStep);
 		}
 
@@ -403,6 +408,7 @@ int main()
 
 			renderQueue.Clear();
 			scene.EnqueueForRender(&renderQueue);
+			scene2.EnqueueForRender(&renderQueue);
 			Engine::EnqueueForRender(Engine::collections(), &renderQueue);
 			renderQueue.Finalize();
 

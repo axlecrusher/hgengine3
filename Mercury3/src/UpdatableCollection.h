@@ -11,6 +11,8 @@ public:
 	virtual void EnqueueForRender(RenderQueue* queue) = 0;
 };
 
+using IUpdatableCollectionPtr = std::shared_ptr<IUpdatableCollection>;
+
 /* This is for data oriented processing. Large collections of objects can
 be stored contiguously in memory. Updates benefit from cache hits.*/
 template<typename T>

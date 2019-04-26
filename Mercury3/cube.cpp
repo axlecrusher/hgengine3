@@ -16,7 +16,7 @@
 
 #include <InstancedCollection.h>
 #include <cube.h>
-#include <HgEngine.h>
+#include <core/HgScene2.h>
 
 vertex3f test__ = { 1.0,0.0,0.0 };
 
@@ -115,12 +115,12 @@ namespace RotatingCube {
 	}
 }
 
-static void* generate_rotating_cube(HgEntity* entity) {
-	auto collection = Engine::getCollectionOf<RotatingCube::RotatingCube::InstanceCollection>();
+static HgEntity& generate_rotating_cube(Engine::HgScene* scene) {
+	auto collection = scene->getCollectionOf<RotatingCube::RotatingCube::InstanceCollection>();
 	auto& rCube = collection->newItem();
-	entity = &(rCube.getEntity());
-	return entity;
+	return rCube.getEntity();
 }
 
-REGISTER_LINKTIME(rotating_cube, generate_rotating_cube);
+//REGISTER_LINKTIME(rotating_cube, generate_rotating_cube);
+REGISTER_LINKTIME2(rotating_cube, generate_rotating_cube);
 REGISTER_LINKTIME(cube, change_to_cube)

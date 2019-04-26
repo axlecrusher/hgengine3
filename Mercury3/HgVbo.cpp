@@ -126,7 +126,8 @@ VboIndex::VboIndex(VboIndex&& other) noexcept
 
 VboIndex& VboIndex::operator=(VboIndex other) noexcept
 {
-	//I don't think decrement or increment need to happen here
+	//I don't think decrement or increment need to happen here.
+	//Take it from the copied argument
 	std::swap(m_idx, other.m_idx);
 	return *this;
 }

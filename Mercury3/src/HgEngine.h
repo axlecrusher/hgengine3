@@ -23,7 +23,7 @@ namespace Engine
 extern std::unordered_map<std::string, factory_clbk> entity_factories;
 
 //Create simplistic entities existing in HgScene. Nothing complex. Avoid.
-bool create_entity(char* type, HgScene* scene, HgEntity** entity);
+bool create_entity(char* type, ::HgScene* scene, HgEntity** entity);
 
 //Create an entity in a data structure fit to contain entities of type_str.
 //Returns true if successful. Sets entity to the created entity.
