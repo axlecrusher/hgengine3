@@ -39,50 +39,47 @@ namespace HgMath {
 		inline vector scale(T n) const {
 			//Writing functions exactly like this lets the compiler make a lot of good optimizations.
 			vector r = *this;
+
+			//loop vectorized
 			for (int i = 0; i < fcount; i++) {
 				r.xyz[i] *= n;
 			}
 			return r;
 		}
 
-		inline vector operator+(const vector& _rhs) const {
+		inline vector operator+(vector rhs) const {
 			vector r = *this;
-			const vector rhs = _rhs;
 			for (int i = 0; i < fcount; i++) {
 				r.xyz[i] += rhs.xyz[i];
 			}
 			return r;
 		}
 
-		inline vector operator+=(const vector& _rhs) {
-			const vector rhs = _rhs;
+		inline vector operator+=(vector rhs) {
 			for (int i = 0; i < fcount; i++) {
 				xyz[i] += rhs.xyz[i];
 			}
 			return *this;
 		}
 
-		inline vector operator-(const vector& _rhs) const {
+		inline vector operator-(vector rhs) const {
 			vector r = *this;
-			const vector rhs = _rhs;
 			for (int i = 0; i < fcount; i++) {
 				r.xyz[i] -= rhs.xyz[i];
 			}
 			return r;
 		}
 
-		inline vector operator*(const vector& _rhs) const {
+		inline vector operator*(vector rhs) const {
 			vector r = *this;
-			const vector rhs = _rhs;
 			for (int i = 0; i < fcount; i++) {
 				r.xyz[i] *= rhs.xyz[i];
 			}
 			return r;
 		}
 
-		inline vector operator/(const vector& _rhs) const {
+		inline vector operator/(vector rhs) const {
 			vector r = *this;
-			const vector rhs = _rhs;
 			for (int i = 0; i < fcount; i++) {
 				r.xyz[i] /= rhs.xyz[i];
 			}
@@ -98,36 +95,25 @@ namespace HgMath {
 		//	return r;
 		//}
 
-		inline T dot(const vector& _rhs) const {
-			//the 1st loop is auto vectorized
-			T sum = 0;
-			T r[fcount];
+		inline T dot(vector rhs) const {
+			T components[fcount];
+
 			const vector a = *this;
-			const vector b = *this;
-			for (int i = 0; i < 4; i++)
+
+			//the loop is auto vectorized
+			for (int i = 0; i < fcount; i++)
 			{
-				r[i] = a[i] * b[i];
+				components[i] = a[i] * rhs[i];
 			}
-			for (int i = 0; i < 4; i++)
-			{
-				sum += r[i];
-			}
-			return sum;
+
+			const auto sum1 = components[0] + components[1];
+			const auto sum2 = components[2] + components[3];
+
+			return sum1 + sum2;
 		}
 
 		inline T squaredLength() const {
-			//the 1st loop is auto vectorized
-			T sum = 0;
-			T components[fcount];
-			for (int i = 0; i < 4; i++)
-			{
-				components[i] = HgMath::square(xyz[i]);
-			}
-			for (int i = 0; i < 4; i++)
-			{
-				sum += components[i];
-			}
-			return sum;
+			return this->dot(*this);
 		}
 
 		inline T magnitude() const {
@@ -140,7 +126,7 @@ namespace HgMath {
 			//if very close to unit length, don't compute. more stable
 			if (std::abs(1.0f - length) > 1e-06f) {
 				if (length > 1e-06f) {
-					r = this->scale(T(1.0) / length);
+					r = *this / length;
 				}
 			}
 			return r;

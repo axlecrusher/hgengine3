@@ -65,8 +65,9 @@ TEST(VectorMathTests, SquaredLength) {
 
 TEST(VectorMathTests, DotProduct) {
 	vec4 a(2, 3, 4, 5);
-	float r = a.dot(a);
-	EXPECT_NEAR(r, 54.0, 0.000001);
+	vec4 b(6, 7, 8, 9);
+	float r = a.dot(b);
+	EXPECT_NEAR(r, 110.0, 0.000001);
 }
 
 TEST(VectorMathTests, Magnitude) {
