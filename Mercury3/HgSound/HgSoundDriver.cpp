@@ -7,13 +7,17 @@
 
 #include <HgSound\HgSoundDriver_libsoundio.h>
 #include <HgSound\HgSoundDriver_xaudio2.h>
+#include <EventSystem.h>
 
 std::unique_ptr<HgSound::IDriver> SOUND;
 
 namespace HgSound {
 
 std::unique_ptr<HgSound::IDriver> Create()
+//void Create()
 {
+	//std::unique_ptr<HgSound::IDriver> sound_service = std::make_unique<HgSound::XAudio2::XAudio2Driver>();
+	//ServiceLocator<IDriver>::provide(sound_service);
 	return std::make_unique<HgSound::XAudio2::XAudio2Driver>();
 }
 
@@ -123,3 +127,5 @@ std::unique_ptr<HgSound::IDriver> Create()
 		m_buffer.swap();
 	}
 }
+
+REGISTER_EVENT_TYPE(HgSound::Events::PlaySound3D);

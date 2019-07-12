@@ -53,6 +53,7 @@ private:
 };
 
 std::unique_ptr<HgSound::IDriver> Create();
+//void Create();
 
 //Driver is very closely tied to how libsoundio is expected to work. just rework
 //into libsoundio driver
@@ -141,6 +142,19 @@ std::unique_ptr<HgSound::IDriver> Create();
 			dest.reserve(src.size() + dest.size());
 			dest.insert(dest.end(), src.begin(), src.end());
 		}
+	}
+
+	namespace Events
+	{
+
+	struct PlaySound3D
+	{
+		EntityIdType emittingEntityId;
+		HgSound::Emitter emitter;
+		std::string filename;
+		float volume;
+	};
+
 	}
 }
 

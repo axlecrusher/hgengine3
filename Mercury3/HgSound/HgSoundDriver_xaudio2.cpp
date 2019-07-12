@@ -3,6 +3,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include <EventSystem.h>
+
 namespace HgSound {
 namespace XAudio2 {
 
@@ -22,6 +24,11 @@ XAudio2Driver::~XAudio2Driver()
 }
 
 bool XAudio2Driver::init() {
+
+	EventSystem::Register<Events::PlaySound3D>(this, [this](const Events::PlaySound3D& evt) {
+		m_playSoundEvents.push_back(Events::PlaySound3D(evt));
+	});
+
 	HRESULT hr;
 	hr = XAudio2Create(&m_xaudioEngine, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	if (hr != S_OK)
@@ -80,11 +87,35 @@ void XAudio2Driver::threadLoop()
 	{
 		Sleep(10);
 
+		processPlayEvents();
 		processDestroyQueue();
 		update3DAudio();
 //		updateVoices();
 	}
 }
+
+void XAudio2Driver::processPlayEvents()
+{
+	decltype(m_playSoundEvents)::vectorType tmp;
+	m_playSoundEvents.swap(tmp);
+
+	for (auto& evt : tmp)
+	{
+		auto asset = HgSound::SoundAsset::acquire(evt.filename);
+		if (asset->data())
+		{
+			auto snd = asset->newPlayingInstance();
+			snd->setVolume(evt.volume);
+			if (evt.emittingEntityId.isValid())
+			{
+				auto entity = HgEntity::Find(evt.emittingEntityId);
+				evt.emitter = snd->EmitFromEntity(entity);
+			}
+			SOUND->play3d(snd, evt.emitter);
+		}
+	}
+}
+
 
 void XAudio2Driver::processDestroyQueue()
 {

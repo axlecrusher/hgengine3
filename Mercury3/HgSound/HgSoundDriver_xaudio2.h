@@ -98,6 +98,8 @@ private:
 	void update3DAudio();
 	void startVoicePlaying(Voice& v);
 
+	void processPlayEvents();
+
 
 	bool m_initialized;
 	IXAudio2* m_xaudioEngine;
@@ -111,6 +113,7 @@ private:
 	std::vector<Voice> m_voices; //mutex protect
 
 	ProtectedVector<VoiceCallback*> m_toDestroy;
+	ProtectedVector<Events::PlaySound3D> m_playSoundEvents;
 
 	bool m_stop;
 	std::thread m_thread;
