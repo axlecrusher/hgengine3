@@ -70,6 +70,12 @@ static model_data LoadModel(const char* filename) {
 		sizeOfIndices = sizeof(uint16_t);
 	}
 
+	if (indices32 == nullptr && indices16 == nullptr)
+	{
+		fprintf(stderr, "No indices read");
+		return r;
+	}
+
 	auto vertices = std::shared_ptr<vbo_layout_vnut[]>(new vbo_layout_vnut[head.vertex_count]);
 
 	read = fread(vertices.get(), sizeof(*vertices.get()), head.vertex_count, f);
@@ -84,13 +90,17 @@ static model_data LoadModel(const char* filename) {
 		return r;
 	}
 
-	r.indices16 = indices16;
-	r.indices32 = indices32;
-	r.vertices = vertices;
-	r.vertex_count = head.vertex_count;
-	r.index_count = head.index_count;
+	r.storeVertices(vertices, head.vertex_count);
+	if (indices16)
+	{
+		r.storeIndices(indices16, head.index_count);
+	}
+	else
+	{
+		r.storeIndices(indices32, head.index_count);
+	}
 
-	return std::move(r);
+	return r;
 }
 
 static std::shared_ptr<RenderData> init_render_data() {
@@ -120,8 +130,13 @@ int8_t model_data::load(HgEntity* entity, const char* filename) {
 	entity->flags.destroy = true;
 
 	model_data mdl( LoadModel(filename) );
-	if (mdl.vertices == nullptr ||
-		(mdl.indices16 == nullptr)&&(mdl.indices32 == nullptr)) return -1;
+
+	auto vertices = mdl.getVertices();
+	auto indices16 = mdl.getIndices16();
+	auto indices32 = mdl.getIndices32();
+
+	if ( vertices == nullptr ||
+		(indices16 == nullptr)&&(indices32 == nullptr)) return -1;
 
 	/*
 	for (int i = 0; i < mdl.vertex_count; i++) {
@@ -132,15 +147,15 @@ int8_t model_data::load(HgEntity* entity, const char* filename) {
 		printf("%f %f %f %f\n",x, y, z, w);
 	}
 */
-	auto record = HgVbo::GenerateFrom(mdl.vertices.get(), mdl.vertex_count);
+	auto record = HgVbo::GenerateFrom(vertices.get(), mdl.getVertexCount());
 	rd->VertexVboRecord(record);
 
-	if (mdl.indices16 != nullptr) {
-		auto iRec = HgVbo::GenerateUniqueFrom(mdl.indices16.get(), mdl.index_count);
+	if (indices16 != nullptr) {
+		auto iRec = HgVbo::GenerateUniqueFrom(indices16.get(), mdl.getIndexCount());
 		rd->indexVboRecord(iRec);
 	}
-	else if (mdl.indices32 != nullptr) {
-		auto iRec = HgVbo::GenerateUniqueFrom(mdl.indices32.get(), mdl.index_count);
+	else if (indices32 != nullptr) {
+		auto iRec = HgVbo::GenerateUniqueFrom(indices32.get(), mdl.getIndexCount());
 		rd->indexVboRecord(iRec);
 	}
 
