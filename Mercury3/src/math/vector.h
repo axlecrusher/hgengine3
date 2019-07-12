@@ -124,8 +124,8 @@ namespace HgMath {
 			vector r = *this;
 			T length = magnitude();
 			//if very close to unit length, don't compute. more stable
-			if (std::abs(1.0f - length) > 1e-06f) {
-				if (length > 1e-06f) {
+			if (std::abs(1.0f - length) > tolerance<T>()) {
+				if (length > tolerance<T>()) {
 					r = *this / length;
 				}
 			}
@@ -142,7 +142,7 @@ namespace HgMath {
 
 		inline bool isZeroLength() const
 		{
-			return (squaredLength() < HgMath::square(1e-06f));
+			return (squaredLength() < tolerance<T>());
 		}
 
 		inline const T* raw() const { return xyz; }
@@ -156,6 +156,16 @@ namespace HgMath {
 	protected:
 
 		T xyz[fcount];
+	private:
+		template<typename X>
+		X tolerance() const { static_assert(false, "Not implemented"); }
+
+		template<>
+		double tolerance<double>() const { return 1e-15; }
+
+		template<>
+		float tolerance<float>() const { return 1e-06f; }
+
 	};
 /*
 	template<typename T>
