@@ -28,8 +28,8 @@ public:
 		gpuStruct* instanceDataPtr = m_instanceData.getBuffer();
 		for (auto itr = begin(); itr != end(); itr++) {
 			itr->T::update(dtime); //avoid vtable lookup
-			itr->T::getInstanceData(instanceDataPtr);
 			if (!itr->getEntity().flags.destroy) {
+				itr->T::getInstanceData(instanceDataPtr);
 				instanceDataPtr += stride;
 				m_instanceCount++;
 			}
