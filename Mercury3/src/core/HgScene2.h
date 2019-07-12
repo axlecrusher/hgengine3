@@ -20,6 +20,13 @@ class HgScene;
 //typedef HgEntity&(*factoryCallback)(HgScene* scene);
 typedef HgEntity*(*factoryCallback)(HgScene* scene);
 
+/* TODO: Instancing must use the same render data (mesh and material).
+ Only the transformation matrix should be allowed to change.
+ We need to be able to instance the same mesh using different shaders.
+ Currently we instance based on class type, forcing all instances to use
+ the same shader. This needs to be fixed.
+ */
+
 class HgScene
 {
 public:
