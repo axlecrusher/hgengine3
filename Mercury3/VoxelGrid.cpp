@@ -16,48 +16,50 @@ model_data generateVoxelVBO(uint8_t x, uint8_t y) {
 	model_data data;
 	uint32_t cube_count = x*y;
 
-	data.vertex_count = 24 * cube_count;
-	data.vertices = std::shared_ptr<vbo_layout_vnut[]>(new vbo_layout_vnut[data.vertex_count]);
+	const uint32_t vertexCount = 24 * cube_count;
+	auto vertices = std::shared_ptr<vbo_layout_vnut[]>(new vbo_layout_vnut[vertexCount]);
+	data.storeVertices(vertices, vertexCount);
 
-	data.index_count = 36 * cube_count;
-	data.indices16 = std::shared_ptr<uint16_t[]>(new uint16_t[data.index_count]);
+	const uint32_t indexCount = 36 * cube_count;
+	auto indices = std::shared_ptr<uint16_t[]>(new uint16_t[indexCount]);
+	data.storeIndices(indices, indexCount);
 
 	uint16_t vert_counter = 0;
 	uint16_t idx_counter = 0;
 	for (uint16_t i = 0; i < cube_count; i++) {
-		auto vertices = data.vertices.get();
+		auto vertArray = vertices.get();
 		for (uint8_t ix = 0; ix < 24; ++ix) {
 			vbo_layout_vnut vert = raw_cube_data[ix];
 			vert.v.object.x(vert.v.object.x() + (i % x) );
 			vert.v.object.y(vert.v.object.y() - ((i / x)%y));
 //			vert.v.components.z += i / 100;
-			vertices[vert_counter++] = vert;
+			vertArray[vert_counter++] = vert;
 		}
 
-		auto indices = data.indices16.get();
+		auto indexArray = indices.get();
 		for (uint32_t ix = 0; ix < 36; ++ix) {
-			indices[idx_counter++] = cube_indices[ix] + (24 * i);
+			indexArray[idx_counter++] = cube_indices[ix] + (24 * i);
 		}
 	}
-//	voxelGridVertices = vertices;
-	return std::move(data);
+
+	return data;
 }
 
 static void SetupRenderData() {
 	model_data data;
 	if (voxelGridVertices == NULL) {
 		data = generateVoxelVBO(10, 10);
-		voxelGridVertices = data.vertices;
-		indices = data.indices16;
+		voxelGridVertices = data.getVertices();
+		indices = data.getIndices16();
 	}
 
 	//crd = (OGLRenderData*)RenderData::Create();
 	crd = RenderData::Create();
 
-	auto rec = HgVbo::GenerateFrom(voxelGridVertices.get(), data.vertex_count);
+	auto rec = HgVbo::GenerateFrom(voxelGridVertices.get(), data.getVertexCount());
 	crd->VertexVboRecord(rec);
 
-	auto iRec = HgVbo::GenerateFrom(indices.get(), data.index_count);
+	auto iRec = HgVbo::GenerateFrom(indices.get(), data.getIndexCount());
 	crd->indexVboRecord(iRec);
 }
 
