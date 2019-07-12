@@ -225,8 +225,8 @@ int main()
 			float x = (i % 20)*1.1f;
 			float z = (i / 20)*1.1f;
 
-			HgEntity* entity = nullptr;
-			if (scene2.create_entity("rotating_cube", &entity) > 0)
+			HgEntity* entity = scene2.create_entity("rotating_cube");
+			if (entity)
 			{
 				entity->position(point(-10.0f + x, 5.0f, -2.0f - z));
 				entity->scale(0.3f);
@@ -236,11 +236,11 @@ int main()
 			}
 		}
 
-
-		if (Engine::create_entity("cube", &scene, &entity) > 0) {
+		entity = scene2.create_entity("cube");
+		if (entity) {
 			entity->position(point(2,2,-2));
 			entity->scale(0.3f);
-			entity->renderData()->shader = HgShader::acquire("basic_light2_v.glsl", "basic_light2_f.glsl");
+			entity->renderData()->shader = HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f.glsl");
 			//entity->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 		}
 
@@ -270,19 +270,19 @@ int main()
 		//	model_data d = LoadModel("test.hgmdl");
 	}
 
+	auto testSound = HgSound::SoundAsset::acquire("tone.wav");
+	auto snd = testSound->newPlayingInstance();
+	snd->setVolume(0.5);
 
-	HgEntity* teapotSquare = NULL;
-	if (Engine::create_entity("cube", &scene, &teapotSquare) > 0) {
+	HgEntity* teapotSquare = scene2.create_entity("cube");
+	if (teapotSquare > 0) {
 		teapotSquare->scale(0.3);
 		teapotSquare->position(point(0, 3, 0));
 		teapotSquare->inheritParentScale(false);
 		teapotSquare->setParent(teapot);
-	}
 
-	auto testSound = HgSound::SoundAsset::acquire("tone.wav");
-	auto snd = testSound->newPlayingInstance();
-	snd->setVolume(0.5);
-	SOUND->play3d(snd, snd->EmitFromEntity(teapotSquare));
+		SOUND->play3d(snd, snd->EmitFromEntity(teapotSquare));
+	}
 
 	HANDLE thread1 = CreateThread(NULL, 0, &PrintCtr, NULL, 0, NULL);
 
