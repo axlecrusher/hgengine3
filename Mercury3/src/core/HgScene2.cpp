@@ -7,23 +7,18 @@ namespace Engine {
 
 std::unordered_map<std::string, factoryCallback> HgScene::m_entityFactories;
 
-//void RegisterEntityType2(const char* c, Engine::factoryCallback clbk)
-//{
-//	Engine::HgScene::RegisterEntityFactory(c, clbk);
-//}
-
-bool HgScene::create_entity(const char* type_str, HgEntity** entity)
+HgEntity* HgScene::create_entity(const char* type_str)
 {
 	auto factory = m_entityFactories.find(type_str);
 
 	if (factory == m_entityFactories.end()) {
 		fprintf(stderr, "Unable to find entity type \"%s\"\n", type_str);
-		return false;
+		return nullptr;
 	}
 	factoryCallback clbk = factory->second;
-	*entity = &clbk(this);
+	HgEntity* entity = clbk(this);
 
-	return true;
+	return entity;
 }
 
 void HgScene::RegisterEntityFactory(const char* str, Engine::factoryCallback clbk)
@@ -33,13 +28,13 @@ void HgScene::RegisterEntityFactory(const char* str, Engine::factoryCallback clb
 
 void HgScene::update(HgTime dtime)
 {
-	for (auto i : m_collections) {
+	for (auto& i : m_collections) {
 		i->update(dtime);
 	}
 }
 
 void HgScene::EnqueueForRender(RenderQueue* queue) {
-	for (auto i : m_collections) {
+	for (auto& i : m_collections) {
 		i->EnqueueForRender(queue);
 	}
 }

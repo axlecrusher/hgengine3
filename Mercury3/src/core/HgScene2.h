@@ -17,15 +17,19 @@ namespace Engine
 
 class HgScene;
 
-typedef HgEntity&(*factoryCallback)(HgScene* scene);
-
-//void RegisterEntityType2(const char* c, Engine::factoryCallback);
+//typedef HgEntity&(*factoryCallback)(HgScene* scene);
+typedef HgEntity*(*factoryCallback)(HgScene* scene);
 
 class HgScene
 {
 public:
 
-	bool create_entity(const char* type_str, HgEntity** entity);
+	/*	Attempts to create an object of type type_str.
+		Returns nullptr on failure. HgEntity pointer on success.
+		Returned pointer is managed, do not delete.
+	*/
+	HgEntity* create_entity(const char* type_str);
+
 	void EnqueueForRender(RenderQueue* queue);
 	void update(HgTime dtime);
 
@@ -52,8 +56,14 @@ private:
 	std::vector<IUpdatableCollectionPtr> m_collections;
 	std::unordered_map< std::string, IUpdatableCollectionPtr> m_collectionMap;
 
-	//using factoryCallback = std::function<HgEntity&(HgScene* scene)>;
 	static std::unordered_map<std::string, factoryCallback> m_entityFactories;
 };
+
+template<typename T>
+static HgEntity* generate_entity(Engine::HgScene* scene) {
+	auto collection = scene->getCollectionOf<T>();
+	auto& item = collection->newItem();
+	return &item.getEntity();
+}
 
 }
