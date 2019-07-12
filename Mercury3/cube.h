@@ -28,8 +28,9 @@ namespace Cube {
 		using InstanceCollection = InstancedCollection<Cube, gpuStruct, 1>;
 		using InstanceCollectionPtr = std::shared_ptr<InstanceCollection>;
 
-		virtual void update(HgTime tdelta) {}; //ew
-		virtual void update(HgTime tdelta, gpuStruct* instanceData);
+		virtual void update(HgTime tdelta);
+		virtual void getInstanceData(gpuStruct* instanceData);
+
 		void init();
 	private:
 	};
@@ -45,8 +46,9 @@ namespace RotatingCube {
 		using InstanceCollection = InstancedCollection<RotatingCube, gpuStruct, 1>;
 		using InstanceCollectionPtr = std::shared_ptr<InstanceCollection>;
 
-		virtual void update(HgTime tdelta) {}; //ew
-		virtual void update(HgTime tdelta, gpuStruct* instanceData);
+		virtual void update(HgTime tdelta);
+		virtual void getInstanceData(gpuStruct* instanceData);
+
 		void init();
 	private:
 		HgTime m_age;

@@ -83,9 +83,10 @@ void* change_to_cube(HgEntity* entity) {
 
 namespace Cube {
 
-void Cube::update(HgTime dt, gpuStruct* instanceData) {
-	using namespace HgMath;
+void Cube::update(HgTime dt) {
+}
 
+void Cube::getInstanceData(gpuStruct* instanceData) {
 	const auto mat = getEntity().computeWorldSpaceMatrix();
 	mat.store(instanceData->matrix);
 }
@@ -103,7 +104,7 @@ void Cube::init() {
 
 namespace RotatingCube {
 
-	void RotatingCube::update(HgTime dt, gpuStruct* instanceData) {
+	void RotatingCube::update(HgTime dt) {
 		using namespace HgMath;
 		m_age += dt;
 
@@ -116,6 +117,9 @@ namespace RotatingCube {
 		const double deg = degTime * m_age.msec();
 		const quaternion rotation = quaternion::fromEuler(angle::ZERO, angle::deg(deg), angle::ZERO);
 		getEntity().orientation(rotation);
+	}
+
+	void RotatingCube::getInstanceData(gpuStruct* instanceData) {
 		const auto mat = getEntity().computeWorldSpaceMatrix();
 		mat.store(instanceData->matrix);
 	}

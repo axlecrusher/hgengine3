@@ -27,7 +27,8 @@ public:
 
 		gpuStruct* instanceDataPtr = m_instanceData.getBuffer();
 		for (auto itr = begin(); itr != end(); itr++) {
-			itr->T::update(dtime, instanceDataPtr); //avoid vtable lookup
+			itr->T::update(dtime); //avoid vtable lookup
+			itr->T::getInstanceData(instanceDataPtr);
 			if (!itr->getEntity().flags.destroy) {
 				instanceDataPtr += stride;
 				m_instanceCount++;
@@ -129,5 +130,5 @@ private:
 template<typename gpu_structure>
 class IUpdatableInstance : public IUpdatable {
 public:
-	virtual void update(HgTime tdelta, gpu_structure* instanceData) = 0;
+	virtual void getInstanceData(gpu_structure* instanceData) = 0;
 };
