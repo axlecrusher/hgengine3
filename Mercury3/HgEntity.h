@@ -265,6 +265,9 @@ public:
 		inline void setName(const std::string& name) { m_extendedData->setName(name); }
 		inline std::string& getName() const { m_extendedData->getName(); }
 
+		/*	Find an existing entity by id. Returned pointer is managed, do not delete.
+			Return nullptr if the entity does not exist.
+		*/
 		static HgEntity* Find(EntityIdType id);
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }
