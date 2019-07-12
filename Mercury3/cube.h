@@ -18,21 +18,32 @@ struct CubeIndices {
 namespace Cube {
 	constexpr uint32_t vertexCount = 24;
 	constexpr uint32_t indiceCount = 36;
+
+	struct gpuStruct {
+		float matrix[16];
+	};
+
+	class Cube : public IUpdatableInstance<gpuStruct> {
+	public:
+		using InstanceCollection = InstancedCollection<Cube, gpuStruct, 1>;
+		using InstanceCollectionPtr = std::shared_ptr<InstanceCollection>;
+
+		virtual void update(HgTime tdelta) {}; //ew
+		virtual void update(HgTime tdelta, gpuStruct* instanceData);
+		void init();
+	private:
+	};
 }
 
 namespace RotatingCube {
 	struct gpuStruct {
 		float matrix[16];
-//		quaternion rotation;
 	};
 
 	class RotatingCube : public IUpdatableInstance<gpuStruct> {
 	public:
 		using InstanceCollection = InstancedCollection<RotatingCube, gpuStruct, 1>;
 		using InstanceCollectionPtr = std::shared_ptr<InstanceCollection>;
-
-		//static RotatingCube& RotatingCube::Generate();
-		static InstanceCollectionPtr getInstanceCollection();
 
 		virtual void update(HgTime tdelta) {}; //ew
 		virtual void update(HgTime tdelta, gpuStruct* instanceData);

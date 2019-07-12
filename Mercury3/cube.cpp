@@ -63,10 +63,6 @@ uint8_t cube_indices[36] = {
 //instanced render data
 static std::shared_ptr<RenderData> crd;
 
-static void destroy(HgEntity* e) {
-	e->destroy();
-}
-
 static void SetupRenderData() {
 	crd = RenderData::Create();
 
@@ -83,6 +79,26 @@ void* change_to_cube(HgEntity* entity) {
 
 	entity->setRenderData(crd);
 	return nullptr;
+}
+
+namespace Cube {
+
+void Cube::update(HgTime dt, gpuStruct* instanceData) {
+	using namespace HgMath;
+
+	const auto mat = getEntity().computeWorldSpaceMatrix();
+	mat.store(instanceData->matrix);
+}
+
+void Cube::init() {
+	IUpdatableInstance<gpuStruct>::init();
+
+	HgEntity* e = &getEntity();
+	change_to_cube(e);
+
+	RenderDataPtr rd = std::make_shared<RenderData>(*crd);
+	e->setRenderData(rd);
+}
 }
 
 namespace RotatingCube {
@@ -105,6 +121,8 @@ namespace RotatingCube {
 	}
 
 	void RotatingCube::init() {
+		IUpdatableInstance<gpuStruct>::init();
+
 		HgEntity* e = &getEntity();
 		change_to_cube(e);
 
@@ -115,12 +133,5 @@ namespace RotatingCube {
 	}
 }
 
-static HgEntity& generate_rotating_cube(Engine::HgScene* scene) {
-	auto collection = scene->getCollectionOf<RotatingCube::RotatingCube::InstanceCollection>();
-	auto& rCube = collection->newItem();
-	return rCube.getEntity();
-}
-
-//REGISTER_LINKTIME(rotating_cube, generate_rotating_cube);
-REGISTER_LINKTIME2(rotating_cube, generate_rotating_cube);
-REGISTER_LINKTIME(cube, change_to_cube)
+REGISTER_LINKTIME2(rotating_cube, RotatingCube::RotatingCube);
+REGISTER_LINKTIME2(cube, Cube::Cube);
