@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 //Mutex guarded access to type variable
 template<typename T>
 class GuardedType
@@ -36,6 +38,20 @@ public:
 		std::lock_guard<std::mutex> lock(m_mutex);
 		return m_value;
 	}
+
+	class Accessor
+	{
+	public:
+		Accessor(const GuardedType<T> x)
+			:m_lock(x.m_mutex), m_ptr(&x.m_value)
+		{}
+
+		T& get() const { return *m_ptr; }
+	private:
+		T* m_ptr;
+		std::lock_guard<std::mutex> m_lock;
+	};
+
 
 private:
 	T m_value;
