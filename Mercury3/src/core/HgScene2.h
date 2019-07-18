@@ -25,6 +25,10 @@ typedef HgEntity*(*factoryCallback)(HgScene* scene);
  We need to be able to instance the same mesh using different shaders.
  Currently we instance based on class type, forcing all instances to use
  the same shader. This needs to be fixed.
+
+
+
+ shaders, vbo, textures?
  */
 
 class HgScene
