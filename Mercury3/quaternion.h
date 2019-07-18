@@ -42,8 +42,8 @@ public:
 	inline float z() const { return wxyz[3]; }
 	inline void z(float a) { wxyz[3] = a; }
 
-	inline float squaredLength() const {
-		return wxyz.squaredLength();
+	inline float squaredMagnitude() const {
+		return wxyz.squaredMagnitude();
 	}
 
 	inline float dot(const quaternion& rhs) const {

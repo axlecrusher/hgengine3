@@ -37,14 +37,14 @@ namespace {
 		quaternion r2 = b.normal();
 
 		EXPECT_NEAR(r1.magnitude(), 1.0, 0.000001);
-		EXPECT_NEAR(r1.squaredLength(), 1.0, 0.000001);
+		EXPECT_NEAR(r1.squaredMagnitude(), 1.0, 0.000001);
 		EXPECT_NEAR(r1.w(), 0.18257418274879456, 0.000001);
 		EXPECT_NEAR(r1.x(), 0.36514836549758911, 0.000001);
 		EXPECT_NEAR(r1.y(), 0.54772257804870605, 0.000001);
 		EXPECT_NEAR(r1.z(), 0.73029673099517822, 0.000001);
 
 		EXPECT_NEAR(r2.magnitude(), 1.0, 0.000001);
-		EXPECT_NEAR(r2.squaredLength(), 1.0, 0.000001);
+		EXPECT_NEAR(r2.squaredMagnitude(), 1.0, 0.000001);
 		EXPECT_NEAR(r2.w(), 0.948209345, 0.000001);
 		EXPECT_NEAR(r2.x(), 0.316069782, 0.000001);
 		EXPECT_NEAR(r2.y(), 0.0316069759, 0.000001);

@@ -112,22 +112,25 @@ namespace HgMath {
 			return sum1 + sum2;
 		}
 
-		inline T squaredLength() const {
+		inline T squaredMagnitude() const {
 			return this->dot(*this);
 		}
 
 		inline T magnitude() const {
-			return HgMath::sqrt(squaredLength());
+			return HgMath::sqrt(squaredMagnitude());
 		}
 
 		inline vector normal() const {
-			vector r = *this;
-			T length = magnitude();
-			//if very close to unit length, don't compute. more stable
-			if (std::abs(1.0f - length) > tolerance<T>()) {
-				if (length > tolerance<T>()) {
-					r = *this / length;
-				}
+			vector r;
+			double sqmag = squaredMagnitude();
+			//https://stackoverflow.com/questions/11667783/quaternion-and-normalization/12934750#12934750
+			if (std::abs(1.0 - sqmag) < 2.107342e-08)
+			{
+				r = this->scale(T(2.0 / (1.0 + sqmag)));
+			}
+			else
+			{
+				r = *this / T(::sqrt(sqmag));
 			}
 			return r;
 		}
@@ -142,7 +145,7 @@ namespace HgMath {
 
 		inline bool isZeroLength() const
 		{
-			return (squaredLength() < tolerance<T>());
+			return (squaredMagnitude() < tolerance<T>());
 		}
 
 		inline const T* raw() const { return xyz; }

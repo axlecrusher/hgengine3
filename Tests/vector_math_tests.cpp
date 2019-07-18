@@ -59,7 +59,7 @@ TEST(VectorMathTests, Division) {
 
 TEST(VectorMathTests, SquaredLength) {
 	vec4 a(2, 3, 4, 5);
-	float r = a.squaredLength();
+	float r = a.squaredMagnitude();
 	EXPECT_NEAR(r, 54.0, 0.000001);
 }
 
