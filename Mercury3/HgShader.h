@@ -5,7 +5,7 @@
 #include <HgCamera.h>
 #include <memory>
 
-#include <RenderData.h>
+//#include <RenderData.h>
 #include <math/matrix.h>
 
 class RenderData;

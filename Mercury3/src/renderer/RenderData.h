@@ -1,26 +1,10 @@
 #pragma once
 
 #include <stdint.h>
-#include <memory>
 
-#include <HgShader.h>
-//#include <HgTexture.h>
 #include <HgVbo.h>
-
 #include <HgGPUBuffer.h>
-#include <HgTexture.h>
-#include <vector>
-
-class HgShader;
-//class IHgVbo;
-class HgTexture;
-
-enum BlendMode : uint8_t {
-	BLEND_NORMAL = 0,
-	BLEND_ADDITIVE,
-	BLEND_ALPHA,
-	BLEND_INVALID = 0xFF
-};
+#include <Material.h>
 
 //enum RenderFlags : uint8_t {
 //	NONE = 0,
@@ -28,47 +12,6 @@ enum BlendMode : uint8_t {
 //	DEPTH_WRITE = 2
 //};
 
-class Material
-{
-public:
-	Material();
-	Material(const Material& other);
-
-	void clearTextureIDs();
-	void setTexture(const HgTexture* t);
-
-	void setShader(HgShader* shader);
-	HgShader& getShader() { return *m_shader.get(); }
-
-	void updateGpuTextures();
-	//bool updateTextures() const { return m_updateTextures; }
-
-	void addTexture(const HgTexture::TexturePtr& texture);
-	void setUpdateTextures(bool t) { m_updateTextures = t; }
-
-	bool isTransparent() const { return m_transparent; }
-	void setTransparent(bool t) { m_transparent = t; }
-
-	bool needsTexturesUpdated() const { return m_updateTextures; }
-
-	uint32_t getGPUTextureHandle(HgTexture::TextureType t) const { return m_gpuTextureHandles[t]; }
-
-	BlendMode blendMode() const { return m_blendMode; }
-	void setBlendMode(BlendMode m) { m_blendMode = m; }
-
-private:
-	struct ShaderReleaser {
-		void operator()(HgShader* shader);
-	};
-
-	std::unique_ptr<HgShader, ShaderReleaser> m_shader;
-	std::vector< HgTexture::TexturePtr > m_textures;
-	BlendMode m_blendMode;
-	uint32_t m_gpuTextureHandles[HgTexture::TEXTURE_TYPE_COUNT];
-
-	bool m_transparent;
-	bool m_updateTextures;
-};
 
 class RenderData {
 private:
@@ -78,9 +21,6 @@ private:
 	VboIndex m_colorVbo;
 
 public:
-	//typedef std::shared_ptr<RenderData>(*newRenderDataCallback)();
-	//typedef void(*indiceRenderFunc)(RenderData* rd);
-	//static newRenderDataCallback Create;
 	static std::shared_ptr<RenderData> Create() { return std::make_shared<RenderData>(); }
 
 	struct Flags {
@@ -117,14 +57,8 @@ public:
 
 	uint32_t instanceCount;
 
-	//HgShader* shader;
-
-	//RenderFlags renderFlags;
-
 	//std::shared_ptr<IHgGPUBuffer> gpuBuffer;
 	IHgGPUBuffer* gpuBuffer;
-
-	//std::vector< HgTexture::TexturePtr > textures;
 
 	Flags renderFlags;
 
