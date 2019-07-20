@@ -18,9 +18,7 @@ HgShader::createShaderCallback HgShader::Create = nullptr;
 typedef struct shader_entry {
 	uint32_t use_count;
 	std::unique_ptr<HgShader> shader;
-
-	char* vertex_path;
-	char* frag_path;
+	std::string vertex_path, frag_path;
 } shader_entry;
 
 /* keep shader_names seperate, we iterate through the list, want it cached*/
@@ -71,8 +69,8 @@ HgShader* HgShader::acquire(const char* vert, const char* frag) {
 	shader_names[i] = name;
 	shader_list[i].use_count = 1;
 	shader_list[i].shader = HgShader::Create(vert, frag);
-	shader_list[i].frag_path = str_cat(frag, "");
-	shader_list[i].vertex_path = str_cat(vert, "");
+	shader_list[i].frag_path = std::string(frag);
+	shader_list[i].vertex_path = std::string(vert);
 	WatchFileForChange(frag, ShaderFileChanged, shader_list+i);
 	WatchFileForChange(vert, ShaderFileChanged, shader_list + i);
 
