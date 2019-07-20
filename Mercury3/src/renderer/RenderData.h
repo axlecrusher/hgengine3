@@ -28,6 +28,48 @@ enum BlendMode : uint8_t {
 //	DEPTH_WRITE = 2
 //};
 
+class Material
+{
+public:
+	Material();
+	Material(const Material& other);
+
+	void clearTextureIDs();
+	void setTexture(const HgTexture* t);
+
+	void setShader(HgShader* shader);
+	HgShader& getShader() { return *m_shader.get(); }
+
+	void updateGpuTextures();
+	//bool updateTextures() const { return m_updateTextures; }
+
+	void addTexture(const HgTexture::TexturePtr& texture);
+	void setUpdateTextures(bool t) { m_updateTextures = t; }
+
+	bool isTransparent() const { return m_transparent; }
+	void setTransparent(bool t) { m_transparent = t; }
+
+	bool needsTexturesUpdated() const { return m_updateTextures; }
+
+	uint32_t getGPUTextureHandle(HgTexture::TextureType t) const { return m_gpuTextureHandles[t]; }
+
+	BlendMode blendMode() const { return m_blendMode; }
+	void setBlendMode(BlendMode m) { m_blendMode = m; }
+
+private:
+	struct ShaderReleaser {
+		void operator()(HgShader* shader);
+	};
+
+	std::unique_ptr<HgShader, ShaderReleaser> m_shader;
+	std::vector< HgTexture::TexturePtr > m_textures;
+	BlendMode m_blendMode;
+	uint32_t m_gpuTextureHandles[HgTexture::TEXTURE_TYPE_COUNT];
+
+	bool m_transparent;
+	bool m_updateTextures;
+};
+
 class RenderData {
 private:
 	//We need to be able to support multiple VBOs without hardcoding more here.
@@ -42,13 +84,11 @@ public:
 	static std::shared_ptr<RenderData> Create() { return std::make_shared<RenderData>(); }
 
 	struct Flags {
-		Flags() : FACE_CULLING(true), DEPTH_WRITE(true), updateTextures(false), transparent(false)
+		Flags() : FACE_CULLING(true), DEPTH_WRITE(true)
 		{}
 
 		bool FACE_CULLING : 1;
 		bool DEPTH_WRITE : 1;
-		bool updateTextures : 1;
-		bool transparent : 1;
 	};
 
 	RenderData();
@@ -58,8 +98,6 @@ public:
 
 	void destroy();
 	void init();
-	void clearTextureIDs();
-	void setTexture(const HgTexture* t);
 
 	IHgVbo* hgVbo() { return m_vertexVbo.VboRec().Vbo().get(); }
 	IHgVbo* indexVbo() { return m_indexVbo.VboRec().Vbo().get(); }
@@ -74,29 +112,24 @@ public:
 	void colorVbo(const VboIndex& vbo_index) { m_colorVbo = vbo_index; }
 	//inline void colorVbo(std::unique_ptr<IHgVbo>& vbo) { m_colorVbo = std::move(vbo); }
 
-	void updateGpuTextures();
-	bool updateTextures() const { return renderFlags.updateTextures; }
-	void updateTextures(bool t) { renderFlags.updateTextures = t; }
-
-	uint32_t getGPUTextureHandle(HgTexture::TextureType t) const { return m_gpuTextureHandles[t]; }
+	Material& getMaterial() { return m_material; }
+	const Material& getMaterial() const { return m_material; }
 
 	uint32_t instanceCount;
 
-	HgShader* shader;
+	//HgShader* shader;
 
 	//RenderFlags renderFlags;
 
 	//std::shared_ptr<IHgGPUBuffer> gpuBuffer;
 	IHgGPUBuffer* gpuBuffer;
 
-	std::vector< HgTexture::TexturePtr > textures;
+	//std::vector< HgTexture::TexturePtr > textures;
 
-	BlendMode blendMode;
 	Flags renderFlags;
 
 private:
-	uint32_t m_gpuTextureHandles[HgTexture::TEXTURE_TYPE_COUNT];
-
+	Material m_material;
 };
 
 typedef std::shared_ptr<RenderData> RenderDataPtr;

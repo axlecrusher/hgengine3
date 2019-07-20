@@ -33,6 +33,24 @@ static void ShaderFileChanged(void* data) {
 	entry->shader->load();
 }
 
+HgShader* HgShader::acquire(HgShader* shader)
+{
+	for (int i = 0; i < MAX_SHADERS; ++i)
+	{
+		if (shader_list[i].shader.get() == shader)
+		{
+			if (shader_list[i].use_count > 0)
+			{
+				shader_list[i].use_count++;
+				return shader;
+			}
+			return nullptr;
+		}
+	}
+	return nullptr;
+}
+
+
 HgShader* HgShader::acquire(const char* vert, const char* frag) {
 	uint32_t i = 0;
 	char* name = str_cat(vert, frag);

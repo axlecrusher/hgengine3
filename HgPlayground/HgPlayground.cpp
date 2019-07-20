@@ -231,7 +231,7 @@ int main()
 				entity->position(point(-10.0f + x, 5.0f, -2.0f - z));
 				entity->scale(0.3f);
 				auto rd = entity->renderData();
-				rd->shader = HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl");
+				rd->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl"));
 				cubeId = entity->getEntityId();
 			}
 		}
@@ -240,7 +240,7 @@ int main()
 		if (entity) {
 			entity->position(point(2,2,-2));
 			entity->scale(0.3f);
-			entity->renderData()->shader = HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f.glsl");
+			entity->renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f.glsl"));
 			//entity->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 		}
 
@@ -250,7 +250,7 @@ int main()
 			//		entity->scale = 100.0f;
 			entity->position().z(-10);
 			//		toQuaternion2(0, -90, 0, &entity->orientation);
-			entity->renderData()->shader = HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl");
+			entity->renderData()->getMaterial().setShader(HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl"));
 		}
 	}
 
@@ -260,9 +260,9 @@ int main()
 		grid->scale(100.0f);
 		grid->position().z(-4);
 		grid->orientation(quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO));
-		grid->renderData()->shader = HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl");
-		grid->renderData()->blendMode = BLEND_ADDITIVE;
-		grid->renderData()->renderFlags.transparent = true;
+		grid->renderData()->getMaterial().setShader(HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl"));
+		grid->renderData()->getMaterial().setBlendMode(BLEND_ADDITIVE);
+		grid->renderData()->getMaterial().setTransparent(true);
 		grid->renderData()->renderFlags.DEPTH_WRITE = false;
 		grid->setName("Grid");
 		grid->setDrawOrder(100);

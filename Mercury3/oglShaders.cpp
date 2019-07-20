@@ -245,7 +245,7 @@ void HgOglShader::uploadMatrices(const float* worldSpaceMatrix, const HgMath::ma
 void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
 
 	glActiveTexture(GL_TEXTURE0);
-	auto textId = rd.getGPUTextureHandle(HgTexture::DIFFUSE);
+	auto textId = rd.getMaterial().getGPUTextureHandle(HgTexture::DIFFUSE);
 	glBindTexture(GL_TEXTURE_2D, textId);
 	if ((m_uniformLocations[U_DIFFUSE_TEXTURE] > -1) && (textId > 0)) {
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);
@@ -253,7 +253,7 @@ void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
 	}
 
 	glActiveTexture(GL_TEXTURE1);
-	textId = rd.getGPUTextureHandle(HgTexture::SPECULAR);
+	textId = rd.getMaterial().getGPUTextureHandle(HgTexture::SPECULAR);
 	glBindTexture(GL_TEXTURE_2D, textId);
 	if ((m_uniformLocations[U_SPECULAR_TEXTURE] > -1) && (textId > 0)) {
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
@@ -261,7 +261,7 @@ void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
 	}
 
 	glActiveTexture(GL_TEXTURE2);
-	textId = rd.getGPUTextureHandle(HgTexture::NORMAL);
+	textId = rd.getMaterial().getGPUTextureHandle(HgTexture::NORMAL);
 	glBindTexture(GL_TEXTURE_2D, textId);
 	if ((m_uniformLocations[U_NORMAL_TEXTURE] > -1) && (textId > 0)) {
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);

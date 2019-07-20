@@ -22,6 +22,10 @@ class HgShader {
 		virtual void uploadMatrices(const float* worldSpaceMatrix, const HgMath::mat4f& projection, const HgMath::mat4f& view) = 0;
 
 		static HgShader* acquire(const char* vert, const char* frag);
+
+		//increase the shader use count if it exists
+		static HgShader* HgShader::acquire(HgShader* shader);
+
 		static void release(HgShader* shader);
 
 		typedef std::unique_ptr<HgShader>(*createShaderCallback)(const char* vert, const char* frag);

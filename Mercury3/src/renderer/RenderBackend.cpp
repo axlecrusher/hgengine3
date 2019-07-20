@@ -20,21 +20,18 @@ static void submit_for_render_serial(const Viewport& vp, RenderData* renderData,
 	RENDERER()->setViewport(vp);
 
 	//load texture data to GPU here. Can this be made to be done right after loading the image data, regardless of thread?
-	if (renderData->updateTextures()) {
-		renderData->updateGpuTextures();
-		renderData->updateTextures(false);
-	}
+	renderData->getMaterial().updateGpuTextures();
 
-	HgShader* shader = renderData->shader;
-	if (shader) {
-		shader->enable();
+	HgShader& shader = renderData->getMaterial().getShader();
+	//if (shader) {
+		shader.enable();
 		//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
 		//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 		//shader->setGlobalUniforms(*camera);
 		//const auto spacial = e->getSpacialData();
-		shader->uploadMatrices(worldSpaceMatrix, projection, viewMatrix);
-		shader->setLocalUniforms(*renderData);
-	}
+		shader.uploadMatrices(worldSpaceMatrix, projection, viewMatrix);
+		shader.setLocalUniforms(*renderData);
+	//}
 
 	renderData->render();
 }
@@ -78,7 +75,7 @@ void RenderQueue::Enqueue(const HgEntity* e)
 
 void RenderQueue::Enqueue(RenderDataPtr& rd, const HgMath::mat4f& wsm, int8_t drawOrder)
 {
-	if (rd->renderFlags.transparent) {
+	if (rd->getMaterial().isTransparent()) {
 		//order by distance back to front?
 		m_transparentEntities.emplace_back(wsm, rd, drawOrder);
 	}

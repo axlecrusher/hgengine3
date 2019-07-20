@@ -15,7 +15,7 @@ int8_t draw_render_packet(const render_packet* p) {
 
 //	HgEntity* e = p->scene->elements + p->element_idx;
 	RenderData* rd = p->renderData;
-	rd->shader->enable();
+	rd->getMaterial().getShader().enable();
 //	VCALL(rd->shader, enable);
 
 	//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
