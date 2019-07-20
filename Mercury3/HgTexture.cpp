@@ -11,7 +11,7 @@ AssetManager<HgTexture> HgTexture::imageMap;
 
 HgTexture::TexturePtr HgTexture::acquire(const std::string& path, TextureType type) {
 	bool isNew = false;
-	HgTexture::TexturePtr ptr = imageMap.get(path, &isNew);
+	auto ptr = imageMap.get(path, &isNew);
 	if (ptr == nullptr) {
 		fprintf(stderr, "Could not open image \"%s\"", path.c_str());
 	}
