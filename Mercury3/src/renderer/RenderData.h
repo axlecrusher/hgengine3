@@ -36,9 +36,6 @@ public:
 
 	void render();
 
-	void destroy();
-	void init();
-
 	IHgVbo* hgVbo() { return m_vertexVbo.VboRec().Vbo().get(); }
 	IHgVbo* indexVbo() { return m_indexVbo.VboRec().Vbo().get(); }
 	IHgVbo* colorVbo() { return m_colorVbo.VboRec().Vbo().get(); }
