@@ -44,6 +44,10 @@ public:
 	~HgTexture();
 
 	typedef void(*shared_ptr_delete)(HgTexture* t);
+
+	/* TODO: I would like to make TexturePtr const since textures are immutible
+	but current GPU state data is stored in the texture and needs to be
+	updated after texture data is loaded. */
 	typedef std::shared_ptr<HgTexture> TexturePtr;
 
 	//used to obtain an image.

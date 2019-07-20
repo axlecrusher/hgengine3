@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <oglShaders.h>
 
+#include <core/HgScene2.h>
+
 #include <HgVbo.h>
 //static vtable_index VTABLE_INDEX;
 //instanced render data
@@ -51,4 +53,26 @@ static void* triangle_factory(HgEntity* e) {
 	return nullptr;
 }
 
+namespace Triangle {
+
+void Triangle::update(HgTime dt) {
+}
+
+void Triangle::getInstanceData(gpuStruct* instanceData) {
+	const auto mat = getEntity().computeWorldSpaceMatrix();
+	mat.store(instanceData->matrix);
+}
+
+void Triangle::init() {
+	IUpdatableInstance<gpuStruct>::init();
+
+	HgEntity* e = &getEntity();
+	change_to_triangle(e);
+
+	RenderDataPtr rd = std::make_shared<RenderData>(*trd);
+	e->setRenderData(rd);
+}
+}
+
+REGISTER_LINKTIME2(triangle, Triangle::Triangle);
 REGISTER_LINKTIME(triangle, triangle_factory)

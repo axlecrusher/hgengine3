@@ -209,16 +209,22 @@ int main()
 	{
 		HgEntity* entity = NULL;
 
-		if (Engine::create_entity("triangle", &scene, &entity) > 0) {
-			const auto tmp = entity->position();
-			entity->position(tmp.x(1.5f).z(1.0f));
-			//	toQuaternion2(0, 0, 90, &entity->orientation);
-		}
+		{
+			HgEntity* entity = scene2.create_entity("triangle");
+			if (entity) {
+				const auto tmp = entity->position();
+				entity->position(tmp.x(1.5f).z(1.0f));
+				entity->renderData()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
+				//	toQuaternion2(0, 0, 90, &entity->orientation);
+			}
 
-		if (Engine::create_entity("triangle", &scene, &entity) > 0) {
-			const auto tmp = entity->position();
-			entity->position(tmp.x(0.0f).z(-2.0f));
-			//	toQuaternion2(45,0,0,&entity->orientation);
+			entity = scene2.create_entity("triangle");
+			if (entity) {
+				const auto tmp = entity->position();
+				entity->position(tmp.x(0.0f).z(-2.0f));
+				entity->renderData()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
+				//	toQuaternion2(45,0,0,&entity->orientation);
+			}
 		}
 
 		for (i = 0; i < ANI_TRIS; i++) {
