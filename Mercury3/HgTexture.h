@@ -58,7 +58,9 @@ public:
 	inline TextureType getType() const { return m_type; }
 
 	//Indicates that texture needs to be sent to gpu
-	bool NeedsGPUUpdate() const { return needsUpdate; }
+	inline bool NeedsGPUUpdate() const { return needsUpdate; }
+
+	inline size_t getUniqueId() const { return m_uniqueId; }
 
 	void sendToGPU();
 	inline uint32_t getGPUId() const { return gpuId; }
@@ -95,6 +97,8 @@ private:
 
 	uint32_t gpuId;
 	bool needsUpdate;
+
+	size_t m_uniqueId;
 
 	static AssetManager<HgTexture> imageMap;
 	friend AssetManager<HgTexture>;

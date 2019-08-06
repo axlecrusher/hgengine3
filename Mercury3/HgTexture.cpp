@@ -33,6 +33,7 @@ HgTexture::HgTexture()
 	data = nullptr;
 	gpuId = 0;
 	m_type = DIFFUSE;
+	m_uniqueId = 0;
 }
 
 
@@ -116,6 +117,9 @@ bool HgTexture::load(const std::string& path) {
 }
 
 bool HgTexture::load_internal(std::string path) {
+	std::hash<std::string> hashFunc;
+	m_uniqueId = hashFunc(path);
+
 	char filecode[4];
 	FILE *f = fopen(path.c_str(), "rb");
 	if (f == nullptr) {

@@ -41,6 +41,7 @@ Material::Material(const Material& other)
 void Material::setShader(HgShader* shader)
 {
 	m_shader = std::unique_ptr<HgShader, ShaderDeleter>(shader);
+	m_recomputeHash = true;
 }
 
 void Material::ShaderDeleter::operator()(HgShader* shader)
@@ -51,4 +52,33 @@ void Material::ShaderDeleter::operator()(HgShader* shader)
 void Material::addTexture(const HgTexture::TexturePtr& texture) {
 	m_textures.push_back(texture);
 	m_updateTextures = true;
+	m_recomputeHash = true;
+}
+
+void Material::computeHash()
+{
+	size_t hash = m_shader->getUniqueId();
+	for (const auto& t : m_textures)
+	{
+		hash ^= t->getUniqueId();
+	}
+
+	std::hash<uint32_t> ih;
+	hash ^= ih(m_blendMode);
+
+	std::hash<bool> bh;
+	hash ^= bh(m_transparent);
+
+	m_uniqueId = hash;
+}
+
+size_t  Material::getUniqueId()
+{
+	if (m_recomputeHash)
+	{
+		computeHash();
+	}
+	m_recomputeHash = false;
+
+	return m_uniqueId;
 }

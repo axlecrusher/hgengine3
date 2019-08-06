@@ -171,15 +171,20 @@ std::unique_ptr<HgShader> HgOglShader::Create(const char* vert, const char* frag
 
 
 	auto source = std::make_unique<shader_source>();
-	source->vert_file_path = str_copy(vert);
-	source->frag_file_path = str_copy(frag);
+
+	source->vert_file_path = vert;
+	source->frag_file_path = frag;
+
+	std::hash<std::string> hash;
+	s->setUniqueId(hash(source->vert_file_path + source->frag_file_path));
+
 	s->setProgramCode(source);
 
 	return s;
 }
 
 HgOglShader::HgOglShader()
-	:program_id(0), m_loadState(LoadState::NOT_LOADED)
+	:HgShader(), program_id(0), m_loadState(LoadState::NOT_LOADED)
 {
 	memset(m_uniformLocations, -1, sizeof(m_uniformLocations));
 }

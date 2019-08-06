@@ -31,16 +31,20 @@ public:
 	void setUpdateTextures(bool t) { m_updateTextures = t; }
 
 	bool isTransparent() const { return m_transparent; }
-	void setTransparent(bool t) { m_transparent = t; }
+	void setTransparent(bool t) { m_transparent = t; m_recomputeHash = true;	}
 
 	bool needsTexturesUpdated() const { return m_updateTextures; }
 
 	uint32_t getGPUTextureHandle(HgTexture::TextureType t) const { return m_gpuTextureHandles[t]; }
 
 	BlendMode blendMode() const { return m_blendMode; }
-	void setBlendMode(BlendMode m) { m_blendMode = m; }
+	void setBlendMode(BlendMode m) { m_blendMode = m; m_recomputeHash = true; }
+
+	size_t getUniqueId();
 
 private:
+	void computeHash();
+
 	struct ShaderDeleter {
 		void operator()(HgShader* shader);
 	};
@@ -52,4 +56,7 @@ private:
 
 	bool m_transparent;
 	bool m_updateTextures;
+	bool m_recomputeHash;
+
+	size_t m_uniqueId;
 };

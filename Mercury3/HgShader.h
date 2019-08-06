@@ -12,7 +12,12 @@ class RenderData;
 
 class HgShader {
 	public:
-		virtual ~HgShader() {};
+		HgShader()
+			:m_uniqueId(0)
+		{}
+
+		virtual ~HgShader()
+		{};
 
 		virtual void load() = 0;
 		virtual void destroy() = 0;
@@ -20,6 +25,8 @@ class HgShader {
 
 		virtual void setLocalUniforms(const RenderData& rd) = 0;
 		virtual void uploadMatrices(const float* worldSpaceMatrix, const HgMath::mat4f& projection, const HgMath::mat4f& view) = 0;
+
+		inline size_t getUniqueId() const { return m_uniqueId; }
 
 		static HgShader* acquire(const char* vert, const char* frag);
 
@@ -30,4 +37,8 @@ class HgShader {
 
 		typedef std::unique_ptr<HgShader>(*createShaderCallback)(const char* vert, const char* frag);
 		static createShaderCallback Create;
+protected:
+	inline void setUniqueId(size_t uniqueId) { m_uniqueId = uniqueId; }
+private:
+	size_t m_uniqueId;
 };
