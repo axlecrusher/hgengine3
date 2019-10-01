@@ -160,10 +160,22 @@ template<> struct hash<EntityIdType>
 class EntityLocator
 {
 public:
+	class SearchResult
+	{
+	public:
+		SearchResult() : entity(nullptr)
+		{}
+
+		bool isValid() const { return entity != nullptr; }
+
+		HgEntity* entity;
+		HgEntity* operator->() { return entity; }
+	};
+
 	void RegisterEntity(HgEntity* entity);
 	void RemoveEntity(EntityIdType id);
 
-	HgEntity* Find(EntityIdType id) const;
+	SearchResult Find(EntityIdType id) const;
 private:
 	std::unordered_map<EntityIdType, HgEntity*> m_entities;
 	mutable std::mutex m_mutex;
@@ -224,7 +236,7 @@ public:
 			m_updateNumber = updateNumber;
 			//require parents to be updated first
 			auto parent = getParent();
-			if ((parent != nullptr) && parent->needsUpdate(updateNumber)) parent->update(dtime, updateNumber);
+			if ((parent.isValid()) && parent->needsUpdate(updateNumber)) parent->update(dtime, updateNumber);
 			m_logic->update(dtime);
 		}
 
@@ -236,10 +248,11 @@ public:
 
 		inline void setParent(HgEntity* parent) { m_parentId = parent->getEntityId(); }
 		
-		inline HgEntity* getParent() const
+		inline EntityLocator::SearchResult getParent() const
 		{
-			if (!m_parentId.isValid()) return nullptr;
-			return Find(m_parentId);
+			EntityLocator::SearchResult r;
+			if (m_parentId.isValid()) r = Find(m_parentId);
+			return r;
 		}
 
 		inline void setChild(HgEntity* child) { child->setParent(this); }
@@ -268,7 +281,7 @@ public:
 		/*	Find an existing entity by id. Returned pointer is managed, do not delete.
 			Return nullptr if the entity does not exist.
 		*/
-		static HgEntity* Find(EntityIdType id);
+		static EntityLocator::SearchResult Find(EntityIdType id);
 private:
 	inline bool hasLogic() const { return m_logic != nullptr; }
 

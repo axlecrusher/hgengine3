@@ -51,7 +51,7 @@ namespace HgSound {
 
 		//Will setup sound to be emitted from an entity. 
 		Emitter EmitFromEntity(const HgEntity* e);
-		HgEntity* getEmittingEntity() const { return HgEntity::Find(m_emittingEntityId); }
+		auto getEmittingEntity() const { return HgEntity::Find(m_emittingEntityId); }
 
 	private:
 		SoundAsset::ptr m_sound;

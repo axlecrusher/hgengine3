@@ -109,7 +109,7 @@ void XAudio2Driver::processPlayEvents()
 			if (evt.emittingEntityId.isValid())
 			{
 				auto entity = HgEntity::Find(evt.emittingEntityId);
-				evt.emitter = snd->EmitFromEntity(entity);
+				evt.emitter = snd->EmitFromEntity(entity.entity);
 			}
 			SOUND->play3d(snd, evt.emitter);
 		}
@@ -381,7 +381,7 @@ void XAudio2Driver::update()
 	for (auto& voice : m_voices)
 	{
 		auto entity = voice.sound->getEmittingEntity();
-		if (entity)
+		if (entity.isValid())
 		{
 			Emitter tmp = voice.sound->getEmitter();
 			tmp.setPosition( entity->computeWorldSpacePosition() );

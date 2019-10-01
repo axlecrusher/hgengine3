@@ -45,9 +45,9 @@ void EntityLocator::RemoveEntity(EntityIdType id)
 	}
 }
 
-HgEntity* EntityLocator::Find(EntityIdType id) const
+EntityLocator::SearchResult EntityLocator::Find(EntityIdType id) const
 {
-	HgEntity* entity = nullptr;
+	SearchResult result;
 	if (id.isValid())
 	{
 		std::lock_guard<std::mutex> m_lock(m_mutex);
@@ -55,10 +55,10 @@ HgEntity* EntityLocator::Find(EntityIdType id) const
 		auto itr = m_entities.find(id);
 		if (itr != m_entities.end())
 		{
-			entity = itr->second;
+			result.entity = itr->second;
 		}
 	}
-	return entity;
+	return result;
 }
 
 EntityLocator& HgEntity::Locator()
@@ -67,7 +67,7 @@ EntityLocator& HgEntity::Locator()
 	return locator;
 }
 
-HgEntity* HgEntity::Find(EntityIdType id)
+EntityLocator::SearchResult HgEntity::Find(EntityIdType id)
 {
 	return Locator().Find(id);
 }
@@ -160,7 +160,7 @@ HgMath::mat4f HgEntity::computeWorldSpaceMatrix(bool applyScale, bool applyRotat
 	//}
 
 	auto parent = getParent();
-	if (parent) {
+	if (parent.isValid()) {
 		modelMatrix = parent->computeWorldSpaceMatrix(flags.inheritParentScale,
 			flags.inheritParentRotation, flags.inheritParentTranslation) * modelMatrix;
 	}
