@@ -127,7 +127,7 @@ int8_t model_data::load(HgEntity* entity, const char* filename) {
 
 	auto rd = entity->renderData();
 
-	entity->flags.destroy = true;
+	entity->setDestroy(false);
 
 	model_data mdl( LoadModel(filename) );
 
@@ -159,7 +159,7 @@ int8_t model_data::load(HgEntity* entity, const char* filename) {
 		rd->indexVboRecord(iRec);
 	}
 
-	entity->flags.destroy = false;
+	entity->setDestroy(false);
 
 	return 0;
 }

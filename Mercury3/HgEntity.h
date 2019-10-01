@@ -271,12 +271,17 @@ public:
 		inline void inheritParentRotation(bool x) { flags.inheritParentRotation = x; }
 		inline void inheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
 
+		inline void setDestroy(bool x) { flags.destroy = x; }
+		inline void setHidden(bool x) { flags.hidden = x; }
+
 		//Lower numbers draw first. default draw order is 0
 		inline void setDrawOrder(int8_t order) { m_drawOrder = order; }
 		inline int8_t getDrawOrder() const { return m_drawOrder; }
 
 		inline void setName(const std::string& name) { m_extendedData->setName(name); }
 		inline std::string& getName() const { m_extendedData->getName(); }
+
+		inline EntityFlags getFlags() const { return flags; }
 
 		/*	Find an existing entity by id. Returned pointer is managed, do not delete.
 			Return nullptr if the entity does not exist.
@@ -298,8 +303,9 @@ private:
 	EntityIdType m_parentId;
 	uint32_t m_updateNumber;
 	int8_t m_drawOrder;
-public:
+
 	EntityFlags flags;
+public:
 };
 
 class EntityCreated

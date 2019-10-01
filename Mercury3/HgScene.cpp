@@ -102,7 +102,7 @@ void HgScene::update(HgTime dtime) {
 
 		/* FIXME: WARNING!!! if this loop is running async to the render thread, entity deletion can cause a crash!*/
 		//shared_ptr my way out of this?
-		if (e->flags.destroy) {
+		if (e->getFlags().destroy) {
 			removeEntity(i);
 			continue;
 		}
@@ -121,7 +121,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue)
 
 		//I would like to move this out of here for a more perminent, solution
 		//where the vectors don't need to be rebuild every time
-		if (!e->flags.hidden) { 
+		if (!e->getFlags().hidden) { 
 			queue->Enqueue(e);
 		}
 

@@ -47,7 +47,7 @@ public:
 		gpuStruct* instanceDataPtr = m_instanceData.getBuffer();
 		for (auto itr : m_updatedItems)
 		{
-			auto flags = itr->getEntity().flags;
+			auto flags = itr->getEntity().getFlags();
 			if (!flags.destroy && !flags.hidden) {
 				entityPtr = &itr->getEntity();
 				itr->T::getInstanceData(instanceDataPtr);

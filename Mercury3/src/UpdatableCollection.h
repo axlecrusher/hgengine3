@@ -44,7 +44,7 @@ public:
 
 		for (auto itr = begin(); itr != end(); itr++) {
 			auto& e = itr->getEntity();
-			if (!e.flags.hidden) {
+			if (!e.getFlags().hidden) {
 				queue->Enqueue(&e);
 			}
 		}
