@@ -28,12 +28,8 @@ GLBufferId::GLBufferId(GLBufferId&& rhs)
 
 const GLBufferId& GLBufferId::operator=(GLBufferId&& rhs)
 {
-	this->buffId = rhs.buffId;
-	this->texId = rhs.texId;
-
-	rhs.buffId = 0;
-	rhs.texId = 0;
-
+	std::swap(buffId, rhs.buffId);
+	std::swap(texId, rhs.texId);
 	return *this;
 }
 
