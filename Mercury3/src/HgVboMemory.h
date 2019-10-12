@@ -16,7 +16,7 @@ public:
 	void clear() { m_buffer.clear(); }
 
 	inline T* getBuffer() { return m_buffer.data(); }
-	inline uint32_t getCount() const { return m_buffer.size(); }
+	inline uint32_t getCount() const { return (uint32_t)m_buffer.size(); }
 	static constexpr inline uint8_t Stride() { return sizeof(T); }
 
 private:

@@ -267,9 +267,9 @@ public:
 		HgMath::mat4f computeWorldSpaceMatrix(bool scale = true, bool rotation = true, bool translation = true) const;
 		point computeWorldSpacePosition() const;
 
-		inline void inheritParentScale(bool x) { flags.inheritParentScale = x; }
-		inline void inheritParentRotation(bool x) { flags.inheritParentRotation = x; }
-		inline void inheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
+		inline void setInheritParentScale(bool x) { flags.inheritParentScale = x; }
+		inline void setInheritParentRotation(bool x) { flags.inheritParentRotation = x; }
+		inline void setInheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
 
 		inline void setDestroy(bool x) { flags.destroy = x; }
 		inline void setHidden(bool x) { flags.hidden = x; }

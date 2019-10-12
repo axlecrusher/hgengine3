@@ -284,7 +284,7 @@ int main()
 	if (teapotSquare > 0) {
 		teapotSquare->scale(0.3);
 		teapotSquare->position(point(0, 3, 0));
-		teapotSquare->inheritParentScale(false);
+		teapotSquare->setInheritParentScale(false);
 		teapotSquare->setParent(teapot);
 		teapotSquare->renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_blue.glsl"));
 		//teapotSquare->setHidden(true);
