@@ -19,6 +19,7 @@ struct GPUInstanceMetaData
 	std::shared_ptr< HgGPUBufferSegment<gpuStruct> > instanceData;
 };
 
+//Stride is how many gpuStructs are used per instance of T
 template<typename T, typename gpuStruct, int stride>
 class InstancedCollection : public IUpdatableCollection {
 public:
@@ -88,7 +89,7 @@ public:
 		{
 			RenderDataPtr& rd = itr.second.entityPtr->getRenderDataPtr();
 			rd->instanceCount = itr.second.instanceCount;
-			itr.second.instanceData->setCount(itr.second.instanceCount);
+			itr.second.instanceData->setCount(itr.second.instanceCount*stride);
 			itr.second.instanceData->NeedsUpdate(true);
 
 			rd->gpuBuffer = itr.second.instanceData;
