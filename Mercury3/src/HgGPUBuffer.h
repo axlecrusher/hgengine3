@@ -32,7 +32,7 @@ public:
 	inline void UseType(BUFFER_USE_TYPE t) { m_useType = t; }
 	inline BUFFER_USE_TYPE UseType() const { return m_useType; }
 
-	inline uint32_t size() const { return m_sizeBytes; }
+	inline uint32_t sizeBytes() const { return m_sizeBytes; }
 
 	//inline void Use() {
 	//	if (NeedsUpdate()) {
@@ -64,7 +64,7 @@ public:
 
 	inline void AddData(const T* data, uint32_t count) {
 		m_memory.add_data(data, count);
-		m_sizeBytes += sizeof(T)*count;
+		m_sizeBytes = m_memory.getCount() * sizeof(T);
 		NeedsUpdate(true);
 		m_buffer = m_memory.getBuffer();
 	}
@@ -79,4 +79,16 @@ public:
 
 private:
 	HgVboMemory<T> m_memory;
+};
+
+
+//implementation of IHgGPUBuffer that uses a portion of a HgGPUBuffer
+template<typename T>
+class HgGPUBufferSegment : public IHgGPUBuffer {
+
+public:
+	inline void setBuffer(T* ptr) { m_buffer = ptr; }
+
+	//set the size of the buffer based on the number of items
+	inline void setCount(uint32_t count) { m_sizeBytes = count * sizeof(T); }
 };

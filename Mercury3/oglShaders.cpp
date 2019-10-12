@@ -274,7 +274,7 @@ void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
 	}
 
 	glActiveTexture(GL_TEXTURE3);
-	auto gpuBuffer = rd.gpuBuffer;
+	auto gpuBuffer = rd.gpuBuffer.get();
 	if ((m_uniformLocations[U_BUFFER_OBJECT1] > -1) && (gpuBuffer != nullptr)) {
 		OGLHgGPUBuffer* api = (OGLHgGPUBuffer*)gpuBuffer->apiImpl();
 		if (gpuBuffer->NeedsUpdate()) {

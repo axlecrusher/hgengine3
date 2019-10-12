@@ -55,7 +55,8 @@ public:
 	uint32_t instanceCount;
 
 	//std::shared_ptr<IHgGPUBuffer> gpuBuffer;
-	IHgGPUBuffer* gpuBuffer;
+	//IHgGPUBuffer* gpuBuffer;
+	std::shared_ptr<IHgGPUBuffer> gpuBuffer;
 
 	Flags renderFlags;
 

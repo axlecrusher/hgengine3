@@ -242,11 +242,11 @@ int main()
 			}
 		}
 
-		entity = scene2.create_entity("cube");
-		if (entity) {
-			entity->position(point(2,2,-2));
-			entity->scale(0.3f);
-			entity->renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f.glsl"));
+		auto redCube = scene2.create_entity("cube");
+		if (redCube) {
+			redCube->position(point(2,2,-2));
+			redCube->scale(1.3f);
+			redCube->renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_red.glsl"));
 			//entity->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 		}
 
@@ -286,7 +286,8 @@ int main()
 		teapotSquare->position(point(0, 3, 0));
 		teapotSquare->inheritParentScale(false);
 		teapotSquare->setParent(teapot);
-
+		teapotSquare->renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_blue.glsl"));
+		//teapotSquare->setHidden(true);
 		SOUND->play3d(snd, snd->EmitFromEntity(teapotSquare));
 	}
 
@@ -415,7 +416,7 @@ int main()
 			renderQueue.Clear();
 			scene.EnqueueForRender(&renderQueue);
 			scene2.EnqueueForRender(&renderQueue);
-			Engine::EnqueueForRender(Engine::collections(), &renderQueue);
+			//Engine::EnqueueForRender(Engine::collections(), &renderQueue);
 			renderQueue.Finalize();
 
 			renderTarget->Render(&camera, &renderQueue);

@@ -4,6 +4,21 @@
 #include <UpdatableCollection.h>
 #include <algorithm>
 
+//Structure to contain the data required for instance rendering
+template<typename gpuStruct>
+struct GPUInstanceMetaData
+{
+	GPUInstanceMetaData()
+		:instanceCount(0), entityPtr(0)
+	{
+		instanceData = std::make_shared<HgGPUBufferSegment<gpuStruct>>();
+	}
+	uint32_t instanceCount;
+	HgEntity* entityPtr;
+
+	std::shared_ptr< HgGPUBufferSegment<gpuStruct> > instanceData;
+};
+
 template<typename T, typename gpuStruct, int stride>
 class InstancedCollection : public IUpdatableCollection {
 public:
@@ -11,6 +26,7 @@ public:
 
 	InstancedCollection() {
 		//m_instanceCount = 0;
+		m_instanceData = std::make_shared< HgGPUBuffer<gpuStruct> >();
 	}
 
 	//InstancedCollection(uint32_t reserve) : m_items(reserve) {
@@ -42,28 +58,41 @@ public:
 		if (m_updatedItems.empty()) return;
 
 		HgEntity* entityPtr = nullptr;
-		size_t instanceCount = 0;
 
-		gpuStruct* instanceDataPtr = m_instanceData.getBuffer();
+		std::unordered_map<size_t, GPUInstanceMetaData<gpuStruct> > instances;
+
+		//Group item instances into groups that can be instance rendered
+		gpuStruct* instanceDataPtr = m_instanceData->getBuffer();
 		for (auto itr : m_updatedItems)
 		{
 			auto flags = itr->getEntity().getFlags();
 			if (!flags.destroy && !flags.hidden) {
 				entityPtr = &itr->getEntity();
+				const auto hashId = entityPtr->renderData()->getMaterial().getUniqueId();
+				auto& tmp = instances[hashId];
+
+				if (tmp.instanceData->getBufferPtr() == nullptr)
+				{
+					tmp.instanceData->setBuffer(instanceDataPtr);
+				}
+
+				tmp.entityPtr = entityPtr;
+				tmp.instanceCount++;
+
 				itr->T::getInstanceData(instanceDataPtr);
 				instanceDataPtr += stride;
-				instanceCount++;
 			}
 		}
 
-		if (entityPtr != nullptr)
+		for (auto& itr : instances)
 		{
-			auto& rd = entityPtr->getRenderDataPtr();
+			RenderDataPtr& rd = itr.second.entityPtr->getRenderDataPtr();
+			rd->instanceCount = itr.second.instanceCount;
+			itr.second.instanceData->setCount(itr.second.instanceCount);
+			itr.second.instanceData->NeedsUpdate(true);
 
-			renderData->instanceCount = (uint32_t)instanceCount;
-			renderData->gpuBuffer = &m_instanceData;
-
-			queue->Enqueue(renderData);
+			rd->gpuBuffer = itr.second.instanceData;
+			queue->Enqueue(rd);
 		}
 	}
 
@@ -74,16 +103,16 @@ public:
 			//new item created, add more instance data
 			//some instance objects can require more than 1 gpuStruct per instance (voxel rain), so use stride as count
 			auto data = std::make_unique<gpuStruct[]>(stride);
-			m_instanceData.AddData(data.get(), stride);
+			m_instanceData->AddData(data.get(), stride);
 		}
 		tmp.init();
 
-		//This is an instancing data structure.
-		//All instances need to share the same render data.
-		if (renderData == nullptr)
-			renderData = tmp.getEntity().getRenderDataPtr();
+		////This is an instancing data structure.
+		////All instances need to share the same render data.
+		//if (renderData == nullptr)
+		//	renderData = tmp.getEntity().getRenderDataPtr();
 
-		tmp.getEntity().setRenderData(renderData);
+		//tmp.getEntity().setRenderData(renderData);
 
 		return tmp;
 	}
@@ -127,13 +156,14 @@ public:
 		return collection;
 	}
 
-	std::shared_ptr<RenderData> renderData;
+	//std::shared_ptr<RenderData> renderData;
 
 private:
 	//size_t m_instanceCount;
 	SwissArray<T> m_items;
 	std::vector<T*> m_updatedItems; //has been updated and ready for render
-	HgGPUBuffer<gpuStruct> m_instanceData;
+	//HgGPUBuffer<gpuStruct> m_instanceData;
+	std::shared_ptr<HgGPUBuffer<gpuStruct>> m_instanceData;
 };
 
 template<typename gpu_structure>

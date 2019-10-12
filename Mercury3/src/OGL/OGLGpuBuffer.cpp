@@ -1,23 +1,75 @@
 #include <OGL/OGLGpuBuffer.h>
 
-OGLHgGPUBuffer::~OGLHgGPUBuffer() {
-	if (m_buffId > 0) {
-		glDeleteBuffers(1, &m_buffId);
-		glDeleteTextures(1, &m_texId);
+std::vector<GLBufferId> OGLHgGPUBuffer::m_useableBufferIds;
+
+
+GLBufferId::~GLBufferId()
+{
+	if (buffId > 0) {
+		glDeleteBuffers(1, &buffId);
+		glDeleteTextures(1, &texId);
 	}
-	m_texId = 0;
-	m_buffId = 0;
+	texId = 0;
+	buffId = 0;
+}
+
+void GLBufferId::AllocateOnGPU()
+{
+	if (texId == 0) {
+		glGenBuffers(1, &buffId);
+		glGenTextures(1, &texId);
+	}
+}
+
+GLBufferId::GLBufferId(GLBufferId&& rhs)
+{
+	*this = std::move(rhs);
+}
+
+const GLBufferId& GLBufferId::operator=(GLBufferId&& rhs)
+{
+	this->buffId = rhs.buffId;
+	this->texId = rhs.texId;
+
+	rhs.buffId = 0;
+	rhs.texId = 0;
+
+	return *this;
+}
+
+
+
+GLBufferId OGLHgGPUBuffer::getGLBufferId()
+{
+	if (m_useableBufferIds.size() > 0)
+	{
+		auto r = std::move(m_useableBufferIds.back());
+		m_useableBufferIds.pop_back();
+		return r;
+	}
+
+	GLBufferId ids;
+	ids.AllocateOnGPU();
+	return ids;
+}
+
+void  OGLHgGPUBuffer::freeGLBufferId(GLBufferId& rhs)
+{
+	m_useableBufferIds.emplace_back(std::move(rhs));
+}
+
+
+OGLHgGPUBuffer::~OGLHgGPUBuffer()
+{
+	freeGLBufferId(m_bufferIds);
 }
 
 void OGLHgGPUBuffer::SendToGPU(const IHgGPUBuffer* bufferObject) {
-	if (m_texId == 0) {
-		glGenBuffers(1, &m_buffId);
-		glGenTextures(1, &m_texId);
-	}
+	m_bufferIds = getGLBufferId();
 
-	glBindBuffer(GL_TEXTURE_BUFFER, m_buffId);
+	glBindBuffer(GL_TEXTURE_BUFFER, m_bufferIds.buffId);
 
-	const size_t size = bufferObject->size();
+	const size_t size = bufferObject->sizeBytes();
 
 	if (m_lastSize < size) {
 		//grow buffer and load all data
@@ -31,6 +83,6 @@ void OGLHgGPUBuffer::SendToGPU(const IHgGPUBuffer* bufferObject) {
 }
 
 void OGLHgGPUBuffer::Bind() {
-	glBindTexture(GL_TEXTURE_BUFFER, m_texId);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_buffId);
+	glBindTexture(GL_TEXTURE_BUFFER, m_bufferIds.texId);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_bufferIds.buffId);
 }

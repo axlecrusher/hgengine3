@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <assert.h>
+#include <vector>
 
 template<typename T>
 class HgVboMemory
@@ -10,23 +11,25 @@ public:
 	HgVboMemory();
 	~HgVboMemory();
 
-	uint32_t add_data(const T* data, uint32_t vertex_count);
-	void clear();
+	//returns the offset in the buffer where the added chunk of data begins
+	uint32_t add_data(const T* data, uint32_t count);
+	void clear() { m_buffer.clear(); }
 
-	inline T* getBuffer() { return buffer; }
-	inline uint32_t getCount() const { return count; }
+	inline T* getBuffer() { return m_buffer.data(); }
+	inline uint32_t getCount() const { return m_buffer.size(); }
 	static constexpr inline uint8_t Stride() { return sizeof(T); }
 
 private:
-	T* HgVboMemory::resize(uint32_t count);
+	std::vector<T> m_buffer;
+	//T* HgVboMemory::resize(uint32_t count);
 
-	T* buffer;
-	uint32_t count;
+	//T* buffer;
+	//uint32_t count;
 };
 
 template<typename T>
 HgVboMemory<T>::HgVboMemory()
-	:buffer(nullptr), count(0)
+	//:buffer(nullptr), count(0)
 {
 }
 
@@ -35,31 +38,37 @@ HgVboMemory<T>::~HgVboMemory() {
 	clear();
 }
 
+//template<typename T>
+//T* HgVboMemory<T>::resize(uint32_t count) {
+//	T* buf = (T*)realloc(buffer, count * sizeof(T));
+//	assert(buf != NULL);
+//	buffer = buf;
+//
+//	return buf;
+//}
+
+//template<typename T>
+//void HgVboMemory<T>::clear() {
+//	if (buffer != nullptr) free(buffer);
+//	buffer = NULL;
+//	count = 0;
+//}
+
 template<typename T>
-T* HgVboMemory<T>::resize(uint32_t count) {
-	T* buf = (T*)realloc(buffer, count * sizeof(T));
-	assert(buf != NULL);
-	buffer = buf;
+uint32_t HgVboMemory<T>::add_data(const T* data, uint32_t count) {
+	const auto offset = getCount();
+	m_buffer.resize(offset + count);
 
-	return buf;
-}
+	T* buf = getBuffer() + offset;
+	memcpy(buf, data, sizeof(T)*count);
 
-template<typename T>
-void HgVboMemory<T>::clear() {
-	if (buffer != nullptr) free(buffer);
-	buffer = NULL;
-	count = 0;
-}
+	//T* buf = buffer = resize(count + vertex_count);
+	//buf = buf + count;
 
-template<typename T>
-uint32_t HgVboMemory<T>::add_data(const T* data, uint32_t vertex_count) {
-	T* buf = buffer = resize(count + vertex_count);
-	buf = buf + count;
+	//memcpy(buf, data, sizeof(T)*vertex_count);
 
-	memcpy(buf, data, sizeof(T)*vertex_count);
-
-	uint32_t offset = count;
-	count += vertex_count;
+	//uint32_t offset = count;
+	//count += vertex_count;
 
 	return offset;
 }
