@@ -187,11 +187,16 @@ LONG_PTR Win32Window::ChangeStyle(DWORD dwStyle) {
 bool Win32Window::ChangeDisplaySettings() {
 	DEVMODE screenSettings;
 	memset(&screenSettings, 0, sizeof(screenSettings));
-	screenSettings.dmSize = sizeof(screenSettings);
-	screenSettings.dmPelsWidth = m_requestedWidth;
-	screenSettings.dmPelsHeight = m_requestedHeight;
-	screenSettings.dmBitsPerPel = m_bits;
-	screenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+	//copy existing screen settings
+	EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &screenSettings);
+
+	//screenSettings.dmSize = sizeof(screenSettings);
+	//screenSettings.dmPelsWidth = m_requestedWidth;
+	//screenSettings.dmPelsHeight = m_requestedHeight;
+	//screenSettings.dmBitsPerPel = m_bits;
+	//screenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
 
 	DWORD dwFlags = 0;
 	dwFlags = m_fullscreen ? CDS_FULLSCREEN | dwFlags : dwFlags;
