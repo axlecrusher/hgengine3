@@ -319,9 +319,11 @@ void Win32Window::GenPixelType()
 
 bool Win32Window::SwapBuffers()
 {
-//	glFinish();
-
-	return (::SwapBuffers( m_hdc )==TRUE);
+	//glFinish();
+	//DwmFlush();
+	const auto r = (::SwapBuffers(m_hdc) == TRUE);
+	glFinish(); //seems to help smooth motion
+	return r;
 }
 
 bool Win32Window::PumpMessages()
