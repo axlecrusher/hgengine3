@@ -22,14 +22,13 @@ public:
 
 	virtual void use() { use_common(); }
 
-	//virtual void draw(uint32_t count, uint32_t vertex_offset, uint32_t idx_offset)
 	virtual void draw(const RenderData* rd)
 	{ 
 		if (rd->instanceCount > 0) {
 			draw_instanced(rd);
 		}
 		else {
-			draw_vbo(rd->indexVboRecord().Count(), rd->VertexVboRecord().Offset(), rd->indexVboRecord().Offset());
+			draw_single(rd);
 		}
 	}
 	virtual void* getBuffer() { return m_mem.getBuffer(); }
@@ -60,12 +59,13 @@ private:
 	void bind();
 	void destroy();
 
-	void draw_vbo(uint32_t count, uint32_t offset, uint32_t idx_offset);
+	void draw_single(const RenderData* rd);
 	void draw_instanced(const RenderData* rd);
 
-	GLenum indiceType();
+	//returns the GLenum for the type of indices in the vbo
+	GLenum indiceType()	{ static_assert(false, "VBO is not an indice vbo");	}
 
-	//draw vbo directly without using indices
+	//instanced vbo rendering using array, not indice
 	inline void draw_arrays_instanced(const RenderData* rd)
 	{
 		const auto& vbo_rec = rd->VertexVboRecord();
@@ -76,7 +76,7 @@ private:
 		glDrawArraysInstanced(mode, offset, count, rd->instanceCount);
 	}
 
-	//draw vbo using indices
+	//instanced vbo rendering using indices
 	inline void draw_elements_instanced(const RenderData* rd) {
 		const auto& vbo_rec = rd->indexVboRecord();
 		const auto idx_offset = vbo_rec.Offset();
@@ -87,6 +87,18 @@ private:
 		const auto iType = indiceType();
 
 		glDrawElementsInstancedBaseVertex(mode, idx_count, iType, (void*)offset, rd->instanceCount, vetexOffest);
+	}
+
+	//vbo rendering using indices
+	inline void draw_elements(const RenderData* rd) {
+		const auto indice_count = rd->indexVboRecord().Count();
+		const auto vertex_offset = rd->VertexVboRecord().Offset();
+		const auto idxOffset = rd->indexVboRecord().Offset();
+		const size_t offset = sizeof(uint8_t)*idxOffset; //offset into indice buffer
+		const auto iType = indiceType();
+		const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
+
+		glDrawElementsBaseVertex(mode, indice_count, iType, (void*)offset, vertex_offset);
 	}
 
 	void sendIndicesToGPU() {
@@ -256,7 +268,7 @@ void OGLvbo<T>::destroy() {
 
 //default 
 template<typename T>
-inline void OGLvbo<T>::draw_vbo(uint32_t count, uint32_t offset, uint32_t idx_offset) { }
+inline void OGLvbo<T>::draw_single(const RenderData* rd) { }
 
 //default to drawing using arrays. Indice drawing needs its own templates
 template<typename T>
@@ -264,28 +276,13 @@ inline void OGLvbo<T>::draw_instanced(const RenderData* rd) { draw_arrays_instan
 
 //NOTE: THESE ARE INLINE. THEY NEED TO BE IN THE HEADER, NOT CPP
 template<>
-inline void OGLvbo<uint8_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
-	const size_t offset = sizeof(uint8_t)*idx_offset; //offset into indice buffer
-	//const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
-
-	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_BYTE, (void*)offset, vertex_offset);
-}
+inline void OGLvbo<uint8_t>::draw_single(const RenderData* rd) { draw_elements(rd); }
 
 template<>
-inline void OGLvbo<uint16_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
-	const size_t offset = sizeof(uint16_t)*idx_offset; //offset into indice buffer
-	//const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
-
-	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_SHORT, (void*)offset, vertex_offset);
-}
+inline void OGLvbo<uint16_t>::draw_single(const RenderData* rd) { draw_elements(rd); }
 
 template<>
-inline void OGLvbo<uint32_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
-	const size_t offset = sizeof(uint32_t)*idx_offset; //offset into indice buffer
-	//const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
-
-	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_INT, (void*)offset, vertex_offset);
-}
+inline void OGLvbo<uint32_t>::draw_single(const RenderData* rd) { draw_elements(rd); }
 
 template<>
 inline void OGLvbo<uint8_t>::draw_instanced(const RenderData* rd) { draw_elements_instanced(rd); }
