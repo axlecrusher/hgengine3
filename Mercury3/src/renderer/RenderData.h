@@ -12,6 +12,11 @@
 //	DEPTH_WRITE = 2
 //};
 
+enum PrimitiveType : uint8_t
+{
+	TRIANGLES,
+	LINES
+};
 
 class RenderData {
 private:
@@ -52,6 +57,9 @@ public:
 	Material& getMaterial() { return m_material; }
 	const Material& getMaterial() const { return m_material; }
 
+	PrimitiveType getPrimitiveType() const { return m_primitive; }
+	void setPrimitiveType(PrimitiveType t) { m_primitive = t; }
+
 	uint32_t instanceCount;
 
 	//std::shared_ptr<IHgGPUBuffer> gpuBuffer;
@@ -62,6 +70,7 @@ public:
 
 private:
 	Material m_material;
+	PrimitiveType m_primitive;
 };
 
 typedef std::shared_ptr<RenderData> RenderDataPtr;

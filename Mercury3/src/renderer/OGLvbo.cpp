@@ -1,19 +1,14 @@
 #include <OGLvbo.h>
 
-////8 bit index
-//template<>
-//void OGLvbo<uint8_t>::use() {
-//	use_common();
-//}
-//
-////16 bit index
-//template<>
-//void OGLvbo<uint16_t>::use() {
-//	use_common();
-//}
-//
-//template<>
-//void OGLvbo<color>::use() {
-//	use_common();
-//}
-
+GLenum hgPrimitiveTypeToGLType(PrimitiveType t)
+{
+	switch (t)
+	{
+	case PrimitiveType::TRIANGLES:
+		return GL_TRIANGLES;
+	case PrimitiveType::LINES:
+		return GL_LINES;
+	default:
+		return GL_TRIANGLES;
+	}
+}

@@ -5,7 +5,7 @@
 
 RenderData::RenderData()
 	:instanceCount(0)
-	, gpuBuffer(nullptr)
+	, gpuBuffer(nullptr), m_primitive(PrimitiveType::TRIANGLES)
 {
 }
 
@@ -14,9 +14,23 @@ RenderData::~RenderData()
 }
 
 void RenderData::render() {
+	auto vertex = hgVbo();
+	auto idx = indexVbo();
+	auto color = colorVbo();
+
+	if (vertex == nullptr) return;
+
 	RENDERER()->setRenderAttributes(m_material.blendMode(), renderFlags);
-	hgVbo()->use();
-	if (colorVbo() != nullptr) colorVbo()->use();
-	indexVbo()->use();
-	indexVbo()->draw(this);
+	vertex->use();
+	if (color != nullptr) color->use();
+
+	if (idx)
+	{
+		idx->use();
+		idx->draw(this);
+	}
+	else
+	{
+		vertex->draw(this);
+	}
 }

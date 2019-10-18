@@ -6,6 +6,8 @@
 #include <glew.h>
 #include <RenderData.h>
 
+GLenum hgPrimitiveTypeToGLType(PrimitiveType t);
+
 template<typename T>
 class OGLvbo : public IHgVbo {
 public:
@@ -150,19 +152,29 @@ void OGLvbo<T>::sendToGPU() {
 	switch (vbo_type) {
 	case VBO_VC:
 	case VBO_COLOR8:
-		glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, m_mem.Stride(), (void*)sizeof(vertex));
+	{
+		size_t offset = sizeof(vertex);
+		glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, m_mem.Stride(), (void*)offset);
 		glEnableVertexAttribArray(L_COLOR);
 		break;
+	}
 	case VBO_VN:
-		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, m_mem.Stride(), (void*)sizeof(vertex));
+	{
+		size_t offset = sizeof(vertex);
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, m_mem.Stride(), (void*)offset);
 		glEnableVertexAttribArray(L_NORMAL);
 		break;
+	}
 	case VBO_VNU:
-		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, m_mem.Stride(), (void*)sizeof(vertex));
+	{
+		size_t offset = sizeof(vertex);
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, m_mem.Stride(), (void*)offset);
 		glEnableVertexAttribArray(L_NORMAL);
-		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, m_mem.Stride(), (void*)(sizeof(vertex) + sizeof(normal)));
+		offset += sizeof(normal);
+		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, m_mem.Stride(), (void*)offset);
 		glEnableVertexAttribArray(L_UV);
 		break;
+	}
 	case VBO_VNUT:
 	{
 		size_t offset = sizeof(vertex);
@@ -216,18 +228,24 @@ inline void OGLvbo<T>::draw_instanced(const RenderData* rd) {}
 template<>
 inline void OGLvbo<uint8_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
 	const size_t offset = sizeof(uint8_t)*idx_offset; //offset into indice buffer
+	//const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
+
 	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_BYTE, (void*)offset, vertex_offset);
 }
 
 template<>
 inline void OGLvbo<uint16_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
 	const size_t offset = sizeof(uint16_t)*idx_offset; //offset into indice buffer
+	//const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
+
 	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_SHORT, (void*)offset, vertex_offset);
 }
 
 template<>
 inline void OGLvbo<uint32_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_offset, uint32_t idx_offset) {
 	const size_t offset = sizeof(uint32_t)*idx_offset; //offset into indice buffer
+	//const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
+
 	glDrawElementsBaseVertex(GL_TRIANGLES, indice_count, GL_UNSIGNED_INT, (void*)offset, vertex_offset);
 }
 
@@ -238,7 +256,9 @@ inline void OGLvbo<uint8_t>::draw_instanced(const RenderData* rd) {
 	const auto idx_count = vbo_rec.Count();
 	const size_t offset = idx_offset * sizeof(uint8_t); //offset into indice buffer
 	const auto vetexOffest = rd->VertexVboRecord().Offset();
-	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, idx_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount, vetexOffest);
+	const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
+
+	glDrawElementsInstancedBaseVertex(mode, idx_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount, vetexOffest);
 	//glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount);
 }
 
@@ -249,7 +269,9 @@ inline void OGLvbo<uint16_t>::draw_instanced(const RenderData* rd) {
 	const auto idx_count = vbo_rec.Count();
 	const size_t offset = idx_offset * sizeof(uint16_t); //offset into indice buffer
 	const auto vetexOffest = rd->VertexVboRecord().Offset();
-	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, idx_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount, vetexOffest);
+	const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
+
+	glDrawElementsInstancedBaseVertex(mode, idx_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount, vetexOffest);
 	//glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount);
 }
 
@@ -260,8 +282,19 @@ inline void OGLvbo<uint32_t>::draw_instanced(const RenderData* rd) {
 	const auto idx_count = vbo_rec.Count();
 	const size_t offset = idx_offset * sizeof(uint32_t); //offset into indice buffer
 	const auto vetexOffest = rd->VertexVboRecord().Offset();
-	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount, vetexOffest);
+	const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
+	glDrawElementsInstancedBaseVertex(mode, idx_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount, vetexOffest);
 	//glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount);
+}
+
+template<>
+inline void OGLvbo<vbo_layout_vc>::draw_instanced(const RenderData* rd) {
+	const auto& vbo_rec = rd->VertexVboRecord();
+	const auto offset = vbo_rec.Offset();
+	const auto count = vbo_rec.Count();
+	const auto vetexOffest = rd->VertexVboRecord().Offset();
+	const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
+	glDrawArraysInstanced(mode, offset, count, rd->instanceCount);
 }
 
 //8 bit index
