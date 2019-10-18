@@ -8,7 +8,8 @@ public:
 	//HgTime(uint64_t begin, uint64_t end);
 	
 	inline static HgTime msec(uint32_t t) { return HgTime(t); }
-	inline static HgTime seconds(uint32_t t) { return HgTime((uint32_t)(t*1000.0f)); }
+	inline static HgTime seconds(float t) { return HgTime((uint32_t)(t*1000.0f)); }
+	//inline static HgTime seconds(uint32_t t) { return HgTime((uint32_t)(t*1000.0f)); }
 
 	inline uint32_t msec() const {	return m_msec; }
 	inline float seconds() const { return m_msec / 1000.0f; }
