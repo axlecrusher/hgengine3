@@ -63,6 +63,43 @@ private:
 	void draw_vbo(uint32_t count, uint32_t offset, uint32_t idx_offset);
 	void draw_instanced(const RenderData* rd);
 
+	GLenum indiceType();
+
+	//draw vbo directly without using indices
+	inline void draw_arrays_instanced(const RenderData* rd)
+	{
+		const auto& vbo_rec = rd->VertexVboRecord();
+		const auto offset = vbo_rec.Offset();
+		const auto count = vbo_rec.Count();
+		const auto vetexOffest = rd->VertexVboRecord().Offset();
+		const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
+		glDrawArraysInstanced(mode, offset, count, rd->instanceCount);
+	}
+
+	//draw vbo using indices
+	inline void draw_elements_instanced(const RenderData* rd) {
+		const auto& vbo_rec = rd->indexVboRecord();
+		const auto idx_offset = vbo_rec.Offset();
+		const auto idx_count = vbo_rec.Count();
+		const size_t offset = idx_offset * sizeof(T); //offset into indice buffer
+		const auto vetexOffest = rd->VertexVboRecord().Offset();
+		const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
+		const auto iType = indiceType();
+
+		glDrawElementsInstancedBaseVertex(mode, idx_count, iType, (void*)offset, rd->instanceCount, vetexOffest);
+	}
+
+	void sendIndicesToGPU() {
+		if (handle.vbo_id == 0) {
+			GLuint buf_id;
+			glGenBuffers(1, &buf_id);
+			handle.vbo_id = buf_id;
+		}
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
+	}
+
 	HgVboMemory<T> m_mem;
 	GLuint m_vboType;
 
@@ -217,12 +254,13 @@ void OGLvbo<T>::destroy() {
 	m_mem.clear();
 }
 
-
+//default 
 template<typename T>
-inline void OGLvbo<T>::draw_vbo(uint32_t count, uint32_t offset, uint32_t idx_offset) {}
+inline void OGLvbo<T>::draw_vbo(uint32_t count, uint32_t offset, uint32_t idx_offset) { }
 
+//default to drawing using arrays. Indice drawing needs its own templates
 template<typename T>
-inline void OGLvbo<T>::draw_instanced(const RenderData* rd) {}
+inline void OGLvbo<T>::draw_instanced(const RenderData* rd) { draw_arrays_instanced(rd); }
 
 //NOTE: THESE ARE INLINE. THEY NEED TO BE IN THE HEADER, NOT CPP
 template<>
@@ -250,128 +288,50 @@ inline void OGLvbo<uint32_t>::draw_vbo(uint32_t indice_count, uint32_t vertex_of
 }
 
 template<>
-inline void OGLvbo<uint8_t>::draw_instanced(const RenderData* rd) {
-	const auto& vbo_rec = rd->indexVboRecord();
-	const auto idx_offset = vbo_rec.Offset();
-	const auto idx_count = vbo_rec.Count();
-	const size_t offset = idx_offset * sizeof(uint8_t); //offset into indice buffer
-	const auto vetexOffest = rd->VertexVboRecord().Offset();
-	const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
-
-	glDrawElementsInstancedBaseVertex(mode, idx_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount, vetexOffest);
-	//glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_BYTE, (void*)offset, rd->instanceCount);
-}
+inline void OGLvbo<uint8_t>::draw_instanced(const RenderData* rd) { draw_elements_instanced(rd); }
 
 template<>
-inline void OGLvbo<uint16_t>::draw_instanced(const RenderData* rd) {
-	const auto& vbo_rec = rd->indexVboRecord();
-	const auto idx_offset = vbo_rec.Offset();
-	const auto idx_count = vbo_rec.Count();
-	const size_t offset = idx_offset * sizeof(uint16_t); //offset into indice buffer
-	const auto vetexOffest = rd->VertexVboRecord().Offset();
-	const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
-
-	glDrawElementsInstancedBaseVertex(mode, idx_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount, vetexOffest);
-	//glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_SHORT, (void*)offset, rd->instanceCount);
-}
+inline void OGLvbo<uint16_t>::draw_instanced(const RenderData* rd) { draw_elements_instanced(rd); }
 
 template<>
-inline void OGLvbo<uint32_t>::draw_instanced(const RenderData* rd) {
-	const auto& vbo_rec = rd->indexVboRecord();
-	const auto idx_offset = vbo_rec.Offset();
-	const auto idx_count = vbo_rec.Count();
-	const size_t offset = idx_offset * sizeof(uint32_t); //offset into indice buffer
-	const auto vetexOffest = rd->VertexVboRecord().Offset();
-	const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
-	glDrawElementsInstancedBaseVertex(mode, idx_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount, vetexOffest);
-	//glDrawElementsInstanced(GL_TRIANGLES, idx_count, GL_UNSIGNED_INT, (void*)offset, rd->instanceCount);
-}
+inline void OGLvbo<uint32_t>::draw_instanced(const RenderData* rd) { draw_elements_instanced(rd); }
 
 template<>
-inline void OGLvbo<vbo_layout_vc>::draw_instanced(const RenderData* rd) {
-	const auto& vbo_rec = rd->VertexVboRecord();
-	const auto offset = vbo_rec.Offset();
-	const auto count = vbo_rec.Count();
-	const auto vetexOffest = rd->VertexVboRecord().Offset();
-	const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
-	glDrawArraysInstanced(mode, offset, count, rd->instanceCount);
-}
+inline GLenum OGLvbo<uint8_t>::indiceType() { return GL_UNSIGNED_BYTE; }
+
+template<>
+inline GLenum OGLvbo<uint16_t>::indiceType() { return GL_UNSIGNED_SHORT; }
+
+template<>
+inline GLenum OGLvbo<uint32_t>::indiceType() { return GL_UNSIGNED_INT; }
 
 //8 bit index
 template<>
-inline void OGLvbo<uint8_t>::sendToGPU() {
-	if (handle.vbo_id == 0) {
-		GLuint buf_id;
-		glGenBuffers(1, &buf_id);
-		handle.vbo_id = buf_id;
-	}
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
-}
+inline void OGLvbo<uint8_t>::sendToGPU() { sendIndicesToGPU(); }
 
 //16 bit index
 template<>
-inline void OGLvbo<uint16_t>::sendToGPU() {
-	if (handle.vbo_id == 0) {
-		GLuint buf_id;
-		glGenBuffers(1, &buf_id);
-		handle.vbo_id = buf_id;
-	}
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
-}
+inline void OGLvbo<uint16_t>::sendToGPU() { sendIndicesToGPU(); }
 
 //32 bit index
 template<>
-inline void OGLvbo<uint32_t>::sendToGPU() {
-	if (handle.vbo_id == 0) {
-		GLuint buf_id;
-		glGenBuffers(1, &buf_id);
-		handle.vbo_id = buf_id;
-	}
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
-}
+inline void OGLvbo<uint32_t>::sendToGPU() { sendIndicesToGPU(); }
 
 template<>
-inline void OGLvbo<color8>::sendToGPU() {
-	if (handle.vbo_id == 0) {
-		GLuint buf_id;
-		glGenBuffers(1, &buf_id);
-		handle.vbo_id = buf_id;
-		/*
-		glGenVertexArrays(1, &vbo->vao_id);
-		glBindVertexArray(vbo->vao_id);
-		glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, (void*)0);
-		glEnableVertexAttribArray(L_COLOR);
-		*/
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, handle.vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, m_mem.getCount() * m_mem.Stride(), m_mem.getBuffer(), VboUseage(m_useType));
-}
+inline void OGLvbo<color8>::sendToGPU() { sendIndicesToGPU(); }
 
 
 //8 bit index
 template<>
-inline void OGLvbo<uint8_t>::bind() {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
-}
+inline void OGLvbo<uint8_t>::bind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id); }
 
 //16 bit index
 template<>
-inline void OGLvbo<uint16_t>::bind() {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
-}
+inline void OGLvbo<uint16_t>::bind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id); }
 
 //16 bit index
 template<>
-inline void OGLvbo<uint32_t>::bind() {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id);
-}
+inline void OGLvbo<uint32_t>::bind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id); }
 
 template<>
 inline void OGLvbo<color8>::bind() {
