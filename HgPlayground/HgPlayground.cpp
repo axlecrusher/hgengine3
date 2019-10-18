@@ -39,6 +39,9 @@
 
 #include <core/HgScene2.h>
 
+#include <triangle.h>
+#include <TBNVisualization.h>
+
 float projection[16];
 
 HgCamera camera;
@@ -190,11 +193,22 @@ int main()
 	allocate_space(&gravity, ANI_TRIS);
 	gravity.scene = &scene;
 	gravity.vector.y(-1);
-	
+
+	//scene2.create_entity("triangle");
 	HgEntity* teapot = NULL;
 	scene.getNewEntity(&teapot);
 	model_data::load_ini(teapot, "teapot.ini");
 	teapot->origin(teapot->origin().x(2).z(3).y(1));
+
+	{
+		auto& tbn = scene2.create_entity<TBNVisualization::TBNVisualization>();
+		tbn.getEntity().setParent(teapot);
+		
+		auto rd = teapot->getRenderDataPtr();
+		auto vertexCount = rd->VertexVboRecord().Count();
+		const vbo_layout_vnut* data = (const vbo_layout_vnut*)rd->VertexVboRecord().Vbo()->getBuffer();
+		tbn.buildFromVertexData(data, vertexCount);
+	}
 	
 	//for (int i = 0; i < 4; ++i) {
 	//	HgEntity* statue = NULL;
@@ -210,7 +224,9 @@ int main()
 		HgEntity* entity = NULL;
 
 		{
-			HgEntity* entity = scene2.create_entity("triangle");
+			auto& triangle = scene2.create_entity<Triangle::Triangle>();
+			HgEntity* entity = &triangle.getEntity();
+			//HgEntity* entity = scene2.create_entity("triangle");
 			if (entity) {
 				const auto tmp = entity->position();
 				entity->position(tmp.x(1.5f).z(1.0f));
