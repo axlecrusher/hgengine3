@@ -369,7 +369,7 @@ void RegisterEntityType(const char* c, factory_clbk);
 
 #define REGISTER_LINKTIME2( func, type ) \
 	__pragma(comment(linker,"/export:"##LINKER_PREFIX##"REGISTER_ENTITY2"#func)); \
-	extern "C" { void REGISTER_ENTITY2##func() { Engine::HgScene::RegisterEntityFactory(#func, Engine::generate_entity<type::InstanceCollection>); } }
+	extern "C" { void REGISTER_ENTITY2##func() { Engine::HgScene::RegisterEntityFactory(#func, Engine::HgScene::generate_entity<type>); } }
 #else
 #define REGISTER_LINKTIME( func ) \
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }

@@ -41,6 +41,14 @@ public:
 	*/
 	HgEntity* create_entity(const char* type_str);
 
+	//Typed entity creation method
+	template<typename T>
+	T& create_entity() {
+		auto collection = getCollectionOf<T::InstanceCollection>();
+		auto& item = collection->newItem();
+		return item;
+	}
+
 	void EnqueueForRender(RenderQueue* queue);
 	void update(HgTime dtime);
 
@@ -62,6 +70,11 @@ public:
 	}
 
 	static void RegisterEntityFactory(const char* str, Engine::factoryCallback clbk);
+	template<typename T>
+	static HgEntity* generate_entity(Engine::HgScene* scene) {
+		auto& typedObject = scene->create_entity<T>();
+		return &typedObject.getEntity();
+	}
 private:
 	using IUpdatableCollectionPtr = std::shared_ptr<IUpdatableCollection>;
 	std::vector<IUpdatableCollectionPtr> m_collections;
@@ -69,12 +82,5 @@ private:
 
 	static std::unordered_map<std::string, factoryCallback> m_entityFactories;
 };
-
-template<typename T>
-static HgEntity* generate_entity(Engine::HgScene* scene) {
-	auto collection = scene->getCollectionOf<T>();
-	auto& item = collection->newItem();
-	return &item.getEntity();
-}
 
 }

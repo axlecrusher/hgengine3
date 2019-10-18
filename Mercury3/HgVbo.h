@@ -92,6 +92,14 @@ public:
 	virtual ~IHgVbo() {}
 
 	//	Copy data straight into VBO. Ensure that data, is using the correct vbo layout for your data
+	template<typename T>
+	uint32_t add_data(const T* d, uint32_t count)
+	{
+		if (d == nullptr) return 0;
+		return add_data((void*)d, count);
+	}
+
+	//	Copy data straight into VBO. Ensure that data, is using the correct vbo layout for your data
 	virtual uint32_t add_data(void* data, uint32_t count) = 0;
 
 	//	Clear data from RAM. Will not upload new data to GPU until new data is added.
@@ -128,6 +136,8 @@ public:
 	{}
 
 	std::shared_ptr<IHgVbo>& Vbo() { return m_vbo; }
+	std::shared_ptr<IHgVbo> Vbo() const { return m_vbo; }
+
 	uint32_t Offset() const { return m_offset; }
 	uint32_t Count() const { return m_count; }
 
@@ -200,7 +210,7 @@ namespace HgVbo {
 		//return HgVboRecord(vbo, offset, count);
 
 		std::shared_ptr<IHgVbo> vbo = Create<T>();
-		auto offset = vbo->add_data(data, count);
+		auto offset = vbo->add_data<T>(data, count);
 		return VboManager::Singleton().InsertVboRecord(HgVboRecord(vbo, offset, count));
 	}
 
@@ -211,7 +221,7 @@ namespace HgVbo {
 		//return HgVboRecord(vbo, offset, count);
 
 		static std::shared_ptr<IHgVbo> vbo = Create<T>();
-		auto offset = vbo->add_data(data, count);
+		auto offset = vbo->add_data<T>(data, count);
 		return VboManager::Singleton().InsertVboRecord(HgVboRecord(vbo, offset, count));
 	}
 
