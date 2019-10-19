@@ -69,7 +69,8 @@ public:
 			auto flags = itr->getEntity().getFlags();
 			if (!flags.destroy && !flags.hidden) {
 				entityPtr = &itr->getEntity();
-				const auto hashId = entityPtr->renderData()->getMaterial().getUniqueId();
+				//const auto hashId = entityPtr->renderData()->getMaterial().getUniqueId();
+				const size_t hashId = (size_t)entityPtr->renderData();
 				auto& tmp = instances[hashId];
 
 				if (tmp.instanceData->getBufferPtr() == nullptr)
