@@ -44,12 +44,21 @@ typedef vertex3f vector3f;
 		uint16_t u, v;
 	} uv_coord;
 
+
+	//union normal {
+	//	vertex3f object;
+	//	float raw[3];
+
+	//	normal() : object() {}
+	//	normal(float x, float y, float z) : object(x, y, z) {}
+	//};
+
 	typedef struct normal {
 		float x, y, z;
 	} normal;
 
 	typedef struct tangent {
-		float x, y, z, w;
+		float x, y, z, w; //w is the handiness sign
 	} tangent;
 
 	typedef vector3f velocity;
