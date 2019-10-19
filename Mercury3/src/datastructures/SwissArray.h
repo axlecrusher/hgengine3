@@ -214,6 +214,7 @@ private:
 			if (m_used[i])
 			{
 				new (p + i) T(std::move(head[i])); //move constructor
+				(head+i)->~T();
 			}
 		}
 
