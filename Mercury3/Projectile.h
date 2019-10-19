@@ -7,6 +7,8 @@
 class Projectile : public IUpdatable {
 public:
 	Projectile();
+	Projectile(Projectile&&) = default;
+
 	virtual void update(HgTime tdelta);
 	vector3 direction;
 private:
