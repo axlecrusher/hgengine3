@@ -209,7 +209,15 @@ private:
 
 	void allocate(size_t size) {
 		T* p = m_alloc.allocate(size);
-		memcpy(p, head, sizeof(T)*m_allocatedSize);
+		for (size_t i = 0; i < m_allocatedSize; i++)
+		{
+			if (m_used[i])
+			{
+				new (p + i) T(std::move(head[i])); //move constructor
+			}
+		}
+
+		//memcpy(p, head, sizeof(T)*m_allocatedSize);
 		m_alloc.deallocate(head, m_allocatedSize);
 		m_allocatedSize = size;
 		head = p;
