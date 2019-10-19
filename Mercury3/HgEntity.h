@@ -173,7 +173,7 @@ public:
 	};
 
 	void RegisterEntity(HgEntity* entity);
-	void RemoveEntity(EntityIdType id);
+	void RemoveEntity(EntityIdType id, HgEntity* entity);
 
 	SearchResult Find(EntityIdType id) const;
 private:

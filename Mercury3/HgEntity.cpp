@@ -32,7 +32,7 @@ void EntityLocator::RegisterEntity(HgEntity* entity)
 	m_entities[id] = entity;
 }
 
-void EntityLocator::RemoveEntity(EntityIdType id)
+void EntityLocator::RemoveEntity(EntityIdType id, HgEntity* entity)
 {
 	if (!id.isValid()) return;
 
@@ -41,7 +41,10 @@ void EntityLocator::RemoveEntity(EntityIdType id)
 	auto itr = m_entities.find(id);
 	if (itr != m_entities.end())
 	{
-		m_entities.erase(itr);
+		if (itr->second == entity)
+		{
+			m_entities.erase(itr);
+		}
 	}
 }
 
@@ -126,7 +129,7 @@ void HgEntity::destroy()
 	if (m_entityId.isValid())
 	{
 		EventSystem::PublishEvent(EntityDestroyed(this, m_entityId));
-		Locator().RemoveEntity(m_entityId);
+		Locator().RemoveEntity(m_entityId, this);
 	}
 	m_logic.reset();
 	m_renderData.reset();
