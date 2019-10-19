@@ -32,7 +32,7 @@ void EntityLocator::RegisterEntity(HgEntity* entity)
 	m_entities[id] = entity;
 }
 
-void EntityLocator::RemoveEntity(EntityIdType id, HgEntity* entity)
+void EntityLocator::RemoveEntity(EntityIdType id)
 {
 	if (!id.isValid()) return;
 
@@ -41,10 +41,7 @@ void EntityLocator::RemoveEntity(EntityIdType id, HgEntity* entity)
 	auto itr = m_entities.find(id);
 	if (itr != m_entities.end())
 	{
-		if (itr->second == entity)
-		{
-			m_entities.erase(itr);
-		}
+		m_entities.erase(itr);
 	}
 }
 
@@ -108,7 +105,6 @@ HgEntity::~HgEntity() {
 HgEntity::HgEntity(HgEntity &&rhs)
 {
 	m_spacialData = std::move(rhs.m_spacialData);
-	m_entityId = std::move(rhs.m_entityId);
 	m_renderData = std::move(rhs.m_renderData);
 	m_logic = std::move(rhs.m_logic);
 	m_extendedData = std::move(rhs.m_extendedData);
@@ -118,6 +114,8 @@ HgEntity::HgEntity(HgEntity &&rhs)
 	flags = std::move(rhs.flags);
 
 	setLogic(std::move(m_logic)); //reset logic pointer
+
+	std::swap(m_entityId, rhs.m_entityId);
 	Locator().RegisterEntity(this);
 
 	rhs.destroy();
@@ -129,7 +127,7 @@ void HgEntity::destroy()
 	if (m_entityId.isValid())
 	{
 		EventSystem::PublishEvent(EntityDestroyed(this, m_entityId));
-		Locator().RemoveEntity(m_entityId, this);
+		Locator().RemoveEntity(m_entityId);
 	}
 	m_logic.reset();
 	m_renderData.reset();
