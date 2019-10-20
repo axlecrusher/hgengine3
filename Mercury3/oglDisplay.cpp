@@ -92,6 +92,13 @@ uint32_t ogl_updateTextureData(HgTexture* tex) {
 	case HgTexture::format::DXT5:
 		format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 		break;
+	case HgTexture::format::BC5U_ATI:
+	case HgTexture::format::BC5U:
+		format = GL_COMPRESSED_RG_RGTC2;
+		break;
+	case HgTexture::format::BC5S:
+		format = GL_COMPRESSED_SIGNED_RG_RGTC2;
+		break;
 	}
 
 	if (properties.format < 0xFF) {

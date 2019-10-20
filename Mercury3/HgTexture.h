@@ -20,8 +20,11 @@ public:
 		DXT2 = 0x32545844,
 		DXT3 = 0x33545844,
 		DXT4 = 0x34545844,
-		DXT5 = 0x35545844
-	};
+		DXT5 = 0x35545844, //DXT5
+		BC5U_ATI = 0x32495441, //ATI2
+		BC5U = 0x55354342, // BC5U
+		BC5S = 0x53354342 //BC5S
+};
 
 	enum TextureType : uint8_t {
 		DIFFUSE = 0,
