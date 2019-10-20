@@ -12,11 +12,17 @@
 //	DEPTH_WRITE = 2
 //};
 
+namespace HgEngine
+{
+
 enum PrimitiveType : uint8_t
 {
 	TRIANGLES,
-	LINES
+	LINES,
+	POINTS
 };
+
+}
 
 class RenderData {
 private:
@@ -26,7 +32,9 @@ private:
 	VboIndex m_colorVbo;
 
 public:
-	static std::shared_ptr<RenderData> Create() { return std::make_shared<RenderData>(); }
+	typedef std::shared_ptr<RenderData> RenderDataPtr;
+
+	static RenderDataPtr Create();
 
 	struct Flags {
 		Flags() : FACE_CULLING(true), DEPTH_WRITE(true)
@@ -57,8 +65,8 @@ public:
 	Material& getMaterial() { return m_material; }
 	const Material& getMaterial() const { return m_material; }
 
-	PrimitiveType getPrimitiveType() const { return m_primitive; }
-	void setPrimitiveType(PrimitiveType t) { m_primitive = t; }
+	HgEngine::PrimitiveType getPrimitiveType() const { return m_primitive; }
+	void setPrimitiveType(HgEngine::PrimitiveType t) { m_primitive = t; }
 
 	uint32_t instanceCount;
 
@@ -70,8 +78,8 @@ public:
 
 private:
 	Material m_material;
-	PrimitiveType m_primitive;
+	HgEngine::PrimitiveType m_primitive;
 };
 
-typedef std::shared_ptr<RenderData> RenderDataPtr;
+typedef RenderData::RenderDataPtr RenderDataPtr;
 //typedef std::shared_ptr<const RenderData> RenderDataPtr_const;

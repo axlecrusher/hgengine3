@@ -5,12 +5,20 @@
 
 RenderData::RenderData()
 	:instanceCount(0)
-	, gpuBuffer(nullptr), m_primitive(PrimitiveType::TRIANGLES)
+	, gpuBuffer(nullptr), m_primitive(HgEngine::PrimitiveType::TRIANGLES)
 {
 }
 
 RenderData::~RenderData()
 {
+}
+
+RenderDataPtr RenderData::Create()
+{
+	auto t = new RenderData();
+	std::shared_ptr<RenderData> rd(t);
+	//auto rd = std::make_shared<RenderData>();
+	return rd;
 }
 
 void RenderData::render() {
