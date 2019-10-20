@@ -85,10 +85,27 @@ typedef struct {
 	uint32_t reserved2;
 } DDS_HEADER;
 
+typedef struct {
+	uint32_t dxgiFormat;
+	uint32_t resourceDimension;
+	uint32_t miscFlag;
+	uint32_t arraySize;
+	uint32_t miscFlags2;
+} DDS_HEADER_DXT10;
+
+#define DDPF_FOURCC 0x4
+#define DX10 0x30315844
+
 bool HgTexture::dds_load(FILE* f) {
 	DDS_HEADER header;
+	DDS_HEADER_DXT10 dx10Header;
 
 	fread(&header, 124, 1, f);
+
+	if (header.ddspf.flags == DDPF_FOURCC && header.ddspf.fourCC == DX10)
+	{
+		fread(&dx10Header, 20, 1, f);
+	}
 
 	Properties p;
 
