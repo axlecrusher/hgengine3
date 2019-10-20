@@ -103,11 +103,6 @@ static model_data LoadModel(const char* filename) {
 	return r;
 }
 
-static std::shared_ptr<RenderData> init_render_data() {
-	auto rd = RenderData::Create();
-	return rd;
-}
-
 static void updateClbk(HgEntity* e, uint32_t tdelta) {
 	//	printf("cube\n");
 }
@@ -117,8 +112,9 @@ static void destroy(HgEntity* e) {
 }
 
 static void* change_to_model(HgEntity* entity) {
-	//create an instance of the render data for all triangles to share
-	entity->setRenderData( init_render_data() ); //this needs to be per model instance if the model is animated
+	//this needs to be per model instance if the model is animated
+	auto rd = RenderData::Create();
+	entity->setRenderData( rd );
 	return nullptr;
 }
 
