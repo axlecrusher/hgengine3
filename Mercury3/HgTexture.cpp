@@ -147,12 +147,13 @@ bool HgTexture::load_internal(std::string path) {
 	m_path = std::move(path);
 
 	fread(filecode, 1, 4, f);
-	if (strncmp(filecode, "DDS ", 4) != 0) {
-		fseek(f, 0, SEEK_SET);
-		return stb_load(f);
+	if (strncmp(filecode, "DDS ", 4) == 0)
+	{
+		return dds_load(f);
 	}
 
-	return dds_load(f);
+	fseek(f, 0, SEEK_SET);
+	return stb_load(f);
 }
 
 void HgTexture::sendToGPU()
