@@ -150,3 +150,9 @@ HgVboRecord& VboIndex::VboRec() const {
 	}
 	return emptyRec; //eewwww
 }
+
+void* HgVboRecord::getBuffer() const {
+	uint8_t* data = (uint8_t*)m_vbo->getBuffer();
+	data += m_vbo->Stride() * Offset();
+	return data;
+}

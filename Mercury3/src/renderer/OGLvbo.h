@@ -6,7 +6,7 @@
 #include <glew.h>
 #include <RenderData.h>
 
-GLenum hgPrimitiveTypeToGLType(PrimitiveType t);
+GLenum hgPrimitiveTypeToGLType(HgEngine::PrimitiveType t);
 
 template<typename T>
 class OGLvbo : public IHgVbo {
@@ -37,7 +37,7 @@ public:
 
 	inline uint32_t getCount() const { return m_mem.getCount(); }
 
-	static constexpr inline uint8_t Stride() { return sizeof(T); }
+	//static constexpr inline uint8_t Stride() { return sizeof(T); }
 
 	static constexpr VBO_TYPE Type() {
 		//looks stupid but is compile time evaluated
@@ -71,7 +71,6 @@ private:
 		const auto& vbo_rec = rd->VertexVboRecord();
 		const auto offset = vbo_rec.Offset();
 		const auto count = vbo_rec.Count();
-		const auto vetexOffest = rd->VertexVboRecord().Offset();
 		const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
 		glDrawArraysInstanced(mode, offset, count, rd->instanceCount);
 	}
@@ -140,6 +139,7 @@ OGLvbo<T>::OGLvbo()
 {
 	constexpr VBO_TYPE type = Type();
 	m_type = type;
+	m_stride = sizeof(T);
 	memset(&handle, 0, sizeof(handle));
 	static_assert(Type() != VBO_TYPE_INVALID, "Invalid VBO Type");
 }
@@ -174,7 +174,7 @@ void OGLvbo<T>::sendToGPU() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle.vbo_id);
 
-	const GLsizei size = m_mem.getCount() * m_mem.Stride();
+	const GLsizei size = (GLsizei)m_mem.getSizeBytes();
 
 	if (updateOnly) {
 		//try orphaning buffer
@@ -186,12 +186,14 @@ void OGLvbo<T>::sendToGPU() {
 		glBufferData(GL_ARRAY_BUFFER, size, m_mem.getBuffer(), useType);
 	}
 
+	const GLsizei stride = (GLsizei)m_mem.Stride();
+
 	glBindVertexArray(handle.vao_id);
 
 	glBindBuffer(GL_ARRAY_BUFFER, handle.vbo_id);
 	//minimize calls to glVertexAttribPointer, use same format for all meshes in a VBO
 
-	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, m_mem.Stride(), NULL);
+	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, stride, NULL);
 	glEnableVertexAttribArray(L_VERTEX); //enable access to attribute
 
 	constexpr VBO_TYPE vbo_type = Type();
@@ -203,37 +205,37 @@ void OGLvbo<T>::sendToGPU() {
 	case VBO_COLOR8:
 	{
 		size_t offset = sizeof(vertex);
-		glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, m_mem.Stride(), (void*)offset);
+		glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (void*)offset);
 		glEnableVertexAttribArray(L_COLOR);
 		break;
 	}
 	case VBO_VN:
 	{
 		size_t offset = sizeof(vertex);
-		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, m_mem.Stride(), (void*)offset);
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, stride, (void*)offset);
 		glEnableVertexAttribArray(L_NORMAL);
 		break;
 	}
 	case VBO_VNU:
 	{
 		size_t offset = sizeof(vertex);
-		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, m_mem.Stride(), (void*)offset);
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, stride, (void*)offset);
 		glEnableVertexAttribArray(L_NORMAL);
 		offset += sizeof(normal);
-		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, m_mem.Stride(), (void*)offset);
+		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, stride, (void*)offset);
 		glEnableVertexAttribArray(L_UV);
 		break;
 	}
 	case VBO_VNUT:
 	{
 		size_t offset = sizeof(vertex);
-		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, m_mem.Stride(), (void*)offset);
+		glVertexAttribPointer(L_NORMAL, 3, GL_FLOAT, GL_FALSE, stride, (void*)offset);
 		glEnableVertexAttribArray(L_NORMAL);
 		offset += sizeof(normal);
-		glVertexAttribPointer(L_TANGENT, 4, GL_FLOAT, GL_FALSE, m_mem.Stride(), (void*)offset);
+		glVertexAttribPointer(L_TANGENT, 4, GL_FLOAT, GL_FALSE, stride, (void*)offset);
 		glEnableVertexAttribArray(L_TANGENT);
 		offset += sizeof(tangent); //tangent normals
-		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, m_mem.Stride(), (void*)offset);
+		glVertexAttribPointer(L_UV, 2, GL_UNSIGNED_SHORT, GL_TRUE, stride, (void*)offset);
 		glEnableVertexAttribArray(L_UV);
 		break;
 	}

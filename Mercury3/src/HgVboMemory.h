@@ -17,7 +17,9 @@ public:
 
 	inline T* getBuffer() { return m_buffer.data(); }
 	inline uint32_t getCount() const { return (uint32_t)m_buffer.size(); }
-	static constexpr inline uint8_t Stride() { return sizeof(T); }
+	static constexpr inline size_t Stride() { return sizeof(T); }
+
+	inline size_t getSizeBytes() const { return getCount() * sizeof(T); }
 
 private:
 	std::vector<T> m_buffer;

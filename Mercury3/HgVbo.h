@@ -92,6 +92,7 @@ public:
 	virtual ~IHgVbo() {}
 
 	//	Copy data straight into VBO. Ensure that data, is using the correct vbo layout for your data
+	// returns number T offset
 	template<typename T>
 	uint32_t add_data(const T* d, uint32_t count)
 	{
@@ -120,9 +121,13 @@ public:
 	virtual void setNeedsUpdate(bool t) = 0;
 
 	virtual void* getBuffer() = 0;
+
+	inline auto Stride() const { return m_stride; }
+
 protected:
 	VBO_TYPE m_type;
 	BUFFER_USE_TYPE m_useType;
+	uint32_t m_stride; //size of the underlying datatype
 };
 
 class HgVboRecord {
@@ -140,6 +145,9 @@ public:
 
 	uint32_t Offset() const { return m_offset; }
 	uint32_t Count() const { return m_count; }
+
+	//get a pointer to the data buffer, offset to the correct position
+	void* getBuffer() const;
 
 private:
 	std::shared_ptr<IHgVbo> m_vbo;
