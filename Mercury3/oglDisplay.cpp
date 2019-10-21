@@ -60,16 +60,13 @@ uint32_t ogl_updateTextureData(HgTexture* tex) {
 
 	const auto properties = tex->getProperties();
 
-	if (properties.mipMapCount > 1)
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	GLint min_filter = GL_LINEAR;
+	if (properties.mipMapCount > 1) {
+		min_filter = GL_LINEAR_MIPMAP_LINEAR;
 	}
-	else
-	{
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	GLint internal, format;
 
