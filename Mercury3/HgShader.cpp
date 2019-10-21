@@ -27,7 +27,7 @@ shader_entry shader_list[MAX_SHADERS];
 
 static void ShaderFileChanged(void* data) {
 	shader_entry* entry = (shader_entry*)data;
-	fprintf(stderr, "Shader file changed:%s\n", entry->frag_path);
+	fprintf(stderr, "Shader file changed:%s\n", entry->frag_path.c_str());
 	entry->shader->load();
 }
 
