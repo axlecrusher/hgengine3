@@ -71,8 +71,15 @@ HgShader* HgShader::acquire(const char* vert, const char* frag) {
 	shader_list[i].shader = HgShader::Create(vert, frag);
 	shader_list[i].frag_path = std::string(frag);
 	shader_list[i].vertex_path = std::string(vert);
-	WatchFileForChange(frag, ShaderFileChanged, shader_list+i);
-	WatchFileForChange(vert, ShaderFileChanged, shader_list + i);
+
+	void* addr1 = shader_list + i;
+	WatchFileForChange(frag, [addr1]() {
+		ShaderFileChanged(addr1);
+	});
+
+	WatchFileForChange(vert, [addr1]() {
+		ShaderFileChanged(addr1);
+	});
 
 	shader_list[i].shader->load();
 
