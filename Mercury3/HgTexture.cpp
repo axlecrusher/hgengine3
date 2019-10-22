@@ -1,5 +1,4 @@
 #include "HgTexture.h"
-#include <glew.h>
 #include <FileWatch.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -7,7 +6,8 @@
 
 #include <vector>
 
-HgTexture::gpuUpdateTextureFunction HgTexture::updateTextureFunc;
+HgTexture::GraphicsCallbacks HgTexture::gpuCallbacks;
+
 AssetManager<HgTexture> HgTexture::imageMap;
 
 void HgTexture::wireReload(HgTexture::TexturePtr ptr)
@@ -44,7 +44,6 @@ void HgTexture::release(HgTexture* t) {
 */
 HgTexture::HgTexture()
 {
-	m_data = nullptr;
 	gpuId = 0;
 	m_type = DIFFUSE;
 	m_uniqueId = 0;
@@ -53,7 +52,12 @@ HgTexture::HgTexture()
 
 HgTexture::~HgTexture()
 {
-	if (gpuId > 0) glDeleteTextures(1,&gpuId); //FIXME abstract this
+	if (getGPUId() > 0) {
+		//TODO: Fix gpuCallbacks being destroyed before textures
+		if (gpuCallbacks.deleteTexture) gpuCallbacks.deleteTexture(getGPUId());
+	}
+
+	gpuId = 0;
 }
 
 bool HgTexture::stb_load(FILE* f) {
@@ -208,6 +212,6 @@ void HgTexture::sendToGPU()
 {
 //	gpuId = updateTextureFunc(m_width, m_height, m_channels, data);
 	setNeedsGPUUpdate(false);
-	gpuId = updateTextureFunc(this);
+	gpuId = gpuCallbacks.updateTexture(this);
 	m_data.reset();
 }

@@ -76,8 +76,13 @@ public:
 
 	const std::string& getPath() const { return m_path; }
 
-	using gpuUpdateTextureFunction = std::function<uint32_t(HgTexture*)>;
-	static gpuUpdateTextureFunction updateTextureFunc;
+	typedef struct GraphicsCallbacks
+	{
+		std::function<uint32_t(HgTexture*)> updateTexture;
+		std::function<void(uint32_t)> deleteTexture;
+	} GraphicsCallbacks;
+
+	static GraphicsCallbacks gpuCallbacks;
 private:
 	struct free_deleter {
 		template <typename T>

@@ -24,7 +24,11 @@ RenderBackend* OGLBackend::Create() {
 
 	HgShader::Create = HgOglShader::Create;
 	//RenderData::Create = new_renderData_ogl;
-	HgTexture::updateTextureFunc = ogl_updateTextureData;
+
+	HgTexture::GraphicsCallbacks gc;
+	gc.updateTexture = ogl_updateTextureData;
+	gc.deleteTexture = [](uint32_t id) { GLuint x = id; glDeleteTextures(1, &x); };
+	HgTexture::gpuCallbacks = gc;
 
 	return &openglRenderer;
 }
