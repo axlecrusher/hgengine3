@@ -70,7 +70,7 @@ public:
 
 	Properties getProperties() const { return m_properties; }
 
-	const unsigned char* getData() const { return data; }
+	const unsigned char* getData() const { return m_data; }
 
 	const std::string& getPath() const { return m_path; }
 
@@ -96,7 +96,7 @@ private:
 	bool HgTexture::dds_load(FILE* f);
 
 	std::string m_path;
-	unsigned char* data;
+	unsigned char* m_data;
 
 	TextureType m_type;
 	Properties m_properties;

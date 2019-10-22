@@ -26,7 +26,12 @@ public:
 		}
 		
 		asset = AssetPtr(new T(), [this](T* asset) { this->release(asset); });
-		asset->load(path);
+		bool success = asset->load(path);
+		if (!success)
+		{
+			return AssetPtr(nullptr); //return null asset on fail
+		}
+
 		{
 			//scoped block for mutex lock
 			std::lock_guard<std::recursive_mutex> lock(m_mutex);

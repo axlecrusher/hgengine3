@@ -44,7 +44,7 @@ void HgTexture::release(HgTexture* t) {
 */
 HgTexture::HgTexture()
 {
-	data = nullptr;
+	m_data = nullptr;
 	gpuId = 0;
 	m_type = DIFFUSE;
 	m_uniqueId = 0;
@@ -54,21 +54,28 @@ HgTexture::HgTexture()
 HgTexture::~HgTexture()
 {
 	if (gpuId > 0) glDeleteTextures(1,&gpuId); //FIXME abstract this
-	SAFE_FREE(data);
+	SAFE_FREE(m_data);
 }
 
 bool HgTexture::stb_load(FILE* f) {
+	Properties p;
 	int x, y, fileChannels;
 //	stbi_set_flip_vertically_on_load(1);
-	data = stbi_load_from_file(f, &x, &y, &fileChannels, 0);
-	m_properties.format = (HgTexture::format)fileChannels;
-	m_properties.width = x;
-	m_properties.height = y;
+
+	auto data = stbi_load_from_file(f, &x, &y, &fileChannels, 0);
+	p.format = (HgTexture::format)fileChannels;
+	p.width = x;
+	p.height = y;
 	fclose(f);
 
+	if (data != NULL)
+	{
+		std::swap(m_data, data);
+		m_properties = p;
+	}
 
-
-	return data != NULL;
+	SAFE_FREE(data);
+	return m_data != NULL;
 }
 
 struct DDS_PIXELFORMAT {
@@ -111,10 +118,14 @@ typedef struct {
 #define DX10 0x30315844
 
 bool HgTexture::dds_load(FILE* f) {
+	bool success = false;
 	DDS_HEADER header;
 	DDS_HEADER_DXT10 dx10Header;
 
-	fread(&header, 124, 1, f);
+	if (fread(&header, 124, 1, f) != 1)
+	{
+		return false;
+	}
 
 	if (header.ddspf.flags == DDPF_FOURCC && header.ddspf.fourCC == DX10)
 	{
@@ -127,17 +138,26 @@ bool HgTexture::dds_load(FILE* f) {
 	p.width = header.width;
 	p.mipMapCount = header.mipMapCount;
 	p.format = (HgTexture::format)header.ddspf.fourCC;
-	m_properties = p;
 
 	const auto linearSize = header.pitchOrLinearSize;
 	const uint32_t size = p.mipMapCount > 1 ? linearSize * 2 : linearSize;
 
-	SAFE_FREE(data);
-	data = (unsigned char*)malloc(size);
-	fread(data, 1, size, f);
+	auto data = (unsigned char*)malloc(size);
+	const auto r = fread(data, 1, size, f);
+	//if (r == size)
+	//{
+		success = true;
+	//}
 	fclose(f);
 
-	return true;
+	if (success)
+	{
+		std::swap(m_data, data);
+		m_properties = p;
+	}
+
+	SAFE_FREE(data);
+	return success;
 }
 
 bool HgTexture::load(const std::string& path) {
@@ -149,8 +169,10 @@ bool HgTexture::load(const std::string& path) {
 }
 
 bool HgTexture::load_internal(std::string path) {
+	//don't leave texture in an unknown state if load fails
+
 	std::hash<std::string> hashFunc;
-	m_uniqueId = hashFunc(path);
+	const auto uniqueId = hashFunc(path);
 
 	char filecode[4];
 	FILE *f = fopen(path.c_str(), "rb");
@@ -159,16 +181,25 @@ bool HgTexture::load_internal(std::string path) {
 		return false;
 	}
 
-	m_path = std::move(path);
+	bool success = false;
 
 	fread(filecode, 1, 4, f);
 	if (strncmp(filecode, "DDS ", 4) == 0)
 	{
-		return dds_load(f);
+		success = dds_load(f);
 	}
 
 	fseek(f, 0, SEEK_SET);
-	return stb_load(f);
+	success = stb_load(f);
+
+	if (success)
+	{
+		//only update local data if texture loaded
+		m_uniqueId = uniqueId;
+		m_path = std::move(path);
+	}
+
+	return success;
 }
 
 void HgTexture::sendToGPU()
@@ -176,5 +207,5 @@ void HgTexture::sendToGPU()
 //	gpuId = updateTextureFunc(m_width, m_height, m_channels, data);
 	setNeedsGPUUpdate(false);
 	gpuId = updateTextureFunc(this);
-	SAFE_FREE(data);
+	SAFE_FREE(m_data);
 }
