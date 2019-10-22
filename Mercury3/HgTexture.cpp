@@ -54,7 +54,6 @@ HgTexture::HgTexture()
 HgTexture::~HgTexture()
 {
 	if (gpuId > 0) glDeleteTextures(1,&gpuId); //FIXME abstract this
-	SAFE_FREE(m_data);
 }
 
 bool HgTexture::stb_load(FILE* f) {
@@ -62,20 +61,21 @@ bool HgTexture::stb_load(FILE* f) {
 	int x, y, fileChannels;
 //	stbi_set_flip_vertically_on_load(1);
 
-	auto data = stbi_load_from_file(f, &x, &y, &fileChannels, 0);
+	std::unique_ptr<unsigned char, free_deleter> data(stbi_load_from_file(f, &x, &y, &fileChannels, 0));
+	bool success = (data != NULL);
+
 	p.format = (HgTexture::format)fileChannels;
 	p.width = x;
 	p.height = y;
 	fclose(f);
 
-	if (data != NULL)
+	if (success)
 	{
 		std::swap(m_data, data);
 		m_properties = p;
 	}
 
-	SAFE_FREE(data);
-	return m_data != NULL;
+	return success;
 }
 
 struct DDS_PIXELFORMAT {
@@ -142,8 +142,9 @@ bool HgTexture::dds_load(FILE* f) {
 	const auto linearSize = header.pitchOrLinearSize;
 	const uint32_t size = p.mipMapCount > 1 ? linearSize * 2 : linearSize;
 
-	auto data = (unsigned char*)malloc(size);
-	const auto r = fread(data, 1, size, f);
+	auto data = std::unique_ptr<unsigned char, free_deleter>((unsigned char*)malloc(size));
+
+	const auto r = fread(data.get(), 1, size, f);
 	//if (r == size)
 	//{
 		success = true;
@@ -156,7 +157,6 @@ bool HgTexture::dds_load(FILE* f) {
 		m_properties = p;
 	}
 
-	SAFE_FREE(data);
 	return success;
 }
 
@@ -188,9 +188,11 @@ bool HgTexture::load_internal(std::string path) {
 	{
 		success = dds_load(f);
 	}
-
-	fseek(f, 0, SEEK_SET);
-	success = stb_load(f);
+	else
+	{
+		fseek(f, 0, SEEK_SET);
+		success = stb_load(f);
+	}
 
 	if (success)
 	{
@@ -207,5 +209,5 @@ void HgTexture::sendToGPU()
 //	gpuId = updateTextureFunc(m_width, m_height, m_channels, data);
 	setNeedsGPUUpdate(false);
 	gpuId = updateTextureFunc(this);
-	SAFE_FREE(m_data);
+	m_data.reset();
 }

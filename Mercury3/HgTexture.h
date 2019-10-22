@@ -46,6 +46,8 @@ public:
 
 	~HgTexture();
 
+	HgTexture(const HgTexture& rhs) = delete;
+
 	typedef void(*shared_ptr_delete)(HgTexture* t);
 
 	/* TODO: I would like to make TexturePtr const since textures are immutible
@@ -70,13 +72,21 @@ public:
 
 	Properties getProperties() const { return m_properties; }
 
-	const unsigned char* getData() const { return m_data; }
+	const unsigned char* getData() const { return m_data.get(); }
 
 	const std::string& getPath() const { return m_path; }
 
 	using gpuUpdateTextureFunction = std::function<uint32_t(HgTexture*)>;
 	static gpuUpdateTextureFunction updateTextureFunc;
 private:
+	struct free_deleter {
+		template <typename T>
+		void operator()(T *p) const {
+			free(p);
+			p = NULL;
+		}
+	};
+
 	//use HgTexture::acquire to instantiate a texture
 	HgTexture();
 	static void wireReload(HgTexture::TexturePtr ptr);
@@ -96,7 +106,8 @@ private:
 	bool HgTexture::dds_load(FILE* f);
 
 	std::string m_path;
-	unsigned char* m_data;
+	std::unique_ptr<unsigned char, free_deleter> m_data;
+	//unsigned char* m_data;
 
 	TextureType m_type;
 	Properties m_properties;
