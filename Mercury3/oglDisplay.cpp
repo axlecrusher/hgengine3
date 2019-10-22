@@ -52,8 +52,13 @@ static GLint colorDepth(HgTexture::channels c) {
 }
 */
 uint32_t ogl_updateTextureData(HgTexture* tex) {
-	GLuint id;
-	glGenTextures(1, &id);
+	GLuint id = tex->getGPUId();
+
+	if (tex->getGPUId() == 0)
+	{
+		glGenTextures(1, &id);
+	}
+
 	glBindTexture(GL_TEXTURE_2D, id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

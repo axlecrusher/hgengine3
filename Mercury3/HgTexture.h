@@ -72,11 +72,14 @@ public:
 
 	const unsigned char* getData() const { return data; }
 
+	const std::string& getPath() const { return m_path; }
+
 	using gpuUpdateTextureFunction = std::function<uint32_t(HgTexture*)>;
 	static gpuUpdateTextureFunction updateTextureFunc;
 private:
 	//use HgTexture::acquire to instantiate a texture
 	HgTexture();
+	static void wireReload(HgTexture::TexturePtr ptr);
 
 	bool load(const std::string& path);
 	bool load_internal(std::string path);

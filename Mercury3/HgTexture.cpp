@@ -1,5 +1,6 @@
 #include "HgTexture.h"
 #include <glew.h>
+#include <FileWatch.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -9,11 +10,24 @@
 HgTexture::gpuUpdateTextureFunction HgTexture::updateTextureFunc;
 AssetManager<HgTexture> HgTexture::imageMap;
 
+void HgTexture::wireReload(HgTexture::TexturePtr ptr)
+{
+	std::weak_ptr<HgTexture> wptr = ptr;
+	WatchFileForChange(ptr->getPath(), [wptr]() {
+		auto ptr = wptr.lock();
+		ptr->load(ptr->getPath());
+	});
+}
+
 HgTexture::TexturePtr HgTexture::acquire(const std::string& path, TextureType type) {
 	bool isNew = false;
 	auto ptr = imageMap.get(path, &isNew);
 	if (ptr == nullptr) {
 		fprintf(stderr, "Could not open image \"%s\"", path.c_str());
+	}
+	else
+	{
+		wireReload(ptr);
 	}
 	if (isNew) {
 		ptr->setType(type);
@@ -118,6 +132,7 @@ bool HgTexture::dds_load(FILE* f) {
 	const auto linearSize = header.pitchOrLinearSize;
 	const uint32_t size = p.mipMapCount > 1 ? linearSize * 2 : linearSize;
 
+	SAFE_FREE(data);
 	data = (unsigned char*)malloc(size);
 	fread(data, 1, size, f);
 	fclose(f);

@@ -49,16 +49,23 @@ void FileWatcher::checkForChange()
 	{
 		uint64_t t = _GetFileTime(info.path.c_str());
 		if (t != info.mod_time) {
+			fprintf(stdout, "File changed:%s\n", info.path.c_str());
 			info.mod_time = t;
 			info.callback();
 		}
 	}
 }
 
-void WatchFileForChange(const char* path, FileWatcher::CallbackFunction clbk)
+//void WatchFileForChange(const char* path, FileWatcher::CallbackFunction clbk)
+//{
+//	std::lock_guard<std::mutex> lock(watcherMutex);
+//	watcher.watchFile(path, clbk);
+//}
+
+void WatchFileForChange(std::string path, FileWatcher::CallbackFunction clbk)
 {
 	std::lock_guard<std::mutex> lock(watcherMutex);
-	watcher.watchFile(path, clbk);
+	watcher.watchFile(std::move(path), clbk);
 }
 
 void CheckFilesForChange() {

@@ -20,5 +20,5 @@ private:
 	std::vector< FileInfo > m_fileCallbacks;
 };
 
-void WatchFileForChange(const char* path, FileWatcher::CallbackFunction clbk);
+void WatchFileForChange(std::string path, FileWatcher::CallbackFunction clbk);
 void CheckFilesForChange();
