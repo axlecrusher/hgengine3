@@ -78,7 +78,6 @@ public:
 		const unsigned char* getData() const { return m_data.get(); }
 		std::unique_ptr<unsigned char, free_deleter> m_data;
 		Properties properties;
-		std::string path;
 	} LoadedTextureData;
 
 	~HgTexture();

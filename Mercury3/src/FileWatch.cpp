@@ -33,6 +33,8 @@ static uint64_t _GetFileTime(const char* path) {
 
 void FileWatcher::watchFile(std::string path, CallbackFunction callback)
 {
+	if (path.empty()) return;
+
 	FileInfo info;
 	info.mod_time = _GetFileTime(path.c_str());
 	info.path = std::move(path);
@@ -64,8 +66,11 @@ void FileWatcher::checkForChange()
 
 void WatchFileForChange(std::string path, FileWatcher::CallbackFunction clbk)
 {
-	std::lock_guard<std::mutex> lock(watcherMutex);
-	watcher.watchFile(std::move(path), clbk);
+	if (!path.empty())
+	{
+		std::lock_guard<std::mutex> lock(watcherMutex);
+		watcher.watchFile(std::move(path), clbk);
+	}
 }
 
 void CheckFilesForChange() {

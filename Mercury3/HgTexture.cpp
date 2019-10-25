@@ -25,12 +25,11 @@ HgTexture::TexturePtr HgTexture::acquire(const std::string& path, TextureType ty
 	if (ptr == nullptr) {
 		fprintf(stderr, "Could not open image \"%s\"", path.c_str());
 	}
-	else
-	{
-		wireReload(ptr);
-	}
+
 	if (isNew) {
 		ptr->setType(type);
+		ptr->m_path = path;
+		wireReload(ptr);
 	}
 	return std::move( ptr );
 }
@@ -203,7 +202,6 @@ bool HgTexture::load_internal(std::string path) {
 	if (ltd!=nullptr)
 	{
 		//only update local data if texture loaded
-		ltd->path = std::move(path);
 		setLoadedTextureData(ltd);
 		return true;
 	}
@@ -217,7 +215,6 @@ void HgTexture::sendToGPU()
 	setNeedsGPUUpdate(false);
 	auto ltd = getLoadedTextureData();
 	m_properties = ltd->properties;
-	m_path = std::move(ltd->path);
 	m_gpuId = gpuCallbacks.updateTexture(this);
 	ltd.reset();
 }
