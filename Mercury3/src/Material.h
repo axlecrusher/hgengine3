@@ -40,10 +40,10 @@ public:
 	BlendMode blendMode() const { return m_blendMode; }
 	void setBlendMode(BlendMode m) { m_blendMode = m; m_recomputeHash = true; }
 
-	size_t getUniqueId();
+	//size_t getUniqueId();
 
 private:
-	void computeHash();
+	//void computeHash();
 
 	struct ShaderDeleter {
 		void operator()(HgShader* shader);

@@ -55,30 +55,30 @@ void Material::addTexture(const HgTexture::TexturePtr& texture) {
 	m_recomputeHash = true;
 }
 
-void Material::computeHash()
-{
-	size_t hash = m_shader->getUniqueId();
-	for (const auto& t : m_textures)
-	{
-		hash ^= t->getUniqueId();
-	}
-
-	std::hash<uint32_t> ih;
-	hash ^= ih(m_blendMode);
-
-	std::hash<bool> bh;
-	hash ^= bh(m_transparent);
-
-	m_uniqueId = hash;
-}
-
-size_t  Material::getUniqueId()
-{
-	if (m_recomputeHash)
-	{
-		computeHash();
-	}
-	m_recomputeHash = false;
-
-	return m_uniqueId;
-}
+//void Material::computeHash()
+//{
+//	size_t hash = m_shader->getUniqueId();
+//	for (const auto& t : m_textures)
+//	{
+//		hash ^= t->getUniqueId();
+//	}
+//
+//	std::hash<uint32_t> ih;
+//	hash ^= ih(m_blendMode);
+//
+//	std::hash<bool> bh;
+//	hash ^= bh(m_transparent);
+//
+//	m_uniqueId = hash;
+//}
+//
+//size_t  Material::getUniqueId()
+//{
+//	if (m_recomputeHash)
+//	{
+//		computeHash();
+//	}
+//	m_recomputeHash = false;
+//
+//	return m_uniqueId;
+//}
