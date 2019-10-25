@@ -112,8 +112,10 @@ uint32_t ogl_updateTextureData(HgTexture* tex) {
 		break;
 	}
 
+	auto ltd = tex->getLoadedTextureData();
+
 	if (properties.format < 0xFF) {
-		glTexImage2D(GL_TEXTURE_2D, 0, internal, properties.width, properties.height, 0, format, GL_UNSIGNED_BYTE, tex->getData());
+		glTexImage2D(GL_TEXTURE_2D, 0, internal, properties.width, properties.height, 0, format, GL_UNSIGNED_BYTE, ltd->getData());
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
@@ -126,7 +128,7 @@ uint32_t ogl_updateTextureData(HgTexture* tex) {
 		for (uint32_t level = 0; level < properties.mipMapCount && (width || height); ++level)
 		{
 			uint32_t size = ((width + 3) / 4)*((height + 3) / 4)*blockSize;
-			glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height, 0, size, tex->getData() + offset);
+			glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height, 0, size, ltd->getData() + offset);
 
 			offset += size;
 			width /= 2;

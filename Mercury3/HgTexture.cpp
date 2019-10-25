@@ -44,7 +44,7 @@ void HgTexture::release(HgTexture* t) {
 */
 HgTexture::HgTexture()
 {
-	gpuId = 0;
+	m_gpuId = 0;
 	m_type = DIFFUSE;
 	m_uniqueId = 0;
 }
@@ -57,7 +57,7 @@ HgTexture::~HgTexture()
 		if (gpuCallbacks.deleteTexture) gpuCallbacks.deleteTexture(getGPUId());
 	}
 
-	gpuId = 0;
+	m_gpuId = 0;
 }
 
 bool HgTexture::stb_load(FILE* f) {
@@ -75,8 +75,10 @@ bool HgTexture::stb_load(FILE* f) {
 
 	if (success)
 	{
-		std::swap(m_data, data);
-		m_properties = p;
+		auto ltd = std::make_unique<LoadedTextureData>();
+		ltd->m_data = std::move(data);
+		ltd->properties = p;
+		setLoadedTextureData(ltd);
 	}
 
 	return success;
@@ -157,8 +159,10 @@ bool HgTexture::dds_load(FILE* f) {
 
 	if (success)
 	{
-		std::swap(m_data, data);
-		m_properties = p;
+		auto ltd = std::make_unique<LoadedTextureData>();
+		ltd->m_data = std::move(data);
+		ltd->properties = p;
+		setLoadedTextureData(ltd);
 	}
 
 	return success;
@@ -212,6 +216,21 @@ void HgTexture::sendToGPU()
 {
 //	gpuId = updateTextureFunc(m_width, m_height, m_channels, data);
 	setNeedsGPUUpdate(false);
-	gpuId = gpuCallbacks.updateTexture(this);
-	m_data.reset();
+	auto ltd = getLoadedTextureData();
+	m_properties = ltd->properties;
+	m_gpuId = gpuCallbacks.updateTexture(this);
+	ltd.reset();
+}
+
+
+void HgTexture::setLoadedTextureData(std::unique_ptr<LoadedTextureData>& ltd)
+{
+	std::shared_ptr<LoadedTextureData> ptr(std::move(ltd));
+	m_loadedData.set(ptr);
+	setNeedsGPUUpdate(true);
+}
+
+std::shared_ptr<HgTexture::LoadedTextureData> HgTexture::getLoadedTextureData() const
+{
+	return m_loadedData.get();
 }

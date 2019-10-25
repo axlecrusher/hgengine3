@@ -3,9 +3,29 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <atomic>
 
 #include "str_utils.h"
 #include <AssetManager.h>
+
+template<typename T>
+class ThreadSafePtr
+{
+public:
+	void set(std::shared_ptr<T>& p)
+	{
+		std::atomic_store(&m_ptr, p);
+	}
+
+	auto get() const
+	{
+		auto p = std::atomic_load(&m_ptr);
+		return p;
+	}
+private:
+	std::shared_ptr<T> m_ptr;
+};
+
 
 class HgTexture
 {
@@ -35,7 +55,7 @@ public:
 
 	struct Properties
 	{
-		Properties()
+		Properties() noexcept
 			: width(0), height(0), format(HgTexture::format::UNKNOWN), mipMapCount(0)
 		{}
 
@@ -43,6 +63,22 @@ public:
 		uint16_t width, height;
 		uint8_t mipMapCount;
 	};
+
+	struct free_deleter {
+		template <typename T>
+		void operator()(T *p) const {
+			free(p);
+			p = NULL;
+		}
+	};
+
+	//Struture to provide data from texture loading functions
+	typedef struct LoadedTextureData
+	{
+		const unsigned char* getData() const { return m_data.get(); }
+		std::unique_ptr<unsigned char, free_deleter> m_data;
+		Properties properties;
+	} LoadedTextureData;
 
 	~HgTexture();
 
@@ -63,18 +99,23 @@ public:
 	inline TextureType getType() const { return m_type; }
 
 	//Indicates that texture needs to be sent to gpu
-	inline bool NeedsGPUUpdate() const { return needsUpdate; }
+	inline bool NeedsGPUUpdate() const { return m_needsUpdate; }
 
 	inline size_t getUniqueId() const { return m_uniqueId; }
 
 	void sendToGPU();
-	inline uint32_t getGPUId() const { return gpuId; }
+	inline uint32_t getGPUId() const { return m_gpuId; }
 
 	Properties getProperties() const { return m_properties; }
 
-	const unsigned char* getData() const { return m_data.get(); }
+	//const unsigned char* getData() const { return m_data.get(); }
 
 	const std::string& getPath() const { return m_path; }
+
+	//Thread safe
+	void setLoadedTextureData(std::unique_ptr<LoadedTextureData>& ltd);
+	//Thread safe
+	std::shared_ptr<LoadedTextureData> getLoadedTextureData() const;
 
 	typedef struct GraphicsCallbacks
 	{
@@ -84,12 +125,9 @@ public:
 
 	static GraphicsCallbacks gpuCallbacks;
 private:
-	struct free_deleter {
-		template <typename T>
-		void operator()(T *p) const {
-			free(p);
-			p = NULL;
-		}
+	class LoadedTextureDataWrapper
+	{
+
 	};
 
 	//use HgTexture::acquire to instantiate a texture
@@ -102,7 +140,7 @@ private:
 	inline void setType(TextureType texType) { m_type = texType; }
 
 	//Indicates that texture needs to be sent to gpu
-	void setNeedsGPUUpdate(bool update) { needsUpdate = update; }
+	void setNeedsGPUUpdate(bool update) { m_needsUpdate = update; }
 
 	//used when an image is no longer used. Called by TexturePtr, not user callible.
 //	static void release(HgTexture* t);
@@ -111,14 +149,12 @@ private:
 	bool HgTexture::dds_load(FILE* f);
 
 	std::string m_path;
-	std::unique_ptr<unsigned char, free_deleter> m_data;
-	//unsigned char* m_data;
-
 	TextureType m_type;
 	Properties m_properties;
+	uint32_t m_gpuId;
+	std::atomic<bool> m_needsUpdate;
 
-	uint32_t gpuId;
-	bool needsUpdate;
+	ThreadSafePtr<LoadedTextureData> m_loadedData;
 
 	size_t m_uniqueId;
 
