@@ -78,6 +78,7 @@ public:
 		const unsigned char* getData() const { return m_data.get(); }
 		std::unique_ptr<unsigned char, free_deleter> m_data;
 		Properties properties;
+		std::string path;
 	} LoadedTextureData;
 
 	~HgTexture();
@@ -101,7 +102,7 @@ public:
 	//Indicates that texture needs to be sent to gpu
 	inline bool NeedsGPUUpdate() const { return m_needsUpdate; }
 
-	inline size_t getUniqueId() const { return m_uniqueId; }
+	//inline size_t getUniqueId() const { return m_uniqueId; }
 
 	void sendToGPU();
 	inline uint32_t getGPUId() const { return m_gpuId; }
@@ -125,10 +126,6 @@ public:
 
 	static GraphicsCallbacks gpuCallbacks;
 private:
-	class LoadedTextureDataWrapper
-	{
-
-	};
 
 	//use HgTexture::acquire to instantiate a texture
 	HgTexture();
@@ -145,8 +142,8 @@ private:
 	//used when an image is no longer used. Called by TexturePtr, not user callible.
 //	static void release(HgTexture* t);
 
-	bool HgTexture::stb_load(FILE* f);
-	bool HgTexture::dds_load(FILE* f);
+	std::unique_ptr<LoadedTextureData> HgTexture::stb_load(FILE* f);
+	std::unique_ptr<LoadedTextureData> HgTexture::dds_load(FILE* f);
 
 	std::string m_path;
 	TextureType m_type;
@@ -156,7 +153,7 @@ private:
 
 	ThreadSafePtr<LoadedTextureData> m_loadedData;
 
-	size_t m_uniqueId;
+	//size_t m_uniqueId;
 
 	static AssetManager<HgTexture> imageMap;
 	friend AssetManager<HgTexture>;

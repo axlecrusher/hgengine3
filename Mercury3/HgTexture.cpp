@@ -46,7 +46,6 @@ HgTexture::HgTexture()
 {
 	m_gpuId = 0;
 	m_type = DIFFUSE;
-	m_uniqueId = 0;
 }
 
 
@@ -60,7 +59,7 @@ HgTexture::~HgTexture()
 	m_gpuId = 0;
 }
 
-bool HgTexture::stb_load(FILE* f) {
+std::unique_ptr<HgTexture::LoadedTextureData> HgTexture::stb_load(FILE* f) {
 	Properties p;
 	int x, y, fileChannels;
 //	stbi_set_flip_vertically_on_load(1);
@@ -78,10 +77,10 @@ bool HgTexture::stb_load(FILE* f) {
 		auto ltd = std::make_unique<LoadedTextureData>();
 		ltd->m_data = std::move(data);
 		ltd->properties = p;
-		setLoadedTextureData(ltd);
+		return std::move(ltd);
 	}
 
-	return success;
+	return nullptr;
 }
 
 struct DDS_PIXELFORMAT {
@@ -123,7 +122,7 @@ typedef struct {
 #define DDPF_FOURCC 0x4
 #define DX10 0x30315844
 
-bool HgTexture::dds_load(FILE* f) {
+std::unique_ptr<HgTexture::LoadedTextureData> HgTexture::dds_load(FILE* f) {
 	bool success = false;
 	DDS_HEADER header;
 	DDS_HEADER_DXT10 dx10Header;
@@ -162,10 +161,12 @@ bool HgTexture::dds_load(FILE* f) {
 		auto ltd = std::make_unique<LoadedTextureData>();
 		ltd->m_data = std::move(data);
 		ltd->properties = p;
-		setLoadedTextureData(ltd);
+		return std::move(ltd);
+		//ltd->path = std::move(path);
+		//setLoadedTextureData(ltd);
 	}
 
-	return success;
+	return nullptr;
 }
 
 bool HgTexture::load(const std::string& path) {
@@ -179,9 +180,6 @@ bool HgTexture::load(const std::string& path) {
 bool HgTexture::load_internal(std::string path) {
 	//don't leave texture in an unknown state if load fails
 
-	std::hash<std::string> hashFunc;
-	const auto uniqueId = hashFunc(path);
-
 	char filecode[4];
 	FILE *f = fopen(path.c_str(), "rb");
 	if (f == nullptr) {
@@ -189,27 +187,28 @@ bool HgTexture::load_internal(std::string path) {
 		return false;
 	}
 
-	bool success = false;
+	std::unique_ptr<HgTexture::LoadedTextureData> ltd;
 
 	fread(filecode, 1, 4, f);
 	if (strncmp(filecode, "DDS ", 4) == 0)
 	{
-		success = dds_load(f);
+		ltd = dds_load(f);
 	}
 	else
 	{
 		fseek(f, 0, SEEK_SET);
-		success = stb_load(f);
+		ltd = stb_load(f);
 	}
 
-	if (success)
+	if (ltd!=nullptr)
 	{
 		//only update local data if texture loaded
-		m_uniqueId = uniqueId;
-		m_path = std::move(path);
+		ltd->path = std::move(path);
+		setLoadedTextureData(ltd);
+		return true;
 	}
 
-	return success;
+	return false;
 }
 
 void HgTexture::sendToGPU()
@@ -218,6 +217,7 @@ void HgTexture::sendToGPU()
 	setNeedsGPUUpdate(false);
 	auto ltd = getLoadedTextureData();
 	m_properties = ltd->properties;
+	m_path = std::move(ltd->path);
 	m_gpuId = gpuCallbacks.updateTexture(this);
 	ltd.reset();
 }
