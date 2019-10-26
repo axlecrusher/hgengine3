@@ -51,6 +51,10 @@ namespace HgMath {
 			return tmp;
 		}
 
+		inline vertex operator*(T rhs) const {
+			return this->scale(rhs);
+		}
+
 		inline vertex operator+(const vertex& rhs) const {
 			vertex tmp;
 			for (int i = 0; i < fcount; i++) {
@@ -154,6 +158,21 @@ namespace HgMath {
 	private:
 		T xyz[fcount];
 	};
+
+	//Project A onto B.
+	template<typename T>
+	inline vertex<T> Project(const vertex<T>& A, const vertex<T>& B)
+	{
+		return (A.dot(B) / B.squaredLength()) * B;
+	}
+
+	//Compute component of A that is perpendicular to B
+	template<typename T>
+	inline vertex<T> Reject(const vertex<T>& A, const vertex<T>& B)
+	{
+		const auto tmp = A.dot(B) / B.squaredLength();
+		return A - (B * tmp);
+	}
 }
 
 typedef HgMath::vertex<double> vertex3d;
