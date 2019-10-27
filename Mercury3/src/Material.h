@@ -35,7 +35,7 @@ public:
 
 	bool needsTexturesUpdated() const { return m_updateTextures; }
 
-	uint32_t getGPUTextureHandle(HgTexture::TextureType t) const { return m_gpuTextureHandles[t]; }
+	HgTexture::Handle getGPUTextureHandle(HgTexture::TextureType t) const { return m_gpuTextureHandles[t]; }
 
 	BlendMode blendMode() const { return m_blendMode; }
 	void setBlendMode(BlendMode m) { m_blendMode = m; m_recomputeHash = true; }
@@ -52,7 +52,7 @@ private:
 	std::unique_ptr<HgShader, ShaderDeleter> m_shader;
 	std::vector< HgTexture::TexturePtr > m_textures;
 	BlendMode m_blendMode;
-	uint32_t m_gpuTextureHandles[HgTexture::TEXTURE_TYPE_COUNT];
+	HgTexture::Handle m_gpuTextureHandles[HgTexture::TEXTURE_TYPE_COUNT];
 
 	bool m_transparent;
 	bool m_updateTextures;

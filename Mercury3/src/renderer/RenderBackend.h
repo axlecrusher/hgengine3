@@ -43,6 +43,8 @@ public:
 	RendererType Type() const { return m_type; }
 	//void setup_viewports(uint16_t width, uint16_t height);
 
+	virtual void BindTexture(uint16_t textureLocation, HgTexture::Handle textureHandle) = 0;
+
 protected:
 	RendererType m_type;
 

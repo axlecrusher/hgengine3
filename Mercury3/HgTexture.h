@@ -26,10 +26,10 @@ private:
 	std::shared_ptr<T> m_ptr;
 };
 
-
 class HgTexture
 {
 public:
+	typedef uint32_t Handle;
 	enum format {
 		UNKNOWN = 0,
 		GRAY = 1,
@@ -104,7 +104,7 @@ public:
 	//inline size_t getUniqueId() const { return m_uniqueId; }
 
 	void sendToGPU();
-	inline uint32_t getGPUId() const { return m_gpuId; }
+	inline uint32_t getHandle() const { return m_handle; }
 
 	Properties getProperties() const { return m_properties; }
 
@@ -115,7 +115,7 @@ public:
 	//Thread safe
 	void setLoadedTextureData(std::unique_ptr<LoadedTextureData>& ltd);
 	//Thread safe
-	std::shared_ptr<LoadedTextureData> getLoadedTextureData() const;
+	std::shared_ptr<const LoadedTextureData> getLoadedTextureData() const;
 
 	typedef struct GraphicsCallbacks
 	{
@@ -147,10 +147,10 @@ private:
 	std::string m_path;
 	TextureType m_type;
 	Properties m_properties;
-	uint32_t m_gpuId;
+	Handle m_handle;
 	std::atomic<bool> m_needsUpdate;
 
-	ThreadSafePtr<LoadedTextureData> m_loadedData;
+	ThreadSafePtr<const LoadedTextureData> m_loadedData;
 
 	//size_t m_uniqueId;
 

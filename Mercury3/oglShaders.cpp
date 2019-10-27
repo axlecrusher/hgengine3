@@ -13,6 +13,8 @@
 #include <OGL/OGLGpuBuffer.h>
 #include <RenderBackend.h>
 
+#include <OGLBackend.h>
+
 static GLuint _currentShaderProgram = 0;
 
 #pragma warning(disable:4996)
@@ -248,32 +250,34 @@ void HgOglShader::uploadMatrices(const float* worldSpaceMatrix, const HgMath::ma
 
 
 void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
-
-	glActiveTexture(GL_TEXTURE0);
 	auto textId = rd.getMaterial().getGPUTextureHandle(HgTexture::DIFFUSE);
-	glBindTexture(GL_TEXTURE_2D, textId);
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, textId);
 	if ((m_uniformLocations[U_DIFFUSE_TEXTURE] > -1) && (textId > 0)) {
+		RENDERER()->BindTexture(0, textId);
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);
 		glUniform1i(m_uniformLocations[U_DIFFUSE_TEXTURE], 0);
 	}
 
-	glActiveTexture(GL_TEXTURE1);
 	textId = rd.getMaterial().getGPUTextureHandle(HgTexture::SPECULAR);
-	glBindTexture(GL_TEXTURE_2D, textId);
+	//glActiveTexture(GL_TEXTURE1);
+	//glBindTexture(GL_TEXTURE_2D, textId);
 	if ((m_uniformLocations[U_SPECULAR_TEXTURE] > -1) && (textId > 0)) {
+		RENDERER()->BindTexture(1, textId);
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
 		glUniform1i(m_uniformLocations[U_SPECULAR_TEXTURE], 1);
 	}
 
-	glActiveTexture(GL_TEXTURE2);
 	textId = rd.getMaterial().getGPUTextureHandle(HgTexture::NORMAL);
-	glBindTexture(GL_TEXTURE_2D, textId);
+	//glActiveTexture(GL_TEXTURE2);
+	//glBindTexture(GL_TEXTURE_2D, textId);
 	if ((m_uniformLocations[U_NORMAL_TEXTURE] > -1) && (textId > 0)) {
+		RENDERER()->BindTexture(2, textId);
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
 		glUniform1i(m_uniformLocations[U_NORMAL_TEXTURE], 2);
 	}
 
-	glActiveTexture(GL_TEXTURE3);
+	((OGLBackend*)RENDERER())->ActiveTexture(GL_TEXTURE3);
 	auto gpuBuffer = rd.gpuBuffer.get();
 	if ((m_uniformLocations[U_BUFFER_OBJECT1] > -1) && (gpuBuffer != nullptr)) {
 		OGLHgGPUBuffer* api = (OGLHgGPUBuffer*)gpuBuffer->apiImpl();

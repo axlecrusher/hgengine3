@@ -52,9 +52,9 @@ static GLint colorDepth(HgTexture::channels c) {
 }
 */
 uint32_t ogl_updateTextureData(HgTexture* tex) {
-	GLuint id = tex->getGPUId();
+	GLuint id = tex->getHandle();
 
-	if (tex->getGPUId() == 0)
+	if (tex->getHandle() == 0)
 	{
 		glGenTextures(1, &id);
 	}

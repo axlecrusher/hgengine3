@@ -1,6 +1,7 @@
 #pragma once
 
 #include <RenderBackend.h>
+#include <glew.h>
 
 class OGLBackend : public RenderBackend {
 public:
@@ -18,6 +19,9 @@ public:
 	void EndFrame();
 	void setViewport(const Viewport& vp);
 	std::unique_ptr<IFramebuffer> CreateFrameBuffer();
+
+	void ActiveTexture(GLenum t);
+	void BindTexture(uint16_t textureLocation, HgTexture::Handle textureHandle);
 
 	enum EnabledState
 	{

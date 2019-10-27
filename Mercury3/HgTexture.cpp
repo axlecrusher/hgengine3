@@ -43,19 +43,19 @@ void HgTexture::release(HgTexture* t) {
 */
 HgTexture::HgTexture()
 {
-	m_gpuId = 0;
+	m_handle = 0;
 	m_type = DIFFUSE;
 }
 
 
 HgTexture::~HgTexture()
 {
-	if (getGPUId() > 0) {
+	if (getHandle() > 0) {
 		//TODO: Fix gpuCallbacks being destroyed before textures
-		if (gpuCallbacks.deleteTexture) gpuCallbacks.deleteTexture(getGPUId());
+		if (gpuCallbacks.deleteTexture) gpuCallbacks.deleteTexture(getHandle());
 	}
 
-	m_gpuId = 0;
+	m_handle = 0;
 }
 
 std::unique_ptr<HgTexture::LoadedTextureData> HgTexture::stb_load(FILE* f) {
@@ -215,19 +215,19 @@ void HgTexture::sendToGPU()
 	setNeedsGPUUpdate(false);
 	auto ltd = getLoadedTextureData();
 	m_properties = ltd->properties;
-	m_gpuId = gpuCallbacks.updateTexture(this);
+	m_handle = gpuCallbacks.updateTexture(this);
 	ltd.reset();
 }
 
 
 void HgTexture::setLoadedTextureData(std::unique_ptr<LoadedTextureData>& ltd)
 {
-	std::shared_ptr<LoadedTextureData> ptr(std::move(ltd));
+	std::shared_ptr<const LoadedTextureData> ptr(std::move(ltd));
 	m_loadedData.set(ptr);
 	setNeedsGPUUpdate(true);
 }
 
-std::shared_ptr<HgTexture::LoadedTextureData> HgTexture::getLoadedTextureData() const
+std::shared_ptr<const HgTexture::LoadedTextureData> HgTexture::getLoadedTextureData() const
 {
 	return m_loadedData.get();
 }

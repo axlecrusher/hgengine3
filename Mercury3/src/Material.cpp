@@ -6,7 +6,7 @@ void Material::clearTextureIDs() {
 
 void Material::setTexture(const HgTexture* t) {
 	const HgTexture::TextureType type = t->getType();
-	m_gpuTextureHandles[type] = t->getGPUId();
+	m_gpuTextureHandles[type] = t->getHandle();
 }
 
 void Material::updateGpuTextures() {
