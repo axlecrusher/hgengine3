@@ -250,11 +250,13 @@ void HgOglShader::uploadMatrices(const float* worldSpaceMatrix, const HgMath::ma
 
 
 void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
+	auto renderer = (OGLBackend*)RENDERER();
+
 	auto textId = rd.getMaterial().getGPUTextureHandle(HgTexture::DIFFUSE);
 	//glActiveTexture(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_2D, textId);
 	if ((m_uniformLocations[U_DIFFUSE_TEXTURE] > -1) && (textId > 0)) {
-		RENDERER()->BindTexture(0, textId);
+		renderer->BindTexture(0, textId, GL_TEXTURE_2D);
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);
 		glUniform1i(m_uniformLocations[U_DIFFUSE_TEXTURE], 0);
 	}
@@ -263,7 +265,7 @@ void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
 	//glActiveTexture(GL_TEXTURE1);
 	//glBindTexture(GL_TEXTURE_2D, textId);
 	if ((m_uniformLocations[U_SPECULAR_TEXTURE] > -1) && (textId > 0)) {
-		RENDERER()->BindTexture(1, textId);
+		renderer->BindTexture(1, textId, GL_TEXTURE_2D);
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
 		glUniform1i(m_uniformLocations[U_SPECULAR_TEXTURE], 1);
 	}
@@ -272,12 +274,11 @@ void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
 	//glActiveTexture(GL_TEXTURE2);
 	//glBindTexture(GL_TEXTURE_2D, textId);
 	if ((m_uniformLocations[U_NORMAL_TEXTURE] > -1) && (textId > 0)) {
-		RENDERER()->BindTexture(2, textId);
+		renderer->BindTexture(2, textId, GL_TEXTURE_2D);
 		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
 		glUniform1i(m_uniformLocations[U_NORMAL_TEXTURE], 2);
 	}
 
-	((OGLBackend*)RENDERER())->ActiveTexture(GL_TEXTURE3);
 	auto gpuBuffer = rd.gpuBuffer.get();
 	if ((m_uniformLocations[U_BUFFER_OBJECT1] > -1) && (gpuBuffer != nullptr)) {
 		OGLHgGPUBuffer* api = (OGLHgGPUBuffer*)gpuBuffer->apiImpl();
@@ -285,7 +286,7 @@ void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
 			//api->OGLHgGPUBuffer::SendToGPU(oglrd->gpuBuffer.get()); //no vtable lookup
 			api->OGLHgGPUBuffer::SendToGPU(gpuBuffer); //no vtable lookup
 		}
-		api->OGLHgGPUBuffer::Bind(); //no vtable lookup
+		api->OGLHgGPUBuffer::Bind(3); //no vtable lookup
 		glUniform1i(m_uniformLocations[U_BUFFER_OBJECT1], 3);
 	}
 }

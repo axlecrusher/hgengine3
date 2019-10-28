@@ -1,4 +1,6 @@
 #include <OGL/OGLGpuBuffer.h>
+#include <RenderBackend.h>
+#include <OGLBackend.h>
 
 std::vector<GLBufferId> OGLHgGPUBuffer::m_useableBufferIds;
 
@@ -34,7 +36,21 @@ const GLBufferId& GLBufferId::operator=(GLBufferId&& rhs)
 	rhs.buffId = 0;
 	rhs.texId = 0;
 
+	m_bufferBound = rhs.m_bufferBound;
+
 	return *this;
+}
+
+void GLBufferId::AssociateBuffers()
+{
+	//setup associate the buffer with the texture
+	if (!m_bufferBound)
+	{
+		auto renderer = (OGLBackend*)RENDERER();
+		renderer->BindTexture(10, texId, GL_TEXTURE_BUFFER);
+		glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, buffId);
+		m_bufferBound = true;
+	}
 }
 
 
@@ -80,9 +96,11 @@ void OGLHgGPUBuffer::SendToGPU(const IHgGPUBuffer* bufferObject) {
 		glBufferSubData(GL_TEXTURE_BUFFER, 0, size, bufferObject->getBufferPtr());
 	}
 	m_lastSize = size;
+
+	m_bufferIds.AssociateBuffers();
 }
 
-void OGLHgGPUBuffer::Bind() {
-	glBindTexture(GL_TEXTURE_BUFFER, m_bufferIds.texId);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, m_bufferIds.buffId);
+void OGLHgGPUBuffer::Bind(uint16_t textureLocation) {
+	auto renderer = (OGLBackend*)RENDERER();
+	renderer->BindTexture(3, m_bufferIds.texId, GL_TEXTURE_BUFFER);
 }

@@ -12,7 +12,7 @@ public:
 	virtual ~IGPUBufferImpl() {}
 
 	virtual void SendToGPU(const IHgGPUBuffer* bufferObject) = 0;
-	virtual void Bind() = 0;
+	virtual void Bind(uint16_t textureLocation) = 0;
 };
 
 class IHgGPUBuffer {

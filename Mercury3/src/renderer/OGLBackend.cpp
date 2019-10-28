@@ -19,6 +19,35 @@ static void GLAPIENTRY ogl_error_clbk(GLenum source, GLenum type, GLuint id,
 	//fprintf(stderr, "%s\n", message);
 }
 
+uint8_t OGLTextureUnit::convertTextureTarget(GLenum target)
+{
+	switch (target)
+	{
+	case GL_TEXTURE_2D:
+		return 0;
+	case GL_TEXTURE_BUFFER:
+		return 1;
+	default:
+		return 2;
+	}
+}
+
+void OGLTextureUnit::BindTexture(GLenum target, GLuint textureId)
+{
+	const auto i = convertTextureTarget(target);
+	if (GetBoundTexture(target) != textureId)
+	{
+		glBindTexture(target, textureId);
+		m_targets[i] = textureId;
+	}
+}
+
+GLuint OGLTextureUnit::GetBoundTexture(GLenum target)
+{
+	const auto i = convertTextureTarget(target);
+	return m_targets[i];
+}
+
 RenderBackend* OGLBackend::Create() {
 	static OGLBackend openglRenderer;
 
@@ -133,55 +162,30 @@ void OGLBackend::setRenderAttributes(BlendMode blendMode, RenderData::Flags flag
 
 static GLenum convertTextureLocation(uint16_t location)
 {
-	switch (location)
-	{
-	case 0:
-		return GL_TEXTURE0;
-	case 1:
-		return GL_TEXTURE1;
-	case 2:
-		return GL_TEXTURE2;
-	//case 3:
-	//	return GL_TEXTURE3;
-	case 4:
-		return GL_TEXTURE4;
-	case 5:
-		return GL_TEXTURE5;
-	case 6:
-		return GL_TEXTURE6;
-	case 7:
-		return GL_TEXTURE7;
-	case 8:
-		return GL_TEXTURE8;
-	case 9:
-		return GL_TEXTURE9;
-	default:
-		return GL_TEXTURE10;
-	}
+	return GL_TEXTURE0 + location;
 }
 
-void OGLBackend::ActiveTexture(GLenum t)
+OGLTextureUnit& OGLBackend::ActiveTexture(uint16_t t)
 {
-	static GLenum activeTexture = 0;
-	if (activeTexture != t)
+	static OGLTextureUnit units[40];
+	static GLenum activeTextureUnit = -1;
+
+	const auto location = convertTextureLocation(t);
+
+	if (activeTextureUnit != location)
 	{
-		glActiveTexture(t);
-		activeTexture = t;
+		glActiveTexture(location);
+		activeTextureUnit = location;
 	}
+
+	return units[t];
 }
 
-void OGLBackend::BindTexture(uint16_t textureLocation, HgTexture::Handle textureHandle)
+void OGLBackend::BindTexture(uint16_t textureLocation, HgTexture::Handle textureHandle, GLenum target)
 {
-	static GLuint boundTexture[11] = { 0 };
-	const auto texture = convertTextureLocation(textureLocation);
-
-	ActiveTexture(texture);
+	auto& unit = ActiveTexture(textureLocation);
 
 	if (textureHandle == 0) return;
 
-	if (boundTexture[textureLocation] != textureHandle)
-	{
-		glBindTexture(GL_TEXTURE_2D, textureHandle);
-		boundTexture[textureLocation] = textureHandle;
-	}
+	unit.BindTexture(target, textureHandle);
 }

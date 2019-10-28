@@ -7,7 +7,7 @@
 //A structure to contain opengl buffer and texture id.
 struct GLBufferId
 {
-	GLBufferId() : buffId(0), texId(0)
+	GLBufferId() : buffId(0), texId(0), m_bufferBound(false)
 	{}
 
 	~GLBufferId();
@@ -22,8 +22,11 @@ struct GLBufferId
 	const GLBufferId& operator=(const GLBufferId& rhs) = delete;
 	const GLBufferId& operator=(GLBufferId&& rhs);
 
+	void AssociateBuffers();
+
 	GLuint buffId;
 	GLuint texId;
+	bool m_bufferBound;
 };
 
 class OGLHgGPUBuffer : public IGPUBufferImpl {
@@ -32,7 +35,7 @@ public:
 	~OGLHgGPUBuffer();
 
 	virtual void SendToGPU(const IHgGPUBuffer* bufferObject) final;
-	virtual void Bind() final;
+	virtual void Bind(uint16_t textureLocation) final;
 
 	//inline GLuint TextureId() const { return m_bufferIds.texId; }
 private:
