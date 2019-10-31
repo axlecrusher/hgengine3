@@ -60,18 +60,59 @@ bool XAudio2Driver::init() {
 	return true;
 }
 
+static UINT timerId = 0;
+
+void XAudio2Driver::TimerClbk(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2)
+{
+	if (timerId == uTimerID)
+	{
+		XAudio2Driver* driver = (XAudio2Driver*)dwUser;
+		driver->processPlayEvents();
+		driver->processDestroyQueue();
+		driver->update3DAudio();
+		//		updateVoices();
+		driver->m_stop = false;
+	}
+}
+
 bool XAudio2Driver::start() {
 	//bool success = Driver::start();
-	m_thread = std::thread([](XAudio2Driver* driver) { driver->threadLoop(); }, this);
+	//m_thread = std::thread([](XAudio2Driver* driver) { driver->threadLoop(); }, this);
+
+	TIMECAPS tc;
+	UINT     wTimerRes;
+
+	if (timeGetDevCaps(&tc, sizeof(TIMECAPS)) != TIMERR_NOERROR)
+	{
+		// Error; application can't continue.
+	}
+
+	wTimerRes = (std::min)((std::max)(tc.wPeriodMin, 5u), tc.wPeriodMax);
+	timeBeginPeriod(wTimerRes);
+
+	timerId = timeSetEvent(10, 5, TimerClbk, (DWORD_PTR)this, TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
+
+	timeEndPeriod(wTimerRes);
+
 	return true;
 }
 
 void XAudio2Driver::shutdown()
 {
+	timeKillEvent(timerId);
+
+	//make sure TimerClbk isn't running??
+	while (m_stop == false)
+	{
+		m_stop = true;
+		Sleep(10);
+	}
+
+
 	//signal stop, wake thread from wait, wait for thread to join
 	m_stop = true;
-	if (m_thread.joinable())
-		m_thread.join();
+	//if (m_thread.joinable())
+	//	m_thread.join();
 
 	if (m_xaudioEngine)
 	{
@@ -80,19 +121,18 @@ void XAudio2Driver::shutdown()
 	}
 }
 
-
-void XAudio2Driver::threadLoop()
-{
-	while (!m_stop)
-	{
-		Sleep(10);
-
-		processPlayEvents();
-		processDestroyQueue();
-		update3DAudio();
-//		updateVoices();
-	}
-}
+//void XAudio2Driver::threadLoop()
+//{
+//	while (!m_stop)
+//	{
+//		Sleep(10);
+//
+//		processPlayEvents();
+//		processDestroyQueue();
+//		update3DAudio();
+////		updateVoices();
+//	}
+//}
 
 void XAudio2Driver::processPlayEvents()
 {

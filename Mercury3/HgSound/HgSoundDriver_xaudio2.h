@@ -87,7 +87,9 @@ public:
 	void queueDestroy(VoiceCallback* x) { m_toDestroy.push_back(x); }
 
 private:
-	void threadLoop();
+	static void TimerClbk(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2);
+
+	//void threadLoop();
 	Voice initVoice(PlayingSound::ptr& sound);
 
 	void InsertVoice(Voice& v);
@@ -115,8 +117,12 @@ private:
 	ProtectedVector<VoiceCallback*> m_toDestroy;
 	ProtectedVector<Events::PlaySound3D> m_playSoundEvents;
 
-	bool m_stop;
-	std::thread m_thread;
+	std::atomic<bool> m_stop;
+	//bool m_stop;
+	//std::thread m_thread;
+
+	//UINT m_timerId;
+
 };
 }
 }
