@@ -105,7 +105,7 @@ void XAudio2Driver::shutdown()
 	while (m_stop == false)
 	{
 		m_stop = true;
-		Sleep(10);
+		Sleep(100);
 	}
 
 
