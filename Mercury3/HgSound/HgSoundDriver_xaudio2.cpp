@@ -60,18 +60,28 @@ bool XAudio2Driver::init() {
 	return true;
 }
 
-static UINT timerId = 0;
+XAudio2Driver::ClbkUserData::ClbkUserData()
+{
+	timerId = 0;
+	driver = nullptr;
+}
 
 void XAudio2Driver::TimerClbk(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2)
 {
-	if (timerId == uTimerID)
+	if (dwUser == NULL) return;
+
+	const auto data = (const ClbkUserData*)dwUser;
+	if (data->magic == 0x58415532)
 	{
-		XAudio2Driver* driver = (XAudio2Driver*)dwUser;
-		driver->processPlayEvents();
-		driver->processDestroyQueue();
-		driver->update3DAudio();
-		//		updateVoices();
-		driver->m_stop = false;
+		if (data->timerId == uTimerID)
+		{
+			XAudio2Driver* driver = data->driver;
+			driver->processPlayEvents();
+			driver->processDestroyQueue();
+			driver->update3DAudio();
+			//		updateVoices();
+			driver->m_stop = false;
+		}
 	}
 }
 
@@ -90,7 +100,8 @@ bool XAudio2Driver::start() {
 	wTimerRes = (std::min)((std::max)(tc.wPeriodMin, 5u), tc.wPeriodMax);
 	timeBeginPeriod(wTimerRes);
 
-	timerId = timeSetEvent(10, 5, TimerClbk, (DWORD_PTR)this, TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
+	m_clbkData.driver = this;
+	m_clbkData.timerId = timeSetEvent(10, 5, TimerClbk, (DWORD_PTR)&m_clbkData, TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
 
 	timeEndPeriod(wTimerRes);
 
@@ -99,7 +110,7 @@ bool XAudio2Driver::start() {
 
 void XAudio2Driver::shutdown()
 {
-	timeKillEvent(timerId);
+	timeKillEvent(m_clbkData.timerId);
 
 	//make sure TimerClbk isn't running??
 	while (m_stop == false)

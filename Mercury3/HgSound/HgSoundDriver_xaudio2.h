@@ -87,6 +87,14 @@ public:
 	void queueDestroy(VoiceCallback* x) { m_toDestroy.push_back(x); }
 
 private:
+	typedef struct ClbkUserData
+	{
+		ClbkUserData();
+		const uint32_t magic = 0x58415532;
+		UINT timerId;
+		XAudio2Driver* driver;
+	} ClbkUserData;
+
 	static void TimerClbk(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2);
 
 	//void threadLoop();
@@ -118,6 +126,7 @@ private:
 	ProtectedVector<Events::PlaySound3D> m_playSoundEvents;
 
 	std::atomic<bool> m_stop;
+	ClbkUserData m_clbkData;
 	//bool m_stop;
 	//std::thread m_thread;
 
