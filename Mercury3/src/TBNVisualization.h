@@ -19,6 +19,7 @@ public:
 	virtual void getInstanceData(gpuStruct* instanceData);
 
 	void buildFromVertexData(const vbo_layout_vnut* data, const uint32_t vertexCount);
+	void buildFromVertexData(const HgVboRecord& data);
 
 	void init();
 private:

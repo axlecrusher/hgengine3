@@ -18,6 +18,7 @@ public:
 	virtual void update(HgTime tdelta);
 	virtual void getInstanceData(gpuStruct* instanceData);
 
+	void buildFromVertexData(const HgVboRecord& vborec);
 	void buildFromVertexData(const vbo_layout_vnut* data, const uint32_t vertexCount);
 
 	void init();

@@ -23,6 +23,26 @@ void TBNVisualization::init() {
 	e->setRenderData(rd);
 }
 
+void TBNVisualization::buildFromVertexData(const HgVboRecord& vborec)
+{
+	const auto vertexCount = vborec.Count();
+	switch (vborec.Vbo()->VboType())
+	{
+	case VBO_VNUT:
+		{
+			auto data = vborec.getBufferAs<vbo_layout_vnut>();
+			buildFromVertexData(data, vertexCount);
+		}
+		break;
+	case VBO_VNU:
+		{
+			auto data = vborec.getBufferAs<vbo_layout_vnu>();
+			//buildFromVertexData(data, vertexCount);
+		}
+	break;
+	}
+}
+
 void TBNVisualization::buildFromVertexData(const vbo_layout_vnut* vboData, const uint32_t vertexCount)
 {
 	//we want to visualize the tangent, bitangent, and normal vectors.
