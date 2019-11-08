@@ -149,6 +149,9 @@ public:
 	//get a pointer to the data buffer, offset to the correct position
 	void* getBuffer() const;
 
+	template<typename T>
+	inline const T* getBufferAs() const { return reinterpret_cast<T*>(getBuffer()); }
+
 private:
 	std::shared_ptr<IHgVbo> m_vbo;
 	uint32_t m_offset;
