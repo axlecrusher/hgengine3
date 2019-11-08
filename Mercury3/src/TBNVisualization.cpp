@@ -34,11 +34,11 @@ void TBNVisualization::buildFromVertexData(const HgVboRecord& vborec)
 			buildFromVertexData(data, vertexCount);
 		}
 		break;
-	case VBO_VNU:
-		{
-			auto data = vborec.getBufferAs<vbo_layout_vnu>();
-			//buildFromVertexData(data, vertexCount);
-		}
+	//case VBO_VNU:
+	//	{
+	//		auto data = vborec.getBufferAs<vbo_layout_vnu>();
+	//		//buildFromVertexData(data, vertexCount);
+	//	}
 	break;
 	}
 }
