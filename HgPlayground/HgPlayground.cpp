@@ -41,6 +41,7 @@
 
 #include <triangle.h>
 #include <TBNVisualization.h>
+#include <PointCloud.h>
 
 float projection[16];
 
@@ -200,16 +201,36 @@ int main()
 	model_data::load_ini(teapot, "teapot.ini");
 	teapot->origin(teapot->origin().x(2).z(3).y(1));
 
+	//{
+	//	auto& tbn = scene2.create_entity<TBNVisualization::TBNVisualization>();
+	//	tbn.getEntity().setParent(teapot);
+
+	//	auto rd = teapot->getRenderDataPtr();
+	//	auto vertexCount = rd->VertexVboRecord().Count();
+	//	const vbo_layout_vnut* data = (const vbo_layout_vnut*)rd->VertexVboRecord().Vbo()->getBuffer();
+	//	tbn.buildFromVertexData(data, vertexCount);
+	//}
+
+
+	HgEntity* gun = NULL;
+	scene.getNewEntity(&gun);
+	model_data::load_ini(gun, "gun.ini");
+	//gun->setHidden(true);
+
 	{
 		auto& tbn = scene2.create_entity<TBNVisualization::TBNVisualization>();
-		tbn.getEntity().setParent(teapot);
-		
-		auto rd = teapot->getRenderDataPtr();
-		auto vertexCount = rd->VertexVboRecord().Count();
-		const vbo_layout_vnut* data = (const vbo_layout_vnut*)rd->VertexVboRecord().Vbo()->getBuffer();
-		tbn.buildFromVertexData(data, vertexCount);
+		tbn.buildFromVertexData(gun->getRenderDataPtr()->VertexVboRecord());
+		tbn.getEntity().setParent(gun);
+		tbn.getEntity().setHidden(true);
 	}
 	
+	{
+		auto& pointCloud = scene2.create_entity<PointCloud::PointCloud>();
+		pointCloud.buildFromVertexData(gun->getRenderDataPtr()->VertexVboRecord());
+		pointCloud.getEntity().setParent(gun);
+		pointCloud.getEntity().setHidden(true);
+	}
+
 	//for (int i = 0; i < 4; ++i) {
 	//	HgEntity* statue = NULL;
 	//	scene.getNewEntity(&statue);
@@ -243,6 +264,7 @@ int main()
 			}
 		}
 
+
 		for (i = 0; i < ANI_TRIS; i++) {
 			float x = (i % 20)*1.1f;
 			float z = (i / 20)*1.1f;
@@ -252,8 +274,17 @@ int main()
 			{
 				entity->position(point(-10.0f + x, 5.0f, -2.0f - z));
 				entity->scale(0.3f);
-				auto rd = entity->renderData();
-				rd->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl"));
+				if (!cubeId.isValid())
+				{
+					auto rd = entity->renderData();
+					rd->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl"));
+				}
+				else
+				{
+					auto r = HgEntity::Find(cubeId);
+					auto rd = r.entity->getRenderDataPtr();
+					entity->setRenderData(rd); //instance it
+				}
 				cubeId = entity->getEntityId();
 			}
 		}
@@ -409,7 +440,7 @@ int main()
 
 			grid->position(point(camera.getWorldSpacePosition()).y(0));
 
-			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg((time.msec() % 10000) / 27.777777777777777777777777777778), angle::ZERO);
+			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg(std::fmod(time.msec(),10000) / 27.777777777777777777777777777778), angle::ZERO);
 			teapot->orientation(orientation.conjugate());
 
 			scene.update(timeStep);
@@ -419,15 +450,14 @@ int main()
 
 		SOUND->update();
 
-		doRender = true;
+		HgSound::Listener listener;
+		listener.setPosition(camera.getWorldSpacePosition());
+		listener.setForward(camera.getForward());
+		listener.setUp(camera.getUp());
+		SOUND->setListener(listener);
+
 		if (doRender) {
 			BeginFrame();
-
-			HgSound::Listener listener;
-			listener.setPosition(camera.getWorldSpacePosition());
-			listener.setForward(camera.getForward());
-			listener.setUp(camera.getUp());
-			SOUND->setListener(listener);
 
 			renderQueue.Clear();
 			scene.EnqueueForRender(&renderQueue);
