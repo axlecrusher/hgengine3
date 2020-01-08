@@ -43,13 +43,14 @@
 #include <TBNVisualization.h>
 #include <PointCloud.h>
 
+#include <OpenVr.h>
+#include <OpenVRRenderTarget.h>
+
 float projection[16];
 
 HgCamera camera;
 
 HANDLE endOfRenderFrame = NULL;
-
-#define EYE_DISTANCE -0.07f
 
 #define USE_RENDER_THREAD 0
 
@@ -154,8 +155,20 @@ int main()
 
 	ENGINE::InitEngine();
 
+	OpenVrProxy openVr;
+	//auto inVr = openVr.Init();
+	auto inVr = false;
+
 	std::unique_ptr<IRenderTarget> renderTarget;
-	renderTarget = std::make_unique<WindowRenderTarget>();
+
+	if (inVr)
+	{
+		renderTarget = std::make_unique<OpenVRRenderTarget>(&openVr);
+	}
+	else
+	{
+		renderTarget = std::make_unique<WindowRenderTarget>();
+	}
 	renderTarget->Init();
 
 	auto window = MercuryWindow::GetCurrentWindow();

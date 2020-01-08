@@ -94,7 +94,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include\;$(ProjectDir)lib\libsoundio\;$(ProjectDir)src\;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\renderer;$(ProjectDir)include\;$(ProjectDir)lib\libsoundio\;$(ProjectDir)src\OGL;$(ProjectDir)src\datastructures;$(ProjectDir)src\;$(ProjectDir)src\core;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -113,7 +113,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include\;$(ProjectDir)lib\libsoundio\;$(ProjectDir)src\;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\renderer;$(ProjectDir)include\stb;$(ProjectDir)include\;$(ProjectDir)lib\libsoundio\;$(ProjectDir)src\OGL;$(ProjectDir)src\datastructures;$(ProjectDir)HgSound;$(ProjectDir)src\;$(ProjectDir)src\core;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -134,7 +134,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include\;$(ProjectDir)lib\libsoundio\;$(ProjectDir)src\;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\renderer;$(ProjectDir)include\;$(ProjectDir)lib\libsoundio\;$(ProjectDir)src\OGL;$(ProjectDir)src\datastructures;$(ProjectDir)src\;$(ProjectDir)src\core;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
       <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -158,7 +158,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)include\;$(ProjectDir)lib\libsoundio\;$(ProjectDir)src\;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src\renderer;$(ProjectDir)include\stb;$(ProjectDir)include\;$(ProjectDir)lib\libsoundio\;$(ProjectDir)src\OGL;$(ProjectDir)src\datastructures;$(ProjectDir)HgSound;$(ProjectDir)src\;$(ProjectDir)src\core;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerOutput>AssemblyCode</AssemblerOutput>
       <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>

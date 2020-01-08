@@ -81,7 +81,10 @@ OGLHgGPUBuffer::~OGLHgGPUBuffer()
 }
 
 void OGLHgGPUBuffer::SendToGPU(const IHgGPUBuffer* bufferObject) {
-	m_bufferIds = getGLBufferId();
+	if (!m_bufferIds.isValid())
+	{
+		m_bufferIds = getGLBufferId();
+	}
 
 	glBindBuffer(GL_TEXTURE_BUFFER, m_bufferIds.buffId);
 

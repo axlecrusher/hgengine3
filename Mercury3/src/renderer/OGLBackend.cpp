@@ -16,7 +16,10 @@
 
 static void GLAPIENTRY ogl_error_clbk(GLenum source, GLenum type, GLuint id,
 	GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-	//fprintf(stderr, "%s\n", message);
+	if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
+	{
+		fprintf(stderr, "%s\n", message);
+	}
 }
 
 uint8_t OGLTextureUnit::convertTextureTarget(GLenum target)

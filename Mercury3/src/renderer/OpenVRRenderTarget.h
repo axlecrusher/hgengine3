@@ -17,9 +17,13 @@ public:
 	virtual bool Init();
 	virtual void Render(HgCamera* camera, RenderQueue* queue);
 
+	void updateHMD();
+
+	inline HgTime deltaTime() const { return m_timeSinceLastPose; }
+	inline HgTime poseTime() const { return m_timeOfPose; }
+
 private:
 	void initEyeFramebuffers();
-	void updateHMD();
 
 	HgMath::mat4f getHMDProjectionEye(vr::EVREye eye);
 	HgMath::mat4f getHMDPoseEye(vr::EVREye eye);
@@ -48,6 +52,10 @@ private:
 
 	vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
 	vr::ETrackedDeviceClass m_deviceClass[vr::k_unMaxTrackedDeviceCount];
+
+	bool m_timerInited;
+	HgTimer m_timer;
+	HgTime m_timeSinceLastPose, m_timeOfPose;
 };
 
 namespace Events

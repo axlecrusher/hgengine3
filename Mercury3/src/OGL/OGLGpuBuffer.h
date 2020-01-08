@@ -24,6 +24,8 @@ struct GLBufferId
 
 	void AssociateBuffers();
 
+	bool isValid() const { return buffId != 0; }
+
 	GLuint buffId;
 	GLuint texId;
 	bool m_bufferBound;

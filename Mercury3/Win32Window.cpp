@@ -322,7 +322,7 @@ bool Win32Window::SwapBuffers()
 	//glFinish();
 	//DwmFlush();
 	const auto r = (::SwapBuffers(m_hdc) == TRUE);
-	glFinish(); //seems to help smooth motion
+	//glFinish(); //seems to help smooth motion
 	return r;
 }
 

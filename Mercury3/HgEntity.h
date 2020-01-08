@@ -16,7 +16,7 @@
 #include <RenderData.h>
 
 #include <unordered_map>
-#include <ServiceLocator.h>
+//#include <ServiceLocator.h>
 #include <GuardedType.h>
 
 //#include <core/HgScene2.h>

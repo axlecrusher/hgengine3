@@ -8,10 +8,8 @@
 #include <OGLFramebuffer.h>
 #include <EventSystem.h>
 
-#define EYE_DISTANCE -0.07f
-
 OpenVRRenderTarget::OpenVRRenderTarget(OpenVrProxy* openvr)
-	:m_openvr(openvr), m_initalized(false)
+	:m_openvr(openvr), m_initalized(false), m_timerInited(false)
 {
 	m_HMDPose = vectorial::mat4f::identity();
 	m_projectionLeftEye = vectorial::mat4f::identity();
@@ -55,6 +53,7 @@ bool OpenVRRenderTarget::Init()
 	m_leftEyePos = getHMDPoseEye(vr::Eye_Left);
 	m_rightEyePos = getHMDPoseEye(vr::Eye_Right);
 
+	m_timerInited = false;
 	m_initalized = true;
 	return true;
 }
@@ -83,6 +82,19 @@ void OpenVRRenderTarget::updateHMD()
 	if (hmd == nullptr) return;
 
 	vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
+
+	if (m_timerInited == false)
+	{
+		m_timerInited = true;
+		m_timer.start();
+		m_timeSinceLastPose = m_timeOfPose.msec(0);
+	}
+	else
+	{
+		const auto time = m_timer.getElasped();
+		m_timeSinceLastPose = time - m_timeOfPose;
+		m_timeOfPose = time;
+	}
 
 	for (int nDevice = 1; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice)
 	{
@@ -117,14 +129,13 @@ void OpenVRRenderTarget::updateHMD()
 
 		EventSystem::PublishEvent(poseUpdated);
 	}
-
 }
 
 void OpenVRRenderTarget::Render(HgCamera* camera, RenderQueue* queue)
 {
 	if (!m_initalized) return;
 
-	updateHMD();
+	//updateHMD();
 
 	auto left = dynamic_cast<OGLFramebuffer*>(m_leftEye.get());
 	auto right = dynamic_cast<OGLFramebuffer*>(m_rightEye.get());
