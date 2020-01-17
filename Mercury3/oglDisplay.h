@@ -33,15 +33,6 @@ enum UniformLocations {
 	U_UNIFORM_COUNT = 14
 };
 
-//struct UniformStringEnumPair
-//{
-//	const char* name;
-//	UniformLocations idx;
-//};
-//
-//extern UniformStringEnumPair UniformStringMap[];
-
-//extern char *UniformString[];
 //extern float* _projection;
 
 //class OGLRenderData : public RenderData {
