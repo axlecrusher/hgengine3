@@ -172,5 +172,4 @@ template<typename gpu_structure>
 class IUpdatableInstance : public IUpdatable {
 public:
 	virtual void getInstanceData(gpu_structure* instanceData) = 0;
-	virtual void getInterpolatedInstanceData(gpu_structure* instanceData, const HgTime& remain) = 0;
 };
