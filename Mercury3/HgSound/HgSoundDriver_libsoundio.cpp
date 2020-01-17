@@ -26,14 +26,6 @@ namespace HgSound {
 		fprintf(stderr, "underflow %d\n", count++);
 	}
 
-	//	static volatile bool want_pause = false;
-
-	//	static void(*write_sample)(char *ptr, double sample);
-
-		//different sound devices may require different buffer sizes.
-		//10ms appears too small for blutooth devices.
-	const int32_t Driver::samples = 441*2; //for each channel, 10ms
-
 	inline void write_sample_float32le(char *ptr, float sample) {
 		float *buf = (float *)ptr;
 		*buf = sample;

@@ -12,7 +12,10 @@
 std::unique_ptr<HgSound::IDriver> SOUND;
 
 namespace HgSound {
-	const int32_t Driver::samples = 441 * 2; //for each channel, 10ms
+
+//different sound devices may require different buffer sizes.
+//10ms appears too small for blutooth devices.
+const int32_t Driver::samples = 441 * 2; //for each channel, 10ms
 
 std::unique_ptr<HgSound::IDriver> Create()
 //void Create()
