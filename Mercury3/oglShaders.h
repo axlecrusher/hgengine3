@@ -30,8 +30,7 @@ class HgOglShader : public HgShader {
 
 		inline void setProgramCode(std::unique_ptr<shader_source>& ss) { m_shaderSource = std::move(ss); }
 
-		virtual void setLocalUniforms(const RenderData& rd);
-		virtual void setRemainingTime(const HgTime& t);
+		virtual void setLocalUniforms(const ShaderUniforms& uniforms);
 		virtual void uploadMatrices(const float* worldSpaceMatrix, const HgMath::mat4f& projection, const HgMath::mat4f& view);
 
 		static std::unique_ptr<HgShader> Create(const char* vert, const char* frag);
@@ -43,7 +42,7 @@ class HgOglShader : public HgShader {
 		};
 
 		static void setup_shader(HgOglShader* s);
-		void sendLocalUniformsToGPU(const RenderData& rd);
+		void sendLocalUniformsToGPU(const ShaderUniforms& uniforms);
 
 		/* Perhaps shader uniforms should be stored locally per instance of a shader and then
 		sent to the video driver when the shader instance is enabled.

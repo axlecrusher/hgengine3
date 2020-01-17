@@ -33,8 +33,13 @@ static void submit_for_render_serial(const Viewport& vp, const RenderInstance& r
 		//shader->setGlobalUniforms(*camera);
 		//const auto spacial = e->getSpacialData();
 		shader.uploadMatrices(worldSpaceMatrix, projection, viewMatrix);
-		shader.setLocalUniforms(*renderData);
-		shader.setRemainingTime(ri.remainingTime);
+
+		ShaderUniforms uniforms;
+		uniforms.material = &(renderData->getMaterial());
+		uniforms.gpuBuffer = renderData->gpuBuffer.get();
+		uniforms.remainingTime = &ri.remainingTime;
+
+		shader.setLocalUniforms(uniforms);
 	//}
 
 	renderData->render();

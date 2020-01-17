@@ -235,18 +235,11 @@ void HgOglShader::enable() {
 	if (program_id>0) useShaderProgram(program_id);
 }
 
-void HgOglShader::setRemainingTime(const HgTime& t)
-{
-	if (m_uniformLocations[U_TIME_REMAIN] > -1) {
-		glUniform1f(m_uniformLocations[U_TIME_REMAIN], t.seconds());
-	}
-}
-
-void HgOglShader::setLocalUniforms(const RenderData& rd) {
+void HgOglShader::setLocalUniforms(const ShaderUniforms& uniforms) {
 	GLuint old_program = _currentShaderProgram;
 
 	if (old_program == program_id) {
-		sendLocalUniformsToGPU(rd);
+		sendLocalUniformsToGPU(uniforms);
 		return;
 	}
 
@@ -254,7 +247,7 @@ void HgOglShader::setLocalUniforms(const RenderData& rd) {
 	fprintf(stderr, "Warning (%s): Temporary shader context change.\n", __FUNCTION__);
 	enable();
 
-	sendLocalUniformsToGPU(rd);
+	sendLocalUniformsToGPU(uniforms);
 
 	useShaderProgram(old_program); //change back to previous program
 }
@@ -276,37 +269,40 @@ void HgOglShader::uploadMatrices(const float* worldSpaceMatrix, const HgMath::ma
 }
 
 
-void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
+void HgOglShader::sendLocalUniformsToGPU(const ShaderUniforms& uniforms) {
 	auto renderer = (OGLBackend*)RENDERER();
 
-	auto textId = rd.getMaterial().getGPUTextureHandle(HgTexture::DIFFUSE);
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, textId);
-	if ((m_uniformLocations[U_DIFFUSE_TEXTURE] > -1) && (textId > 0)) {
-		renderer->BindTexture(0, textId, GL_TEXTURE_2D);
-		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);
-		glUniform1i(m_uniformLocations[U_DIFFUSE_TEXTURE], 0);
+	if (uniforms.material)
+	{
+		auto textId = uniforms.material->getGPUTextureHandle(HgTexture::DIFFUSE);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, textId);
+		if ((m_uniformLocations[U_DIFFUSE_TEXTURE] > -1) && (textId > 0)) {
+			renderer->BindTexture(0, textId, GL_TEXTURE_2D);
+			//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::DIFFUSE]);
+			glUniform1i(m_uniformLocations[U_DIFFUSE_TEXTURE], 0);
+		}
+
+		textId = uniforms.material->getGPUTextureHandle(HgTexture::SPECULAR);
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, textId);
+		if ((m_uniformLocations[U_SPECULAR_TEXTURE] > -1) && (textId > 0)) {
+			renderer->BindTexture(1, textId, GL_TEXTURE_2D);
+			//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
+			glUniform1i(m_uniformLocations[U_SPECULAR_TEXTURE], 1);
+		}
+
+		textId = uniforms.material->getGPUTextureHandle(HgTexture::NORMAL);
+		//glActiveTexture(GL_TEXTURE2);
+		//glBindTexture(GL_TEXTURE_2D, textId);
+		if ((m_uniformLocations[U_NORMAL_TEXTURE] > -1) && (textId > 0)) {
+			renderer->BindTexture(2, textId, GL_TEXTURE_2D);
+			//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
+			glUniform1i(m_uniformLocations[U_NORMAL_TEXTURE], 2);
+		}
 	}
 
-	textId = rd.getMaterial().getGPUTextureHandle(HgTexture::SPECULAR);
-	//glActiveTexture(GL_TEXTURE1);
-	//glBindTexture(GL_TEXTURE_2D, textId);
-	if ((m_uniformLocations[U_SPECULAR_TEXTURE] > -1) && (textId > 0)) {
-		renderer->BindTexture(1, textId, GL_TEXTURE_2D);
-		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
-		glUniform1i(m_uniformLocations[U_SPECULAR_TEXTURE], 1);
-	}
-
-	textId = rd.getMaterial().getGPUTextureHandle(HgTexture::NORMAL);
-	//glActiveTexture(GL_TEXTURE2);
-	//glBindTexture(GL_TEXTURE_2D, textId);
-	if ((m_uniformLocations[U_NORMAL_TEXTURE] > -1) && (textId > 0)) {
-		renderer->BindTexture(2, textId, GL_TEXTURE_2D);
-		//		glBindTexture(GL_TEXTURE_2D, oglrd->textureID[HgTexture::SPECULAR]);
-		glUniform1i(m_uniformLocations[U_NORMAL_TEXTURE], 2);
-	}
-
-	auto gpuBuffer = rd.gpuBuffer.get();
+	auto gpuBuffer = uniforms.gpuBuffer;
 	if ((m_uniformLocations[U_BUFFER_OBJECT1] > -1) && (gpuBuffer != nullptr)) {
 		OGLHgGPUBuffer* api = (OGLHgGPUBuffer*)gpuBuffer->apiImpl();
 		if (gpuBuffer->NeedsUpdate()) {
@@ -315,5 +311,9 @@ void HgOglShader::sendLocalUniformsToGPU(const RenderData& rd) {
 		}
 		api->OGLHgGPUBuffer::Bind(3); //no vtable lookup
 		glUniform1i(m_uniformLocations[U_BUFFER_OBJECT1], 3);
+	}
+
+	if ((m_uniformLocations[U_TIME_REMAIN] > -1) && (uniforms.remainingTime != nullptr)) {
+		glUniform1f(m_uniformLocations[U_TIME_REMAIN], uniforms.remainingTime->seconds());
 	}
 }
