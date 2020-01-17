@@ -37,8 +37,8 @@ void Projectile::update(HgTime tdelta) {
 			return;
 		}
 
-		float tmp = tdelta.msec() * projectileMsecSpeed;
-		vector3 r = direction.scale(tmp);
+		float distance = tdelta.seconds() * 20.0;
+		vector3 r = direction.normal().scale(distance);
 		m_entity.position(m_entity.position() + r);
 }
 

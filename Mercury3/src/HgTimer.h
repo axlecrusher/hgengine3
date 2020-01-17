@@ -15,6 +15,8 @@ public:
 	static HgTime nanoseconds(uint64_t t);
 	//inline static HgTime seconds(uint32_t t) { return HgTime((uint32_t)(t*1000.0f)); }
 
+	void zero();
+
 	inline double msec() const {	return m_nanoseconds / 1000000.0; }
 	inline double seconds() const { return m_nanoseconds / 1000000000.0; }
 
@@ -40,8 +42,21 @@ class HgTimer {
 public:
 	HgTimer();
 	void start();
-	inline HgTime getElasped() const { const auto t = ( currentTime() - m_startTime ); return HgTime::nanoseconds(t); }
-//	inline float f_millisecondsElasped() const { return (currentTime() - m_startTime) / 1000.0f; }
+
+	inline HgTime getElasped() const
+	{
+		const auto dt = ( currentTime() - m_startTime );
+		return HgTime::nanoseconds(dt);
+	}
+
+	inline HgTime getElaspedAndRestart()
+	{
+		const auto t = currentTime();
+		const auto dt = (t - m_startTime);
+		m_startTime = t;
+		return HgTime::nanoseconds(dt);
+	}
+
 private:
 
 	//Returns nanoseconds

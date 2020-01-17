@@ -31,9 +31,9 @@ void updateCollections(HgTime dtime) {
 	}
 }
 
-void EnqueueForRender(std::vector<std::shared_ptr<IUpdatableCollection>>& c, RenderQueue* queue) {
+void EnqueueForRender(std::vector<std::shared_ptr<IUpdatableCollection>>& c, RenderQueue* queue, HgTime dt) {
 	for (auto i : c) {
-		i->EnqueueForRender(queue);
+		i->EnqueueForRender(queue, dt);
 	}
 }
 

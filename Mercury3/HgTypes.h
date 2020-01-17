@@ -2,6 +2,7 @@
 
 #include <vertex.h>
 #include <vertex3d.h>
+#include <HgTimer.h>
 
 typedef vertex3f point;
 typedef vertex3f vector3;
@@ -66,3 +67,20 @@ typedef vertex3f vector3f;
 //#ifdef __cplusplus
 //}
 //#endif
+
+inline velocity operator/(const vector3& v, HgTime t)
+{
+	return v / t.seconds();
+}
+
+inline vector3f operator*(const velocity& v, HgTime t)
+{
+	return v * t.seconds();
+}
+
+namespace HgMath{
+	inline vectorial::vec3f vec3f(const vector3f& v)
+	{
+		return vectorial::vec3f(v.raw());
+	}
+}

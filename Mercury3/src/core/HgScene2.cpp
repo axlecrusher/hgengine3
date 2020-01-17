@@ -33,9 +33,9 @@ void HgScene::update(HgTime dtime)
 	}
 }
 
-void HgScene::EnqueueForRender(RenderQueue* queue) {
+void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	for (auto& i : m_collections) {
-		i->EnqueueForRender(queue);
+		i->EnqueueForRender(queue, dt);
 	}
 }
 

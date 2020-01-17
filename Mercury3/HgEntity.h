@@ -91,11 +91,16 @@ private:
 	quaternion m_orientation; //16 bytes
 	vertex3f m_position; float m_scale; //16 bytes
 	vertex3f m_origin; //12 bytes
+
+	vertex3f m_prevPosition;
 public:
 	SpacialData() : m_scale(1.0f) {}
 
 	inline const vertex3f origin() const { return m_origin; }
 	inline void origin(const vertex3f& p) { m_origin = p; }
+
+	inline const vertex3f PreviousPosition() const { return m_prevPosition; }
+	inline void PreviousPosition(const vertex3f& p) { m_prevPosition = p; }
 
 	//inline vertex3f& position() { return m_position; }
 	inline const vertex3f& position() const { return m_position; }
@@ -227,6 +232,7 @@ public:
 		inline void scale(float s) { m_spacialData.scale(s); }
 
 		const SpacialData& getSpacialData() const { return m_spacialData; }
+		SpacialData& getSpacialData() { return m_spacialData; }
 
 		inline bool isRenderable() const { return m_renderData != nullptr; }
 		inline void render() { if (isRenderable()) m_renderData->render();  }

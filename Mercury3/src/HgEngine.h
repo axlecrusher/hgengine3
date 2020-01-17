@@ -31,7 +31,7 @@ bool create_entity(const char* type_str, HgEntity** entity);
 
 std::vector<std::shared_ptr<IUpdatableCollection>>& collections();
 void updateCollections(HgTime dtime);
-void EnqueueForRender(std::vector<std::shared_ptr<IUpdatableCollection>>& c, RenderQueue* queue);
+void EnqueueForRender(std::vector<std::shared_ptr<IUpdatableCollection>>& c, RenderQueue* queue, HgTime dt);
 
 template<typename T>
 std::shared_ptr<T> getCollectionOf()

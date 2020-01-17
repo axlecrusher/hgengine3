@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <cmath>
+#include <vectorial/vectorial.h>
 
 #undef max
 #undef min

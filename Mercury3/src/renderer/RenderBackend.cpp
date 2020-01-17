@@ -16,7 +16,10 @@ RenderBackend* RENDERER() {
 	return api;
 }
 
-static void submit_for_render_serial(const Viewport& vp, RenderData* renderData, const float* worldSpaceMatrix, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection) {
+static void submit_for_render_serial(const Viewport& vp, const RenderInstance& ri, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection) {
+	RenderData* renderData = ri.renderData.get();
+	const float* worldSpaceMatrix = ri.interpolatedWorldSpaceMatrix;
+
 	RENDERER()->setViewport(vp);
 
 	//load texture data to GPU here. Can this be made to be done right after loading the image data, regardless of thread?
@@ -31,6 +34,7 @@ static void submit_for_render_serial(const Viewport& vp, RenderData* renderData,
 		//const auto spacial = e->getSpacialData();
 		shader.uploadMatrices(worldSpaceMatrix, projection, viewMatrix);
 		shader.setLocalUniforms(*renderData);
+		shader.setRemainingTime(ri.remainingTime);
 	//}
 
 	renderData->render();
@@ -39,11 +43,11 @@ static void submit_for_render_serial(const Viewport& vp, RenderData* renderData,
 void Renderer::Render(const Viewport& vp, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection, RenderQueue* queue)
 {
 	for (auto& renderInstance : queue->getOpaqueQueue()) {
-		submit_for_render_serial(vp, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix, viewMatrix, projection);
+		submit_for_render_serial(vp, renderInstance, viewMatrix, projection);
 	}
 
 	for (auto& renderInstance : queue->getTransparentQueue()) {
-		submit_for_render_serial(vp, renderInstance.renderData.get(), renderInstance.worldSpaceMatrix, viewMatrix, projection);
+		submit_for_render_serial(vp, renderInstance, viewMatrix, projection);
 	}
 }
 
@@ -58,37 +62,72 @@ void RenderQueue::Enqueue(RenderDataPtr& renderData)
 	if (renderData)
 	{
 		const auto worldSpaceMatrix = HgMath::mat4f::identity();
-		Enqueue(renderData, worldSpaceMatrix, 0);
+
+		vector3f velocity;
+		Enqueue(renderData, worldSpaceMatrix, 0, velocity);
 	}
 }
 
+velocity ComputeVelocity(const HgMath::mat4f& worldSpace, HgEntity* e, const HgTime& dt)
+{
+	//try to compute the velocity of an entity based on the previous rendered position
+	point currentPosition;
 
-void RenderQueue::Enqueue(const HgEntity* e)
+	//compute the position based on this game update loop result
+	transformPoint(worldSpace, vectorial::vec3f::zero()).store(currentPosition.raw());
+	const auto delta = currentPosition - e->getSpacialData().PreviousPosition();
+
+	//store the current position for use in the next render
+	e->getSpacialData().PreviousPosition(currentPosition);
+
+	return (delta / dt); //velocity
+}
+
+void RenderQueue::Enqueue(HgEntity* e, HgTime dt)
 {
 	auto renderData = e->getRenderDataPtr();
 	if (renderData)
 	{
 		const auto worldSpaceMatrix = e->computeWorldSpaceMatrix();
-		Enqueue(renderData, worldSpaceMatrix, e->getDrawOrder());
+		const auto vel = ComputeVelocity(worldSpaceMatrix, e, dt);
+		Enqueue(renderData, worldSpaceMatrix, e->getDrawOrder(), vel);
 	}
 }
 
-void RenderQueue::Enqueue(RenderDataPtr& rd, const HgMath::mat4f& wsm, int8_t drawOrder)
+void RenderQueue::Enqueue(RenderDataPtr& rd, const HgMath::mat4f& wsm, int8_t drawOrder, const vector3f& velocityVector)
 {
 	if (rd->getMaterial().isTransparent()) {
 		//order by distance back to front?
-		m_transparentEntities.emplace_back(wsm, rd, drawOrder);
+		m_transparentEntities.emplace_back(wsm, rd, velocityVector, drawOrder);
 	}
 	else {
 		//order by distance front to back?
-		m_opaqueEntities.emplace_back(wsm, rd, drawOrder);
+		m_opaqueEntities.emplace_back(wsm, rd, velocityVector, drawOrder);
 	}
 }
 
-
-
-void RenderQueue::Finalize()
+void interpolatePosition(RenderInstance& ri, const HgTime& remain)
 {
+	const auto deltaPos = ri.velocityVector * remain;
+	const auto translate = vectorial::mat4f::translation(HgMath::vec3f(deltaPos));
+	const auto worldMatrix = vectorial::mat4f(ri.worldSpaceMatrix);
+	const auto matrix = translate * worldMatrix;
+
+	matrix.store(ri.interpolatedWorldSpaceMatrix);
+}
+
+void RenderQueue::Finalize(const HgTime& remain)
+{
+	for (auto& renderInstance : m_opaqueEntities) {
+		renderInstance.remainingTime = remain;
+		interpolatePosition(renderInstance, remain);
+	}
+
+	for (auto& renderInstance : m_transparentEntities) {
+		renderInstance.remainingTime = remain;
+		interpolatePosition(renderInstance, remain);
+	}
+
 	sort(m_opaqueEntities);
 	sort(m_transparentEntities);
 }

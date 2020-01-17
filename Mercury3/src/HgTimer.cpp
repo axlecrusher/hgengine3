@@ -2,6 +2,11 @@
 #include <Windows.h>
 #include <cmath>
 
+void HgTime::zero()
+{
+	m_nanoseconds = 0;
+}
+
 HgTime HgTime::msec(double t)
 {
 	HgTime tmp(t * 1000000.0);
@@ -41,7 +46,7 @@ uint64_t HgTimer::currentTime() const {
 	//	return GetTickCount64();
 	//use QueryUnbiasedInterruptTime in place of GetTickCount64 as GetTickCount64 has a resolution between 10 and 16 milliseconds
 	QueryUnbiasedInterruptTime((PULONGLONG)&wTime); //100 nano seconds
-	return wTime*100; //nanoseconds
+	return wTime*100; //conver to nanoseconds
 }
 
 //HgTime::HgTime(uint64_t begin, uint64_t end) {

@@ -8,7 +8,7 @@
 class IUpdatableCollection {
 public:
 	virtual void update(HgTime dtime) = 0;
-	virtual void EnqueueForRender(RenderQueue* queue) = 0;
+	virtual void EnqueueForRender(RenderQueue* queue, HgTime dt) = 0;
 };
 
 using IUpdatableCollectionPtr = std::shared_ptr<IUpdatableCollection>;
@@ -46,13 +46,13 @@ public:
 		//A different type handles adding items to the render queue
 	}
 
-	virtual void EnqueueForRender(RenderQueue* queue) final {
+	virtual void EnqueueForRender(RenderQueue* queue, HgTime dt) final {
 		if (empty()) return;
 
 		for (auto itr = begin(); itr != end(); itr++) {
 			auto& e = itr->getEntity();
 			if (!e.getFlags().hidden) {
-				queue->Enqueue(&e);
+				queue->Enqueue(&e, dt);
 			}
 		}
 	}

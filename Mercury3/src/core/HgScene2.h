@@ -49,7 +49,7 @@ public:
 		return item;
 	}
 
-	void EnqueueForRender(RenderQueue* queue);
+	void EnqueueForRender(RenderQueue* queue, HgTime dt);
 	void update(HgTime dtime);
 
 

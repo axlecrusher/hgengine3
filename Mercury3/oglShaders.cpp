@@ -17,6 +17,23 @@
 
 static GLuint _currentShaderProgram = 0;
 
+std::unordered_map <std::string, UniformLocations > UniformStringMap = {
+	{"rotation", UniformLocations::U_ROTATION },
+	{"translation", UniformLocations::U_POSITION },
+	{"view", UniformLocations::U_VIEW },
+	{"projection", UniformLocations::U_PROJECTION },
+	{"cam_rot", UniformLocations::U_CAMERA_ROT },
+	{"cam_position", UniformLocations::U_CAMERA_POS },
+	{"origin", UniformLocations::U_ORIGIN },
+	{"diffuseTex", UniformLocations::U_DIFFUSE_TEXTURE },
+	{"specularTex", UniformLocations::U_SPECULAR_TEXTURE },
+	{"normalTex", UniformLocations::U_NORMAL_TEXTURE },
+	{"bufferObject1", UniformLocations::U_BUFFER_OBJECT1 },
+	{"modelMatrix", UniformLocations::U_MODEL_MATRIX },
+	{"matrices[0]", UniformLocations::U_MATRICES },
+	{"remainingTime", UniformLocations::U_TIME_REMAIN }
+};
+
 #pragma warning(disable:4996)
 
 void _print_shader_info_log(GLuint idx) {
@@ -157,13 +174,16 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 	for (GLuint i = 0; i < uniform_count; i++)
 	{
 		glGetActiveUniform(shader_program, i, 64, &length, &size, &type, name);
-		//printf("Uniform #%d Type: %u Name: %s\n", i, type, name);
-		for (int j = 0; j < U_UNIFORM_COUNT; j++) {
-			if (strcmp(name, UniformString[j]) == 0) {
-				shader->m_uniformLocations[j] = glGetUniformLocation(shader_program, name);
-				break;
-			}
-			if (j == (U_UNIFORM_COUNT - 1)) fprintf(stderr, "HgShaders: Unknown uniform \"%s\"\n", name);
+		const auto itr = UniformStringMap.find(std::string(name, length));
+
+		if (itr != UniformStringMap.end())
+		{
+			const auto idx = itr->second;
+			shader->m_uniformLocations[idx] = glGetUniformLocation(shader_program, name);
+		}
+		else
+		{
+			fprintf(stderr, "HgShaders: Unknown uniform \"%s\"\n", name);
 		}
 	}
 }
@@ -213,6 +233,13 @@ void HgOglShader::enable() {
 
 	if (program_id == 0 || m_loadState == LoadState::SOURCE_LOADED) setup_shader(this);
 	if (program_id>0) useShaderProgram(program_id);
+}
+
+void HgOglShader::setRemainingTime(const HgTime& t)
+{
+	if (m_uniformLocations[U_TIME_REMAIN] > -1) {
+		glUniform1f(m_uniformLocations[U_TIME_REMAIN], t.seconds());
+	}
 }
 
 void HgOglShader::setLocalUniforms(const RenderData& rd) {

@@ -12,45 +12,6 @@ static BlendMode _currentBlendMode = BLEND_INVALID;
 //HgCamera* _camera;
 //float* _projection;
 
-char *UniformString[] = {
-	"rotation",
-	"translation",
-	"view",
-	"projection",
-	"cam_rot",
-	"cam_position",
-	"origin",
-	"diffuseTex",
-	"specularTex",
-	"normalTex",
-	"bufferObject1",
-	"modelMatrix",
-	"matrices[0]",
-	NULL
-};
-
-//OGLRenderData::OGLRenderData()
-//	:RenderData()
-//{
-//	memset(textureID, 0, sizeof(textureID));
-//	init();
-//}
-
-/*
-static GLint colorDepth(HgTexture::channels c) {
-	switch (c) {
-	case HgTexture::channels::GRAY:
-		return 0;
-	case HgTexture::channels::GRAY_ALPHA:
-		return 0;
-	case HgTexture::channels::RGB:
-		return GL_RGB8;
-	case HgTexture::channels::RGBA:
-		return GL_RGBA8;
-	}
-	return 0; //crash
-}
-*/
 uint32_t ogl_updateTextureData(HgTexture* tex) {
 	GLuint id = tex->getHandle();
 

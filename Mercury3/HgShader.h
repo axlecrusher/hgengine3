@@ -24,6 +24,7 @@ class HgShader {
 		virtual void enable() = 0;
 
 		virtual void setLocalUniforms(const RenderData& rd) = 0;
+		virtual void setRemainingTime(const HgTime& t) = 0;
 		virtual void uploadMatrices(const float* worldSpaceMatrix, const HgMath::mat4f& projection, const HgMath::mat4f& view) = 0;
 
 		inline size_t getUniqueId() const { return m_uniqueId; }

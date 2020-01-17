@@ -53,7 +53,7 @@ class HgScene {
 		inline uint32_t nextUpdateNumber() { return ++m_updateCount; }
 
 		void update(HgTime dtime);
-		void EnqueueForRender(RenderQueue* queue);
+		void EnqueueForRender(RenderQueue* queue, HgTime dt);
 
 //		void(*submit_for_render)(HgEntity* e);
 private:

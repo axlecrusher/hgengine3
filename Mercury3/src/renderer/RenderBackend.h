@@ -52,24 +52,29 @@ protected:
 };
 
 struct RenderInstance {
-	RenderInstance(const HgMath::mat4f& _worldSpaceMatrix, RenderDataPtr& rd, int8_t order = 0)
-		:renderData(rd), drawOrder(order)
+	RenderInstance(const HgMath::mat4f& _worldSpaceMatrix, RenderDataPtr& rd, const vector3f& _velocityVector, int8_t order = 0)
+		:renderData(rd), drawOrder(order), velocityVector(_velocityVector)
 	{
 		_worldSpaceMatrix.store(worldSpaceMatrix);
+		_worldSpaceMatrix.store(interpolatedWorldSpaceMatrix);
 	}
 	float worldSpaceMatrix[16];
+	float interpolatedWorldSpaceMatrix[16];
 	RenderDataPtr renderData;
 	int8_t drawOrder;
+	HgTime remainingTime;
+
+	vector3f velocityVector;
 };
 
 class RenderQueue
 {
 public:
-	void Enqueue(const HgEntity* entity);
+	void Enqueue(HgEntity* entity, HgTime t);
 	void Enqueue(RenderDataPtr& rd);
 
 	//sorts queue on draw order for proper rendering
-	void Finalize();
+	void Finalize(const HgTime& remain);
 
 	//Clears existing queue
 	void Clear()
@@ -81,7 +86,7 @@ public:
 	const std::vector<RenderInstance>& getOpaqueQueue() const { return m_opaqueEntities; }
 	const std::vector<RenderInstance>& getTransparentQueue() const { return m_transparentEntities; }
 private:
-	void Enqueue(RenderDataPtr& rd, const HgMath::mat4f& wsm, int8_t drawOrder);
+	void Enqueue(RenderDataPtr& rd, const HgMath::mat4f& wsm, int8_t drawOrder, const vector3f& velocity);
 	void sort(std::vector<RenderInstance>& v);
 
 	std::vector<RenderInstance> m_opaqueEntities;

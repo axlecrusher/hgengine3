@@ -29,10 +29,19 @@ enum UniformLocations {
 	U_BUFFER_OBJECT1 = 10,
 	U_MODEL_MATRIX = 11,
 	U_MATRICES = 12,
-	U_UNIFORM_COUNT = 13
+	U_TIME_REMAIN = 13,
+	U_UNIFORM_COUNT = 14
 };
 
-extern char *UniformString[];
+//struct UniformStringEnumPair
+//{
+//	const char* name;
+//	UniformLocations idx;
+//};
+//
+//extern UniformStringEnumPair UniformStringMap[];
+
+//extern char *UniformString[];
 //extern float* _projection;
 
 //class OGLRenderData : public RenderData {

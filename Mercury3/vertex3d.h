@@ -94,6 +94,22 @@ namespace HgMath {
 			return tmp;
 		}
 
+		inline vertex operator/(const double rhs) const {
+			vertex tmp;
+			for (int i = 0; i < fcount; i++) {
+				tmp.xyz[i] = (T)(xyz[i] / rhs);
+			}
+			return tmp;
+		}
+
+		inline vertex operator*(const double rhs) const {
+			vertex tmp;
+			for (int i = 0; i < fcount; i++) {
+				tmp.xyz[i] = (T)(xyz[i] * rhs);
+			}
+			return tmp;
+		}
+
 		inline T dot(const vertex& rhs) const {
 			T r = 0;
 			for (int i = 0; i < fcount; i++) {

@@ -55,7 +55,7 @@ public:
 		//Enqueue in second pass after updates.
 	}
 
-	virtual void EnqueueForRender(RenderQueue* queue) final {
+	virtual void EnqueueForRender(RenderQueue* queue, HgTime dt) final {
 		if (m_updatedItems.empty()) return;
 
 		HgEntity* entityPtr = nullptr;
@@ -172,4 +172,5 @@ template<typename gpu_structure>
 class IUpdatableInstance : public IUpdatable {
 public:
 	virtual void getInstanceData(gpu_structure* instanceData) = 0;
+	virtual void getInterpolatedInstanceData(gpu_structure* instanceData, const HgTime& remain) = 0;
 };
