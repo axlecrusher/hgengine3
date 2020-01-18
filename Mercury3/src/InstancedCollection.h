@@ -9,12 +9,13 @@ template<typename gpuStruct>
 struct GPUInstanceMetaData
 {
 	GPUInstanceMetaData()
-		:instanceCount(0), entityPtr(0)
+		:instanceCount(0)//, entityPtr(nullptr)
 	{
 		instanceData = std::make_shared<HgGPUBufferSegment<gpuStruct>>();
 	}
 	uint32_t instanceCount;
-	HgEntity* entityPtr;
+	RenderDataPtr renderData;
+	//HgEntity* entityPtr;
 
 	std::shared_ptr< HgGPUBufferSegment<gpuStruct> > instanceData;
 };
@@ -58,19 +59,17 @@ public:
 	virtual void EnqueueForRender(RenderQueue* queue, HgTime dt) final {
 		if (m_updatedItems.empty()) return;
 
-		HgEntity* entityPtr = nullptr;
-
 		std::unordered_map<size_t, GPUInstanceMetaData<gpuStruct> > instances;
 
 		//Group item instances into groups that can be instance rendered
 		gpuStruct* instanceDataPtr = m_instanceData->getBuffer();
 		for (auto itr : m_updatedItems)
 		{
-			auto flags = itr->getEntity().getFlags();
+			HgEntity& entity = itr->getEntity();
+
+			auto flags = entity.getFlags();
 			if (!flags.destroy && !flags.hidden) {
-				entityPtr = &itr->getEntity();
-				//const auto hashId = entityPtr->renderData()->getMaterial().getUniqueId();
-				const size_t hashId = (size_t)entityPtr->renderData();
+				const size_t hashId = (size_t)entity.renderData();
 				auto& tmp = instances[hashId];
 
 				if (tmp.instanceData->getBufferPtr() == nullptr)
@@ -78,7 +77,7 @@ public:
 					tmp.instanceData->setBuffer(instanceDataPtr);
 				}
 
-				tmp.entityPtr = entityPtr;
+				tmp.renderData = entity.getRenderDataPtr();
 				tmp.instanceCount++;
 
 				itr->T::getInstanceData(instanceDataPtr);
@@ -88,7 +87,7 @@ public:
 
 		for (auto& itr : instances)
 		{
-			RenderDataPtr& rd = itr.second.entityPtr->getRenderDataPtr();
+			RenderDataPtr& rd = itr.second.renderData;
 			rd->instanceCount = itr.second.instanceCount;
 			itr.second.instanceData->setCount(itr.second.instanceCount*stride);
 			itr.second.instanceData->NeedsUpdate(true);
