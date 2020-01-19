@@ -97,11 +97,11 @@ bool XAudio2Driver::start() {
 		// Error; application can't continue.
 	}
 
-	wTimerRes = (std::min)((std::max)(tc.wPeriodMin, 5u), tc.wPeriodMax);
+	wTimerRes = (std::min)((std::max)(tc.wPeriodMin, 2u), tc.wPeriodMax);
 	timeBeginPeriod(wTimerRes);
 
 	m_clbkData.driver = this;
-	m_clbkData.timerId = timeSetEvent(10, 5, TimerClbk, (DWORD_PTR)&m_clbkData, TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
+	m_clbkData.timerId = timeSetEvent(5, 2, TimerClbk, (DWORD_PTR)&m_clbkData, TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
 
 	timeEndPeriod(wTimerRes);
 
