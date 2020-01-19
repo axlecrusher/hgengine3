@@ -27,12 +27,8 @@ public:
 	typedef typename SwissArray<T>::iterator iterator;
 
 	InstancedCollection() {
-		//m_instanceCount = 0;
 		m_instanceData = std::make_shared< HgGPUBuffer<gpuStruct> >();
 	}
-
-	//InstancedCollection(uint32_t reserve) : m_items(reserve) {
-	//}
 
 	virtual void update(HgTime dtime) final {
 		if (empty()) return;
@@ -41,13 +37,15 @@ public:
 		//new instances could be added after this update, so keep track of how many
 		//instances were updated so that we don't render newly added but not updated
 		//instances that have been created.
-		m_updatedItems.clear();
-		m_updatedItems.reserve(m_items.count());
+		m_updatedItemIdx.clear();
+		m_updatedItemIdx.reserve(m_items.count());
 
 		for (auto itr = begin(); itr != end(); itr++) {
-			auto& i = *itr;
-			i.T::update(dtime); //avoid vtable lookup
-			m_updatedItems.push_back(&i);
+			//auto& i = *itr;
+			itr->T::update(dtime); //avoid vtable lookup
+
+			//m_items can change and b expanded. only store the index to the item.
+			m_updatedItemIdx.push_back(itr.index());
 		}
 
 		//if a thing is enqueued for rendering here, a different part
@@ -57,15 +55,16 @@ public:
 	}
 
 	virtual void EnqueueForRender(RenderQueue* queue, HgTime dt) final {
-		if (m_updatedItems.empty()) return;
+		if (m_updatedItemIdx.empty()) return;
 
 		std::unordered_map<size_t, GPUInstanceMetaData<gpuStruct> > instances;
 
 		//Group item instances into groups that can be instance rendered
 		gpuStruct* instanceDataPtr = m_instanceData->getBuffer();
-		for (auto itr : m_updatedItems)
+		for (auto idx : m_updatedItemIdx)
 		{
-			HgEntity& entity = itr->getEntity();
+			auto itr = getItem(idx);
+			const HgEntity& entity = itr->getEntity();
 
 			auto flags = entity.getFlags();
 			if (!flags.destroy && !flags.hidden) {
@@ -122,6 +121,8 @@ public:
 		return m_items.remove(x);
 	}
 
+	inline auto getItem(uint32_t idx) { return m_items.at(idx); }
+
 	inline iterator erase(const iterator& itr) {
 		return m_items.erase(itr);
 	}
@@ -162,8 +163,7 @@ public:
 private:
 	//size_t m_instanceCount;
 	SwissArray<T> m_items;
-	std::vector<T*> m_updatedItems; //has been updated and ready for render
-	//HgGPUBuffer<gpuStruct> m_instanceData;
+	std::vector<uint32_t> m_updatedItemIdx; //has been updated and ready for render
 	std::shared_ptr<HgGPUBuffer<gpuStruct>> m_instanceData;
 };
 

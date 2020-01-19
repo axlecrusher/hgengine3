@@ -264,7 +264,10 @@ public:
 		inline void setChild(HgEntity* child) { child->setParent(this); }
 
 		inline void setRenderData(std::shared_ptr<RenderData>& rd) { m_renderData = rd; }
+
 		RenderData* renderData() { return m_renderData.get(); }
+		const RenderData* renderData() const { return m_renderData.get(); }
+
 		RenderDataPtr& getRenderDataPtr() { return m_renderData; }
 		const RenderDataPtr& getRenderDataPtr() const { return m_renderData; }
 

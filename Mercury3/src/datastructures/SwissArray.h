@@ -67,6 +67,11 @@ public:
 		return r;
 	}
 
+	inline iterator at(uint32_t idx)
+	{
+		return iterator(idx, this);
+	}
+
 	class iterator
 	{
 	public:
@@ -104,6 +109,8 @@ public:
 		inline bool operator!=(const self_type& rhs) const { return (sa != rhs.sa) || (itr_ != rhs.itr_); }
 
 		inline bool itemValid() const { return sa->m_used[itr_]; }
+
+		inline auto index() const { return itr_; }
 	private:
 		SwissArray<T>* sa;
 		size_t itr_;
