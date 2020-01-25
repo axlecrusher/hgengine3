@@ -153,7 +153,7 @@ void XAudio2Driver::processPlayEvents()
 	for (auto& evt : tmp)
 	{
 		auto asset = HgSound::SoundAsset::acquire(evt.filename);
-		if (asset->data())
+		if (asset->isValid())
 		{
 			auto snd = asset->newPlayingInstance();
 			snd->setVolume(evt.volume);
@@ -176,8 +176,8 @@ void XAudio2Driver::processDestroyQueue()
 	for (auto clbk : tmp)
 	{
 		auto voice = RemoveVoice(clbk);
-		voice.xaudioVoice->DestroyVoice();
-		voice.sound->eventPlaybackEnded();
+		voice->xaudioVoice->DestroyVoice();
+		voice->sound->eventPlaybackEnded();
 	}
 }
 
@@ -186,8 +186,8 @@ void XAudio2Driver::updateVoices()
 	std::lock_guard<std::mutex> lock(m_callbackMtx);
 	for (auto& voice : m_voices)
 	{
-		auto sound = voice.sound;
-		voice.xaudioVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
+		auto sound = voice->sound;
+		voice->xaudioVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
 	}
 
 }
@@ -241,11 +241,11 @@ void XAudio2Driver::update3DAudio()
 
 	for (auto& voice : m_voices)
 	{
-		auto& sound = voice.sound;
+		auto& sound = voice->sound;
 
-		if (voice.voice3d)
+		if (voice->voice3d)
 		{
-			auto& voice3d = voice.voice3d;
+			auto& voice3d = voice->voice3d;
 			auto& DSPSettings = voice3d->dsp_settings;
 
 			updateEmitter(sound->getEmitter(), voice3d->emitter);
@@ -256,19 +256,21 @@ void XAudio2Driver::update3DAudio()
 				X3DAUDIO_CALCULATE_LPF_DIRECT,
 				&DSPSettings);
 
-			voice.xaudioVoice->SetOutputMatrix(m_masteringVoice, DSPSettings.SrcChannelCount, DSPSettings.DstChannelCount, DSPSettings.pMatrixCoefficients);
-			voice.xaudioVoice->SetFrequencyRatio(DSPSettings.DopplerFactor);
+			voice->xaudioVoice->SetOutputMatrix(m_masteringVoice, DSPSettings.SrcChannelCount, DSPSettings.DstChannelCount, DSPSettings.pMatrixCoefficients);
+			voice->xaudioVoice->SetFrequencyRatio(DSPSettings.DopplerFactor);
 		}
 
-		voice.xaudioVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
+		voice->xaudioVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
 	}
 }
 
 void XAudio2Driver::play(PlayingSound::ptr& sound, HgTime startOffset)
 {
-	Voice v = initVoice(sound);
+	auto v = initVoice(sound);
+	v->submitAudio();
+
+	startVoicePlaying(*v);
 	InsertVoice(v);
-	startVoicePlaying(v);
 }
 
 void XAudio2Driver::startVoicePlaying(Voice& v)
@@ -285,9 +287,9 @@ static void xaudioVoiceDeleter(IXAudio2SourceVoice* p)
 	p->DestroyVoice();
 }
 
-Voice XAudio2Driver::initVoice(PlayingSound::ptr& sound)
+std::unique_ptr<Voice> XAudio2Driver::initVoice(PlayingSound::ptr& sound)
 {
-	Voice v;
+	auto v = std::make_unique<Voice>();
 
 	auto asset = sound->getSoundAsset();
 
@@ -299,13 +301,6 @@ Voice XAudio2Driver::initVoice(PlayingSound::ptr& sound)
 	format.nAvgBytesPerSec = 4 * format.nChannels * format.nSamplesPerSec;
 	format.wBitsPerSample = 32;
 	format.nBlockAlign = (format.nChannels*format.wBitsPerSample) / 8;
-
-	XAUDIO2_BUFFER buffer;
-	memset(&buffer, 0, sizeof(XAUDIO2_BUFFER));
-
-	buffer.AudioBytes = asset->totalSamples() * 4;
-	buffer.pAudioData = reinterpret_cast<const BYTE*>(asset->data());
-	buffer.Flags = XAUDIO2_END_OF_STREAM; // tell the source voice not to expect any data after this buffer
 
 	HRESULT hr;
 	IXAudio2SourceVoice* pSourceVoice;
@@ -319,22 +314,45 @@ Voice XAudio2Driver::initVoice(PlayingSound::ptr& sound)
 		return v;
 	}
 
-//	auto sourceVoice = std::shared_ptr<IXAudio2SourceVoice>(pSourceVoice, xaudioVoiceDeleter);
-
-	hr = pSourceVoice->SubmitSourceBuffer(&buffer);
-	if (hr != S_OK)
-	{
-		std::cerr << "Failed to play sound: " << hr << std::endl;
-		return v;
-	}
-
-	pSourceVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
-
-	v.xaudioVoice = pSourceVoice;
-	v.callback = voiceCallback;
-	v.sound = sound;
+	v->xaudioVoice = pSourceVoice;
+	v->callback = voiceCallback;
+	v->sound = sound;
 
 	return v;
+}
+
+Voice::~Voice()
+{
+	xaudioVoice = nullptr;
+}
+
+void Voice::submitAudio()
+{
+	XAUDIO2_BUFFER buffer;
+	memset(&buffer, 0, sizeof(XAUDIO2_BUFFER));
+
+	auto asset = sound->getSoundAsset();
+
+	//move this to callback logic?
+	const auto packet = sound->getAudioSamples();
+	buffer.AudioBytes = packet.ByteCount();
+	buffer.pAudioData = reinterpret_cast<const BYTE*>(packet.audioSamples);
+
+	// tell the source voice not to expect any data after this buffer
+	buffer.Flags = packet.hasMorePackets ? 0 : XAUDIO2_END_OF_STREAM;
+	buffer.pContext = this;
+
+	hasMoreSamples = packet.hasMorePackets;
+
+	//	auto sourceVoice = std::shared_ptr<IXAudio2SourceVoice>(pSourceVoice, xaudioVoiceDeleter);
+
+	HRESULT hr = xaudioVoice->SubmitSourceBuffer(&buffer);
+	if (hr != S_OK)
+	{
+		std::cerr << "Failed to submit XAUDIO2_BUFFER (" << hr << ")" << std::endl;
+	}
+
+	xaudioVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
 }
 
 void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
@@ -346,7 +364,8 @@ void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 		return;
 	}
 
-	Voice v = initVoice(sound);
+	auto v = initVoice(sound);
+	v->submitAudio();
 
 	X3DAUDIO_EMITTER x_emitter = { 0 };
 	x_emitter.ChannelCount = asset->getNumChannels();
@@ -370,57 +389,65 @@ void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 		X3DAUDIO_CALCULATE_LPF_DIRECT,
 		&DSPSettings);
 
-	v.xaudioVoice->SetOutputMatrix(m_masteringVoice, DSPSettings.SrcChannelCount, DSPSettings.DstChannelCount, DSPSettings.pMatrixCoefficients);
-	v.xaudioVoice->SetFrequencyRatio(DSPSettings.DopplerFactor);
+	v->xaudioVoice->SetOutputMatrix(m_masteringVoice, DSPSettings.SrcChannelCount, DSPSettings.DstChannelCount, DSPSettings.pMatrixCoefficients);
+	v->xaudioVoice->SetFrequencyRatio(DSPSettings.DopplerFactor);
 	//pSFXSourceVoice->SetOutputMatrix(pSubmixVoice, 1, 1, &DSPSettings.ReverbLevel);
 
-	startVoicePlaying(v);
+	startVoicePlaying(*v);
 
 	auto v3d = std::make_shared<Voice3D>();
 	v3d->dsp_settings = DSPSettings;
 	v3d->emitter = x_emitter;
 	v3d->pMatrixCoefficients = matrix.release();
-	v.voice3d = v3d;
+	v->voice3d = v3d;
 
 	sound->setEmitter(emitter);
 
 	InsertVoice(v);
 }
 
-void XAudio2Driver::InsertVoice(Voice& v)
+void XAudio2Driver::InsertVoice(std::unique_ptr<Voice>& v)
 {
 	std::lock_guard<std::mutex> lock(m_callbackMtx);
-	m_voices.push_back(v);
+	m_voices.push_back(std::move(v));
 }
 
-Voice XAudio2Driver::RemoveVoice(VoiceCallback* x)
+std::unique_ptr<Voice> XAudio2Driver::RemoveVoice(VoiceCallback* x)
 {
 	std::lock_guard<std::mutex> lock(m_callbackMtx);
+	std::unique_ptr<Voice> ret;
 
-	Voice ret;
-	auto itr = std::find(m_voices.begin(), m_voices.end(), x);
+	auto itr = std::find_if(m_voices.begin(), m_voices.end(), [x](std::unique_ptr<Voice>& p)
+	{
+		return *p == x;
+	});
+
 	if (itr != m_voices.end())
 	{
-		ret = *itr;
-		*itr = m_voices.back();
+		ret = std::move(*itr);
+		*itr = std::move(m_voices.back());
 //		std::iter_swap(itr, m_voices.back());
 		m_voices.pop_back();
 	}
-	return ret;
+
+	return std::move(ret);
 }
 
 
 void XAudio2Driver::stopPlayback(const PlayingSound* sound)
 {
 	std::lock_guard<std::mutex> lock(m_callbackMtx);
-	auto itr = std::find(m_voices.begin(), m_voices.end(), sound);
+	auto itr = std::find_if(m_voices.begin(), m_voices.end(), [sound](std::unique_ptr<Voice>& p)
+	{
+		return *p == sound;
+	});
 
 	if (itr != m_voices.end())
 	{
 		auto& voice = *itr;
-//		voice.xaudioVoice->Stop();
-		voice.xaudioVoice->DestroyVoice();
-		*itr = m_voices.back();
+//		voice->xaudioVoice->Stop();
+		voice->xaudioVoice->DestroyVoice();
+		*itr = std::move(m_voices.back());
 		m_voices.pop_back();
 	}
 }
@@ -431,12 +458,12 @@ void XAudio2Driver::update()
 
 	for (auto& voice : m_voices)
 	{
-		auto entity = voice.sound->getEmittingEntity();
+		auto entity = voice->sound->getEmittingEntity();
 		if (entity.isValid())
 		{
-			Emitter tmp = voice.sound->getEmitter();
+			Emitter tmp = voice->sound->getEmitter();
 			tmp.setPosition( entity->computeWorldSpacePosition() );
-			voice.sound->setEmitter(tmp);
+			voice->sound->setEmitter(tmp);
 		}
 	}
 }
@@ -445,6 +472,16 @@ void VoiceCallback::OnStreamEnd()
 {
 	//std::cout << "stream ended" << std::endl;
 	soundDriver->queueDestroy(this);
+}
+
+void VoiceCallback::OnBufferEnd(void * pBufferContext)
+{
+	Voice* v = (Voice*)pBufferContext;
+
+	if (v->hasMoreSamples)
+	{
+		v->submitAudio();
+	}
 }
 
 }} //namespaces

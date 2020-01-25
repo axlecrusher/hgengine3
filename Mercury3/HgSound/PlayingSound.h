@@ -16,12 +16,15 @@ namespace HgSound {
 		typedef std::shared_ptr<PlayingSound> ptr;
 		typedef void(*playbackEndedFunc)(SoundAsset::ptr& p);
 
-		PlayingSound(SoundAsset::ptr SoundAsset);
+		PlayingSound(SoundAsset::ptr& SoundAsset, std::unique_ptr<IAudioSourceState>& sourceState);
 
 		//void getSamples(uint32_t samples, float* buffer);
 		//bool isFinished() const { return m_nextSample >= m_sound->totalSamples(); }
 
 		void stop();
+
+		//Returns the next packet of audio samples from the audio source
+		SamplePacket getAudioSamples() { return m_sound->getAudioSource().getBuffer(*m_audioSourceState); }
 
 		inline void setVolume(float x) { m_volume = x; }
 		inline float getVolume() const { return m_volume; }
@@ -58,6 +61,8 @@ namespace HgSound {
 		std::atomic<playbackEndedFunc> m_playbackEndedClbk;
 		std::atomic<float> m_volume;
 		GuardedType<HgSound::Emitter> m_emitter; //is there a way to do this without a mutex?
+
+		std::unique_ptr<IAudioSourceState> m_audioSourceState;
 
 		EntityIdType m_emittingEntityId;
 //		uint64_t m_nextSample; //next sample to play

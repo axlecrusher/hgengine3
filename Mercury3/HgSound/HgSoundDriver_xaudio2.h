@@ -23,8 +23,9 @@ public:
 	//Called when the voice has just finished playing a contiguous audio stream.
 	virtual void OnStreamEnd();
 
+	virtual void OnBufferEnd(void * pBufferContext);
+
 	//Unused methods are stubs
-	virtual void OnBufferEnd(void * pBufferContext) {};
 	virtual void OnBufferStart(void * pBufferContext) {}
 	virtual void OnLoopEnd(void * pBufferContext) {}
 	virtual void OnVoiceError(void * pBufferContext, HRESULT Error) {}
@@ -54,8 +55,10 @@ struct Voice3D
 struct Voice
 {
 	Voice()
-		:xaudioVoice(nullptr)
+		:xaudioVoice(nullptr), hasMoreSamples(false)
 	{}
+
+	~Voice();
 
 	inline bool operator==(const VoiceCallback* rhs) const { return callback.get() == rhs; }
 	inline bool operator<(const VoiceCallback* rhs) const { return callback.get() < rhs; }
@@ -63,11 +66,16 @@ struct Voice
 	inline bool operator==(const PlayingSound* rhs) const { return sound.get() == rhs; }
 	inline bool operator<(const PlayingSound* rhs) const { return sound.get() < rhs; }
 
+	//submit the next audio SamplePacket to be played
+	void submitAudio();
+
 	IXAudio2SourceVoice* xaudioVoice;
 //	std::shared_ptr<IXAudio2SourceVoice> xaudioVoice;
 	std::shared_ptr<VoiceCallback> callback;
 	PlayingSound::ptr sound;
 	std::shared_ptr<Voice3D> voice3d;
+
+	bool hasMoreSamples; //has more samples to play
 };
 
 class XAudio2Driver : public HgSound::IDriver {
@@ -98,10 +106,10 @@ private:
 	static void TimerClbk(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2);
 
 	//void threadLoop();
-	Voice initVoice(PlayingSound::ptr& sound);
+	std::unique_ptr<Voice> initVoice(PlayingSound::ptr& sound);
 
-	void InsertVoice(Voice& v);
-	Voice RemoveVoice(VoiceCallback* x);
+	void InsertVoice(std::unique_ptr<Voice>& v);
+	std::unique_ptr<Voice> RemoveVoice(VoiceCallback* x);
 
 	void processDestroyQueue();
 	void updateVoices();
@@ -120,7 +128,7 @@ private:
 	//X3DAUDIO_LISTENER m_listener;
 
 	std::mutex m_callbackMtx;
-	std::vector<Voice> m_voices; //mutex protect
+	std::vector<std::unique_ptr<Voice>> m_voices; //mutex protect
 
 	ProtectedVector<VoiceCallback*> m_toDestroy;
 	ProtectedVector<Events::PlaySound3D> m_playSoundEvents;

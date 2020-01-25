@@ -3,9 +3,8 @@
 
 namespace HgSound {
 
-	PlayingSound::PlayingSound(SoundAsset::ptr asset)
-		: m_sound(std::move(asset)), m_playbackEndedClbk(nullptr), m_volume(1.0)
-//		, m_nextSample(0)
+	PlayingSound::PlayingSound(SoundAsset::ptr& asset, std::unique_ptr<IAudioSourceState>& sourceState)
+		: m_sound(asset), m_playbackEndedClbk(nullptr), m_volume(1.0), m_audioSourceState(std::move(sourceState))
 	{
 
 	}
