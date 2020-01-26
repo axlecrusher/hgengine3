@@ -5,7 +5,6 @@
 #include <string.h>
 #include <assert.h>
 
-#include <str_utils.h>
 #include <HgMath.h>
 #include <unordered_map>
 

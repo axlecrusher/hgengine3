@@ -29,7 +29,7 @@ namespace ENGINE {
 
 			for (int i = 0; i < KeyDownMap_length; ++i) {
 				bool b = (i == key1) || (i == key2);
-				others |= (!b && KeyDownMap[i]>0);
+				others |= (!b && KeyDownMap[i]);
 			}
 
 			return !others;

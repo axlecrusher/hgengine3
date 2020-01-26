@@ -10,7 +10,7 @@
 
 #include <HgEntity.h>
 #include <HgScene.h>
-#include <shapes.h>
+//#include <shapes.h>
 
 #include <HgMath.h>
 #include <HgTypes.h>

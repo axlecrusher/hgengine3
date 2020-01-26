@@ -5,7 +5,6 @@
 #include <map>
 #include <atomic>
 
-#include "str_utils.h"
 #include <AssetManager.h>
 
 template<typename T>

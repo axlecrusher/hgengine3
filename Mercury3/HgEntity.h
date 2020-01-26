@@ -6,7 +6,6 @@
 #include <HgTypes.h>
 #include <HgShader.h>
 
-#include <str_utils.h>
 #include <memory>
 #include <HgTexture.h>
 #include <vector>
