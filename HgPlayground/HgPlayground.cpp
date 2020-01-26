@@ -45,6 +45,7 @@
 
 #include <OpenVr.h>
 #include <OpenVRRenderTarget.h>
+#include <Player.h>
 
 float projection[16];
 
@@ -156,8 +157,8 @@ int main()
 	ENGINE::InitEngine();
 
 	OpenVrProxy openVr;
-	//auto inVr = openVr.Init();
-	auto inVr = false;
+	bool inVr = false;
+	//inVr = openVr.Init();
 
 	std::unique_ptr<IRenderTarget> renderTarget;
 
@@ -200,6 +201,16 @@ int main()
 	printf("\n");
 
 	scene.init();
+
+	Player PLAYER1;
+	PLAYER1.entity().init();
+
+	PLAYER1.setPosition({ 0, 1.76784, 0 });
+
+	EventSystem::Register<Events::HMDPoseUpdated>(&PLAYER1, [&PLAYER1](const Events::HMDPoseUpdated& evt) {
+		PLAYER1.setOrientation(evt.orientation);
+		PLAYER1.setPosition(evt.position);
+	});
 
 	Engine::HgScene scene2;
 
@@ -336,19 +347,21 @@ int main()
 		//	model_data d = LoadModel("test.hgmdl");
 	}
 
-	auto testSound = HgSound::SoundAsset::acquire("tone.wav");
-	auto snd = testSound->newPlayingInstance();
-	snd->setVolume(0.5);
+	{
+		auto testSound = HgSound::SoundAsset::acquire("tone2.wav");
+		auto snd = testSound->newPlayingInstance();
+		snd->setVolume(0.5);
 
-	HgEntity* teapotSquare = scene2.create_entity("cube");
-	if (teapotSquare > 0) {
-		teapotSquare->scale(0.3);
-		teapotSquare->position(point(0, 3, 0));
-		teapotSquare->setInheritParentScale(false);
-		teapotSquare->setParent(teapot);
-		teapotSquare->renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_blue.glsl"));
-		//teapotSquare->setHidden(true);
-		SOUND->play3d(snd, snd->EmitFromEntity(teapotSquare));
+		HgEntity* teapotSquare = scene2.create_entity("cube");
+		if (teapotSquare > 0) {
+			teapotSquare->scale(0.3);
+			teapotSquare->position(point(0, 3, 0));
+			teapotSquare->setInheritParentScale(false);
+			teapotSquare->setParent(teapot);
+			teapotSquare->renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_blue.glsl"));
+			//teapotSquare->setHidden(true);
+			SOUND->play3d(snd, snd->EmitFromEntity(teapotSquare));
+		}
 	}
 
 	HANDLE thread1 = CreateThread(NULL, 0, &PrintCtr, NULL, 0, NULL);
@@ -384,7 +397,7 @@ int main()
 	//	SetupOGLExtensions();
 #endif
 
-	HgTimer gameTimer;
+	//HgTimer gameTimer;
 	HgTime last_time;
 
 	int8_t do_render = 1;
@@ -397,23 +410,28 @@ int main()
 	const HgTime timeStep = HgTime::msec(8); // about 120 ups
 
 	RenderQueue renderQueue;
+	//gameTimer.start();
 
-	gameTimer.start();
+	bool sceneUpdated = false;
+
+	HgTime time;
+	HgTimer realTime;
+	realTime.start();
+	
+	accumulatedTime += timeStep;
+	
 	while (!window->m_close) {
-		const HgTime time = gameTimer.getElasped();
-		accumulatedTime += time - last_time;
-		last_time = time;
-
 		if (accumulatedTime.msec() > 100) {
 			accumulatedTime = HgTime::msec(100);
 		}
 
-		bool doRender = false;
+		HgTime elaspedTime;
 
 		//update loop
 		while (accumulatedTime >= timeStep) {
+			time += timeStep;
 			accumulatedTime -= timeStep;
-			doRender = true;
+			elaspedTime += timeStep;
 
 			if (timeStep.msec() > 0) {
 				vector3 v;
@@ -425,7 +443,7 @@ int main()
 
 
 				if (KeyDownMap[KeyCodes::KEY_SPACE]) {
-					snd->stop();
+					//snd->stop();
 				}
 
 				//			if (v.components.z > 0) DebugBreak();
@@ -459,9 +477,20 @@ int main()
 			scene.update(timeStep);
 			scene2.update(timeStep);
 			Engine::updateCollections(timeStep);
+			sceneUpdated = true;
 		}
 
+
+		HgTime remainTime = accumulatedTime;
+
 		SOUND->update();
+
+		//set camera to player
+		if (openVr.isValid())
+		{
+			camera.setWorldSpacePosition(PLAYER1.position());
+			camera.setWorldSpaceOrientation(PLAYER1.orientation());
+		}
 
 		HgSound::Listener listener;
 		listener.setPosition(camera.getWorldSpacePosition());
@@ -469,22 +498,53 @@ int main()
 		listener.setUp(camera.getUp());
 		SOUND->setListener(listener);
 
-		if (doRender) {
+		{
 			BeginFrame();
 
-			renderQueue.Clear();
-			scene.EnqueueForRender(&renderQueue);
-			scene2.EnqueueForRender(&renderQueue);
-			//Engine::EnqueueForRender(Engine::collections(), &renderQueue);
-			renderQueue.Finalize();
+			if (sceneUpdated)
+			{
+				//if the scene was not updated, don't rebuild the render queue
+				renderQueue.Clear();
+
+				scene.EnqueueForRender(&renderQueue, elaspedTime);
+				scene2.EnqueueForRender(&renderQueue, elaspedTime);
+				//Engine::EnqueueForRender(Engine::collections(), &renderQueue);
+			}
+			renderQueue.Finalize(remainTime);
 
 			renderTarget->Render(&camera, &renderQueue);
 
 			window->SwapBuffers();
 			InterlockedAdd(&itrctr, 1);
-			doRender = false;
+			sceneUpdated = false;
 		}
-	}
+
+		HgTime realTimeDt;
+
+		//how much realtime was taken for this game loop
+		if (openVr.isValid())
+		{
+			OpenVRRenderTarget* vrTarget = (OpenVRRenderTarget*)renderTarget.get();
+			vrTarget->updateHMD();
+			realTimeDt = vrTarget->deltaTime();
+			openVr.HandleInput();
+		}
+		else
+		{
+			realTimeDt = realTime.getElaspedAndRestart();
+		}
+
+		//printf("frame time %f\n", realTimeDt.msec());
+
+		//slow down if we are going really fast
+		if (realTimeDt.msec() < 1.0)
+		{
+			Sleep(1);
+		}
+
+		accumulatedTime += realTimeDt;
+
+	}//main loop
 
 	return 0;
 }
