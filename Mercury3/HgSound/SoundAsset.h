@@ -1,107 +1,16 @@
 #pragma once
 
 #include <AssetManager.h>
-#include <HgSound/dr_wav.h>
+
+#include "IAudioSource.h"
 
 namespace HgSound {
 	class PlayingSound;
 	class Driver;
 
-	struct SamplePacket
-	{
-		uint32_t sampleCount; //number of consecutive samples
-		uint32_t sampleBytes; //size of a single sample
-		bool hasMorePackets;
-		char* audioSamples;
-
-		inline uint32_t ByteCount() const { return sampleCount * sampleBytes; }
-	};
-
-	class IAudioSourceState
-	{
-	public:
-		virtual ~IAudioSourceState() {}
-	};
-
-	class IAudioSource
-	{
-	public:	
-		
-		enum SourceType
-		{
-			NONE,
-			BUFFERED,
-			STREAM
-		};
-
-		virtual ~IAudioSource() = default;
-		virtual SamplePacket getBuffer(IAudioSourceState& state) const = 0;
-		virtual std::unique_ptr<IAudioSourceState> newState() const = 0;
-
-		inline SourceType sourceType() const { return m_type; }
-
-	protected:
-		SourceType m_type;
-	};
-
-	class BufferedWavSource : public IAudioSource
-	{
-	public:
-		BufferedWavSource(float* samples, uint32_t sampleCount)
-			: m_samples(samples), m_count(sampleCount)
-		{
-			m_type = SourceType::BUFFERED;
-		}
-
-		virtual ~BufferedWavSource();
-
-		virtual SamplePacket getBuffer(IAudioSourceState& state) const;
-		virtual std::unique_ptr<IAudioSourceState> newState() const;
-	private:
-		uint32_t m_count;
-		float* m_samples;
-	};
-
-	class StreamingWavSource : public IAudioSource
-	{
-	public:
-		class State : public IAudioSourceState
-		{
-		public:
-			State()
-				:m_buffer(nullptr)
-			{}
-			virtual ~State();
-
-			void open(const char* path);
-			inline drwav* get_drwav() { return &m_wav; }
-			inline float* get_sampleBuffer() { return m_buffer; }
-
-		private:
-			drwav m_wav;
-			//SamplePacket m_samples;
-
-			float* m_buffer;
-		};
-
-		StreamingWavSource(std::string path)
-			:m_path(path)
-		{
-			m_type = SourceType::STREAM;
-		}
-
-		virtual ~StreamingWavSource();
-
-		virtual SamplePacket getBuffer(IAudioSourceState& state) const;
-		virtual std::unique_ptr<IAudioSourceState> newState() const;
-	private:
-		std::string m_path;
-	};
-
 	class SoundAsset
 	{
 	public:
-
 
 		typedef AssetManager<SoundAsset>::AssetPtr ptr;
 
