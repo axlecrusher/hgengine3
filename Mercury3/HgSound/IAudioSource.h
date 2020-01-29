@@ -30,7 +30,7 @@ namespace HgSound {
 		};
 
 		virtual ~IAudioSource() = default;
-		virtual SamplePacket getBuffer(IAudioSourceState& state) const = 0;
+		virtual SamplePacket getNextSamples(IAudioSourceState& state) const = 0;
 		virtual void initializeState(std::unique_ptr<IAudioSourceState>& state) const = 0;
 
 		inline SourceType sourceType() const { return m_type; }

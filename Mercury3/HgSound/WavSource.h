@@ -17,7 +17,7 @@ namespace HgSound {
 
 		virtual ~BufferedWavSource();
 
-		virtual SamplePacket getBuffer(IAudioSourceState& state) const;
+		virtual SamplePacket getNextSamples(IAudioSourceState& state) const;
 		virtual void initializeState(std::unique_ptr<IAudioSourceState>& state) const;
 	private:
 		uint32_t m_count;
@@ -31,19 +31,23 @@ namespace HgSound {
 		{
 		public:
 			State()
-				:m_buffer(nullptr)
+				:m_frontBuffer(nullptr), m_backBuffer(nullptr)
 			{}
 			virtual ~State();
 
 			void open(const char* path);
 			inline drwav* get_drwav() { return &m_wav; }
-			inline float* get_sampleBuffer() { return m_buffer; }
+			inline float* get_sampleBuffer() { return m_frontBuffer; }
+			inline float* getBackBuffer() { return m_backBuffer; }
+
+			void swapBuffers() { std::swap(m_frontBuffer, m_backBuffer); }
 
 		private:
+
 			drwav m_wav;
 			//SamplePacket m_samples;
 
-			float* m_buffer;
+			float *m_frontBuffer, *m_backBuffer;
 		};
 
 		StreamingWavSource(std::string path)
@@ -54,7 +58,7 @@ namespace HgSound {
 
 		virtual ~StreamingWavSource();
 
-		virtual SamplePacket getBuffer(IAudioSourceState& state) const;
+		virtual SamplePacket getNextSamples(IAudioSourceState& state) const;
 		virtual void initializeState(std::unique_ptr<IAudioSourceState>& state) const;
 	private:
 		std::string m_path;

@@ -15,7 +15,7 @@ StreamingWavSource::~StreamingWavSource()
 {
 }
 
-SamplePacket BufferedWavSource::getBuffer(IAudioSourceState& state) const
+SamplePacket BufferedWavSource::getNextSamples(IAudioSourceState& state) const
 {
 	SamplePacket p;
 
@@ -40,7 +40,7 @@ void StreamingWavSource::initializeState(std::unique_ptr<IAudioSourceState>& sta
 	state = std::move(tmp);
 }
 
-SamplePacket StreamingWavSource::getBuffer(IAudioSourceState& s) const
+SamplePacket StreamingWavSource::getNextSamples(IAudioSourceState& s) const
 {
 	SamplePacket p;
 
@@ -50,14 +50,14 @@ SamplePacket StreamingWavSource::getBuffer(IAudioSourceState& s) const
 	drwav_uint64 framesToRead = wav->sampleRate / 10; // 1/10th of a second
 	auto samplesCount = framesToRead * wav->channels;
 
-	auto buffer = state.get_sampleBuffer();
+	auto buffer = state.getBackBuffer();
 	size_t framesDecoded = drwav_read_pcm_frames_f32(wav, framesToRead, buffer);
+	state.swapBuffers();
 
 	p.sampleBytes = 4;
 	p.sampleCount = framesDecoded * wav->channels;
 	p.audioSamples = (char*)buffer;
 	p.hasMorePackets = !(framesDecoded < framesToRead);
-
 
 	return p;
 }
@@ -65,7 +65,8 @@ SamplePacket StreamingWavSource::getBuffer(IAudioSourceState& s) const
 StreamingWavSource::State::~State()
 {
 	drwav_uninit(&m_wav);
-	delete[] m_buffer;
+	delete[] m_frontBuffer;
+	delete[] m_backBuffer;
 }
 
 void StreamingWavSource::State::open(const char* path)
@@ -80,7 +81,8 @@ void StreamingWavSource::State::open(const char* path)
 	drwav_uint64 framesToRead = wav->sampleRate / 10; // 1/10th of a second
 	auto samplesCount = framesToRead * wav->channels;
 
-	m_buffer = new float[samplesCount];
+	m_frontBuffer = new float[samplesCount]();
+	m_backBuffer = new float[samplesCount]();
 }
 
 

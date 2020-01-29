@@ -24,7 +24,7 @@ namespace HgSound {
 		void stop();
 
 		//Returns the next packet of audio samples from the audio source
-		SamplePacket getAudioSamples() { return m_sound->getAudioSource().getBuffer(*m_audioSourceState); }
+		SamplePacket getAudioSamples() { return m_sound->getAudioSource().getNextSamples(*m_audioSourceState); }
 
 		inline void setVolume(float x) { m_volume = x; }
 		inline float getVolume() const { return m_volume; }
