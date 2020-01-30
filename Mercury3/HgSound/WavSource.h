@@ -4,6 +4,8 @@
 #include <HgSound/dr_wav.h>
 #include <HgSound/IAudioSource.h>
 
+#include <future>
+
 namespace HgSound {
 
 	class BufferedWavSource : public IAudioSource
@@ -42,11 +44,12 @@ namespace HgSound {
 
 			void swapBuffers() { std::swap(m_frontBuffer, m_backBuffer); }
 
+			std::future<SamplePacket> nextToPlay;
+
+			SamplePacket currentPlaying;
 		private:
 
 			drwav m_wav;
-			//SamplePacket m_samples;
-
 			float *m_frontBuffer, *m_backBuffer;
 		};
 

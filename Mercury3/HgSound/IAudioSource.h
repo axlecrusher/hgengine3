@@ -4,6 +4,10 @@ namespace HgSound {
 
 	struct SamplePacket
 	{
+		SamplePacket()
+			:sampleCount(0), sampleBytes(0), hasMorePackets(false), audioSamples(nullptr)
+		{}
+
 		size_t sampleCount; //number of consecutive samples
 		size_t sampleBytes; //size of a single sample
 		bool hasMorePackets;
