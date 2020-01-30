@@ -91,15 +91,18 @@ private:
 	vertex3f m_position; float m_scale; //16 bytes
 	vertex3f m_origin; //12 bytes
 
+	bool m_hasPrevious;
 	vertex3f m_prevPosition;
 public:
-	SpacialData() : m_scale(1.0f) {}
+	SpacialData() : m_scale(1.0f), m_hasPrevious(false)
+	{}
 
 	inline const vertex3f origin() const { return m_origin; }
 	inline void origin(const vertex3f& p) { m_origin = p; }
 
-	inline const vertex3f PreviousPosition() const { return m_prevPosition; }
-	inline void PreviousPosition(const vertex3f& p) { m_prevPosition = p; }
+	inline bool hasPrevious() const { return m_hasPrevious; }
+	inline const vertex3f& PreviousPosition() const { return m_prevPosition; }
+	inline void PreviousPosition(const vertex3f& p) { m_hasPrevious = true; m_prevPosition = p; }
 
 	//inline vertex3f& position() { return m_position; }
 	inline const vertex3f& position() const { return m_position; }

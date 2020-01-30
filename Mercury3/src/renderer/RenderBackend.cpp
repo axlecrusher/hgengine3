@@ -78,14 +78,20 @@ velocity ComputeVelocity(const HgMath::mat4f& worldSpace, HgEntity* e, const HgT
 	//try to compute the velocity of an entity based on the previous rendered position
 	point currentPosition;
 
+	auto& spd = e->getSpacialData();
+	bool hasPrevious = spd.hasPrevious();
+
 	//compute the position based on this game update loop result
 	transformPoint(worldSpace, vectorial::vec3f::zero()).store(currentPosition.raw());
-	const auto delta = currentPosition - e->getSpacialData().PreviousPosition();
+	const auto delta = currentPosition - spd.PreviousPosition();
 
 	//store the current position for use in the next render
-	e->getSpacialData().PreviousPosition(currentPosition);
+	spd.PreviousPosition(currentPosition);
 
-	return (delta / dt); //velocity
+	if (hasPrevious)
+		return (delta / dt); //velocity
+
+	return velocity();
 }
 
 void RenderQueue::Enqueue(HgEntity* e, HgTime dt)
