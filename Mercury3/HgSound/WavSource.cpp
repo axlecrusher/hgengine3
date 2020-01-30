@@ -88,6 +88,12 @@ SamplePacket StreamingWavSource::getNextSamples(IAudioSourceState& s) const
 
 StreamingWavSource::State::~State()
 {
+	if (nextToPlay.valid())
+	{
+		//if the future is valid, then wait for the IO thread to return. keep state valid.
+		nextToPlay.wait();
+	}
+
 	drwav_uninit(&m_wav);
 
 	if (m_frontBuffer) delete[] m_frontBuffer;
