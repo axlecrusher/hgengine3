@@ -16,7 +16,6 @@ target_compile_options(hgplayground PRIVATE ${WIDECHAR})
 set(HGENGINE_INCLUDES "../Mercury3")
 
 file(GLOB OGGLIBS
-	../Mercury3/lib/x64/libogg/lib/*.lib
 	../Mercury3/lib/x64/vorbis/lib/*.lib
 )
 

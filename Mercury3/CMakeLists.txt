@@ -10,7 +10,6 @@ file(GLOB OGGINCLUDE
 )
 
 file(GLOB OGGLIBS
-	lib/x64/libogg/lib/*.lib
 	lib/x64/vorbis/lib/*.lib
 )
 
