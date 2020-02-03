@@ -15,11 +15,16 @@ target_compile_options(hgplayground PRIVATE ${WIDECHAR})
 
 set(HGENGINE_INCLUDES "../Mercury3")
 
+file(GLOB OGGLIBS
+	../Mercury3/lib/x64/libogg/lib/*.lib
+	../Mercury3/lib/x64/vorbis/lib/*.lib
+)
+
 SET_TARGET_PROPERTIES(hgplayground PROPERTIES LINK_FLAGS "/WHOLEARCHIVE:hgengine.lib")
 #SET_TARGET_PROPERTIES(hgplayground PROPERTIES LINK_FLAGS_RELEASE "/WHOLEARCHIVE:hgengine.lib")
 #SET_TARGET_PROPERTIES(hgplayground PROPERTIES LINK_FLAGS_DEBUG "/WHOLEARCHIVE:hgengine.lib")
 
-target_link_libraries (hgplayground LINK_PUBLIC hgengine ${GLEW_LIBRARY} ${OPENGL_gl_LIBRARY} ${DBGHELP_LIBRARY} ${SOUNDIO_LIB} xaudio2.lib ${OPENVR_LIB} Winmm.lib)
+target_link_libraries (hgplayground LINK_PUBLIC hgengine ${GLEW_LIBRARY} ${OPENGL_gl_LIBRARY} ${DBGHELP_LIBRARY} ${SOUNDIO_LIB} xaudio2.lib ${OPENVR_LIB} Winmm.lib ${OGGLIBS})
 
 include_directories(${GLEW_INCLUDE_DIRS})
 target_include_directories(hgengine PUBLIC "${HGENGINE_INCLUDES}/")

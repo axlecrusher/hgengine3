@@ -1,69 +1,57 @@
 #pragma once
 
 #include <string>
-#include <HgSound/dr_wav.h>
 #include <HgSound/IAudioSource.h>
+#include <vorbis/vorbisfile.h>
 
 #include <future>
 
 namespace HgSound {
 
-	class BufferedWavSource : public IAudioSource
-	{
-	public:
-		BufferedWavSource(float* samples, uint32_t sampleCount)
-			: m_samples(samples), m_count(sampleCount)
-		{
-			m_type = SourceType::BUFFERED;
-		}
-
-		virtual ~BufferedWavSource();
-
-		virtual SamplePacket getNextSamples(IAudioSourceState& state) const;
-		virtual void initializeState(std::unique_ptr<IAudioSourceState>& state) const;
-	private:
-		uint32_t m_count;
-		float* m_samples;
-	};
-
-	class StreamingWavSource : public IAudioSource
+	class StreamingOggSource : public IAudioSource
 	{
 	public:
 		class State : public IAudioSourceState
 		{
 		public:
 			State()
-				:m_frontBuffer(nullptr), m_backBuffer(nullptr)
+				:m_frontBuffer(nullptr), m_backBuffer(nullptr), m_samplesToRead(0)
 			{}
 			virtual ~State();
 
 			void open(const char* path);
-			inline drwav* get_drwav() { return &m_wav; }
+			inline OggVorbis_File* get_vorbis() { return &m_vorbis; }
 			inline float* get_sampleBuffer() { return m_frontBuffer; }
 			inline float* getBackBuffer() { return m_backBuffer; }
-			virtual SourceInfo getSourceInfo() const { return m_info; }
 
 			void swapBuffers() { std::swap(m_frontBuffer, m_backBuffer); }
 
+			static SamplePacket Decode(StreamingOggSource::State* state);
+			//static bool isOgg(char* path);
+
 			std::future<SamplePacket> nextToPlay;
+
+			virtual SourceInfo getSourceInfo() const { return m_info; }
 
 			SamplePacket currentPlaying;
 		private:
 			SourceInfo m_info;
-			drwav m_wav;
+			OggVorbis_File m_vorbis;
+			long m_samplesToRead;
 			float *m_frontBuffer, *m_backBuffer;
 		};
 
-		StreamingWavSource(std::string path)
+		StreamingOggSource(std::string path)
 			:m_path(path)
 		{
 			m_type = SourceType::STREAM;
 		}
 
-		virtual ~StreamingWavSource();
+		virtual ~StreamingOggSource();
 
 		virtual SamplePacket getNextSamples(IAudioSourceState& state) const;
 		virtual void initializeState(std::unique_ptr<IAudioSourceState>& state) const;
+
 	private:
 		std::string m_path;
 	};

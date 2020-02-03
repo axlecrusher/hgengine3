@@ -292,12 +292,13 @@ std::unique_ptr<Voice> XAudio2Driver::initVoice(PlayingSound::ptr& sound)
 	auto v = std::make_unique<Voice>();
 
 	auto asset = sound->getSoundAsset();
+	auto info = sound->getSourceInfo();
 
 	WAVEFORMATEX format;
 	format.cbSize = 0;
 	format.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
-	format.nChannels = asset->getNumChannels();
-	format.nSamplesPerSec = asset->sampleRate();
+	format.nChannels = info.channels;
+	format.nSamplesPerSec = info.sampleRate;
 	format.nAvgBytesPerSec = 4 * format.nChannels * format.nSamplesPerSec;
 	format.wBitsPerSample = 32;
 	format.nBlockAlign = (format.nChannels*format.wBitsPerSample) / 8;
@@ -358,7 +359,8 @@ void Voice::submitAudio()
 void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 {
 	auto asset = sound->getSoundAsset();
-	if (asset->getNumChannels() > 1)
+	auto info = sound->getSourceInfo();
+	if (info.channels > 1)
 	{
 		std::cerr << "Can not play multichannel sound in 3D. Mono Only. " << std::endl;
 		return;
@@ -368,11 +370,11 @@ void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 	v->submitAudio();
 
 	X3DAUDIO_EMITTER x_emitter = { 0 };
-	x_emitter.ChannelCount = asset->getNumChannels();
+	x_emitter.ChannelCount = info.channels;
 	x_emitter.CurveDistanceScaler = 30.0f;
 
 	X3DAUDIO_DSP_SETTINGS DSPSettings = { 0 };
-	DSPSettings.SrcChannelCount = asset->getNumChannels(); //number emitter channels
+	DSPSettings.SrcChannelCount = info.channels; //number emitter channels
 	DSPSettings.DstChannelCount = m_masteringVoiceDetails.InputChannels; //destination voice channels
 	std::unique_ptr<FLOAT32[]> matrix(new FLOAT32[DSPSettings.SrcChannelCount*DSPSettings.DstChannelCount]); //SrcChannelCount * DstChannelCount
 	DSPSettings.pMatrixCoefficients = matrix.get();

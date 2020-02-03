@@ -62,7 +62,7 @@ std::unique_ptr<HgSound::IDriver> Create()
 		if (sound == nullptr) return;
 
 		auto asset = sound->getSoundAsset();
-		const int32_t total_samples = samples * asset->getNumChannels(); //stereo
+		//const int32_t total_samples = samples * asset->getNumChannels(); //stereo
 
 //		sound->jumpToTime(startOffset);
 		//sound->getSamples(total_samples, m_buffer);

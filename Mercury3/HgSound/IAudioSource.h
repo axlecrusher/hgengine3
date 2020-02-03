@@ -16,10 +16,21 @@ namespace HgSound {
 		inline size_t ByteCount() const { return sampleCount * sampleBytes; }
 	};
 
+	struct SourceInfo
+	{
+		SourceInfo()
+			:channels(0), sampleRate(0)
+		{}
+
+		uint8_t channels;
+		uint32_t sampleRate;
+	};
+
 	class IAudioSourceState
 	{
 	public:
 		virtual ~IAudioSourceState() {}
+		virtual SourceInfo getSourceInfo() const = 0;
 	};
 
 	class IAudioSource
@@ -36,9 +47,7 @@ namespace HgSound {
 		virtual ~IAudioSource() = default;
 		virtual SamplePacket getNextSamples(IAudioSourceState& state) const = 0;
 		virtual void initializeState(std::unique_ptr<IAudioSourceState>& state) const = 0;
-
-		inline SourceType sourceType() const { return m_type; }
-
+		inline SourceType getSourceType() const { return m_type; }
 	protected:
 		SourceType m_type;
 	};

@@ -109,6 +109,9 @@ void StreamingWavSource::State::open(const char* path)
 		return;
 	}
 
+	m_info.channels = wav->channels;
+	m_info.sampleRate = wav->sampleRate;
+
 	drwav_uint64 framesToRead = wav->sampleRate / 10; // 1/10th of a second
 	auto samplesCount = framesToRead * wav->channels;
 

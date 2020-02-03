@@ -56,6 +56,9 @@ namespace HgSound {
 		Emitter EmitFromEntity(const HgEntity* e);
 		auto getEmittingEntity() const { return HgEntity::Find(m_emittingEntityId); }
 
+		SourceInfo getSourceInfo() const { return m_audioSourceState->getSourceInfo(); }
+
+
 	private:
 		SoundAsset::ptr m_sound;
 		std::atomic<playbackEndedFunc> m_playbackEndedClbk;

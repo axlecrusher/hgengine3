@@ -1,7 +1,17 @@
 file(GLOB HGSOUNDSRC
 	"HgSound/*.cpp"
 	"HgSound/*.h"
-	lib/libsoundio/soundio/.*
+	lib/libsoundio/soundio/*.*
+)
+
+file(GLOB OGGINCLUDE
+	lib/x64/libogg/include
+	lib/x64/vorbis/include
+)
+
+file(GLOB OGGLIBS
+	lib/x64/libogg/lib/*.lib
+	lib/x64/vorbis/lib/*.lib
 )
 
 source_group("HgSound" FILES ${HGSOUNDSRC})
@@ -43,11 +53,12 @@ if(MSVC)
     set(WIDECHAR "/Zc:wchar_t")
 endif()
 
-add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC} ${CORE_ENGINESOURCES} ${OPENVR_LIB})
+add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC} ${CORE_ENGINESOURCES} ${OPENVR_LIB} ${OGGLIBS})
 target_compile_options(hgengine PRIVATE ${WIDECHAR})
 
 target_include_directories(hgengine PUBLIC "./")
 target_include_directories(hgengine PUBLIC "include/" "include/stb")
+target_include_directories(hgengine PUBLIC ${OGGINCLUDE})
 target_include_directories(hgengine PUBLIC "src/")
 target_include_directories(hgengine PUBLIC "HgSound/")
 target_include_directories(hgengine PUBLIC "src/ogl/")
