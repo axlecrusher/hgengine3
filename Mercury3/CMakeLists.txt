@@ -13,6 +13,14 @@ file(GLOB OGGLIBS
 	lib/x64/vorbis/lib/*.lib
 )
 
+file(GLOB FREETYPE_INCLUDE
+	lib/x64/freetype/include
+)
+
+file(GLOB FREETYPOE_LIBS
+	lib/x64/freetype/win64/*.lib
+)
+
 source_group("HgSound" FILES ${HGSOUNDSRC})
 
 file(GLOB RENDERERSRC
@@ -58,6 +66,7 @@ target_compile_options(hgengine PRIVATE ${WIDECHAR})
 target_include_directories(hgengine PUBLIC "./")
 target_include_directories(hgengine PUBLIC "include/" "include/stb")
 target_include_directories(hgengine PUBLIC ${OGGINCLUDE})
+target_include_directories(hgengine PUBLIC ${FREETYPE_INCLUDE})
 target_include_directories(hgengine PUBLIC "src/")
 target_include_directories(hgengine PUBLIC "HgSound/")
 target_include_directories(hgengine PUBLIC "src/ogl/")

@@ -47,6 +47,8 @@
 #include <OpenVRRenderTarget.h>
 #include <Player.h>
 
+#include <HgFreetype.h>
+
 float projection[16];
 
 HgCamera camera;
@@ -201,6 +203,12 @@ int main()
 	printf("\n");
 
 	scene.init();
+
+
+	HgFreetype testFont;
+	testFont.LoadFont("UbuntuMono-B.ttf");
+	testFont.BuildDigest();
+
 
 	Player PLAYER1;
 	PLAYER1.entity().init();
