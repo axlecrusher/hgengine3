@@ -25,9 +25,13 @@ private:
 	std::shared_ptr<T> m_ptr;
 };
 
+class TexutureFileLoader; //forward declare
+
 class HgTexture
 {
 public:
+	using AssetManagerType = AssetManager<HgTexture>;
+
 	typedef uint32_t Handle;
 	enum format {
 		UNKNOWN = 0,
@@ -90,8 +94,11 @@ public:
 	updated after texture data is loaded. */
 	typedef std::shared_ptr<HgTexture> TexturePtr;
 
-	//used to obtain an image.
+	//used to obtain an image from a file path
 	static TexturePtr acquire(const std::string& path, TextureType type);
+
+	//used to obtain an image from a non-file source
+	static TexturePtr acquire(AssetManagerType::IAssetLoader& textureLoader, TextureType type);
 
 //	channels getChannels() const { return m_channels;  }
 
@@ -156,5 +163,21 @@ private:
 	static AssetManager<HgTexture> imageMap;
 	friend AssetManager<HgTexture>;
 
+	friend TexutureFileLoader;
+
 	//friend uint32_t ogl_updateTextureData(HgTexture* tex);
+};
+
+
+class TexutureFileLoader : public HgTexture::AssetManagerType::IAssetLoader
+{
+	using AssetPtr = HgTexture::AssetManagerType::IAssetLoader::AssetPtr;
+public:
+	TexutureFileLoader(const std::string& path)
+		:m_path(path)
+	{}
+	virtual std::string uniqueIdentifier() const;
+	virtual bool load(AssetPtr& asset) const;
+private:
+	std::string m_path;
 };

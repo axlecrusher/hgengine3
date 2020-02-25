@@ -9,12 +9,25 @@ namespace HgSound {
 
 	AssetManager<SoundAsset> SoundAsset::soundAssets;
 
+	std::string SoundFileLoader::uniqueIdentifier() const
+	{
+		return m_path;
+	}
+
+	bool SoundFileLoader::load(AssetPtr& asset) const
+	{
+		return asset->load(m_path);
+	}
+
 	SoundAsset::SoundAsset()
 	{
 	}
 
 	SoundAsset::ptr SoundAsset::acquire(const std::string& path) {
-		ptr tmp = soundAssets.get(path);
+		SoundFileLoader loader(path);
+
+		bool isNew = false;
+		ptr tmp = soundAssets.get(loader, &isNew);
 		tmp->selfPtr = tmp;
 		return std::move(tmp);
 	}

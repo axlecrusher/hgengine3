@@ -10,6 +10,17 @@ HgTexture::GraphicsCallbacks HgTexture::gpuCallbacks;
 
 AssetManager<HgTexture> HgTexture::imageMap;
 
+
+std::string TexutureFileLoader::uniqueIdentifier() const
+{
+	return m_path;
+}
+
+bool TexutureFileLoader::load(AssetPtr& asset) const
+{
+	return asset->load(m_path);
+}
+
 void HgTexture::wireReload(HgTexture::TexturePtr ptr)
 {
 	std::weak_ptr<HgTexture> wptr = ptr;
@@ -19,20 +30,32 @@ void HgTexture::wireReload(HgTexture::TexturePtr ptr)
 	});
 }
 
-HgTexture::TexturePtr HgTexture::acquire(const std::string& path, TextureType type) {
+HgTexture::TexturePtr HgTexture::acquire(const std::string& path, TextureType type)
+{
+	TexutureFileLoader loader(path);
+	return acquire(loader, type);
+}
+
+HgTexture::TexturePtr HgTexture::acquire(AssetManagerType::IAssetLoader& textureLoader, TextureType type)
+{
 	bool isNew = false;
-	auto ptr = imageMap.get(path, &isNew);
+
+	const std::string uniqueId = textureLoader.uniqueIdentifier();
+	
+	auto ptr = imageMap.get(textureLoader, &isNew);
+
 	if (ptr == nullptr) {
-		fprintf(stderr, "Could not open image \"%s\"", path.c_str());
+		fprintf(stderr, "Could not open image \"%s\"", uniqueId.c_str());
 	}
 
 	if (isNew) {
 		ptr->setType(type);
-		ptr->m_path = path;
+		ptr->m_path = uniqueId;
 		wireReload(ptr);
 	}
-	return std::move( ptr );
+	return std::move(ptr);
 }
+
 /*
 void HgTexture::release(HgTexture* t) {
 	if (imageMap.isValid()) { //make sure map hasn't been destroyed (when program exiting)

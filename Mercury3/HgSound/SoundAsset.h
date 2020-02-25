@@ -8,10 +8,12 @@ namespace HgSound {
 	class PlayingSound;
 	class Driver;
 
+	class SoundFileLoader;
+
 	class SoundAsset
 	{
 	public:
-
+		using AssetManagerType = AssetManager<SoundAsset>;
 		typedef AssetManager<SoundAsset>::AssetPtr ptr;
 
 		SoundAsset();
@@ -42,6 +44,22 @@ namespace HgSound {
 		static AssetManager<SoundAsset> soundAssets;
 		friend AssetManager<SoundAsset>;
 
+		friend SoundFileLoader;
+
 		friend HgSound::Driver;
 	};
+
+	class SoundFileLoader : public SoundAsset::AssetManagerType::IAssetLoader
+	{
+		using AssetPtr = SoundAsset::AssetManagerType::IAssetLoader::AssetPtr;
+	public:
+		SoundFileLoader(const std::string& path)
+			:m_path(path)
+		{}
+		virtual std::string uniqueIdentifier() const;
+		virtual bool load(AssetPtr& asset) const;
+	private:
+		std::string m_path;
+	};
+
 }

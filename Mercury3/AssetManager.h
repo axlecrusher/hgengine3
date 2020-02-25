@@ -11,22 +11,61 @@ class AssetManager {
 public:
 	typedef std::shared_ptr<T> AssetPtr;
 
+	class IAssetLoader
+	{
+	public:
+		using AssetPtr = AssetManager::AssetPtr;
+
+		virtual std::string uniqueIdentifier() const = 0;
+		virtual bool load(AssetPtr& asset) const = 0;
+	};
+
 	AssetManager() :is_valid(true) {}
 	~AssetManager() { is_valid = false; }
 
 	inline bool isValid() const { return is_valid; }
 
-	inline AssetPtr get(const std::string& path) { return get(path, nullptr); }
+	//inline AssetPtr get(const std::string& path) { return get(path, nullptr); }
 
-	AssetPtr get(const std::string& path, bool* isNew) {
-		AssetPtr asset = tryExisting(path);
+	//AssetPtr get(const std::string& path, bool* isNew) {
+	//	AssetPtr asset = tryExisting(path);
+	//	if (asset != nullptr) {
+	//		if (isNew != nullptr) *isNew = false;
+	//		return std::move(asset);
+	//	}
+	//	
+	//	asset = AssetPtr(new T(), [this](T* asset) { this->release(asset); });
+	//	bool success = asset->load(path);
+	//	if (!success)
+	//	{
+	//		return AssetPtr(nullptr); //return null asset on fail
+	//	}
+
+	//	{
+	//		//scoped block for mutex lock
+	//		std::lock_guard<std::recursive_mutex> lock(m_mutex);
+	//		//check if some other thread created it while we were trying to
+	//		auto ptr = find(path).lock();
+	//		if (ptr != nullptr) {
+	//			if (isNew != nullptr) *isNew = true;
+	//			return std::move(ptr);
+	//		}
+	//		m_map.insert(std::make_pair(path, asset));
+	//	}
+	//	if (isNew != nullptr) *isNew = true;
+	//	return std::move(asset);
+	//}
+
+	AssetPtr get(const IAssetLoader& loader, bool* isNew) {
+		const std::string uniqueId = loader.uniqueIdentifier();
+		AssetPtr asset = tryExisting(uniqueId);
 		if (asset != nullptr) {
 			if (isNew != nullptr) *isNew = false;
 			return std::move(asset);
 		}
-		
+
 		asset = AssetPtr(new T(), [this](T* asset) { this->release(asset); });
-		bool success = asset->load(path);
+		bool success = loader.load(asset);
 		if (!success)
 		{
 			return AssetPtr(nullptr); //return null asset on fail
@@ -36,12 +75,12 @@ public:
 			//scoped block for mutex lock
 			std::lock_guard<std::recursive_mutex> lock(m_mutex);
 			//check if some other thread created it while we were trying to
-			auto ptr = find(path).lock();
+			auto ptr = find(uniqueId).lock();
 			if (ptr != nullptr) {
 				if (isNew != nullptr) *isNew = true;
 				return std::move(ptr);
 			}
-			m_map.insert(std::make_pair(path, asset));
+			m_map.insert(std::make_pair(uniqueId, asset));
 		}
 		if (isNew != nullptr) *isNew = true;
 		return std::move(asset);
