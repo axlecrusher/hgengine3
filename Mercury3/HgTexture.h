@@ -136,9 +136,6 @@ private:
 	HgTexture();
 	static void wireReload(HgTexture::TexturePtr ptr);
 
-	bool load(const std::string& path);
-	bool load_internal(std::string path);
-
 	inline void setType(TextureType texType) { m_type = texType; }
 
 	//Indicates that texture needs to be sent to gpu
@@ -149,6 +146,8 @@ private:
 
 	std::unique_ptr<LoadedTextureData> HgTexture::stb_load(FILE* f);
 	std::unique_ptr<LoadedTextureData> HgTexture::dds_load(FILE* f);
+
+	std::unique_ptr<AssetManagerType::IAssetLoader> m_loader;
 
 	std::string m_path;
 	TextureType m_type;
@@ -179,5 +178,29 @@ public:
 	virtual std::string uniqueIdentifier() const;
 	virtual bool load(AssetPtr& asset) const;
 private:
+	bool load_internal(AssetPtr& asset) const;
+
 	std::string m_path;
+};
+
+class RawImageLoader : public HgTexture::AssetManagerType::IAssetLoader
+{
+	using AssetPtr = HgTexture::AssetManagerType::IAssetLoader::AssetPtr;
+public:
+	RawImageLoader(char* image, uint32_t width, uint32_t height)
+		:m_imageData(image), m_width(width), m_height(height)
+	{}
+
+	void setUniqueIdentifier(std::string id)
+	{
+		m_uniqueIdentifier = id;
+	}
+
+	virtual std::string uniqueIdentifier() const;
+	virtual bool load(AssetPtr& asset) const;
+
+private:
+	std::string m_uniqueIdentifier;
+	char* m_imageData;
+	uint32_t m_width, m_height;
 };

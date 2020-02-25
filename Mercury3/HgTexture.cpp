@@ -16,9 +16,20 @@ std::string TexutureFileLoader::uniqueIdentifier() const
 	return m_path;
 }
 
-bool TexutureFileLoader::load(AssetPtr& asset) const
+//bool TexutureFileLoader::load(AssetPtr& asset) const
+//{
+//	return asset->load(m_path);
+//}
+
+std::string RawImageLoader::uniqueIdentifier() const
 {
-	return asset->load(m_path);
+	return m_uniqueIdentifier;
+}
+
+bool RawImageLoader::load(AssetPtr& asset) const
+{
+	return false;
+	//return asset->load(m_path);
 }
 
 void HgTexture::wireReload(HgTexture::TexturePtr ptr)
@@ -26,7 +37,10 @@ void HgTexture::wireReload(HgTexture::TexturePtr ptr)
 	std::weak_ptr<HgTexture> wptr = ptr;
 	WatchFileForChange(ptr->getPath(), [wptr]() {
 		auto ptr = wptr.lock();
-		ptr->load(ptr->getPath());
+		if (ptr && ptr->m_loader)
+		{
+			ptr->m_loader->load(ptr);
+		}
 	});
 }
 
@@ -191,21 +205,23 @@ std::unique_ptr<HgTexture::LoadedTextureData> HgTexture::dds_load(FILE* f) {
 	return nullptr;
 }
 
-bool HgTexture::load(const std::string& path) {
-	bool r = load_internal(path);
+bool TexutureFileLoader::load(AssetPtr& asset) const
+{
+	bool r = load_internal(asset);
 	if (r) {
-		setNeedsGPUUpdate(true);
+		asset->setNeedsGPUUpdate(true);
 	}
 	return r;
 }
 
-bool HgTexture::load_internal(std::string path) {
+bool TexutureFileLoader::load_internal(AssetPtr& asset) const
+{
 	//don't leave texture in an unknown state if load fails
 
 	char filecode[4];
-	FILE *f = fopen(path.c_str(), "rb");
+	FILE *f = fopen(m_path.c_str(), "rb");
 	if (f == nullptr) {
-		fprintf(stderr, "Unable to open file \"%s\"", path.c_str());
+		fprintf(stderr, "Unable to open file \"%s\"", m_path.c_str());
 		return false;
 	}
 
@@ -214,18 +230,18 @@ bool HgTexture::load_internal(std::string path) {
 	fread(filecode, 1, 4, f);
 	if (strncmp(filecode, "DDS ", 4) == 0)
 	{
-		ltd = dds_load(f);
+		ltd = asset->dds_load(f);
 	}
 	else
 	{
 		fseek(f, 0, SEEK_SET);
-		ltd = stb_load(f);
+		ltd = asset->stb_load(f);
 	}
 
 	if (ltd!=nullptr)
 	{
 		//only update local data if texture loaded
-		setLoadedTextureData(ltd);
+		asset->setLoadedTextureData(ltd);
 		return true;
 	}
 
