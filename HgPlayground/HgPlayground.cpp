@@ -204,12 +204,6 @@ int main()
 
 	scene.init();
 
-
-	HgFreetype testFont;
-	testFont.LoadFont("UbuntuMono-B.ttf");
-	testFont.BuildDigest();
-
-
 	Player PLAYER1;
 	PLAYER1.entity().init();
 
