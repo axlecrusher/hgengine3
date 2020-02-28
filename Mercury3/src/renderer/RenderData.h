@@ -37,10 +37,10 @@ public:
 	static RenderDataPtr Create();
 
 	struct Flags {
-		Flags() : FACE_CULLING(true), DEPTH_WRITE(true)
+		Flags() : BACKFACE_CULLING(true), DEPTH_WRITE(true)
 		{}
 
-		bool FACE_CULLING : 1;
+		bool BACKFACE_CULLING : 1;
 		bool DEPTH_WRITE : 1;
 	};
 

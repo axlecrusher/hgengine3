@@ -148,7 +148,7 @@ void OGLBackend::setRenderAttributes(BlendMode blendMode, RenderData::Flags flag
 		break;
 	}
 
-	if (flags.FACE_CULLING) {
+	if (flags.BACKFACE_CULLING) {
 		glEnable(GL_CULL_FACE);
 	}
 	else {

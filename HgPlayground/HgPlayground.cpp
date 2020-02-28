@@ -260,6 +260,9 @@ int main()
 	{
 		auto& text = scene2.create_entity<HgText::Text>();
 		text.setText("HgEngine 3 -- Now with text! VV");
+		text.getEntity().position(point(1, 0, 0));
+		text.getEntity().scale(10.0);
+		text.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
 	}
 	//for (int i = 0; i < 4; ++i) {
 	//	HgEntity* statue = NULL;
