@@ -19,7 +19,6 @@ public:
 	Material(const Material& other);
 
 	void clearTextureIDs();
-	void setTexture(const HgTexture* t);
 
 	void setShader(HgShader* shader);
 	HgShader& getShader() { return *m_shader.get(); }
@@ -27,6 +26,7 @@ public:
 	void updateGpuTextures();
 	//bool updateTextures() const { return m_updateTextures; }
 
+	//add texture as one that can be used by the material
 	void addTexture(const HgTexture::TexturePtr& texture);
 	void setUpdateTextures(bool t) { m_updateTextures = t; }
 
@@ -44,6 +44,9 @@ public:
 
 private:
 	//void computeHash();
+
+	//use the texture
+	void setTexture(const HgTexture* t);
 
 	struct ShaderDeleter {
 		void operator()(HgShader* shader);

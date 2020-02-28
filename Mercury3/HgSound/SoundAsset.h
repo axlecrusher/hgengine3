@@ -58,6 +58,9 @@ namespace HgSound {
 		{}
 		virtual std::string uniqueIdentifier() const;
 		virtual bool load(AssetPtr& asset) const;
+
+		virtual bool sourceChanged() const { return false; }
+
 	private:
 		std::string m_path;
 	};

@@ -19,6 +19,7 @@
 #include <GuardedType.h>
 
 //#include <core/HgScene2.h>
+#include <HgScene2.h> //REGISTER_LINKTIME2 needs this
 
 enum HgEntityFlag {
 	HGE_USED = 0x01, //used in scene graph

@@ -3,6 +3,7 @@
 #include <vertex.h>
 #include <vertex3d.h>
 #include <HgTimer.h>
+#include <limits>
 
 typedef vertex3f point;
 typedef vertex3f vector3;
@@ -41,8 +42,62 @@ typedef vertex3f vector3f;
 		uint16_t r, g, b, a;
 	} color16;
 
+	//UVCoordinates stored in double format
+	struct UVCoordinates
+	{
+		UVCoordinates()
+			:x(0.0), y(0.0)
+		{}
+
+		double x, y;
+	};
+
+	template<typename floatType>
+	uint16_t normalIntFromFloat(floatType x)
+	{
+		constexpr floatType max = std::numeric_limits<uint16_t>::max();
+		uint16_t tmp = uint16_t( std::round(x * max) );
+		return tmp;
+	}
+
+	//defines uint16_t uv type. 
+	struct UVType
+	{
+		UVType(uint16_t v = 0)
+			:value(v)
+		{}
+
+		//val needs to be between range 0.0 to 1.0
+		UVType operator=(double val)
+		{
+			value = normalIntFromFloat(val);
+			return *this;
+		}
+
+		UVType operator=(uint16_t val)
+		{
+			value = val;
+			return *this;
+		}
+
+		uint16_t value;
+	};
+
+	//UV coordinates stored as uint16_t
 	typedef struct uv_coord {
-		uint16_t u, v;
+
+		uv_coord(uint16_t _x = 0, uint16_t _y = 0)
+			:x(_x), y(_y)
+		{}
+
+		uv_coord operator=(const UVCoordinates& uv)
+		{
+			x = normalIntFromFloat(uv.x);
+			y = normalIntFromFloat(uv.y);
+			return *this;
+		}
+
+		UVType x, y;
 	} uv_coord;
 
 

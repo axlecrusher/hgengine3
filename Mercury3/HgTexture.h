@@ -177,6 +177,9 @@ public:
 	{}
 	virtual std::string uniqueIdentifier() const;
 	virtual bool load(AssetPtr& asset) const;
+	
+	virtual bool sourceChanged() const;
+
 private:
 	bool load_internal(AssetPtr& asset) const;
 
@@ -198,6 +201,8 @@ public:
 
 	virtual std::string uniqueIdentifier() const;
 	virtual bool load(AssetPtr& asset) const;
+
+	virtual bool sourceChanged() const { return false; }
 
 private:
 	std::string m_uniqueIdentifier;

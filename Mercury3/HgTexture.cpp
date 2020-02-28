@@ -16,6 +16,11 @@ std::string TexutureFileLoader::uniqueIdentifier() const
 	return m_path;
 }
 
+bool TexutureFileLoader::sourceChanged() const
+{
+	return false;
+}
+
 //bool TexutureFileLoader::load(AssetPtr& asset) const
 //{
 //	return asset->load(m_path);

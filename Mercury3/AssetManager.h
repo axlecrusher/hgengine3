@@ -18,6 +18,9 @@ public:
 
 		virtual std::string uniqueIdentifier() const = 0;
 		virtual bool load(AssetPtr& asset) const = 0;
+
+		//return true if the source data changed and should be reloaded
+		virtual bool sourceChanged() const = 0;
 	};
 
 	AssetManager() :is_valid(true) {}

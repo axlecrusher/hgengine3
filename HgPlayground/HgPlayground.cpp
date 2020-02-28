@@ -263,6 +263,10 @@ int main()
 		pointCloud.getEntity().setHidden(true);
 	}
 
+	{
+		auto& text = scene2.create_entity<HgText::Text>();
+		text.setText("HgEngine 3 -- Now with text! VV");
+	}
 	//for (int i = 0; i < 4; ++i) {
 	//	HgEntity* statue = NULL;
 	//	scene.getNewEntity(&statue);

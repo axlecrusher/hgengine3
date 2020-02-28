@@ -38,8 +38,8 @@ uint32_t ogl_updateTextureData(HgTexture* tex) {
 
 	switch (properties.format) {
 	case HgTexture::format::GRAY:
-		internal = 0;
-		format = 0;
+		internal = GL_RED;
+		format = GL_RED;
 		break;
 	case HgTexture::format::GRAY_ALPHA:
 		internal = 0;
