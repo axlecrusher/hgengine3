@@ -21,7 +21,7 @@ bool WindowRenderTarget::Init()
 	return true;
 }
 
-HgMath::mat4f WindowRenderTarget::getProjectionMatrix()
+HgMath::mat4f WindowRenderTarget::getPerspectiveMatrix() const
 {
 	HgMath::mat4f projectionMatrix;
 
@@ -37,8 +37,9 @@ HgMath::mat4f WindowRenderTarget::getProjectionMatrix()
 	return projectionMatrix;
 }
 
-HgMath::mat4f WindowRenderTarget::getOrthoMatrix()
+HgMath::mat4f WindowRenderTarget::getOrthoMatrix() const
 {
+	//return getPerspectiveMatrix();
 	return vectorial::transpose(HgMath::mat4f::ortho(-1, 1, -1, 1, -1, 1));
 }
 
@@ -50,7 +51,8 @@ void WindowRenderTarget::Render(const RenderParamsList& l)
 	for (const RenderParams& i : l)
 	{
 		const auto hdmCamMatrix = i.camera->toViewMatrix();
-		Renderer::Render(m_windowViewport, hdmCamMatrix, *i.projection, i.queue);
+		const auto projection = i.projection->getProjectionMatrix(*this);
+		Renderer::Render(m_windowViewport, hdmCamMatrix, projection, i.queue);
 	}
 
 	//Renderer::Render(m_windowViewport, camera->toViewMatrix(), projection, queue);

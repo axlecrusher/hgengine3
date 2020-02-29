@@ -45,6 +45,27 @@ static void submit_for_render_serial(const Viewport& vp, const RenderInstance& r
 	renderData->render();
 }
 
+HgMath::mat4f ViewportRenderTarget::getPerspectiveMatrix() const
+{
+	HgMath::mat4f projectionMatrix;
+
+	float projection[16];
+
+	const double width = getWidth();
+	const double height = getHeight();
+	const double aspect = width / height;
+
+	Perspective2(60, aspect, 0.1f, 100.0f, projection);
+	projectionMatrix.load(projection);
+
+	return projectionMatrix;
+}
+
+HgMath::mat4f ViewportRenderTarget::getOrthoMatrix() const
+{
+	return vectorial::transpose(HgMath::mat4f::ortho(-1, 1, -1, 1, -1, 1));
+}
+
 void Renderer::Render(const Viewport& vp, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection, RenderQueue* queue)
 {
 	for (auto& renderInstance : queue->getOpaqueQueue()) {

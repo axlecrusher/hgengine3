@@ -5,6 +5,7 @@
 
 #include <HgEntity.h>
 #include <IFramebuffer.h>
+#include <IRenderTarget.h>
 
 enum RendererType {
 	OPENGL = 0,
@@ -26,6 +27,34 @@ struct Viewport
 
 	uint16_t x, y;
 	uint16_t width, height;
+};
+
+//make a viewport look like a render target
+class ViewportRenderTarget : public IRenderTarget
+{
+public:
+	ViewportRenderTarget(const Viewport* vp)
+		:m_vp(vp)
+	{}
+
+	virtual bool Init() { return true; };
+	virtual void Render(const RenderParamsList& l) {};
+
+	virtual HgMath::mat4f getPerspectiveMatrix() const;
+	virtual HgMath::mat4f getOrthoMatrix() const;
+
+	virtual uint32_t getWidth() const
+	{
+		return m_vp->width;
+	}
+
+	virtual uint32_t getHeight() const
+	{
+		return m_vp->height;
+	}
+
+private:
+	const Viewport* m_vp;
 };
 
 class RenderBackend {

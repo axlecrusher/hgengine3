@@ -544,14 +544,16 @@ int main()
 			renderQueue2d.Finalize(remainTime);
 
 
-			const auto projection3D = renderTarget->getProjectionMatrix();
-			const auto projection2d = renderTarget->getOrthoMatrix();
+			//const auto projection3D = renderTarget->getProjectionMatrix();
+			//const auto projection2d = renderTarget->getOrthoMatrix();
 
 			HgCamera cam2d;
+			PerspectiveProjection perspective;
+			OrthographicProjection orthographic;
 
 			RenderParamsList rpl;
-			rpl.emplace_back(&camera, &projection3D, &renderQueue);
-			rpl.emplace_back(&cam2d, &projection2d, &renderQueue2d);
+			rpl.emplace_back(&camera, &perspective, &renderQueue);
+			rpl.emplace_back(&cam2d, &orthographic, &renderQueue2d);
 
 
 			renderTarget->Render(rpl);
