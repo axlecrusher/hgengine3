@@ -57,18 +57,12 @@ HANDLE endOfRenderFrame = NULL;
 
 #define USE_RENDER_THREAD 0
 
-void BeginFrame() {
-	ENGINE::INPUT::PumpMessages();
-	RENDERER()->Clear();
-	RENDERER()->BeginFrame();
-}
-
 int32_t RenderThreadLoop() {
 	MercuryWindow* w = MercuryWindow::GetCurrentWindow();
 
 	uint8_t stop_frame = 0;
 	while (1) {
-		BeginFrame();
+		//BeginFrame();
 
 		while (stop_frame == 0) {
 			render_packet* x = hgRenderQueue_pop();
@@ -215,6 +209,7 @@ int main()
 	});
 
 	Engine::HgScene scene2;
+	Engine::HgScene scene_2d;
 
 	GravityField gravity = { 0 };
 	allocate_space(&gravity, ANI_TRIS);
@@ -264,6 +259,18 @@ int main()
 		text.getEntity().scale(10.0);
 		text.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
 	}
+
+	{
+		auto& text = scene_2d.create_entity<HgText::Text>();
+		text.setText("Mercury Engine 3");
+		text.getEntity().position(point(-1, 0.95, 0));
+
+		auto& text2 = scene_2d.create_entity<HgText::Text>();
+		text2.setText("https://github.com/axlecrusher/hgengine3");
+		text2.getEntity().position(point(-1, -0.90, 0));
+		text2.getEntity().scale(0.75);
+	}
+
 	//for (int i = 0; i < 4; ++i) {
 	//	HgEntity* statue = NULL;
 	//	scene.getNewEntity(&statue);
@@ -485,6 +492,8 @@ int main()
 
 			scene.update(timeStep);
 			scene2.update(timeStep);
+			scene_2d.update(timeStep);
+
 			Engine::updateCollections(timeStep);
 			sceneUpdated = true;
 		}
@@ -507,8 +516,18 @@ int main()
 		listener.setUp(camera.getUp());
 		SOUND->setListener(listener);
 
+		RenderQueue renderQueue2d;
+
+
+		//Group a projection and reder queue to render
+		struct ProjectionQueue
 		{
-			BeginFrame();
+			HgMath::mat4f* projection;
+			RenderQueue* queue;
+		};
+
+		{
+			ENGINE::INPUT::PumpMessages();
 
 			if (sceneUpdated)
 			{
@@ -517,11 +536,26 @@ int main()
 
 				scene.EnqueueForRender(&renderQueue, elaspedTime);
 				scene2.EnqueueForRender(&renderQueue, elaspedTime);
+
+				scene_2d.EnqueueForRender(&renderQueue2d, elaspedTime);
 				//Engine::EnqueueForRender(Engine::collections(), &renderQueue);
 			}
 			renderQueue.Finalize(remainTime);
+			renderQueue2d.Finalize(remainTime);
 
-			renderTarget->Render(&camera, &renderQueue);
+
+			const auto projection3D = renderTarget->getProjectionMatrix();
+			const auto projection2d = renderTarget->getOrthoMatrix();
+
+			HgCamera cam2d;
+
+			RenderParamsList rpl;
+			rpl.emplace_back(&camera, &projection3D, &renderQueue);
+			rpl.emplace_back(&cam2d, &projection2d, &renderQueue2d);
+
+
+			renderTarget->Render(rpl);
+			//renderTarget->Render(&cam2d, &renderQueue2d, projection2d);
 
 			window->SwapBuffers();
 			InterlockedAdd(&itrctr, 1);

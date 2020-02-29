@@ -57,6 +57,7 @@ public:
 	virtual void EnqueueForRender(RenderQueue* queue, HgTime dt) final {
 		if (m_updatedItemIdx.empty()) return;
 
+		//Pointer address is used as the hash id
 		std::unordered_map<size_t, GPUInstanceMetaData<gpuStruct> > instances;
 
 		//Group item instances into groups that can be instance rendered
@@ -67,7 +68,9 @@ public:
 			const HgEntity& entity = itr->getEntity();
 
 			auto flags = entity.getFlags();
-			if (!flags.destroy && !flags.hidden) {
+			if (!flags.destroy && !flags.hidden)
+			{
+				//use the pointer address as the hash id
 				const size_t hashId = (size_t)entity.renderData();
 				auto& tmp = instances[hashId];
 

@@ -12,9 +12,17 @@ public:
 	{}
 
 	virtual bool Init();
-	virtual void Render(HgCamera* camera, RenderQueue* queue);
+	virtual void Render(const RenderParamsList& l);
+
+	virtual HgMath::mat4f getProjectionMatrix();
+	virtual HgMath::mat4f getOrthoMatrix();
+
+	virtual uint32_t getWidth() const { return m_windowViewport.width; };
+	virtual uint32_t getHeight() const { return m_windowViewport.height; };
+
+
 
 private:
-	HgMath::mat4f m_projection;
+	//HgMath::mat4f m_projection;
 	Viewport m_windowViewport;
 };

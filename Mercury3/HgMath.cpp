@@ -108,3 +108,22 @@ void Perspective2(
 	M[11] = -1.0f;
 	M[14] = (float)((2 * zfar*znear) / (znear - zfar));
 }
+
+void Ortho(	double left, double right,
+			double bottom, double top,
+			double near, double far,
+			float* M)
+{
+	memset(M, 0, 16 * sizeof* M);
+
+	M[3] = -(right + left)/(right-left);
+	M[7] = -(top+bottom)/(top-bottom);
+	M[11] = -(far+near)/(far-near);
+
+
+	//column major
+	M[0] = 2.0 / (right - left);
+	M[5] = 2.0 / (top - bottom);
+	M[10] = -2.0 / (far - near);
+	M[15] = 1.0;
+}

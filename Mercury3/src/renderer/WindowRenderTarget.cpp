@@ -15,26 +15,43 @@ bool WindowRenderTarget::Init()
 
 	auto window = MercuryWindow::GetCurrentWindow();
 
-	int width = window->CurrentWidth();
-	int height = window->CurrentHeight();
-
-	float projection[16];
-
-	m_windowViewport.width = width;
-	m_windowViewport.height = height;
-
-	double renderWidth = width;
-	double renderHeight = height;
-	double aspect = renderWidth / renderHeight;
-	Perspective2(60, aspect, 0.1f, 100.0f, projection);
-	m_projection.load(projection);
-	//auto tmp = HgMath::mat4f::perspective(60*DEG_RAD, aspect, 0.1f, 100.0f);
-	//tmp.store(projection);
+	m_windowViewport.width = window->CurrentWidth();
+	m_windowViewport.height = window->CurrentHeight();
 
 	return true;
 }
 
-void WindowRenderTarget::Render(HgCamera* camera, RenderQueue* queue)
+HgMath::mat4f WindowRenderTarget::getProjectionMatrix()
 {
-	Renderer::Render(m_windowViewport, camera->toViewMatrix(), m_projection, queue);
+	HgMath::mat4f projectionMatrix;
+
+	float projection[16];
+
+	const double width = m_windowViewport.width;
+	const double height = m_windowViewport.height;
+	const double aspect = width / height;
+
+	Perspective2(60, aspect, 0.1f, 100.0f, projection);
+	projectionMatrix.load(projection);
+
+	return projectionMatrix;
+}
+
+HgMath::mat4f WindowRenderTarget::getOrthoMatrix()
+{
+	return vectorial::transpose(HgMath::mat4f::ortho(-1, 1, -1, 1, -1, 1));
+}
+
+void WindowRenderTarget::Render(const RenderParamsList& l)
+{
+	RENDERER()->Clear();
+	RENDERER()->BeginFrame();
+
+	for (const RenderParams& i : l)
+	{
+		const auto hdmCamMatrix = i.camera->toViewMatrix();
+		Renderer::Render(m_windowViewport, hdmCamMatrix, *i.projection, i.queue);
+	}
+
+	//Renderer::Render(m_windowViewport, camera->toViewMatrix(), projection, queue);
 }

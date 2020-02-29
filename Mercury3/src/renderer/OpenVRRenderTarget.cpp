@@ -50,8 +50,8 @@ bool OpenVRRenderTarget::Init()
 
 	m_projectionLeftEye = getHMDProjectionEye(vr::Eye_Left);
 	m_projectionRightEye = getHMDProjectionEye(vr::Eye_Right);
-	m_leftEyePos = getHMDPoseEye(vr::Eye_Left);
-	m_rightEyePos = getHMDPoseEye(vr::Eye_Right);
+	m_leftEyePos = getHMDEyeTransform(vr::Eye_Left);
+	m_rightEyePos = getHMDEyeTransform(vr::Eye_Right);
 
 	m_timerInited = false;
 	m_initalized = true;
@@ -130,37 +130,84 @@ void OpenVRRenderTarget::updateHMD()
 		EventSystem::PublishEvent(poseUpdated);
 	}
 }
-
-void OpenVRRenderTarget::Render(HgCamera* camera, RenderQueue* queue)
+//const RenderParamsList& l
+//void OpenVRRenderTarget::Render(HgCamera* camera, RenderQueue* queue, const HgMath::mat4f& projection)
+void OpenVRRenderTarget::Render(const RenderParamsList& l)
 {
 	if (!m_initalized) return;
 
-	//updateHMD();
+	RENDERER()->Clear();
+	RENDERER()->BeginFrame();
+	for (const RenderParams& i : l)
+	{
+		const auto hdmCamMatrix = i.camera->toViewMatrix();
+		Renderer::Render(m_windowViewport, hdmCamMatrix, *i.projection, i.queue);
+	}
 
 	auto left = dynamic_cast<OGLFramebuffer*>(m_leftEye.get());
 	auto right = dynamic_cast<OGLFramebuffer*>(m_rightEye.get());
 
-	//auto camMat = camera->toViewMatrix(); //replace with head matrix
-	const auto hdmCamMatrix = m_hmdCamera.toViewMatrix();
-	const auto leftEyeMat = m_leftEyePos * hdmCamMatrix;
-	const auto rightEyeMat = m_rightEyePos * hdmCamMatrix;
+	{
+		left->Enable();
+		RENDERER()->Clear();
+		RENDERER()->BeginFrame();
+		const auto eyeTtransform = getHMDEyeTransform(vr::Eye_Left);
+		for (const RenderParams& i : l)
+		{
+			RenderToEye(left, eyeTtransform, m_projectionLeftEye, i);
+		}
+		left->Disable();
+		left->Copy();
+	}
 
-	//render to window first
-	Renderer::Render(m_windowViewport, hdmCamMatrix, m_projection, queue);
+	{
+		right->Enable();
+		RENDERER()->Clear();
+		RENDERER()->BeginFrame();
+		const auto eyeTtransform = getHMDEyeTransform(vr::Eye_Right);
+		for (const RenderParams& i : l)
+		{
+			RenderToEye(right, m_rightEyePos, m_projectionRightEye, i);
+		}
+		right->Disable();
+		right->Copy();
+	}
 
-	m_leftEye->Enable();
-	RENDERER()->Clear();
-	RENDERER()->BeginFrame();
-	Renderer::Render(m_framebufferViewport, leftEyeMat, m_projectionLeftEye, queue); //eye 1
-	m_leftEye->Disable();
-	left->Copy();
+	////updateHMD();
 
-	m_rightEye->Enable();
-	RENDERER()->Clear();
-	RENDERER()->BeginFrame();
-	Renderer::Render(m_framebufferViewport, rightEyeMat, m_projectionRightEye, queue); //eye 2
-	m_rightEye->Disable();
-	right->Copy();
+	//auto right = dynamic_cast<OGLFramebuffer*>(m_rightEye.get());
+
+
+
+
+
+	////auto camMat = camera->toViewMatrix(); //replace with head matrix
+	//const auto hdmCamMatrix = m_hmdCamera.toViewMatrix();
+	//const auto leftEyeMat = m_leftEyePos * hdmCamMatrix;
+	//const auto rightEyeMat = m_rightEyePos * hdmCamMatrix;
+
+	//const auto leftProjection = m_projectionLeftEye * projection;
+	//const auto rightProjection = m_projectionRightEye * projection;
+
+	////render to window first
+	//Renderer::Render(m_windowViewport, hdmCamMatrix, projection, queue);
+
+	//m_leftEye->Enable();
+	//RENDERER()->Clear();
+	//RENDERER()->BeginFrame();
+	//Renderer::Render(m_framebufferViewport, leftEyeMat, leftProjection, queue); //eye 1
+	//m_leftEye->Disable();
+	//left->Copy();
+
+	//m_rightEye->Enable();
+	//RENDERER()->Clear();
+	//RENDERER()->BeginFrame();
+	//Renderer::Render(m_framebufferViewport, rightEyeMat, rightProjection, queue); //eye 2
+	//m_rightEye->Disable();
+	//right->Copy();
+
+	//auto left = dynamic_cast<OGLFramebuffer*>(m_leftEye.get());
+	//auto right = dynamic_cast<OGLFramebuffer*>(m_rightEye.get());
 
 	vr::Texture_t leftEyeTexture = { (void*)(uintptr_t)left->getResolveTextureID(), vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
 	auto e1 = vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
@@ -179,6 +226,33 @@ void OpenVRRenderTarget::Render(HgCamera* camera, RenderQueue* queue)
 	}
 }
 
+void OpenVRRenderTarget::RenderToEye(IFramebuffer* eyeBuffer, const HgMath::mat4f& eyePosTransform,
+	const HgMath::mat4f& eyeProjection, const RenderParams& p)
+{
+	const auto hdmCamMatrix = p.camera->toViewMatrix();
+	const auto eyeMatrix = eyePosTransform * hdmCamMatrix;
+	const auto projection = eyeProjection * (*p.projection);
+
+	//frameBuffer->Enable();
+	//RENDERER()->Clear();
+	//RENDERER()->BeginFrame();
+	Renderer::Render(m_framebufferViewport, eyeMatrix, eyeProjection, p.queue);
+	//frameBuffer->Disable();
+	//frameBuffer->Copy();
+}
+
+void OpenVRRenderTarget::Finish()
+{
+
+}
+
+HgMath::mat4f OpenVRRenderTarget::getOrthoMatrix()
+{
+	return HgMath::mat4f::identity();
+}
+
+
+//returns a projection matrix for the specified eye
 HgMath::mat4f OpenVRRenderTarget::getHMDProjectionEye(vr::EVREye eye)
 {
 	auto hmd = m_openvr->getDevice();
@@ -191,7 +265,7 @@ HgMath::mat4f OpenVRRenderTarget::getHMDProjectionEye(vr::EVREye eye)
 
 }
 
-HgMath::mat4f OpenVRRenderTarget::getHMDPoseEye(vr::EVREye eye)
+HgMath::mat4f OpenVRRenderTarget::getHMDEyeTransform(vr::EVREye eye)
 {
 	auto hmd = m_openvr->getDevice();
 	if (!hmd) return HgMath::mat4f();

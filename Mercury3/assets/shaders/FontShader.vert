@@ -30,6 +30,7 @@ void main() {
 
 	vec4 worldSpacePos =  modelMatrix * vec4(vertex,1);
 	gl_Position = matrices[PROJECTION] * matrices[VIEW] * worldSpacePos;
+//	gl_Position = vec4(vertex,1);
 
 	frag_uv = uv_coord.xy;
 }

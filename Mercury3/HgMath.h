@@ -28,6 +28,11 @@ void Perspective2(
 	const double znear,
 	const double zfar, float* M);
 
+void Ortho(double left, double right,
+	double bottom, double top,
+	double near, double far,
+	float* M);
+
 namespace HgMath {
 	template<typename T>
 	inline T square(T x) { return x*x; }
