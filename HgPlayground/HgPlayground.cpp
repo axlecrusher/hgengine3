@@ -264,9 +264,11 @@ int main()
 		auto& text = scene_2d.create_entity<HgText::Text>();
 		text.setText("Mercury Engine 3");
 		text.getEntity().position(point(-1, 0.95, 0));
+		//text.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
 
 		auto& text2 = scene_2d.create_entity<HgText::Text>();
 		text2.setText("https://github.com/axlecrusher/hgengine3");
+		//text2.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
 		text2.getEntity().position(point(-1, -0.90, 0));
 		text2.getEntity().scale(0.75);
 	}
@@ -518,14 +520,6 @@ int main()
 
 		RenderQueue renderQueue2d;
 
-
-		//Group a projection and reder queue to render
-		struct ProjectionQueue
-		{
-			HgMath::mat4f* projection;
-			RenderQueue* queue;
-		};
-
 		{
 			ENGINE::INPUT::PumpMessages();
 
@@ -542,10 +536,6 @@ int main()
 			}
 			renderQueue.Finalize(remainTime);
 			renderQueue2d.Finalize(remainTime);
-
-
-			//const auto projection3D = renderTarget->getProjectionMatrix();
-			//const auto projection2d = renderTarget->getOrthoMatrix();
 
 			HgCamera cam2d;
 			PerspectiveProjection perspective;
