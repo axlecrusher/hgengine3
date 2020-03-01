@@ -29,7 +29,7 @@ struct Viewport
 	uint16_t width, height;
 };
 
-//make a viewport look like a render target
+//make a viewport look like a render target. For use with getting projection matrices
 class ViewportRenderTarget : public IRenderTarget
 {
 public:

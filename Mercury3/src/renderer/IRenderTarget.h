@@ -29,8 +29,14 @@ public:
 	{}
 
 	virtual bool Init() = 0;
+
+	//Render using RenderParamsList. Should only be called once per frame
 	virtual void Render(const RenderParamsList& l) = 0;
+
+	//Return the Perspective projection for this render target
 	virtual HgMath::mat4f getPerspectiveMatrix() const = 0;
+
+	//Return the Othographic projection for this render target
 	virtual HgMath::mat4f getOrthoMatrix() const = 0;
 
 	virtual uint32_t getWidth() const = 0;
@@ -40,12 +46,14 @@ public:
 	//virtual void Finish() = 0;
 };
 
+//Defines the projection interface
 class IProjection
 {
 public:
 	virtual HgMath::mat4f getProjectionMatrix(const IRenderTarget&) const = 0;
 };
 
+//Perspective projection
 class PerspectiveProjection : public IProjection
 {
 public:
@@ -55,6 +63,7 @@ public:
 	}
 };
 
+//Othographic projection
 class OrthographicProjection : public IProjection
 {
 public:

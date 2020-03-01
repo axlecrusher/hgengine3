@@ -14,8 +14,8 @@ OpenVRRenderTarget::OpenVRRenderTarget(OpenVrProxy* openvr)
 	m_HMDPose = vectorial::mat4f::identity();
 	m_projectionLeftEye = vectorial::mat4f::identity();
 	m_projectionRightEye = vectorial::mat4f::identity();
-	m_leftEyePos = vectorial::mat4f::identity();
-	m_rightEyePos = vectorial::mat4f::identity();
+	//m_leftEyePos = vectorial::mat4f::identity();
+	//m_rightEyePos = vectorial::mat4f::identity();
 
 	memset(m_deviceClass, 0, sizeof(m_deviceClass));
 }
@@ -50,8 +50,8 @@ bool OpenVRRenderTarget::Init()
 
 	m_projectionLeftEye = getHMDProjectionEye(vr::Eye_Left);
 	m_projectionRightEye = getHMDProjectionEye(vr::Eye_Right);
-	m_leftEyePos = getHMDEyeTransform(vr::Eye_Left);
-	m_rightEyePos = getHMDEyeTransform(vr::Eye_Right);
+	//m_leftEyePos = getHMDEyeTransform(vr::Eye_Left);
+	//m_rightEyePos = getHMDEyeTransform(vr::Eye_Right);
 
 	m_timerInited = false;
 	m_initalized = true;
