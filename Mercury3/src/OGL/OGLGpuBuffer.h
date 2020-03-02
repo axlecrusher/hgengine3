@@ -4,7 +4,7 @@
 #include <HgVboMemory.h>
 #include <HgGPUBuffer.h>
 
-//A structure to contain opengl buffer and texture id.
+//Contains opengl buffer and texture id for texture buffers
 struct GLBufferId
 {
 	GLBufferId() : buffId(0), texId(0), m_bufferBound(false)

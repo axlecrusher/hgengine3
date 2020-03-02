@@ -21,6 +21,11 @@ void GLBufferId::AllocateOnGPU()
 		glGenBuffers(1, &buffId);
 		glGenTextures(1, &texId);
 	}
+
+	if (buffId == 0 || texId == 0)
+	{
+		fprintf(stderr, "Error creating texture buffer.\n");
+	}
 }
 
 GLBufferId::GLBufferId(GLBufferId&& rhs)
@@ -71,7 +76,10 @@ GLBufferId OGLHgGPUBuffer::getGLBufferId()
 
 void  OGLHgGPUBuffer::freeGLBufferId(GLBufferId& rhs)
 {
-	m_useableBufferIds.emplace_back(std::move(rhs));
+	if (rhs.isValid())
+	{
+		m_useableBufferIds.emplace_back(std::move(rhs));
+	}
 }
 
 
@@ -84,6 +92,12 @@ void OGLHgGPUBuffer::SendToGPU(const IHgGPUBuffer* bufferObject) {
 	if (!m_bufferIds.isValid())
 	{
 		m_bufferIds = getGLBufferId();
+	}
+
+	if (m_bufferIds.buffId == 0)
+	{
+		printf("GL_TEXTURE_BUFFER id is zero! Ignoring\n");
+		return;
 	}
 
 	glBindBuffer(GL_TEXTURE_BUFFER, m_bufferIds.buffId);

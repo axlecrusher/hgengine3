@@ -125,7 +125,7 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 
 
 	GLuint shader_program = shader->program_id;
-	if (shader_program==0) shader_program = glCreateProgram();
+	if (shader_program == 0) shader_program = glCreateProgram();
 
 	if (vert_id>0) glAttachShader(shader_program, vert_id);
 	if (frag_id>0) glAttachShader(shader_program, frag_id);
@@ -244,7 +244,7 @@ void HgOglShader::setLocalUniforms(const ShaderUniforms& uniforms) {
 	}
 
 	//Log warning about being slow and change to this program
-	fprintf(stderr, "Warning (%s): Temporary shader context change.\n", __FUNCTION__);
+	fprintf(stderr, "Warning (%s): setLocalUniforms forcing temporary shader context change.\n", __FUNCTION__);
 	enable();
 
 	sendLocalUniformsToGPU(uniforms);
@@ -258,7 +258,7 @@ void HgOglShader::uploadMatrices(const float* worldSpaceMatrix, const HgMath::ma
 
 	float mm[16 * matrixCount];
 
-	//if (m_uniformLocations[U_MATRICES] <= -1) return; //everything needs matrices. don't bother checking
+	if (m_uniformLocations[U_MATRICES] <= -1) return; //sometimes opengl will optimize the matrices uniform out
 
 	//rd->getWorldSpaceMatrix(mm);
 	memcpy(mm, worldSpaceMatrix, sizeof(float) * 16);
