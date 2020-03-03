@@ -187,9 +187,14 @@ LONG_PTR Win32Window::ChangeStyle(DWORD dwStyle) {
 bool Win32Window::ChangeDisplaySettings() {
 	DEVMODE screenSettings;
 	memset(&screenSettings, 0, sizeof(screenSettings));
+	screenSettings.dmSize = sizeof(screenSettings);
 
 	//copy existing screen settings
 	EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &screenSettings);
+
+	//Specify the display resolution
+	//screenSettings.dmPelsHeight = 768;
+	//screenSettings.dmPelsWidth = 1024;
 
 	//screenSettings.dmSize = sizeof(screenSettings);
 	//screenSettings.dmPelsWidth = m_requestedWidth;
@@ -201,6 +206,7 @@ bool Win32Window::ChangeDisplaySettings() {
 	DWORD dwFlags = 0;
 	dwFlags = m_fullscreen ? CDS_FULLSCREEN | dwFlags : dwFlags;
 
+	//Change the display resolution
 	auto r = ::ChangeDisplaySettings(&screenSettings, dwFlags);
 
 	char* error_msg = nullptr;
@@ -235,6 +241,9 @@ bool Win32Window::ChangeDisplaySettings() {
 		fprintf(stderr, "Failed to change screen mode: %s\n", error_msg);
 		ret = false;
 	}
+
+	//resize the window
+	SetWindowPos(m_hwnd, HWND_TOP, 0, 0, m_requestedWidth, m_requestedHeight, 0);
 
 	RECT rect;
 	GetClientRect(m_hwnd, &rect);

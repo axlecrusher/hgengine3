@@ -45,6 +45,11 @@ HgMath::mat4f WindowRenderTarget::getOrthoMatrix() const
 
 void WindowRenderTarget::Render(const RenderParamsList& l)
 {
+	//If the display resolution changed we need to know
+	auto window = MercuryWindow::GetCurrentWindow();
+	m_windowViewport.width = window->CurrentWidth();
+	m_windowViewport.height = window->CurrentHeight();
+
 	RENDERER()->Clear();
 	RENDERER()->BeginFrame();
 
