@@ -33,7 +33,8 @@ SamplePacket BufferedWavSource::getNextSamples(IAudioSourceState& state) const
 
 void BufferedWavSource::initializeState(std::unique_ptr<IAudioSourceState>& state) const
 {
-	state.reset(); //buffered sources don't have a state
+	//state.reset(); //buffered sources don't have a state
+	state = std::make_unique<State>(m_sourceInfo);
 }
 
 void StreamingWavSource::initializeState(std::unique_ptr<IAudioSourceState>& state) const

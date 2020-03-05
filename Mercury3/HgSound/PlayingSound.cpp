@@ -6,7 +6,10 @@ namespace HgSound {
 	PlayingSound::PlayingSound(SoundAsset::ptr& asset, std::unique_ptr<IAudioSourceState>& sourceState)
 		: m_sound(asset), m_playbackEndedClbk(nullptr), m_volume(1.0), m_audioSourceState(std::move(sourceState))
 	{
-
+		if (!m_audioSourceState)
+		{
+			fprintf(stderr, "Audio source state null\n");
+		}
 	}
 
 //	void PlayingSound::getSamples(uint32_t samples, float* buffer) {

@@ -11,17 +11,30 @@ namespace HgSound {
 	class BufferedWavSource : public IAudioSource
 	{
 	public:
-		BufferedWavSource(float* samples, uint32_t sampleCount)
-			: m_samples(samples), m_count(sampleCount)
+		BufferedWavSource(const SourceInfo& si, float* samples, uint32_t sampleCount)
+			: m_sourceInfo(si), m_samples(samples), m_count(sampleCount)
 		{
 			m_type = SourceType::BUFFERED;
 		}
+
+		class State : public IAudioSourceState
+		{
+		public:
+			State(const SourceInfo& si)
+				:m_sourceInfo(si)
+			{}
+			SourceInfo getSourceInfo() const { return m_sourceInfo; }
+		private:
+			const SourceInfo& m_sourceInfo;
+		};
 
 		virtual ~BufferedWavSource();
 
 		virtual SamplePacket getNextSamples(IAudioSourceState& state) const;
 		virtual void initializeState(std::unique_ptr<IAudioSourceState>& state) const;
 	private:
+		SourceInfo m_sourceInfo;
+
 		uint32_t m_count;
 		float* m_samples;
 	};

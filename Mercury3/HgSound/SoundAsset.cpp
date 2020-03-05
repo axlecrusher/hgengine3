@@ -58,12 +58,16 @@ namespace HgSound {
 			duration /= wav.sampleRate;
 			if (duration < 10.0)
 			{
+				SourceInfo si;
+				si.channels = wav.channels;
+				si.sampleRate = wav.sampleRate;
+
 				size_t samplesCount = wav.totalPCMFrameCount * wav.channels;
 				auto buffer = new float[samplesCount];
 
 				size_t framesDecoded = drwav_read_pcm_frames_f32(&wav, wav.totalPCMFrameCount, buffer);
-				source = std::make_unique<BufferedWavSource>(buffer, (uint32_t)samplesCount);
 
+				source = std::make_unique<BufferedWavSource>(si, buffer, (uint32_t)samplesCount);
 			}
 			else
 			{
