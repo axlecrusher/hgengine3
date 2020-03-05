@@ -42,7 +42,9 @@ public:
 	//inline GLuint TextureId() const { return m_bufferIds.texId; }
 private:
 	static GLBufferId getGLBufferId();
-	static void freeGLBufferId(GLBufferId& rhs);
+
+	//return GLBufferId to pool for reuse
+	static void releaseGLBufferId(GLBufferId& rhs);
 	static std::vector<GLBufferId> m_useableBufferIds; //a pool of open glbuffer resources
 
 	GLBufferId m_bufferIds;

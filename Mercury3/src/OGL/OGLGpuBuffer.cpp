@@ -74,7 +74,7 @@ GLBufferId OGLHgGPUBuffer::getGLBufferId()
 	return ids;
 }
 
-void  OGLHgGPUBuffer::freeGLBufferId(GLBufferId& rhs)
+void  OGLHgGPUBuffer::releaseGLBufferId(GLBufferId& rhs)
 {
 	if (rhs.isValid())
 	{
@@ -85,7 +85,7 @@ void  OGLHgGPUBuffer::freeGLBufferId(GLBufferId& rhs)
 
 OGLHgGPUBuffer::~OGLHgGPUBuffer()
 {
-	freeGLBufferId(m_bufferIds);
+	releaseGLBufferId(m_bufferIds);
 }
 
 void OGLHgGPUBuffer::SendToGPU(const IHgGPUBuffer* bufferObject) {
