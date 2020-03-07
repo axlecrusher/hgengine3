@@ -11,7 +11,7 @@ WindowRenderTarget::WindowRenderTarget()
 
 bool WindowRenderTarget::Init()
 {
-	ENGINE::StartWindowSystem(1920, 1080);
+	ENGINE::StartWindowSystem(MercuryWindow::Dimensions(1280, 720));
 
 	auto window = MercuryWindow::GetCurrentWindow();
 

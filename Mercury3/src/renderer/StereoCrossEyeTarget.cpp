@@ -13,7 +13,7 @@ StereoCrossEye::StereoCrossEye()
 
 bool StereoCrossEye::Init()
 {
-	ENGINE::StartWindowSystem(1280, 480);
+	ENGINE::StartWindowSystem(MercuryWindow::Dimensions(1280, 480));
 
 	auto window = MercuryWindow::GetCurrentWindow();
 

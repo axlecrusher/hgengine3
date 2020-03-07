@@ -320,26 +320,29 @@ private:
 public:
 };
 
-class EntityCreated
+namespace Events
 {
-public:
-	EntityCreated(HgEntity* e, EntityIdType id)
-		:entity(e)
-	{}
-	HgEntity* entity;
-	EntityIdType entityId;
-};
+	class EntityCreated
+	{
+	public:
+		EntityCreated(HgEntity* e, EntityIdType id)
+			:entity(e)
+		{}
+		HgEntity* entity;
+		EntityIdType entityId;
+	};
 
-class EntityDestroyed
-{
-public:
-	EntityDestroyed(HgEntity* e, EntityIdType id)
-		:entity(e), entityId(id)
-	{}
-	HgEntity* entity;
-	EntityIdType entityId;
-};
+	class EntityDestroyed
+	{
+	public:
+		EntityDestroyed(HgEntity* e, EntityIdType id)
+			:entity(e), entityId(id)
+		{}
+		HgEntity* entity;
+		EntityIdType entityId;
+	};
 
+}
 //Transform point p into world space of HgEntity e
 //point toWorldSpace(const HgEntity* e, const point* p);
 
@@ -382,6 +385,11 @@ void RegisterEntityType(const char* c, factory_clbk);
 #define REGISTER_LINKTIME2( func, type ) \
 	__pragma(comment(linker,"/export:"##LINKER_PREFIX##"REGISTER_ENTITY2"#func)); \
 	extern "C" { void REGISTER_ENTITY2##func() { Engine::HgScene::RegisterEntityFactory(#func, Engine::HgScene::generate_entity<type>); } }
+
+#define REGISTER_LINKTIME3( func, type, CollectionType ) \
+	__pragma(comment(linker,"/export:"##LINKER_PREFIX##"REGISTER_ENTITY3"#func)); \
+	extern "C" { void REGISTER_ENTITY3##func() { Engine::HgScene::RegisterEntityFactory(#func, Engine::HgScene::generate_entity2<type, CollectionType>); } }
+
 #else
 #define REGISTER_LINKTIME( func ) \
 	void __attribute__((constructor)) REGISTER##func() { TestRegistration(#func, &func); }

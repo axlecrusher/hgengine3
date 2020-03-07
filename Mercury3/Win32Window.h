@@ -11,12 +11,12 @@
 class Win32Window : public MercuryWindow
 {
 public:
-	Win32Window(const MString& title, int width, int height, int bits, int depthBits, bool fullscreen);
+	Win32Window(const MString& title, Dimensions d, int bits, int depthBits, bool fullscreen);
 	virtual ~Win32Window();
 	virtual bool SwapBuffers();
 	virtual bool PumpMessages();
 
-	static MercuryWindow* GenWin32Window(uint16_t width, uint16_t height);
+	static MercuryWindow* GenWin32Window(Dimensions d);
 	virtual void* GetProcAddress(const MString& x);
 	//static uint16_t ConvertScancode( size_t scanin );
 	static ENGINE::INPUT::KeyCodes ConvertScancode2(size_t virtualKey);

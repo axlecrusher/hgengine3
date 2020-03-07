@@ -11,11 +11,19 @@
 class MercuryWindow
 {
 public:
-	MercuryWindow(const MString& title, int width, int height, int bits, int depthBits, bool fullscreen);
+	struct Dimensions
+	{
+		Dimensions(uint16_t w = 0, uint16_t h = 0)
+		: width(w), height(h)
+		{}
+		uint16_t width, height;
+	};
+
+	MercuryWindow(const MString& title, MercuryWindow::Dimensions d, int bits, int depthBits, bool fullscreen);
 	virtual ~MercuryWindow();
 
-	inline static MercuryWindow* MakeWindow(uint16_t width, uint16_t height) {
-		MercuryWindow::m_windowInstance = genWindowClbk(width, height);
+	inline static MercuryWindow* MakeWindow(Dimensions d) {
+		MercuryWindow::m_windowInstance = genWindowClbk(d);
 		return GetCurrentWindow();
 	}
 
@@ -29,8 +37,8 @@ public:
 	
 	virtual void* GetProcAddress(const MString& x) = 0;
 	
-	inline int CurrentWidth() const { return m_currentWidth; }
-	inline int CurrentHeight() const { return m_currentHeight; }
+	inline uint16_t CurrentWidth() const { return m_currentDimensions.width; }
+	inline uint16_t CurrentHeight() const { return m_currentDimensions.height; }
 
 	inline bool InFocus() const { return m_inFocus; }
 
@@ -43,13 +51,15 @@ protected:
 	virtual void TryFullscreen() = 0;
 
 //	static MercuryWindow* (*genWindowClbk)(void);
-	static std::function<MercuryWindow*(uint16_t width, uint16_t height)> genWindowClbk;
+	static std::function<MercuryWindow*(Dimensions d)> genWindowClbk;
 //	static Callback0R< MercuryWindow* > genWindowClbk;
 	static MercuryWindow* m_windowInstance;
 	
 	MString m_title;
-	int m_currentWidth, m_currentHeight;
-	int m_requestedWidth, m_requestedHeight;
+
+	Dimensions m_currentDimensions;
+	Dimensions m_requestedDimenstions;
+
 	uint8_t m_bits, m_depthBits;
 	bool m_fullscreen;
 

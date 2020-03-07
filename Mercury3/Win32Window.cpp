@@ -21,12 +21,12 @@ uint8_t GlobalMouseGrabbed_Set = 1;
 //LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //Window callback
 //Callback0R< MercuryWindow* > MercuryWindow::genWindowClbk(Win32Window::GenWin32Window); //Register window generation callback
 //MercuryWindow* MercuryWindow::genWindowClbk = (void*)Win32Window::GenWin32Window;
-std::function<MercuryWindow*(uint16_t width, uint16_t height)> MercuryWindow::genWindowClbk(Win32Window::GenWin32Window);
+std::function<MercuryWindow*(MercuryWindow::Dimensions d)> MercuryWindow::genWindowClbk(Win32Window::GenWin32Window);
 bool ACTIVE = false;
 
-MercuryWindow* Win32Window::GenWin32Window(uint16_t width, uint16_t height)
+MercuryWindow* Win32Window::GenWin32Window(Dimensions d)
 {
-	return new Win32Window("Mercury3", width, height, 24, 16, false);
+	return new Win32Window("Mercury3", d, 24, 16, false);
 }
 
 template<typename STRTYPE>
@@ -41,9 +41,9 @@ STRTYPE* StringToLPCTSTR(const std::string& s)
 	return str;
 }
 
-Win32Window::Win32Window(const MString& title, int width, int height, int bits, int depthBits, bool fullscreen)
+Win32Window::Win32Window(const MString& title, MercuryWindow::Dimensions d, int bits, int depthBits, bool fullscreen)
 	:m_hwnd(NULL), m_hdc(NULL), m_hglrc(NULL), m_hInstance(NULL), m_className(NULL), m_windowAtom(NULL), m_winTitle(NULL),m_cX(0),
-	m_cY(0),MercuryWindow(title, width, height, bits, depthBits, fullscreen)
+	m_cY(0), MercuryWindow(title, d, bits, depthBits, fullscreen)
 {
 	m_className = StringToLPCTSTR<WCHAR>("Mercury Render Window");
 	m_winTitle = StringToLPCTSTR<WCHAR>(title);
@@ -120,9 +120,9 @@ void Win32Window::GenWindow()
 	//}
 
 	rect.left=(long)0;
-	rect.right=(long)m_requestedWidth;
+	rect.right=m_requestedDimenstions.width;
 	rect.top=(long)0;
-	rect.bottom=(long)m_requestedHeight;	
+	rect.bottom=m_requestedDimenstions.height;
 
 	//store default window style values
 	m_dwStyle = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
@@ -142,8 +142,8 @@ void Win32Window::GenWindow()
 		m_winTitle,
 		dwStyle,
 		0, 0,
-		m_requestedWidth,
-		m_requestedHeight,
+		m_requestedDimenstions.width,
+		m_requestedDimenstions.height,
 		NULL,
 		NULL,
 		m_hInstance,
@@ -163,13 +163,13 @@ void Win32Window::GenWindow()
 
 	//Resize windows so it's actually as big as we want, not minus borders.s
 	GetClientRect( m_hwnd, &rect );
-	int diffx = m_requestedWidth - rect.right;
-	int diffy = m_requestedHeight - rect.bottom;
-	SetWindowPos( m_hwnd, HWND_TOP, 0, 0, diffx + m_requestedWidth, diffy + m_requestedHeight, 0 );
+	int diffx = m_requestedDimenstions.width - rect.right;
+	int diffy = m_requestedDimenstions.height - rect.bottom;
+	SetWindowPos( m_hwnd, HWND_TOP, 0, 0, diffx + m_requestedDimenstions.width, diffy + m_requestedDimenstions.height, 0 );
 
 	GetClientRect(m_hwnd, &rect);
-	m_currentWidth = rect.right;
-	m_currentHeight = rect.bottom;
+	m_currentDimensions.width = rect.right;
+	m_currentDimensions.height = rect.bottom;
 
 //	wglSwapInterval(0);
 }
@@ -209,6 +209,13 @@ bool Win32Window::ChangeDisplaySettings() {
 	//Change the display resolution
 	auto r = ::ChangeDisplaySettings(&screenSettings, dwFlags);
 
+	Dimensions d = m_requestedDimenstions;
+	if (m_fullscreen)
+	{
+		d.width = screenSettings.dmPelsWidth;
+		d.height = screenSettings.dmPelsHeight;
+	}
+
 	char* error_msg = nullptr;
 	bool ret = true;
 
@@ -243,12 +250,12 @@ bool Win32Window::ChangeDisplaySettings() {
 	}
 
 	//resize the window
-	SetWindowPos(m_hwnd, HWND_TOP, 0, 0, m_requestedWidth, m_requestedHeight, 0);
+	SetWindowPos(m_hwnd, HWND_TOP, 0, 0, d.width, d.height, 0);
 
 	RECT rect;
 	GetClientRect(m_hwnd, &rect);
-	m_currentWidth = rect.right;
-	m_currentHeight = rect.bottom;
+	m_currentDimensions.width = rect.right;
+	m_currentDimensions.height = rect.bottom;
 
 	return ret;
 }
@@ -351,7 +358,7 @@ bool Win32Window::PumpMessages()
 		{
 			RECT rect;
 			GetWindowRect(m_hwnd, &rect);
-			SetCursorPos( rect.left + m_currentWidth/2, rect.top + m_currentHeight/2 );
+			SetCursorPos( rect.left + CurrentWidth()/2, rect.top + CurrentHeight()/2 );
 		}
 		
 	}
@@ -410,8 +417,8 @@ bool Win32Window::PumpMessages()
 					if( GlobalMouseGrabbed_Set )
 					{
 						int x, y;
-						x = m_currentWidth/2 - px;
-						y = m_currentHeight/2 - py;
+						x = CurrentWidth()/2 - px;
+						y = CurrentHeight()/2 - py;
 
 
 						if (x!=0 || y!=0) //prevent recursive XWarp
@@ -424,8 +431,8 @@ bool Win32Window::PumpMessages()
 							//							MouseInput::ProcessMouseInput(x, y, left, right, center, su, sd, true);
 							lastx = x; lasty = y;
 							
-							pos.x = m_currentWidth/2;
-							pos.y = m_currentHeight/2;
+							pos.x = CurrentWidth()/2;
+							pos.y = CurrentHeight()/2;
 							ClientToScreen(m_hwnd, &pos );
 							SetCursorPos( pos.x, pos.y);
 							if( bWasCursorVisible )

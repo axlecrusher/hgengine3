@@ -3,10 +3,9 @@
 
 #include <HgInput.h>
 
-MercuryWindow::MercuryWindow(const MString& title, int width, int height, int bits, int depthBits, bool fullscreen)
-	:m_title(title), m_requestedWidth(width), m_requestedHeight(height), m_bits(bits), m_depthBits(depthBits), m_fullscreen(fullscreen),
-	m_iLastMouseX(0),m_iLastMouseY(0),m_inFocus(false), m_close(false), m_altEnter(false),
-	m_currentWidth(0), m_currentHeight(0)
+MercuryWindow::MercuryWindow(const MString& title, MercuryWindow::Dimensions d, int bits, int depthBits, bool fullscreen)
+	:m_title(title), m_requestedDimenstions(d), m_bits(bits), m_depthBits(depthBits), m_fullscreen(fullscreen),
+	m_iLastMouseX(0),m_iLastMouseY(0),m_inFocus(false), m_close(false), m_altEnter(false)
 {
 //	MESSAGEMAN.GetValue( "Input.CursorGrabbed" )->SetBool( true );
 }

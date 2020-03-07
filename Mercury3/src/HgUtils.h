@@ -4,10 +4,11 @@
 #define SIZEOF_ARRAY(X) (*(&X + 1) - X)
 
 #include <stdint.h>
+#include <MercuryWindow.h>
 
 namespace ENGINE {
 	void InitEngine();
-	void StartWindowSystem(uint16_t width, uint16_t height);
+	void StartWindowSystem(MercuryWindow::Dimensions d);
 	void EnumberateSymbols();
 	void SetRealtimePriority();
 }

@@ -27,7 +27,7 @@ bool OpenVRRenderTarget::Init()
 	auto strDriver = GetTrackedDeviceString(vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_TrackingSystemName_String);
 	auto strDisplay = GetTrackedDeviceString(vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SerialNumber_String);
 
-	ENGINE::StartWindowSystem(1920, 1080);
+	ENGINE::StartWindowSystem(MercuryWindow::Dimensions(1280, 720));
 
 	auto window = MercuryWindow::GetCurrentWindow();
 

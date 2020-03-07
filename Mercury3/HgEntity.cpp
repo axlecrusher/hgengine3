@@ -94,7 +94,7 @@ void HgEntity::init()
 	m_entityId = m_nextEntityId++;
 
 	Locator().RegisterEntity(this);
-	EventSystem::PublishEvent(EntityCreated(this, m_entityId));
+	EventSystem::PublishEvent(Events::EntityCreated(this, m_entityId));
 }
 
 HgEntity::~HgEntity() {
@@ -125,7 +125,7 @@ void HgEntity::destroy()
 {
 	if (m_entityId.isValid())
 	{
-		EventSystem::PublishEvent(EntityDestroyed(this, m_entityId));
+		EventSystem::PublishEvent(Events::EntityDestroyed(this, m_entityId));
 		Locator().RemoveEntity(m_entityId);
 	}
 	m_logic.reset();
@@ -182,5 +182,5 @@ point HgEntity::computeWorldSpacePosition() const
 //	return v1;
 //}
 
-REGISTER_EVENT_TYPE(EntityCreated)
-REGISTER_EVENT_TYPE(EntityDestroyed)
+REGISTER_EVENT_TYPE(Events::EntityCreated)
+REGISTER_EVENT_TYPE(Events::EntityDestroyed)
