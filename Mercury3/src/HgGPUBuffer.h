@@ -26,21 +26,16 @@ public:
 	virtual ~IHgGPUBuffer() {
 	}
 
-	inline void NeedsUpdate(bool needsUpdate) { m_needsUpdate = needsUpdate; }
-	inline bool NeedsUpdate() const { return m_needsUpdate; }
+	//Set to true if the data needs to be updated on the GPU
+	inline void setNeedsLoadToGPU(bool needsUpdate) { m_needsUpdate = needsUpdate; }
+
+	//returns true if the data needs to be loaded to the GPU
+	inline bool NeedsLoadToGPU() const { return m_needsUpdate; }
 
 	inline void UseType(BUFFER_USE_TYPE t) { m_useType = t; }
 	inline BUFFER_USE_TYPE UseType() const { return m_useType; }
 
 	inline uint32_t sizeBytes() const { return m_sizeBytes; }
-
-	//inline void Use() {
-	//	if (NeedsUpdate()) {
-	//		m_gpuImpl->SendToGPU(this);
-	//		NeedsUpdate(false);
-	//	}
-	//	m_gpuImpl->Bind();
-	//}
 
 	inline IGPUBufferImpl* apiImpl() const { return m_gpuImpl.get(); }
 
@@ -65,7 +60,7 @@ public:
 	inline void AddData(const T* data, uint32_t count) {
 		m_memory.add_data(data, count);
 		m_sizeBytes = m_memory.getCount() * sizeof(T);
-		NeedsUpdate(true);
+		setNeedsLoadToGPU(true);
 		m_buffer = m_memory.getBuffer();
 	}
 

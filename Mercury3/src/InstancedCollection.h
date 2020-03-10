@@ -92,7 +92,7 @@ public:
 			RenderDataPtr& rd = itr.second.renderData;
 			rd->instanceCount = itr.second.instanceCount;
 			itr.second.instanceData->setCount(itr.second.instanceCount*stride);
-			itr.second.instanceData->NeedsUpdate(true);
+			itr.second.instanceData->setNeedsLoadToGPU(true);
 
 			rd->gpuBuffer = itr.second.instanceData;
 			queue->Enqueue(rd);
@@ -172,6 +172,12 @@ private:
 
 template<typename gpu_structure>
 class IUpdatableInstance : public IUpdatable {
+public:
+	virtual void getInstanceData(gpu_structure* instanceData) = 0;
+};
+
+template<typename gpu_structure>
+class DoDUpdatableInstance : public IUpdatable {
 public:
 	virtual void getInstanceData(gpu_structure* instanceData) = 0;
 };

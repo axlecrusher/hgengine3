@@ -86,35 +86,46 @@ struct EntityFlags {
 	bool inheritParentTranslation : 1;
 };
 
+struct SPI
+{
+	SPI()
+		:scale(1.0)
+	{}
+
+	quaternion orientation; //16 bytes
+	vertex3f position; float scale; //16 bytes
+	vertex3f origin; //12 bytes
+};
+
 class SpacialData {
 private:
-	quaternion m_orientation; //16 bytes
-	vertex3f m_position; float m_scale; //16 bytes
-	vertex3f m_origin; //12 bytes
+	SPI m_spi;
 
 	bool m_hasPrevious;
 	vertex3f m_prevPosition;
 public:
-	SpacialData() : m_scale(1.0f), m_hasPrevious(false)
+	SpacialData() : m_hasPrevious(false)
 	{}
 
-	inline const vertex3f origin() const { return m_origin; }
-	inline void origin(const vertex3f& p) { m_origin = p; }
+	inline const vertex3f origin() const { return m_spi.origin; }
+	inline void origin(const vertex3f& p) { m_spi.origin = p; }
 
 	inline bool hasPrevious() const { return m_hasPrevious; }
 	inline const vertex3f& PreviousPosition() const { return m_prevPosition; }
 	inline void PreviousPosition(const vertex3f& p) { m_hasPrevious = true; m_prevPosition = p; }
 
 	//inline vertex3f& position() { return m_position; }
-	inline const vertex3f& position() const { return m_position; }
-	inline void position(const vertex3f& p) { m_position = p; }
+	inline const vertex3f& position() const { return m_spi.position; }
+	inline void position(const vertex3f& p) { m_spi.position = p; }
 
 	//inline quaternion& orientation() { return m_orientation; }
-	inline const quaternion& orientation() const { return m_orientation; }
-	inline void orientation(const quaternion& q) { m_orientation = q; }
+	inline const quaternion& orientation() const { return m_spi.orientation; }
+	inline void orientation(const quaternion& q) { m_spi.orientation = q; }
 
-	inline float scale() const { return m_scale; }
-	inline void scale(float s) { m_scale = s; }
+	inline float scale() const { return m_spi.scale; }
+	inline void scale(float s) { m_spi.scale = s; }
+
+	inline const SPI getSPI() const { return m_spi; }
 };
 
 //typedef uint32_t EntityIdType;
@@ -197,6 +208,9 @@ public:
 private:
 	std::string m_name;
 };
+
+//Compute local transformation matrix
+HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale = true, bool applyRotation = true, bool applyTranslation = true);
 
 /* NOTES: Try to avoid pointers, especially on 64 bit.
 The entity that allocates memory for render data should

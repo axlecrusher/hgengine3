@@ -4,6 +4,8 @@
 #include <HgVbo.h>
 #include <InstancedCollection.h>
 
+#include <core/DataOrientedCollection.h>
+
 extern vbo_layout_vnut raw_cube_data[24];
 extern uint8_t cube_indices[36];
 
@@ -40,6 +42,59 @@ namespace RotatingCube {
 	struct gpuStruct {
 		float matrix[16];
 	};
+
+	struct CubeState
+	{
+		HgTime age;
+		HgTime rotationTime;
+	};
+
+	struct DataOrientedStruct; //forward declare
+
+	class RotatingCube2
+	{
+	public:
+		RotatingCube2(DataOrientedStruct* data, uint32_t idx)
+			:m_data(data), m_instanceIndex(idx)
+		{}
+
+		HgEntity& getEntity();
+		const HgEntity& getEntity() const;
+
+		void setPosition(vertex3f p);
+		vertex3f getPosition() const;
+
+		void setScale(float s);
+		float getScale() const;
+
+		DataOrientedStruct* m_data;
+		uint32_t m_instanceIndex;
+	};
+
+	struct DataOrientedStruct
+	{
+		DataOrientedStruct()
+		{
+			gpuBuffer = std::make_shared< HgGPUBufferSegment<gpuStruct> >();
+		}
+
+		void update(HgTime dt);
+		RotatingCube2& newItem();
+		void EnqueueForRender(RenderQueue* queue, HgTime dt);
+
+		std::vector<CubeState> cubeState;
+		//std::vector<quaternion> rotation;
+		std::vector<SPI> spacial;
+		std::vector<HgEntity> entities;
+		std::vector<RenderData> renderData;
+		std::vector<gpuStruct> gpuStructArray;
+		std::vector<RotatingCube2> glueClass;
+
+		std::shared_ptr< HgGPUBufferSegment<gpuStruct> > gpuBuffer;
+	};
+
+	using RotatingCube2InstanceCollection = DataOrientedCollection<RotatingCube2, DataOrientedStruct>;
+	using RotatingCube2InstanceCollectionPtr = std::shared_ptr<RotatingCube2InstanceCollection>;
 
 	class RotatingCube : public IUpdatableInstance<gpuStruct> {
 	public:

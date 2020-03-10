@@ -305,7 +305,7 @@ void HgOglShader::sendLocalUniformsToGPU(const ShaderUniforms& uniforms) {
 	auto gpuBuffer = uniforms.gpuBuffer;
 	if ((m_uniformLocations[U_BUFFER_OBJECT1] > -1) && (gpuBuffer != nullptr)) {
 		OGLHgGPUBuffer* api = (OGLHgGPUBuffer*)gpuBuffer->apiImpl();
-		if (gpuBuffer->NeedsUpdate()) {
+		if (gpuBuffer->NeedsLoadToGPU()) {
 			//api->OGLHgGPUBuffer::SendToGPU(oglrd->gpuBuffer.get()); //no vtable lookup
 			api->OGLHgGPUBuffer::SendToGPU(gpuBuffer); //no vtable lookup
 		}

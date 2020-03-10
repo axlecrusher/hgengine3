@@ -49,6 +49,8 @@
 
 #include <HgFreetype.h>
 
+#include <cube.h>
+
 float projection[16];
 
 HgCamera camera;
@@ -118,7 +120,7 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	}
 }
 
-#define ANI_TRIS 400
+#define ANI_TRIS 4000
 
 //void fire(HgScene* scene) {
 //	HgEntity* entity = NULL;
@@ -308,14 +310,19 @@ int main()
 
 
 		for (i = 0; i < ANI_TRIS; i++) {
-			float x = (i % 20)*1.1f;
-			float z = (i / 20)*1.1f;
+			float x = (i % 40)*1.1f;
+			float z = (i / 40)*1.1f;
 
-			HgEntity* entity = scene2.create_entity("rotating_cube");
-			if (entity)
+			//HgEntity* entity = scene2.create_entity("rotating_cube");
+			auto cube = scene2.create_entity2<RotatingCube::RotatingCube2, RotatingCube::RotatingCube2InstanceCollection>();
+			HgEntity* entity = &cube.getEntity();
+
+			//if (entity)
 			{
-				entity->position(point(-10.0f + x, 5.0f, -2.0f - z));
-				entity->scale(0.3f);
+				cube.setPosition(point(-20.0f + x, 5.0f, 30.0f - z));
+				cube.setScale(0.3f);
+				//entity->position(point(-20.0f + x, 5.0f, 30.0f - z));
+				//entity->scale(0.3f);
 				if (!cubeId.isValid())
 				{
 					auto rd = entity->renderData();

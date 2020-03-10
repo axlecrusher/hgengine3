@@ -104,6 +104,89 @@ void Cube::init() {
 
 namespace RotatingCube {
 
+	void DataOrientedStruct::update(HgTime dt)
+	{
+		for (uint32_t i = 0; i < cubeState.size(); i++)
+		{
+			using namespace HgMath;
+
+			auto& state = cubeState[i];
+
+			state.age += dt;
+			const double degTime = 360.0 / state.rotationTime.msec();
+
+			while (state.age > state.rotationTime) {
+				state.age -= state.rotationTime;
+			}
+			const double deg = degTime * state.age.msec();
+			//rotation[i] = quaternion::fromEuler(angle::ZERO, angle::deg(deg), angle::ZERO);
+			const auto r = quaternion::fromEuler(angle::ZERO, angle::deg(deg), angle::ZERO);
+
+			spacial[i].orientation = r;
+			//const auto mat = computeTransformMatrix(spacial[i]); //don't want to do this here, update can be called multiple times per frame
+		}
+
+	}
+
+	RotatingCube2& DataOrientedStruct::newItem()
+	{
+		size_t idx = cubeState.size();
+
+		cubeState.emplace_back();
+		//rotation.emplace_back();
+		spacial.emplace_back();
+		entities.emplace_back();
+		gpuStructArray.emplace_back();
+		renderData.emplace_back();
+		glueClass.emplace_back(this, idx);
+
+		cubeState[idx].rotationTime = HgTime::msec(10000 + ((rand() % 10000) - 5000));
+
+		auto& e = entities[idx];
+		e.init();
+		change_to_cube(&e);
+		RenderDataPtr rd = std::make_shared<RenderData>(*crd);
+		e.setRenderData(rd);
+
+		return glueClass[idx];
+	}
+
+	void DataOrientedStruct::EnqueueForRender(RenderQueue* queue, HgTime dt)
+	{
+		auto rd = entities[0].getRenderDataPtr();
+
+		for (uint32_t i = 0; i < spacial.size(); i++)
+		{
+			const auto mat = computeTransformMatrix(spacial[i]);
+			mat.store(gpuStructArray[i].matrix);
+		}
+
+		rd->instanceCount = gpuStructArray.size();
+		gpuBuffer->setBuffer(gpuStructArray.data());
+		gpuBuffer->setCount(gpuStructArray.size());
+		gpuBuffer->setNeedsLoadToGPU(true);
+
+		rd->gpuBuffer = gpuBuffer;
+		queue->Enqueue(rd);
+	}
+
+	void RotatingCube2::setPosition(vertex3f p) { m_data->spacial[m_instanceIndex].position = p; }
+	vertex3f RotatingCube2::getPosition() const { return m_data->spacial[m_instanceIndex].position; }
+
+	void RotatingCube2::setScale(float s) { m_data->spacial[m_instanceIndex].scale = s; }
+	float RotatingCube2::getScale() const { return m_data->spacial[m_instanceIndex].scale; }
+
+	HgEntity& RotatingCube2::getEntity()
+	{
+		return m_data->entities[m_instanceIndex];
+	}
+	
+	const HgEntity&RotatingCube2::getEntity() const
+	{
+		return m_data->entities[m_instanceIndex];
+	}
+
+
 	void RotatingCube::update(HgTime dt) {
 		using namespace HgMath;
 		m_age += dt;
@@ -137,5 +220,7 @@ namespace RotatingCube {
 	}
 }
 
+//REGISTER_LINKTIME3(rotating_cube, RotatingCube::RotatingCube, RotatingCube::RotatingCube::factory);
+REGISTER_LINKTIME3(rotating_cube2, RotatingCube::RotatingCube2, RotatingCube::RotatingCube2InstanceCollection);
 REGISTER_LINKTIME2(rotating_cube, RotatingCube::RotatingCube);
 REGISTER_LINKTIME2(cube, Cube::Cube);
