@@ -71,6 +71,26 @@ EntityLocator::SearchResult HgEntity::Find(EntityIdType id)
 	return Locator().Find(id);
 }
 
+namespace Events
+{
+
+	void UpdateSPIData::execute(SPI& spi) const
+	{
+		if (validFlags.orientation)
+			spi.orientation = spiValues.orientation;
+
+		if (validFlags.position)
+			spi.position = spiValues.position;
+
+		if (validFlags.scale)
+			spi.scale = spiValues.scale;
+
+		if (validFlags.origin)
+			spi.origin = spiValues.origin;
+	}
+
+}
+
 
 void HgEntity::init()
 {
@@ -80,7 +100,7 @@ void HgEntity::init()
 	}
 
 	m_renderData = nullptr;
-	m_logic = nullptr;
+	//m_logic = nullptr;
 	m_renderData = nullptr;
 
 	m_extendedData = std::make_unique<ExtendedEntityData>();
@@ -105,14 +125,14 @@ HgEntity::HgEntity(HgEntity &&rhs)
 {
 	m_spacialData = std::move(rhs.m_spacialData);
 	m_renderData = std::move(rhs.m_renderData);
-	m_logic = std::move(rhs.m_logic);
+	//m_logic = std::move(rhs.m_logic);
 	m_extendedData = std::move(rhs.m_extendedData);
 	m_parentId = std::move(rhs.m_parentId);
 	m_updateNumber = std::move(rhs.m_updateNumber);
 	m_drawOrder = std::move(rhs.m_drawOrder);
 	flags = std::move(rhs.flags);
 
-	setLogic(std::move(m_logic)); //reset logic pointer
+	//setLogic(std::move(m_logic)); //reset logic pointer
 
 	std::swap(m_entityId, rhs.m_entityId);
 	Locator().RegisterEntity(this);
@@ -128,7 +148,7 @@ void HgEntity::destroy()
 		EventSystem::PublishEvent(Events::EntityDestroyed(this, m_entityId));
 		Locator().RemoveEntity(m_entityId);
 	}
-	m_logic.reset();
+	//m_logic.reset();
 	m_renderData.reset();
 	m_entityId = EntityIdType(); //reset id
 }
@@ -191,3 +211,6 @@ point HgEntity::computeWorldSpacePosition() const
 
 REGISTER_EVENT_TYPE(Events::EntityCreated)
 REGISTER_EVENT_TYPE(Events::EntityDestroyed)
+
+
+REGISTER_EVENT_TYPE(Events::UpdateSPIData)

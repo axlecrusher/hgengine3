@@ -42,6 +42,12 @@ void Projectile::update(HgTime tdelta) {
 		m_entity.position(m_entity.position() + r);
 }
 
+void Projectile::getInstanceData(Instancing::GPUTransformationMatrix* instanceData)
+{
+	const auto mat = getEntity().computeWorldSpaceMatrix();
+	mat.store(instanceData->matrix);
+}
+
 static void* generate_projectile(HgEntity* entity) {
 	//element->setLogic(std::make_unique<Projectile>());
 	Projectile& p = CreateProjectile();

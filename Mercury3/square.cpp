@@ -10,6 +10,8 @@
 #include <HgVbo.h>
 #include <HgUtils.h>
 
+#include <square.h>
+
 static float vv[12] = {
 	-0.5f, -0.5f, 0.0f,
 	0.5f, -0.5f, 0.0f,
@@ -64,4 +66,20 @@ static void* change_to_square(HgEntity* entity) {
 	return nullptr;
 }
 
+void Square::getInstanceData(Instancing::GPUTransformationMatrix* instanceData)
+{
+	const auto mat = getEntity().computeWorldSpaceMatrix();
+	mat.store(instanceData->matrix);
+}
+
+void Square::init() {
+	IUpdatableInstance<Instancing::GPUTransformationMatrix>::init();
+
+	HgEntity* e = &getEntity();
+	change_to_square(e);
+
+	e->setRenderData(init_render_data());
+}
+
 REGISTER_LINKTIME(square,change_to_square)
+REGISTER_LINKTIME2(square, Square);

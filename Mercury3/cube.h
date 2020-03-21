@@ -21,17 +21,13 @@ namespace Cube {
 	constexpr uint32_t vertexCount = 24;
 	constexpr uint32_t indiceCount = 36;
 
-	struct gpuStruct {
-		float matrix[16];
-	};
-
-	class Cube : public IUpdatableInstance<gpuStruct> {
+	class Cube : public IUpdatableInstance<Instancing::GPUTransformationMatrix> {
 	public:
-		using InstanceCollection = InstancedCollection<Cube, gpuStruct, 1>;
+		using InstanceCollection = InstancedCollection<Cube, Instancing::GPUTransformationMatrix, 1>;
 		using InstanceCollectionPtr = std::shared_ptr<InstanceCollection>;
 
 		virtual void update(HgTime tdelta);
-		virtual void getInstanceData(gpuStruct* instanceData);
+		virtual void getInstanceData(Instancing::GPUTransformationMatrix* instanceData);
 
 		void init();
 	private:
@@ -39,10 +35,6 @@ namespace Cube {
 }
 
 namespace RotatingCube {
-	struct gpuStruct {
-		float matrix[16];
-	};
-
 	struct CubeState
 	{
 		HgTime age;
@@ -75,7 +67,7 @@ namespace RotatingCube {
 	{
 		DataOrientedStruct()
 		{
-			gpuBuffer = std::make_shared< HgGPUBufferSegment<gpuStruct> >();
+			gpuBuffer = std::make_shared< HgGPUBufferSegment<Instancing::GPUTransformationMatrix> >();
 		}
 
 		void update(HgTime dt);
@@ -87,22 +79,22 @@ namespace RotatingCube {
 		std::vector<SPI> spacial;
 		std::vector<HgEntity> entities;
 		std::vector<RenderData> renderData;
-		std::vector<gpuStruct> gpuStructArray;
+		std::vector<Instancing::GPUTransformationMatrix> gpuStructArray;
 		std::vector<RotatingCube2> glueClass;
 
-		std::shared_ptr< HgGPUBufferSegment<gpuStruct> > gpuBuffer;
+		std::shared_ptr< HgGPUBufferSegment<Instancing::GPUTransformationMatrix> > gpuBuffer;
 	};
 
 	using RotatingCube2InstanceCollection = DataOrientedCollection<RotatingCube2, DataOrientedStruct>;
 	using RotatingCube2InstanceCollectionPtr = std::shared_ptr<RotatingCube2InstanceCollection>;
 
-	class RotatingCube : public IUpdatableInstance<gpuStruct> {
+	class RotatingCube : public IUpdatableInstance<Instancing::GPUTransformationMatrix> {
 	public:
-		using InstanceCollection = InstancedCollection<RotatingCube, gpuStruct, 1>;
+		using InstanceCollection = InstancedCollection<RotatingCube, Instancing::GPUTransformationMatrix, 1>;
 		using InstanceCollectionPtr = std::shared_ptr<InstanceCollection>;
 
 		virtual void update(HgTime tdelta);
-		virtual void getInstanceData(gpuStruct* instanceData);
+		virtual void getInstanceData(Instancing::GPUTransformationMatrix* instanceData);
 
 		void init();
 	private:

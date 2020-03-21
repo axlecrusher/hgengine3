@@ -9,6 +9,8 @@
 #include <IniLoader.h>
 #include <StringConversions.h>
 
+#include <MeshMath.h>
+
 typedef struct header {
 	uint32_t vertex_count, index_count;
 } header;
@@ -111,17 +113,10 @@ static void destroy(HgEntity* e) {
 	e->destroy();
 }
 
-static void* change_to_model(HgEntity* entity) {
+int8_t model_data::load(HgEntity* entity, const char* filename) {
 	//this needs to be per model instance if the model is animated
 	auto rd = RenderData::Create();
-	entity->setRenderData( rd );
-	return nullptr;
-}
-
-int8_t model_data::load(HgEntity* entity, const char* filename) {
-	change_to_model(entity);
-
-	auto rd = entity->renderData();
+	entity->setRenderData(rd);
 
 	entity->setDestroy(false);
 
@@ -135,10 +130,10 @@ int8_t model_data::load(HgEntity* entity, const char* filename) {
 		(indices16 == nullptr)&&(indices32 == nullptr)) return -1;
 
 	if (indices16 != nullptr) {
-		computeTangents(vertices.get(), mdl.getVertexCount(), indices16.get(), mdl.getIndexCount());
+		MeshMath::computeTangents(vertices.get(), mdl.getVertexCount(), indices16.get(), mdl.getIndexCount());
 	}
 	else if (indices32 != nullptr) {
-		computeTangents(vertices.get(), mdl.getVertexCount(), indices32.get(), mdl.getIndexCount());
+		MeshMath::computeTangents(vertices.get(), mdl.getVertexCount(), indices32.get(), mdl.getIndexCount());
 	}
 
 	/*
@@ -173,7 +168,9 @@ bool model_data::load_ini(HgEntity* entity, std::string filename) {
 }
 
 bool model_data::load_ini(HgEntity* entity, const IniLoader::Contents& contents) {
-	change_to_model(entity);
+	//this needs to be per model instance if the model is animated
+	auto rd = RenderData::Create();
+	entity->setRenderData(rd);
 
 	float scale = 1;
 	vector3 origin;
@@ -234,43 +231,24 @@ bool model_data::load_ini(HgEntity* entity, const IniLoader::Contents& contents)
 	return true;
 }
 
-template<typename T>
-float floatFromNormalInt(T x)
+void HgModel::Load(std::string filename)
 {
-	const float max = std::numeric_limits<T>::max();
-	return x / max;
+	if (filename.find_last_of(".ini"))
+	{
+		m_model.load_ini(&m_entity, filename);
+	}
 }
 
-//computes tangents for a triangle as defined by 3 consecutive indices
-void computeTangentsTriangle(const vbo_layout_vnut* vertices, uint32_t* indices, vector3f* tangent, vector3f* bitangent)
+void HgModel::Load(const IniLoader::Contents& ini)
 {
-	const auto& v0 = vertices[indices[0]];
-	const auto& v1 = vertices[indices[1]];
-	const auto& v2 = vertices[indices[2]];
-
-	//printf("%d %d\n", v0.uv.x, v0.uv.y);
-
-	const auto e1 = v1.v.object - v0.v.object;
-	const auto e2 = v2.v.object - v0.v.object;
-
-	const auto x1 = floatFromNormalInt(v1.uv.x.value) - floatFromNormalInt(v0.uv.x.value);
-	const auto x2 = floatFromNormalInt(v2.uv.x.value) - floatFromNormalInt(v0.uv.x.value);
-	const auto y1 = floatFromNormalInt(v1.uv.y.value) - floatFromNormalInt(v0.uv.y.value);
-	const auto y2 = floatFromNormalInt(v2.uv.y.value) - floatFromNormalInt(v0.uv.y.value);
-
-	const float r = 1.0f / (x1 * y2 - x2 * y1);
-	const vector3f t = (e1.scale(y2) - e2.scale(y1)).scale(r);
-	const vector3f b = (e2.scale(x1) - e1.scale(x2)).scale(r);
-
-	tangent[indices[0]] += t;
-	tangent[indices[1]] += t;
-	tangent[indices[2]] += t;
-
-	bitangent[indices[0]] += b;
-	bitangent[indices[1]] += b;
-	bitangent[indices[2]] += b;
+	m_model.load_ini(&m_entity, ini);
 }
 
+void HgModel::getInstanceData(Instancing::GPUTransformationMatrix* instanceData)
+{
+	const auto mat = getEntity().computeWorldSpaceMatrix();
+	mat.store(instanceData->matrix);
+}
 
-
-REGISTER_LINKTIME(hgmodel,change_to_model);
+//REGISTER_LINKTIME(hgmodel,change_to_model);
+REGISTER_LINKTIME2(HgModel, HgModel);

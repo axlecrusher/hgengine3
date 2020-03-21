@@ -37,19 +37,6 @@ class HgEntity;
 class model_data;
 class HgScene;
 
-class HgEntityLogic {
-public:
-	HgEntityLogic() : m_entity(nullptr) {}
-	virtual ~HgEntityLogic() {}
-	virtual void update(HgTime tdelta) = 0;
-
-	inline void setEntity(HgEntity* x) { m_entity = x; }
-	inline HgEntity& getEntityt() { return *m_entity; }
-	inline const HgEntity& getEntity() const { return *m_entity; }
-protected:
-	HgEntity* m_entity; //just a weak pointer back to the parent
-};
-
 //class HgEntityExtended {
 //public:
 //	//HgEntity* owner; //what is this for?
@@ -126,6 +113,7 @@ public:
 	inline void scale(float s) { m_spi.scale = s; }
 
 	inline const SPI getSPI() const { return m_spi; }
+	inline SPI& getSPI() { return m_spi; }
 };
 
 //typedef uint32_t EntityIdType;
@@ -143,7 +131,7 @@ public:
 		rhs.m_id = 0;
 	}
 
-	EntityIdType& operator=(const EntityIdType& rhs)
+	EntityIdType operator=(const EntityIdType& rhs)
 	{
 		m_id = rhs.m_id;
 		return *this;
@@ -162,6 +150,37 @@ public:
 private:
 	uint32_t m_id;
 };
+
+
+
+namespace Events
+{
+	class UpdateSPIData
+	{
+	public:
+		void execute(SPI& spi) const;
+
+		struct ValidityFlags {
+			ValidityFlags() :
+				orientation(false), position(false), scale(false), origin(false)
+			{}
+
+			bool orientation : 1;
+			bool position : 1;
+			bool scale : 1;
+			bool origin : 1;
+		};
+
+		void setOrientation(quaternion o) { spiValues.orientation = o; validFlags.orientation = true; }
+		void setPosition(vertex3f p) { spiValues.position = p; validFlags.position = true; }
+		void setScale(float s) { spiValues.scale = s; validFlags.scale = true; }
+		void setOrigin(vertex3f o) { spiValues.origin = o; validFlags.origin = true; }
+
+		EntityIdType entityId;
+		ValidityFlags validFlags;
+		SPI spiValues;
+	};
+}
 
 namespace std
 {
@@ -254,22 +273,20 @@ public:
 		inline bool isRenderable() const { return m_renderData != nullptr; }
 		inline void render() { if (isRenderable()) m_renderData->render();  }
 
-		inline bool needsUpdate(uint32_t updateNumber) const { return (hasLogic() && (m_updateNumber != updateNumber)); }
+		inline bool needsUpdate(uint32_t updateNumber) const { return ((m_updateNumber != updateNumber)); }
 		inline void update(HgTime dtime, uint32_t updateNumber) {
 			m_updateNumber = updateNumber;
 			//require parents to be updated first
 			auto parent = getParent();
 			if ((parent.isValid()) && parent->needsUpdate(updateNumber)) parent->update(dtime, updateNumber);
-			m_logic->update(dtime);
+			//m_logic->update(dtime);
 		}
-
-		inline void setLogic(std::unique_ptr<HgEntityLogic> logic) { m_logic = std::move(logic); if (m_logic) m_logic->setEntity(this); }
-		inline HgEntityLogic& logic() { return *(m_logic.get()); }
 
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
 		//void updateGpuTextures();
 
 		inline void setParent(HgEntity* parent) { m_parentId = parent->getEntityId(); }
+		inline void setParent(EntityIdType id) { m_parentId = id; }
 		
 		inline EntityLocator::SearchResult getParent() const
 		{
@@ -314,7 +331,6 @@ public:
 		*/
 		static EntityLocator::SearchResult Find(EntityIdType id);
 private:
-	inline bool hasLogic() const { return m_logic != nullptr; }
 
 	static EntityIdType m_nextEntityId;
 	static EntityLocator& Locator();
@@ -323,7 +339,6 @@ private:
 	EntityIdType m_entityId;
 
 	RenderDataPtr m_renderData;
-	std::unique_ptr<HgEntityLogic> m_logic;
 	std::unique_ptr<ExtendedEntityData> m_extendedData; //data we don't really care about and access infrequently
 
 	EntityIdType m_parentId;

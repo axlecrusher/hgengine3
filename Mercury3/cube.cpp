@@ -86,13 +86,13 @@ namespace Cube {
 void Cube::update(HgTime dt) {
 }
 
-void Cube::getInstanceData(gpuStruct* instanceData) {
+void Cube::getInstanceData(Instancing::GPUTransformationMatrix* instanceData) {
 	const auto mat = getEntity().computeWorldSpaceMatrix();
 	mat.store(instanceData->matrix);
 }
 
 void Cube::init() {
-	IUpdatableInstance<gpuStruct>::init();
+	IUpdatableInstance<Instancing::GPUTransformationMatrix>::init();
 
 	HgEntity* e = &getEntity();
 	change_to_cube(e);
@@ -202,13 +202,13 @@ namespace RotatingCube {
 		getEntity().orientation(rotation);
 	}
 
-	void RotatingCube::getInstanceData(gpuStruct* instanceData) {
+	void RotatingCube::getInstanceData(Instancing::GPUTransformationMatrix* instanceData) {
 		const auto mat = getEntity().computeWorldSpaceMatrix();
 		mat.store(instanceData->matrix);
 	}
 
 	void RotatingCube::init() {
-		IUpdatableInstance<gpuStruct>::init();
+		IUpdatableInstance<Instancing::GPUTransformationMatrix>::init();
 
 		HgEntity* e = &getEntity();
 		change_to_cube(e);

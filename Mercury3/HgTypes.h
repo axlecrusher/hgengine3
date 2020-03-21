@@ -60,6 +60,13 @@ typedef vertex3f vector3f;
 		return tmp;
 	}
 
+	template<typename T>
+	float floatFromNormalInt(T x)
+	{
+		const float max = std::numeric_limits<T>::max();
+		return x / max;
+	}
+
 	//defines uint16_t uv type. 
 	struct UVType
 	{

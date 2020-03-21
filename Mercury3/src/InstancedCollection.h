@@ -4,6 +4,14 @@
 #include <UpdatableCollection.h>
 #include <algorithm>
 
+namespace Instancing
+{
+	struct GPUTransformationMatrix
+	{
+		float matrix[16];
+	};
+}
+
 //Structure to contain the data required for instance rendering
 template<typename gpuStruct>
 struct GPUInstanceMetaData
