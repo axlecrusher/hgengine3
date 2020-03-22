@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <cassert>
 
 // Array that can have holes in it. Like swiss cheese :/
 template<typename T>
@@ -46,7 +47,8 @@ public:
 	inline void remove(const T& x) {
 		//super scalar the next 2 lines?
 		ptrdiff_t i = &x - head;
-		if ((&x - head) > ptrdiff_t(m_size)) return;
+		assert(i < m_size && i >= 0);
+		//if ((&x - head) > ptrdiff_t(m_size)) return;
 		head[i].~T();
 		m_used[i] = false;
 		m_usedSize--;

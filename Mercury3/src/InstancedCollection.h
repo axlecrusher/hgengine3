@@ -52,6 +52,12 @@ public:
 			//auto& i = *itr;
 			itr->T::update(dtime); //avoid vtable lookup
 
+			if (itr->T::getEntity().getFlags().destroy)
+			{
+				remove(*itr);
+				continue;
+			}
+
 			//m_items can change and b expanded. only store the index to the item.
 			m_updatedItemIdx.push_back(itr.index());
 		}
@@ -107,16 +113,16 @@ public:
 		}
 	}
 
-	inline T& newItem() {
+	inline T* newItem() {
 		size_t aSize = m_items.size();
-		T& tmp = m_items.newItem();
+		T* tmp = &m_items.newItem();
 		if (m_items.size() > aSize) {
 			//new item created, add more instance data
 			//some instance objects can require more than 1 gpuStruct per instance (voxel rain), so use stride as count
 			auto data = std::make_unique<gpuStruct[]>(stride);
 			m_instanceData->AddData(data.get(), stride);
 		}
-		tmp.init();
+		tmp->init();
 
 		////This is an instancing data structure.
 		////All instances need to share the same render data.

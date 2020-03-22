@@ -57,8 +57,9 @@ public:
 		}
 	}
 
-	inline T& newItem() {
-		return m_items.newItem();
+	inline T* newItem() {
+		T* tmp = &m_items.newItem();
+		return tmp;
 	}
 
 	inline void remove(const T& x) {

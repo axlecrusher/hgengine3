@@ -104,31 +104,31 @@ setFontIdentifier(loader.uniqueIdentifier());
 				ymin /= canvasHeight;
 
 				//bottom left
-				quad[0].v.object.x(xmin);
-				quad[0].v.object.y(ymin);
+				quad[0].v.object.x((float)xmin);
+				quad[0].v.object.y((float)ymin);
 				quad[0].uv.x = glyphData.topLeft.x;
 				quad[0].uv.y = glyphData.bottomRight.y;
 				//quad[0].uv.x = 0 / 512.0;
 				//quad[0].uv.y = 43 / 512.0;
 
 				//bottom right
-				quad[1].v.object.x(xmax);
-				quad[1].v.object.y(ymin);
+				quad[1].v.object.x((float)xmax);
+				quad[1].v.object.y((float)ymin);
 				quad[1].uv = glyphData.bottomRight;
 				//quad[1].uv.x = 14/512.0;
 				//quad[1].uv.y = 43/512.0;
 
 				//top right
-				quad[2].v.object.x(xmax);
-				quad[2].v.object.y(ymax);
+				quad[2].v.object.x((float)xmax);
+				quad[2].v.object.y((float)ymax);
 				quad[2].uv.x = glyphData.bottomRight.x;
 				quad[2].uv.y = glyphData.topLeft.y;
 				//quad[2].uv.x = 14/512.0;
 				//quad[2].uv.y = 0/512.0;
 
 				//top left
-				quad[3].v.object.x(xmin);
-				quad[3].v.object.y(ymax);
+				quad[3].v.object.x((float)xmin);
+				quad[3].v.object.y((float)ymax);
 				quad[3].uv = glyphData.topLeft;
 				//quad[3].uv.x = 0.0;
 				//quad[3].uv.y = 0.0;

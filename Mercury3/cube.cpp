@@ -128,7 +128,7 @@ namespace RotatingCube {
 
 	}
 
-	RotatingCube2& DataOrientedStruct::newItem()
+	RotatingCube2* DataOrientedStruct::newItem()
 	{
 		size_t idx = cubeState.size();
 
@@ -148,7 +148,7 @@ namespace RotatingCube {
 		RenderDataPtr rd = std::make_shared<RenderData>(*crd);
 		e.setRenderData(rd);
 
-		return glueClass[idx];
+		return &glueClass[idx];
 	}
 
 	void DataOrientedStruct::EnqueueForRender(RenderQueue* queue, HgTime dt)

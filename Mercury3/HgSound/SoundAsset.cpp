@@ -33,7 +33,7 @@ namespace HgSound {
 	}
 
 	bool SoundAsset::load(const std::string& path) {
-		unsigned int channels, sampleRate;
+		//unsigned int channels, sampleRate;
 
 		m_path = path;
 

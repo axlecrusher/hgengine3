@@ -71,7 +71,7 @@ namespace RotatingCube {
 		}
 
 		void update(HgTime dt);
-		RotatingCube2& newItem();
+		RotatingCube2* newItem();
 		void EnqueueForRender(RenderQueue* queue, HgTime dt);
 
 		std::vector<CubeState> cubeState;

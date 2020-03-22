@@ -18,7 +18,7 @@ static auto ProjectileCollection()
 	return Engine::getCollectionOf<UpdatableCollection<Projectile>>();
 }
 
-static Projectile& CreateProjectile() {
+static Projectile* CreateProjectile() {
 	return ProjectileCollection()->newItem();
 }
 
@@ -50,13 +50,13 @@ void Projectile::getInstanceData(Instancing::GPUTransformationMatrix* instanceDa
 
 static void* generate_projectile(HgEntity* entity) {
 	//element->setLogic(std::make_unique<Projectile>());
-	Projectile& p = CreateProjectile();
+	Projectile* p = CreateProjectile();
 	//p.setElement(element);
 
 	//p.getElement().init();
 
-	change_to_triangle(&p.getEntity());
-	return &p;
+	change_to_triangle(&p->getEntity());
+	return p;
 }
 
 REGISTER_LINKTIME(basic_projectile, generate_projectile);

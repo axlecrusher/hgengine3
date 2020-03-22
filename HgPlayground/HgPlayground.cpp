@@ -241,38 +241,38 @@ int main()
 	//gun->setHidden(true);
 
 	{
-		auto& tbn = scene2.create_entity<TBNVisualization::TBNVisualization>();
-		tbn.buildFromVertexData(gun->getRenderDataPtr()->VertexVboRecord());
-		tbn.getEntity().setParent(gun);
-		tbn.getEntity().setHidden(true);
+		auto tbn = scene2.create_entity<TBNVisualization::TBNVisualization>();
+		tbn->buildFromVertexData(gun->getRenderDataPtr()->VertexVboRecord());
+		tbn->getEntity().setParent(gun);
+		tbn->getEntity().setHidden(true);
 	}
 	
 	{
-		auto& pointCloud = scene2.create_entity<PointCloud::PointCloud>();
-		pointCloud.buildFromVertexData(gun->getRenderDataPtr()->VertexVboRecord());
-		pointCloud.getEntity().setParent(gun);
-		pointCloud.getEntity().setHidden(true);
+		auto pointCloud = scene2.create_entity<PointCloud::PointCloud>();
+		pointCloud->buildFromVertexData(gun->getRenderDataPtr()->VertexVboRecord());
+		pointCloud->getEntity().setParent(gun);
+		pointCloud->getEntity().setHidden(true);
 	}
 
 	{
-		auto& text = scene2.create_entity<HgText::Text>();
-		text.setText("HgEngine 3 -- Now with text! VV");
-		text.getEntity().position(point(1, 0, 0));
-		text.getEntity().scale(10.0);
-		text.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
+		auto text = scene2.create_entity<HgText::Text>();
+		text->setText("HgEngine 3 -- Now with text! VV");
+		text->getEntity().position(point(1, 0, 0));
+		text->getEntity().scale(10.0);
+		text->getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
 	}
 
 	{
-		auto& text = scene_2d.create_entity<HgText::Text>();
-		text.setText("Mercury Engine 3");
-		text.getEntity().position(point(-1, 0.95, 0));
+		auto text = scene_2d.create_entity<HgText::Text>();
+		text->setText("Mercury Engine 3");
+		text->getEntity().position(point(-1, 0.95, 0));
 		//text.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
 
-		auto& text2 = scene_2d.create_entity<HgText::Text>();
-		text2.setText("https://github.com/axlecrusher/hgengine3");
+		auto* text2 = scene_2d.create_entity<HgText::Text>();
+		text2->setText("https://github.com/axlecrusher/hgengine3");
 		//text2.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
-		text2.getEntity().position(point(-1, -0.90, 0));
-		text2.getEntity().scale(0.75);
+		text2->getEntity().position(point(-1, -0.90, 0));
+		text2->getEntity().scale(0.75);
 	}
 
 	//for (int i = 0; i < 4; ++i) {
@@ -289,8 +289,8 @@ int main()
 		HgEntity* entity = NULL;
 
 		{
-			auto& triangle = scene2.create_entity<Triangle::Triangle>();
-			HgEntity* entity = &triangle.getEntity();
+			auto triangle = scene2.create_entity<Triangle::Triangle>();
+			HgEntity* entity = &triangle->getEntity();
 			//HgEntity* entity = scene2.create_entity("triangle");
 			if (entity) {
 				const auto tmp = entity->position();
@@ -315,12 +315,12 @@ int main()
 
 			//HgEntity* entity = scene2.create_entity("rotating_cube");
 			auto cube = scene2.create_entity2<RotatingCube::RotatingCube2, RotatingCube::RotatingCube2InstanceCollection>();
-			HgEntity* entity = &cube.getEntity();
+			HgEntity* entity = &cube->getEntity();
 
 			//if (entity)
 			{
-				cube.setPosition(point(-20.0f + x, 5.0f, 30.0f - z));
-				cube.setScale(0.3f);
+				cube->setPosition(point(-20.0f + x, 5.0f, 30.0f - z));
+				cube->setScale(0.3f);
 				//entity->position(point(-20.0f + x, 5.0f, 30.0f - z));
 				//entity->scale(0.3f);
 				if (!cubeId.isValid())

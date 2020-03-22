@@ -43,14 +43,14 @@ public:
 
 	//Typed entity creation method
 	template<typename T>
-	T& create_entity() {
+	T* create_entity() {
 		auto collection = getCollectionOf<T::InstanceCollection>();
 		return collection->newItem();
 	}
 
 	//Typed entity creation method
 	template<typename T, typename InstanceCollectionType>
-	T& create_entity2() {
+	T* create_entity2() {
 		auto collection = getCollectionOf<InstanceCollectionType>();
 		return collection->newItem();
 	}
@@ -85,14 +85,14 @@ public:
 
 	template<typename T>
 	static HgEntity* generate_entity(Engine::HgScene* scene) {
-		auto& typedObject = scene->create_entity<T>();
-		return &typedObject.getEntity();
+		auto typedObject = scene->create_entity<T>();
+		return &typedObject->getEntity();
 	}
 
 	template<typename T, typename CollectionType>
 	static HgEntity* generate_entity2(Engine::HgScene* scene) {
-		auto& typedObject = scene->create_entity2<T, CollectionType>();
-		return &typedObject.getEntity();
+		auto typedObject = scene->create_entity2<T, CollectionType>();
+		return &typedObject->getEntity();
 	}
 
 private:
