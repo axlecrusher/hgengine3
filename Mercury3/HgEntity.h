@@ -269,6 +269,7 @@ public:
 
 		const SpacialData& getSpacialData() const { return m_spacialData; }
 		SpacialData& getSpacialData() { return m_spacialData; }
+		void setSpacialData(const SpacialData& x) { m_spacialData = x; }
 
 		inline bool isRenderable() const { return m_renderData != nullptr; }
 		inline void render() { if (isRenderable()) m_renderData->render();  }
