@@ -4,6 +4,8 @@ layout(location = 0) in vec3 vertex;
 layout(location = 1) in vec4 normal;
 layout(location = 3) in vec4 v_color;
 
+in mat4 ModelMatrix;
+
 #define MODEL 0
 #define PROJECTION 1
 #define VIEW 2

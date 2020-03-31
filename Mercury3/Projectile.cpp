@@ -13,18 +13,24 @@
 
 float projectileMsecSpeed = 1.0f / 50.0f;
 
-static auto ProjectileCollection()
-{
-	return Engine::getCollectionOf<UpdatableCollection<Projectile>>();
-}
-
-static Projectile* CreateProjectile() {
-	return ProjectileCollection()->newItem();
-}
+//static auto ProjectileCollection()
+//{
+//	return Engine::getCollectionOf<UpdatableCollection<Projectile>>();
+//}
+//
+//static Projectile* CreateProjectile() {
+//	return ProjectileCollection()->newItem();
+//}
 
 Projectile::Projectile()
 {
+	//m_entity.init();
+}
+
+void Projectile::init()
+{
 	m_entity.init();
+	change_to_triangle(&getEntity());
 }
 
 void Projectile::update(HgTime tdelta) {
@@ -33,7 +39,7 @@ void Projectile::update(HgTime tdelta) {
 		if (total_time >= HgTime::msec(3000)) {
 //			printf("set destroy\n");
 			m_entity.setDestroy(true);
-			ProjectileCollection()->remove(*this);
+			//ProjectileCollection()->remove(*this);
 			return;
 		}
 
@@ -48,15 +54,15 @@ void Projectile::getInstanceData(Instancing::GPUTransformationMatrix* instanceDa
 	mat.store(instanceData->matrix);
 }
 
-static void* generate_projectile(HgEntity* entity) {
-	//element->setLogic(std::make_unique<Projectile>());
-	Projectile* p = CreateProjectile();
-	//p.setElement(element);
-
-	//p.getElement().init();
-
-	change_to_triangle(&p->getEntity());
-	return p;
-}
-
-REGISTER_LINKTIME(basic_projectile, generate_projectile);
+//static void* generate_projectile(HgEntity* entity) {
+//	//element->setLogic(std::make_unique<Projectile>());
+//	Projectile* p = CreateProjectile();
+//	//p.setElement(element);
+//
+//	//p.getElement().init();
+//
+//	change_to_triangle(&p->getEntity());
+//	return p;
+//}
+//
+//REGISTER_LINKTIME(basic_projectile, generate_projectile);

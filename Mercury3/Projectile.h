@@ -11,6 +11,8 @@ public:
 	Projectile();
 	Projectile(Projectile&&) = default;
 
+	virtual void init();
+
 	virtual void update(HgTime tdelta);
 	virtual void getInstanceData(Instancing::GPUTransformationMatrix* instanceData);
 

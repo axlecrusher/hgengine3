@@ -186,6 +186,15 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 			fprintf(stderr, "HgShaders: Unknown uniform \"%s\"\n", name);
 		}
 	}
+
+	{
+		const auto location = glGetAttribLocation(shader_program, "ModelMatrix");
+		if (location > -1)
+		{
+			shader->m_ModelMatrixAttribLocation = location;
+		}
+	}
+
 }
 
 std::unique_ptr<HgShader> HgOglShader::Create(const char* vert, const char* frag) {
@@ -206,7 +215,7 @@ std::unique_ptr<HgShader> HgOglShader::Create(const char* vert, const char* frag
 }
 
 HgOglShader::HgOglShader()
-	:HgShader(), program_id(0), m_loadState(LoadState::NOT_LOADED)
+	:HgShader(), program_id(0), m_loadState(LoadState::NOT_LOADED), m_ModelMatrixAttribLocation(-1)
 {
 	memset(m_uniformLocations, -1, sizeof(m_uniformLocations));
 }

@@ -55,6 +55,7 @@ class HgOglShader : public HgShader {
 
 		GLuint program_id;
 		GLint m_uniformLocations[U_UNIFORM_COUNT];
+		GLint m_ModelMatrixAttribLocation;
 		LoadState m_loadState;
 
 		//other things not needed often

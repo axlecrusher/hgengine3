@@ -184,6 +184,17 @@ HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool 
 }
 
 HgMath::mat4f HgEntity::computeWorldSpaceMatrix(const bool applyScale, bool applyRotation, bool applyTranslation) const {
+	if (m_parentId.isValid())
+	{
+		return computeWorldSpaceMatrixIncludeParent(applyScale, applyRotation, applyTranslation);
+	}
+	else
+	{
+		return computeTransformMatrix(m_spacialData.getSPI(), applyScale, applyRotation, applyTranslation);
+	}
+}
+
+HgMath::mat4f HgEntity::computeWorldSpaceMatrixIncludeParent(const bool applyScale, bool applyRotation, bool applyTranslation) const {
 	HgMath::mat4f modelMatrix = computeTransformMatrix(m_spacialData.getSPI(), applyScale, applyRotation, applyTranslation);
 
 	auto parent = getParent();
