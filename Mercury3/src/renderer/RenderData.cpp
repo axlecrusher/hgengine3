@@ -4,8 +4,7 @@
 //RenderData::newRenderDataCallback RenderData::Create = nullptr;
 
 RenderData::RenderData()
-	:instanceCount(0)
-	, gpuBuffer(nullptr), m_primitive(HgEngine::PrimitiveType::TRIANGLES)
+	:m_primitive(HgEngine::PrimitiveType::TRIANGLES)
 {
 }
 
@@ -21,7 +20,7 @@ RenderDataPtr RenderData::Create()
 	return rd;
 }
 
-void RenderData::render() {
+void RenderData::render(const Instancing::InstancingMetaData* imd) {
 	auto vertex = hgVbo();
 	auto idx = indexVbo();
 	auto color = colorVbo();
@@ -32,13 +31,30 @@ void RenderData::render() {
 	vertex->use();
 	if (color != nullptr) color->use();
 
-	if (idx)
+	if (imd)
 	{
-		idx->use();
-		idx->draw(this);
+		if (idx)
+		{
+			idx->use();
+			idx->draw(imd);
+		}
+		else
+		{
+			vertex->draw(imd);
+		}
 	}
 	else
 	{
-		vertex->draw(this);
+		if (idx)
+		{
+			idx->use();
+			idx->draw(this);
+		}
+		else
+		{
+			vertex->draw(this);
+		}
 	}
+
+
 }

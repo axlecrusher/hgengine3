@@ -3,6 +3,11 @@
 #include <IUpdatable.h>
 #include <UpdatableCollection.h>
 #include <algorithm>
+#include <HgGPUBuffer.h>
+#include <memory>
+#include <core/Instancing.h>
+
+#include <OGL/VertexAttributeBuffer.h>
 
 namespace Instancing
 {
@@ -11,23 +16,6 @@ namespace Instancing
 		float matrix[16];
 	};
 }
-
-//Structure to contain the data required for instance rendering
-template<typename gpuStruct>
-struct GPUInstanceMetaData
-{
-	GPUInstanceMetaData()
-		:instanceCount(0), byteOffset(0)
-	{
-		instanceData = std::make_shared<HgGPUBufferSegment<gpuStruct>>();
-	}
-	uint32_t instanceCount;
-	uint32_t byteOffset;
-	RenderDataPtr renderData;
-	//HgEntity* entityPtr;
-
-	std::shared_ptr< HgGPUBufferSegment<gpuStruct> > instanceData;
-};
 
 //Stride is how many gpuStructs are used per instance of T
 template<typename T, typename gpuStruct, int stride>
@@ -47,7 +35,12 @@ public:
 	};
 
 	InstancedCollection() {
-		m_instanceData = std::make_shared< HgGPUBuffer<gpuStruct> >();
+		auto vBuffer = std::make_shared<HgVectorBuffer<gpuStruct>>();
+
+		std::unique_ptr<IGLBufferUse> action = std::make_unique<MatrixVertexAttribute>("ModelMatrix");
+		vBuffer->setUseClass(action);
+
+		m_vBuffer = vBuffer;
 	}
 
 	virtual void update(HgTime dtime) final {
@@ -90,14 +83,26 @@ public:
 		//std::unordered_map<size_t, GPUInstanceMetaData<gpuStruct> > instances;
 
 		//Group item instances into groups that can be instance rendered
-		gpuStruct* instanceDataPtr = m_instanceData->getBuffer();
+		//gpuStruct* instanceDataPtr = m_instanceData->getBuffer();
+
+		auto instanceDataPtr = m_modelMatrices.data();
+		const auto bufferBeginPtr = instanceDataPtr;
 
 		std::sort(m_updatedItemIdx.begin(), m_updatedItemIdx.end());
 
-		std::vector<GPUInstanceMetaData<gpuStruct>> instances;
+		m_vBuffer->setDataSource(m_modelMatrices);
+		m_vBuffer->setNeedsLoadToGPU(true); //entire vector contents needs to be sent to the GPU
+		//vBuffer->setType(BUFFER_TYPE::VERTEX_ATTRIBUTES);
+
+		//Need a way to indicate how the data in vBuffer is supposed to be used.
+		//Is it vertex attribute. Is it a sample buffer? How do you use it? How is it tied to a specific attribute?
+
+
+
+		std::vector< Instancing::InstancingMetaData > instances;
 
 		size_t lastHashId = 0;
-		GPUInstanceMetaData<gpuStruct>* ptr = nullptr;
+		Instancing::InstancingMetaData* ptr = nullptr;
 
 		for (auto item : m_updatedItemIdx)
 		{
@@ -105,10 +110,9 @@ public:
 			{
 				lastHashId = item.hashId;
 				const auto idx = instances.size();
-				instances.emplace_back();
+				instances.emplace_back( m_vBuffer );
 				ptr = &instances[idx];
-				//ptr->byteOffset = ptr - &instances[0]; //compute offset into buffer
-				ptr->instanceData->setBuffer(instanceDataPtr);
+				ptr->byteOffset = (instanceDataPtr - bufferBeginPtr) * sizeof(gpuStruct); //compute offset into buffer
 			}
 
 			auto itr = getItem(item.idx);
@@ -130,13 +134,7 @@ public:
 		{
 			if (itr.instanceCount > 0)
 			{
-				RenderDataPtr& rd = itr.renderData;
-				rd->instanceCount = itr.instanceCount;
-				itr.instanceData->setCount(itr.instanceCount*stride);
-				itr.instanceData->setNeedsLoadToGPU(true);
-
-				rd->gpuBuffer = itr.instanceData;
-				queue->Enqueue(rd);
+				queue->Enqueue(itr);
 			}
 		}
 	}
@@ -148,8 +146,8 @@ public:
 			//new item created, add more instance data
 			//some instance objects can require more than 1 gpuStruct per instance (voxel rain), so use stride as count
 			auto data = std::make_unique<gpuStruct[]>(stride);
-			m_instanceData->AddData(data.get(), stride);
-			//m_modelMatrices.emplace_back();
+			//m_instanceData->AddData(data.get(), stride);
+			m_modelMatrices.emplace_back();
 		}
 		tmp->init();
 
@@ -211,10 +209,10 @@ private:
 	SwissArray<T> m_items;
 	//std::vector<uint32_t> m_updatedItemIdx; //has been updated and ready for render
 	std::vector<IdxSort> m_updatedItemIdx; //has been updated and ready for render
-	std::shared_ptr<HgGPUBuffer<gpuStruct>> m_instanceData;
-
-	//std::vector<gpuStruct> m_modelMatrices;
 	//std::shared_ptr<HgGPUBuffer<gpuStruct>> m_instanceData;
+
+	std::vector<gpuStruct> m_modelMatrices;
+	std::shared_ptr<IHgGPUBuffer> m_vBuffer;
 };
 
 template<typename gpu_structure>

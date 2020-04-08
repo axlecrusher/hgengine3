@@ -213,11 +213,6 @@ int main()
 	Engine::HgScene scene2;
 	Engine::HgScene scene_2d;
 
-	GravityField gravity = { 0 };
-	allocate_space(&gravity, ANI_TRIS);
-	gravity.scene = &scene;
-	gravity.vector.y(-1);
-
 	//scene2.create_entity("triangle");
 	HgEntity* teapot = NULL;
 	scene.getNewEntity(&teapot);
@@ -235,29 +230,38 @@ int main()
 	//}
 
 
-	HgEntity* gun = NULL;
-	scene.getNewEntity(&gun);
-	model_data::load_ini(gun, "gun.ini");
-	//gun->setHidden(true);
+	//HgEntity* gun = NULL;
+	//scene.getNewEntity(&gun);
+	//model_data::load_ini(gun, "gun.ini");
 
-	{
-		auto tbn = scene2.create_entity<TBNVisualization::TBNVisualization>();
-		tbn->buildFromVertexData(gun->getRenderDataPtr()->VertexVboRecord());
-		tbn->getEntity().setParent(gun);
-		tbn->getEntity().setHidden(true);
-	}
-	
-	{
-		auto pointCloud = scene2.create_entity<PointCloud::PointCloud>();
-		pointCloud->buildFromVertexData(gun->getRenderDataPtr()->VertexVboRecord());
-		pointCloud->getEntity().setParent(gun);
-		pointCloud->getEntity().setHidden(true);
-	}
+	//{
+	//	auto tbn = scene2.create_entity<TBNVisualization::TBNVisualization>();
+	//	tbn->buildFromVertexData(gun->getRenderDataPtr()->VertexVboRecord());
+	//	tbn->getEntity().setParent(gun);
+	//	tbn->getEntity().setHidden(true);
+	//}
+	//
+	//{
+	//	auto pointCloud = scene2.create_entity<PointCloud::PointCloud>();
+	//	pointCloud->buildFromVertexData(gun->getRenderDataPtr()->VertexVboRecord());
+	//	pointCloud->getEntity().setParent(gun);
+	//	pointCloud->getEntity().setHidden(true);
+	//}
 
 	{
 		auto text = scene2.create_entity<HgText::Text>();
 		text->setText("HgEngine 3 -- Now with text! VV");
+		text->getEntity().setDrawOrder(110);
 		text->getEntity().position(point(1, 0, 0));
+		text->getEntity().scale(10.0);
+		text->getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
+	}
+
+	{
+		auto text = scene2.create_entity<HgText::Text>();
+		text->setText("Woooooooooo!");
+		text->getEntity().setDrawOrder(110);
+		text->getEntity().position(point(1, 2, 0));
 		text->getEntity().scale(10.0);
 		text->getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
 	}
@@ -294,16 +298,16 @@ int main()
 			//HgEntity* entity = scene2.create_entity("triangle");
 			if (entity) {
 				const auto tmp = entity->position();
-				entity->position(tmp.x(1.5f).z(1.0f));
-				entity->renderData()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
+				entity->position(tmp.x(1.5f).z(-1.0f));
+				//entity->renderData()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
 				//	toQuaternion2(0, 0, 90, &entity->orientation);
 			}
 
 			entity = scene2.create_entity("triangle");
 			if (entity) {
 				const auto tmp = entity->position();
-				entity->position(tmp.x(0.0f).z(-2.0f));
-				entity->renderData()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
+				entity->position(tmp.x(0.0f).z(-2.5f));
+				//entity->renderData()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
 				//	toQuaternion2(45,0,0,&entity->orientation);
 			}
 		}
@@ -345,15 +349,15 @@ int main()
 			redCube->renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_red.glsl"));
 			//entity->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 		}
-
-//		entity->position.
-
-		if (Engine::create_entity("voxelGrid", &scene, &entity) > 0) {
-			//		entity->scale = 100.0f;
-			entity->position().z(-10);
-			//		toQuaternion2(0, -90, 0, &entity->orientation);
-			entity->renderData()->getMaterial().setShader(HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl"));
-		}
+//
+////		entity->position.
+//
+//		if (Engine::create_entity("voxelGrid", &scene, &entity) > 0) {
+//			//		entity->scale = 100.0f;
+//			entity->position().z(-10);
+//			//		toQuaternion2(0, -90, 0, &entity->orientation);
+//			entity->renderData()->getMaterial().setShader(HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl"));
+//		}
 	}
 
 	HgEntity* grid = nullptr;
@@ -581,7 +585,7 @@ int main()
 		//slow down if we are going really fast
 		if (realTimeDt.msec() < 1.0)
 		{
-			Sleep(1);
+			//Sleep(1);
 		}
 
 		accumulatedTime += realTimeDt;

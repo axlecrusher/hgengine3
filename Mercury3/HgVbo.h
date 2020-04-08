@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <stdint.h>
+#include <core/Enumerations.h>
 #include <HgTypes.h>
 
 #include <vector>
@@ -46,12 +47,6 @@ enum VBO_TYPE : uint8_t {
 	VBO_COLOR16
 };
 
-enum BUFFER_USE_TYPE : uint8_t {
-	BUFFER_DRAW_STATIC = 0,
-	BUFFER_DRAW_DYNAMIC,
-	BUFFER_DRAW_STREAM
-};
-
 //Vertex,Color
 typedef struct vbo_layout_vc {
 	vertex v;
@@ -84,6 +79,11 @@ inline void convert(const vbo_layout_vnut* in, vbo_layout_vn* out) {
 	out->n = in->n;
 }
 
+namespace Instancing
+{
+	struct InstancingMetaData; //forward declare
+}
+
 class RenderData;
 
 class IHgVbo {
@@ -112,6 +112,7 @@ public:
 
 //	virtual void draw(uint32_t count, uint32_t vertex_offset, uint32_t idx_offset) = 0;
 	virtual void draw(const RenderData* rd) = 0;
+	virtual void draw(const Instancing::InstancingMetaData* imd) = 0;
 
 	inline VBO_TYPE VboType() const { return m_type;  }
 

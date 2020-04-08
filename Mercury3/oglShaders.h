@@ -8,15 +8,21 @@
 
 #include <quaternion_dual.h>
 
+//Conversion struct to convert between Hg ShaderHandle and OPENGL GLuint shader handle
+struct OGLShaderHandle
+{
+	OGLShaderHandle(ShaderHandle h)
+		:value(h.value)
+	{}
 
-struct shader_source {
-	std::string vert_file_path;
-	std::string frag_file_path;
-	std::string geom_file_path;
+	OGLShaderHandle(GLuint h)
+		:value(h)
+	{}
 
-	std::string vert_source;
-	std::string frag_source;
-	std::string geom_source;
+	operator GLuint() const { return value; }
+	operator ShaderHandle() const { return ShaderHandle(value); }
+
+	GLuint value;
 };
 
 class HgOglShader : public HgShader {
@@ -25,6 +31,7 @@ class HgOglShader : public HgShader {
 		virtual ~HgOglShader();
 
 		virtual void load();
+		virtual bool compile();
 		virtual void destroy();
 		virtual void enable();
 
@@ -53,16 +60,7 @@ class HgOglShader : public HgShader {
 		What would the benefit of this be? I can't remember. Maybe it makes sense for local uniforms.
 		*/
 
-		GLuint program_id;
+		//GLuint program_id;
 		GLint m_uniformLocations[U_UNIFORM_COUNT];
-		GLint m_ModelMatrixAttribLocation;
 		LoadState m_loadState;
-
-		//other things not needed often
-		std::unique_ptr<shader_source> m_shaderSource;
 };
-
-//GLuint shaders_load(const char* path, uint32_t shader_type);
-//void useShaderProgram(GLuint id);
-//void _print_programme_info_log(GLuint programme);
-//void _print_shader_info_log(GLuint idx);

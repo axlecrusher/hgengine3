@@ -1,28 +1,13 @@
 #pragma once
 
 #include <stdint.h>
+#include <core/Enumerations.h>
 
 #include <HgVbo.h>
 #include <HgGPUBuffer.h>
 #include <Material.h>
 
-//enum RenderFlags : uint8_t {
-//	NONE = 0,
-//	FACE_CULLING = 1,
-//	DEPTH_WRITE = 2
-//};
-
-namespace HgEngine
-{
-
-enum PrimitiveType : uint8_t
-{
-	TRIANGLES,
-	LINES,
-	POINTS
-};
-
-}
+#include <GLBuffer.h>
 
 class RenderData {
 private:
@@ -47,7 +32,7 @@ public:
 	RenderData();
 	~RenderData();
 
-	void render();
+	void render(const Instancing::InstancingMetaData* imd = nullptr);
 
 	IHgVbo* hgVbo() { return m_vertexVbo.VboRec().Vbo().get(); }
 	IHgVbo* indexVbo() { return m_indexVbo.VboRec().Vbo().get(); }
@@ -68,13 +53,15 @@ public:
 	HgEngine::PrimitiveType getPrimitiveType() const { return m_primitive; }
 	void setPrimitiveType(HgEngine::PrimitiveType t) { m_primitive = t; }
 
-	uint32_t instanceCount;
+	//uint32_t instanceCount;
 
+	////std::shared_ptr<IHgGPUBuffer> gpuBuffer;
+	////IHgGPUBuffer* gpuBuffer;
 	//std::shared_ptr<IHgGPUBuffer> gpuBuffer;
-	//IHgGPUBuffer* gpuBuffer;
-	std::shared_ptr<IHgGPUBuffer> gpuBuffer;
 
 	Flags renderFlags;
+
+	GLVaoId vao;
 
 private:
 	Material m_material;

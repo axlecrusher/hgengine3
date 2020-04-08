@@ -10,21 +10,16 @@ layout(location = 3) in vec4 v_color;
 
 //model, projection, and view matrices
 uniform mat4 matrices[3];
-uniform samplerBuffer bufferObject1;
+//uniform samplerBuffer bufferObject1;
+
+in mat4 ModelMatrix;
 
 out vec4 color;
 
 void main() {
-	int bufferOffset = gl_InstanceID*4;
+//	int bufferOffset = gl_InstanceID*4;
 
-	mat4 modelMatrix;
-
-	modelMatrix[0] = texelFetch(bufferObject1,bufferOffset);
-	modelMatrix[1] = texelFetch(bufferObject1,bufferOffset+1);
-	modelMatrix[2] = texelFetch(bufferObject1,bufferOffset+2);
-	modelMatrix[3] = texelFetch(bufferObject1,bufferOffset+3);
-
-	vec4 worldSpacePos =  modelMatrix * vec4(vertex,1);
+	vec4 worldSpacePos =  ModelMatrix * vec4(vertex,1);
 	gl_Position = matrices[PROJECTION] * matrices[VIEW] * worldSpacePos;
 	color = v_color;
 }

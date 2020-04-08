@@ -1,6 +1,5 @@
 #version 420
 
-uniform samplerBuffer bufferObject1;
 uniform sampler2D diffuseTex;
 
 out vec4 fragColor;

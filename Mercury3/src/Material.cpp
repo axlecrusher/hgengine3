@@ -27,7 +27,8 @@ Material::Material()
 	:m_updateTextures(false), m_transparent(false), m_blendMode(BlendMode::BLEND_NORMAL)
 {
 	clearTextureIDs();
-	setShader(HgShader::acquire("test_vertex.glsl", "test_frag.glsl"));
+	//setShader(HgShader::acquire("test_vertex.glsl", "test_frag.glsl"));
+	setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
 }
 
 Material::Material(const Material& other)

@@ -145,8 +145,8 @@ namespace RotatingCube {
 		auto& e = entities[idx];
 		e.init();
 		change_to_cube(&e);
-		RenderDataPtr rd = std::make_shared<RenderData>(*crd);
-		e.setRenderData(rd);
+		//RenderDataPtr rd = std::make_shared<RenderData>(*crd);
+		//e.setRenderData(rd);
 
 		return &glueClass[idx];
 	}
@@ -161,13 +161,15 @@ namespace RotatingCube {
 			mat.store(gpuStructArray[i].matrix);
 		}
 
-		rd->instanceCount = gpuStructArray.size();
-		gpuBuffer->setBuffer(gpuStructArray.data());
-		gpuBuffer->setCount(gpuStructArray.size());
+		gpuBuffer->setDataSource(gpuStructArray);
 		gpuBuffer->setNeedsLoadToGPU(true);
 
-		rd->gpuBuffer = gpuBuffer;
-		queue->Enqueue(rd);
+		Instancing::InstancingMetaData imd;
+		imd.instanceCount = gpuStructArray.size();
+		imd.renderData = rd;
+		imd.instanceData = gpuBuffer;
+
+		queue->Enqueue(imd);
 	}
 
 	void RotatingCube2::setPosition(vertex3f p) { m_data->spacial[m_instanceIndex].position = p; }
@@ -215,8 +217,8 @@ namespace RotatingCube {
 
 		m_rotationTime = HgTime::msec(10000 + ((rand() % 10000) - 5000));
 
-		RenderDataPtr rd = std::make_shared<RenderData>(*crd);
-		e->setRenderData(rd);
+		//RenderDataPtr rd = std::make_shared<RenderData>(*crd);
+		//e->setRenderData(rd);
 	}
 }
 

@@ -69,8 +69,8 @@ void Triangle::init() {
 	HgEntity* e = &getEntity();
 	change_to_triangle(e);
 
-	RenderDataPtr rd = std::make_shared<RenderData>(*trd);
-	e->setRenderData(rd);
+	//RenderDataPtr rd = std::make_shared<RenderData>(*trd);
+	//e->setRenderData(rd);
 }
 }
 

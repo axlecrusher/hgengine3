@@ -3,24 +3,25 @@
 #include <glew.h>
 #include <HgVboMemory.h>
 #include <HgGPUBuffer.h>
+#include <GLBuffer.h>
 
 //Contains opengl buffer and texture id for texture buffers
-struct GLBufferId
+struct GLTextureBuffer
 {
-	GLBufferId() : buffId(0), texId(0), m_bufferBound(false)
+	GLTextureBuffer() : buffId(0), texId(0), m_bufferBound(false)
 	{}
 
-	~GLBufferId();
+	~GLTextureBuffer();
 
 	void AllocateOnGPU();
 
 	//Only allow move operators.
 	//We don't want copies because we don't want the destructor to deallocate the opengl buffer ids.
-	GLBufferId(const GLBufferId& rhs) = delete;
-	GLBufferId(GLBufferId&& rhs);
+	GLTextureBuffer(const GLTextureBuffer& rhs) = delete;
+	GLTextureBuffer(GLTextureBuffer&& rhs);
 
-	const GLBufferId& operator=(const GLBufferId& rhs) = delete;
-	const GLBufferId& operator=(GLBufferId&& rhs);
+	const GLTextureBuffer& operator=(const GLTextureBuffer& rhs) = delete;
+	const GLTextureBuffer& operator=(GLTextureBuffer&& rhs);
 
 	void AssociateBuffers();
 
@@ -41,13 +42,13 @@ public:
 
 	//inline GLuint TextureId() const { return m_bufferIds.texId; }
 private:
-	static GLBufferId getGLBufferId();
+	static GLTextureBuffer getGLTextureBuffer();
 
-	//return GLBufferId to pool for reuse
-	static void releaseGLBufferId(GLBufferId& rhs);
-	static std::vector<GLBufferId> m_useableBufferIds; //a pool of open glbuffer resources
+	//return GLTextureBuffer to pool for reuse
+	static void releaseGLTextureBuffer(GLTextureBuffer& rhs);
+	static std::vector<GLTextureBuffer> m_useableBufferIds; //a pool of open glbuffer resources
 
-	GLBufferId m_bufferIds;
+	GLTextureBuffer m_bufferIds;
 
 	size_t m_lastSize;
 };

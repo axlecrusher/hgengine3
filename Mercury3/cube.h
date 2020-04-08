@@ -67,7 +67,10 @@ namespace RotatingCube {
 	{
 		DataOrientedStruct()
 		{
-			gpuBuffer = std::make_shared< HgGPUBufferSegment<Instancing::GPUTransformationMatrix> >();
+			gpuBuffer = std::make_shared< HgVectorBuffer<Instancing::GPUTransformationMatrix> >();
+
+			std::unique_ptr<IGLBufferUse> action = std::make_unique<MatrixVertexAttribute>("ModelMatrix");
+			gpuBuffer->setUseClass(action);
 		}
 
 		void update(HgTime dt);
@@ -82,7 +85,7 @@ namespace RotatingCube {
 		std::vector<Instancing::GPUTransformationMatrix> gpuStructArray;
 		std::vector<RotatingCube2> glueClass;
 
-		std::shared_ptr< HgGPUBufferSegment<Instancing::GPUTransformationMatrix> > gpuBuffer;
+		std::shared_ptr<IHgGPUBuffer> gpuBuffer;
 	};
 
 	using RotatingCube2InstanceCollection = DataOrientedCollection<RotatingCube2, DataOrientedStruct>;

@@ -6,6 +6,7 @@
 #include <HgEntity.h>
 #include <IFramebuffer.h>
 #include <IRenderTarget.h>
+#include <core/Instancing.h>
 
 enum RendererType {
 	OPENGL = 0,
@@ -81,12 +82,20 @@ protected:
 };
 
 struct RenderInstance {
-	RenderInstance(const HgMath::mat4f& _worldSpaceMatrix, RenderDataPtr& rd, const vector3f& _velocityVector, int8_t order = 0)
+	RenderInstance(const HgMath::mat4f& _worldSpaceMatrix, RenderDataPtr& rd, const vector3f& _velocityVector, int8_t order = 0, const Instancing::InstancingMetaData* imdPtr = nullptr)
 		:renderData(rd), drawOrder(order), velocityVector(_velocityVector)
 	{
 		_worldSpaceMatrix.store(worldSpaceMatrix);
 		_worldSpaceMatrix.store(interpolatedWorldSpaceMatrix);
+
+		if (imdPtr)
+		{
+			imd = *imdPtr;
+		}
 	}
+
+	Instancing::InstancingMetaData imd;
+
 	float worldSpaceMatrix[16];
 	float interpolatedWorldSpaceMatrix[16];
 	RenderDataPtr renderData;
@@ -101,6 +110,7 @@ class RenderQueue
 public:
 	void Enqueue(HgEntity* entity, HgTime t);
 	void Enqueue(RenderDataPtr& rd);
+	void Enqueue(const Instancing::InstancingMetaData& imd);
 
 	//sorts queue on draw order for proper rendering
 	void Finalize(const HgTime& remain);
@@ -115,7 +125,9 @@ public:
 	const std::vector<RenderInstance>& getOpaqueQueue() const { return m_opaqueEntities; }
 	const std::vector<RenderInstance>& getTransparentQueue() const { return m_transparentEntities; }
 private:
-	void Enqueue(RenderDataPtr& rd, const HgMath::mat4f& wsm, int8_t drawOrder, const vector3f& velocity);
+	void Enqueue(RenderDataPtr& rd, const HgMath::mat4f& wsm, int8_t drawOrder, const vector3f& velocity, const Instancing::InstancingMetaData* imd = nullptr);
+
+	//Lower draw order is first
 	void sort(std::vector<RenderInstance>& v);
 
 	std::vector<RenderInstance> m_opaqueEntities;

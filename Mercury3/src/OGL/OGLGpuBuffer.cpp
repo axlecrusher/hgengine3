@@ -2,10 +2,11 @@
 #include <RenderBackend.h>
 #include <OGLBackend.h>
 
-std::vector<GLBufferId> OGLHgGPUBuffer::m_useableBufferIds;
+std::vector<GLTextureBuffer> OGLHgGPUBuffer::m_useableBufferIds;
 
 
-GLBufferId::~GLBufferId()
+
+GLTextureBuffer::~GLTextureBuffer()
 {
 	if (buffId > 0) {
 		glDeleteBuffers(1, &buffId);
@@ -15,7 +16,7 @@ GLBufferId::~GLBufferId()
 	buffId = 0;
 }
 
-void GLBufferId::AllocateOnGPU()
+void GLTextureBuffer::AllocateOnGPU()
 {
 	if (texId == 0) {
 		glGenBuffers(1, &buffId);
@@ -28,12 +29,12 @@ void GLBufferId::AllocateOnGPU()
 	}
 }
 
-GLBufferId::GLBufferId(GLBufferId&& rhs)
+GLTextureBuffer::GLTextureBuffer(GLTextureBuffer&& rhs)
 {
 	*this = std::move(rhs);
 }
 
-const GLBufferId& GLBufferId::operator=(GLBufferId&& rhs)
+const GLTextureBuffer& GLTextureBuffer::operator=(GLTextureBuffer&& rhs)
 {
 	buffId = rhs.buffId;
 	texId = rhs.texId;
@@ -46,7 +47,7 @@ const GLBufferId& GLBufferId::operator=(GLBufferId&& rhs)
 	return *this;
 }
 
-void GLBufferId::AssociateBuffers()
+void GLTextureBuffer::AssociateBuffers()
 {
 	//setup associate the buffer with the texture
 	if (!m_bufferBound)
@@ -60,7 +61,7 @@ void GLBufferId::AssociateBuffers()
 
 
 
-GLBufferId OGLHgGPUBuffer::getGLBufferId()
+GLTextureBuffer OGLHgGPUBuffer::getGLTextureBuffer()
 {
 	if (m_useableBufferIds.size() > 0)
 	{
@@ -69,12 +70,12 @@ GLBufferId OGLHgGPUBuffer::getGLBufferId()
 		return r;
 	}
 
-	GLBufferId ids;
+	GLTextureBuffer ids;
 	ids.AllocateOnGPU();
 	return ids;
 }
 
-void  OGLHgGPUBuffer::releaseGLBufferId(GLBufferId& rhs)
+void  OGLHgGPUBuffer::releaseGLTextureBuffer(GLTextureBuffer& rhs)
 {
 	if (rhs.isValid())
 	{
@@ -85,13 +86,13 @@ void  OGLHgGPUBuffer::releaseGLBufferId(GLBufferId& rhs)
 
 OGLHgGPUBuffer::~OGLHgGPUBuffer()
 {
-	releaseGLBufferId(m_bufferIds);
+	releaseGLTextureBuffer(m_bufferIds);
 }
 
 void OGLHgGPUBuffer::SendToGPU(const IHgGPUBuffer* bufferObject) {
 	if (!m_bufferIds.isValid())
 	{
-		m_bufferIds = getGLBufferId();
+		m_bufferIds = getGLTextureBuffer();
 	}
 
 	if (m_bufferIds.buffId == 0)

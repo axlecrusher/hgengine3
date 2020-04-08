@@ -124,7 +124,7 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 	if ((vert_id == 0) && (frag_id == 0) && (geom_id == 0)) return;
 
 
-	GLuint shader_program = shader->program_id;
+	OGLShaderHandle shader_program = shader->getProgramHandle();
 	if (shader_program == 0) shader_program = glCreateProgram();
 
 	if (vert_id>0) glAttachShader(shader_program, vert_id);
@@ -155,7 +155,8 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 		_print_programme_info_log(shader_program);
 		return;
 	}
-	shader->program_id = shader_program;
+
+	shader->m_handle = shader_program;
 	shader->m_loadState = LoadState::READY;
 
 
@@ -186,15 +187,6 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 			fprintf(stderr, "HgShaders: Unknown uniform \"%s\"\n", name);
 		}
 	}
-
-	{
-		const auto location = glGetAttribLocation(shader_program, "ModelMatrix");
-		if (location > -1)
-		{
-			shader->m_ModelMatrixAttribLocation = location;
-		}
-	}
-
 }
 
 std::unique_ptr<HgShader> HgOglShader::Create(const char* vert, const char* frag) {
@@ -215,7 +207,7 @@ std::unique_ptr<HgShader> HgOglShader::Create(const char* vert, const char* frag
 }
 
 HgOglShader::HgOglShader()
-	:HgShader(), program_id(0), m_loadState(LoadState::NOT_LOADED), m_ModelMatrixAttribLocation(-1)
+	:HgShader(), m_loadState(LoadState::NOT_LOADED)
 {
 	memset(m_uniformLocations, -1, sizeof(m_uniformLocations));
 }
@@ -233,21 +225,44 @@ void HgOglShader::load() {
 }
 
 void HgOglShader::destroy() {
+	OGLShaderHandle program_id = getProgramHandle();
 	if (program_id > 0) glDeleteProgram(program_id);
-	program_id = 0;
+	m_handle = 0;
+}
+
+bool HgOglShader::compile() {
+	if (m_loadState == LoadState::NOT_LOADED)
+	{
+		fprintf(stderr, "Can not compile, source not loaded\n");
+		return false;
+	}
+
+	OGLShaderHandle program_id = getProgramHandle();
+
+	if (program_id == 0 || m_loadState == LoadState::SOURCE_LOADED)
+	{
+		setup_shader(this);
+		return true;
+	}
+	return false;
 }
 
 void HgOglShader::enable() {
-	if (m_loadState == LoadState::NOT_LOADED) return;
+	OGLShaderHandle program_id = getProgramHandle();
+	if (program_id == 0 || m_loadState == LoadState::SOURCE_LOADED)
+	{
+		compile();
+		program_id = getProgramHandle();
+	}
 
-	if (program_id == 0 || m_loadState == LoadState::SOURCE_LOADED) setup_shader(this);
 	if (program_id>0) useShaderProgram(program_id);
 }
 
 void HgOglShader::setLocalUniforms(const ShaderUniforms& uniforms) {
 	GLuint old_program = _currentShaderProgram;
 
-	if (old_program == program_id) {
+	OGLShaderHandle program_id = getProgramHandle();
+		if (old_program == program_id) {
 		sendLocalUniformsToGPU(uniforms);
 		return;
 	}
@@ -276,7 +291,6 @@ void HgOglShader::uploadMatrices(const float* worldSpaceMatrix, const HgMath::ma
 	view.store(mm + 32);
 	glUniformMatrix4fv(m_uniformLocations[U_MATRICES], matrixCount, GL_FALSE, mm);
 }
-
 
 void HgOglShader::sendLocalUniformsToGPU(const ShaderUniforms& uniforms) {
 	auto renderer = (OGLBackend*)RENDERER();
@@ -311,16 +325,16 @@ void HgOglShader::sendLocalUniformsToGPU(const ShaderUniforms& uniforms) {
 		}
 	}
 
-	auto gpuBuffer = uniforms.gpuBuffer;
-	if ((m_uniformLocations[U_BUFFER_OBJECT1] > -1) && (gpuBuffer != nullptr)) {
-		OGLHgGPUBuffer* api = (OGLHgGPUBuffer*)gpuBuffer->apiImpl();
-		if (gpuBuffer->NeedsLoadToGPU()) {
-			//api->OGLHgGPUBuffer::SendToGPU(oglrd->gpuBuffer.get()); //no vtable lookup
-			api->OGLHgGPUBuffer::SendToGPU(gpuBuffer); //no vtable lookup
-		}
-		api->OGLHgGPUBuffer::Bind(3); //no vtable lookup
-		glUniform1i(m_uniformLocations[U_BUFFER_OBJECT1], 3);
-	}
+	//auto gpuBuffer = uniforms.gpuBuffer;
+	//if ((m_uniformLocations[U_BUFFER_OBJECT1] > -1) && (gpuBuffer != nullptr)) {
+	//	OGLHgGPUBuffer* api = (OGLHgGPUBuffer*)gpuBuffer->apiImpl();
+	//	if (gpuBuffer->NeedsLoadToGPU()) {
+	//		//api->OGLHgGPUBuffer::SendToGPU(oglrd->gpuBuffer.get()); //no vtable lookup
+	//		api->OGLHgGPUBuffer::SendToGPU(gpuBuffer); //no vtable lookup
+	//	}
+	//	api->OGLHgGPUBuffer::Bind(3); //no vtable lookup
+	//	glUniform1i(m_uniformLocations[U_BUFFER_OBJECT1], 3);
+	//}
 
 	if ((m_uniformLocations[U_TIME_REMAIN] > -1) && (uniforms.remainingTime != nullptr)) {
 		glUniform1f(m_uniformLocations[U_TIME_REMAIN], uniforms.remainingTime->seconds());

@@ -20,32 +20,9 @@
 
 //#include <core/HgScene2.h>
 #include <HgScene2.h> //REGISTER_LINKTIME2 needs this
-
-enum HgEntityFlag {
-	HGE_USED = 0x01, //used in scene graph
-	HGE_ACTIVE = 0x02,
-	HGE_HIDDEN = 0x04,
-	HGE_UPDATED = 0x08,
-	HGE_DESTROY = 0x10,
-	HGE_UPDATE_TEXTURES = 0x20,
-	HGE_TRANSPARENT = 0x40
-};
-
-//extern float* _projection;
-
 class HgEntity;
 class model_data;
 class HgScene;
-
-//class HgEntityExtended {
-//public:
-//	//HgEntity* owner; //what is this for?
-//	//std::vector< HgTexture::TexturePtr > textures;
-//
-//	HgScene* m_scene; //Scene that entity is a member of
-//
-//	bool m_ownRenderData;
-//};
 
 struct PositionalData {
 	//position, and rotation are in global coordinate system
@@ -272,7 +249,7 @@ public:
 		void setSpacialData(const SpacialData& x) { m_spacialData = x; }
 
 		inline bool isRenderable() const { return m_renderData != nullptr; }
-		inline void render() { if (isRenderable()) m_renderData->render();  }
+		//inline void render() { if (isRenderable()) m_renderData->render();  }
 
 		inline bool needsUpdate(uint32_t updateNumber) const { return ((m_updateNumber != updateNumber)); }
 		inline void update(HgTime dtime, uint32_t updateNumber) {
