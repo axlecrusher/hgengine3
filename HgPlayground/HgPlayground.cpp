@@ -438,7 +438,10 @@ int main()
 	HgTime accumulatedTime;
 	const HgTime timeStep = HgTime::msec(8); // about 120 ups
 
+	//Instantiate render queues here.
+	//If they persist outside the while running loop we can reuse their data when the scene has not changed.
 	RenderQueue renderQueue;
+	RenderQueue renderQueue2d;
 	//gameTimer.start();
 
 	bool sceneUpdated = false;
@@ -529,8 +532,6 @@ int main()
 		listener.setUp(camera.getUp());
 		SOUND->setListener(listener);
 
-		RenderQueue renderQueue2d;
-
 		{
 			ENGINE::INPUT::PumpMessages();
 
@@ -538,15 +539,17 @@ int main()
 			{
 				//if the scene was not updated, don't rebuild the render queue
 				renderQueue.Clear();
+				renderQueue2d.Clear();
 
 				scene.EnqueueForRender(&renderQueue, elaspedTime);
 				scene2.EnqueueForRender(&renderQueue, elaspedTime);
 
 				scene_2d.EnqueueForRender(&renderQueue2d, elaspedTime);
 				//Engine::EnqueueForRender(Engine::collections(), &renderQueue);
+
+				renderQueue.Finalize(remainTime);
+				renderQueue2d.Finalize(remainTime);
 			}
-			renderQueue.Finalize(remainTime);
-			renderQueue2d.Finalize(remainTime);
 
 			HgCamera cam2d;
 			PerspectiveProjection perspective;
