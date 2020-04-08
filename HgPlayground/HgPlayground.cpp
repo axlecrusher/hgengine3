@@ -269,13 +269,13 @@ int main()
 	{
 		auto text = scene_2d.create_entity<HgText::Text>();
 		text->setText("Mercury Engine 3");
-		text->getEntity().position(point(-1, 0.95, 0));
+		text->getEntity().position(point(-0.99, 0.95, 0));
 		//text.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
 
 		auto* text2 = scene_2d.create_entity<HgText::Text>();
 		text2->setText("https://github.com/axlecrusher/hgengine3");
 		//text2.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
-		text2->getEntity().position(point(-1, -0.90, 0));
+		text2->getEntity().position(point(-0.99, -0.98, 0));
 		text2->getEntity().scale(0.75);
 	}
 
