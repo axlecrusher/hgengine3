@@ -18,7 +18,7 @@ void TBNVisualization::init() {
 
 	HgEntity* e = &getEntity();
 	RenderDataPtr rd = std::make_shared<RenderData>();
-	auto shader = HgShader::acquire("tbn_visual_vert.glsl", "tbn_visual_frag.glsl");
+	auto shader = HgShader::acquire("assets/shaders/tbn_visual.vert", "assets/shaders/tbn_visual.glsl");
 	rd->getMaterial().setShader(shader);
 	e->setRenderData(rd);
 }

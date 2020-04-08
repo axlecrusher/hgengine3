@@ -220,13 +220,9 @@ int main()
 	teapot->origin(teapot->origin().x(2).z(3).y(1));
 
 	//{
-	//	auto& tbn = scene2.create_entity<TBNVisualization::TBNVisualization>();
-	//	tbn.getEntity().setParent(teapot);
-
-	//	auto rd = teapot->getRenderDataPtr();
-	//	auto vertexCount = rd->VertexVboRecord().Count();
-	//	const vbo_layout_vnut* data = (const vbo_layout_vnut*)rd->VertexVboRecord().Vbo()->getBuffer();
-	//	tbn.buildFromVertexData(data, vertexCount);
+	//	auto tbn = scene2.create_entity<TBNVisualization::TBNVisualization>();
+	//	tbn->getEntity().setParent(teapot);
+	//	tbn->buildFromVertexData(teapot->getRenderDataPtr()->VertexVboRecord());
 	//}
 
 
