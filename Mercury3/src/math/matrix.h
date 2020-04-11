@@ -15,6 +15,12 @@ namespace HgMath {
 		return vector3f(tmp[0], tmp[1], tmp[2]);
 	}
 
+	inline mat4f toTranslationMatrix(const vector3f& p)
+	{
+		const vectorial::vec3f v(p.raw());
+		return mat4f::translation(v);
+	}
+
 	//class Matrix4x4f {
 	//public:
 	//	static Matrix4x4f identity()

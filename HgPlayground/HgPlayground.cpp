@@ -113,7 +113,7 @@ HgScene scene;
 
 DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	while (1) {
-		printf("UPS %u e_count %d %d\n", itrctr, scene.usedCount(), scene.chunkCount());
+		printf("UPS %u e_count %d %d\n", itrctr, EntityTable::Manager.numberOfEntitiesExisting(), scene.chunkCount());
 		itrctr = 0;
 		CheckFilesForChange();
 		Sleep(1000);
@@ -220,6 +220,7 @@ int main()
 	teapot->origin(teapot->origin().x(2).z(3).y(1));
 
 	//{
+	//	//tbn doesn't really work on the teapot because it doesn't have UV
 	//	auto tbn = scene2.create_entity<TBNVisualization::TBNVisualization>();
 	//	tbn->getEntity().setParent(teapot);
 	//	tbn->buildFromVertexData(teapot->getRenderDataPtr()->VertexVboRecord());
@@ -323,7 +324,7 @@ int main()
 				cube->setScale(0.3f);
 				//entity->position(point(-20.0f + x, 5.0f, 30.0f - z));
 				//entity->scale(0.3f);
-				if (!cubeId.isValid())
+				if (!EntityTable::Manager.exists(cubeId))
 				{
 					auto rd = entity->renderData();
 					rd->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl"));

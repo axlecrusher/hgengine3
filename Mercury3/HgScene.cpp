@@ -96,9 +96,9 @@ void HgScene::update(HgTime dtime) {
 		if (!isUsed(i)) continue;
 		HgEntity* e = get_entity(i);
 
-		if ((dtime.msec() > 0) && e->needsUpdate(updateNumber)) {
-			e->update(dtime, updateNumber);
-		}
+		//if ((dtime.msec() > 0) && e->needsUpdate(updateNumber)) {
+		//	e->update(dtime, updateNumber);
+		//}
 
 		/* FIXME: WARNING!!! if this loop is running async to the render thread, entity deletion can cause a crash!*/
 		//shared_ptr my way out of this?

@@ -141,11 +141,13 @@ public:
 
 	inline T* newItem() {
 		size_t aSize = m_items.size();
-		T* tmp = &m_items.newItem();
+		//T* tmp = &m_items.newItem();
+		auto idx = m_items.newItem();
+		T* tmp = m_items.at(idx).ptr();
 		if (m_items.size() > aSize) {
 			//new item created, add more instance data
 			//some instance objects can require more than 1 gpuStruct per instance (voxel rain), so use stride as count
-			auto data = std::make_unique<gpuStruct[]>(stride);
+			//auto data = std::make_unique<gpuStruct[]>(stride);
 			//m_instanceData->AddData(data.get(), stride);
 			m_modelMatrices.emplace_back();
 		}
@@ -159,6 +161,26 @@ public:
 		//tmp.getEntity().setRenderData(renderData);
 
 		return tmp;
+	}
+
+	inline std::vector<T*> newItems(int count) {
+		std::vector<int> indices(count, 0);
+		for (int i = 0; i < count; ++i)
+		{
+			auto idx = m_items.newItem();
+			indices[i] = idx;
+			m_items.at(idx)->init();
+		}
+
+		m_modelMatrices.resize(m_items.size());
+
+		std::vector<T*> itemPtrs(count, nullptr);
+		for (int i = 0; i < count; ++i)
+		{
+			itemPtrs[i] = m_items.at(indices[i]).ptr();
+		}
+
+		return itemPtrs;
 	}
 
 	inline void remove(const T& x) {

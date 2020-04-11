@@ -15,7 +15,9 @@
 #include <EventSystem.h>
 #include <HgEngine.h>
 
-EntityIdType HgEntity::m_nextEntityId(1);
+EntityTable EntityTable::Manager;
+EntityNameTable HgEntity::EntityNames;
+
 
 void RegisterEntityType(const char* c, factory_clbk factory) {
 	Engine::entity_factories[c] = factory;
@@ -26,14 +28,14 @@ void EntityLocator::RegisterEntity(HgEntity* entity)
 	std::lock_guard<std::mutex> m_lock(m_mutex);
 
 	const auto id = entity->getEntityId();
-	if (!id.isValid()) return;
+	if (!EntityTable::Manager.exists(id)) return;
 
 	m_entities[id] = entity;
 }
 
 void EntityLocator::RemoveEntity(EntityIdType id)
 {
-	if (!id.isValid()) return;
+	if (!EntityTable::Manager.exists(id)) return;
 
 	std::lock_guard<std::mutex> m_lock(m_mutex);
 
@@ -47,7 +49,7 @@ void EntityLocator::RemoveEntity(EntityIdType id)
 EntityLocator::SearchResult EntityLocator::Find(EntityIdType id) const
 {
 	SearchResult result;
-	if (id.isValid())
+	if (EntityTable::Manager.exists(id))
 	{
 		std::lock_guard<std::mutex> m_lock(m_mutex);
 
@@ -91,27 +93,92 @@ namespace Events
 
 }
 
+void EntityNameTable::setName(EntityIdType id, const std::string name)
+{
+	const auto idx = findName(id);
+	storage newRecord{ id, name };
+	if (idx == notFound())
+	{
+		int32_t idx = (int32_t)m_names.size();
+		m_names.emplace_back(newRecord);
+		m_indices.insert({ id, idx });
+	}
+	else
+	{
+		m_names[idx] = newRecord;
+	}
+}
+
+int32_t EntityNameTable::findName(EntityIdType id)
+{
+	int32_t idx = notFound();
+	const auto itr = m_indices.find(id);
+	if (itr != m_indices.end())
+	{
+		idx = itr->second;
+	}
+	return idx;
+}
+
+EntityIdType EntityTable::create()
+{
+	uint32_t idx = 0;
+	if (m_freeIndices.size() > 1024)
+	{
+		idx = m_freeIndices.front();
+		m_freeIndices.pop_front();
+	}
+	else
+	{
+		idx = (uint32_t)m_generation.size();
+		assert(idx < MAX_ENTRIES);
+		m_generation.push_back(0); //what happens when we reach 2^22 ?
+	}
+
+	m_entityTotal++;
+	m_entityActive++;
+
+	return combine_bytes(idx, m_generation[idx]);
+}
+
+void EntityTable::destroy(EntityIdType id)
+{
+	const auto idx = id.index();
+
+	if (exists(id))
+	{
+		//increment generation to invalidate current generation in the wild.
+		m_generation[idx]++;
+		m_freeIndices.push_back(idx);
+		m_entityActive--;
+	}
+}
+
+const std::string& EntityNameTable::getName(EntityIdType id)
+{
+	const auto idx = findName(id);
+	if (idx == notFound())
+	{
+		return m_blankName;
+	}
+	return m_names[idx].name;
+}
 
 void HgEntity::init()
 {
-	if (getEntityId().isValid())
-	{
-		destroy();
-	}
+	EntityTable::Manager.destroy(m_entityId);
 
 	m_renderData = nullptr;
 	//m_logic = nullptr;
 	m_renderData = nullptr;
 
-	m_extendedData = std::make_unique<ExtendedEntityData>();
-
 	auto tmp = EntityIdType();
 	m_parentId = tmp;
-	m_updateNumber = 0;
+	//m_updateNumber = 0;
 
 	m_drawOrder = 0;
 
-	m_entityId = m_nextEntityId++;
+	m_entityId = EntityTable::Manager.create();
 
 	Locator().RegisterEntity(this);
 	EventSystem::PublishEvent(Events::EntityCreated(this, m_entityId));
@@ -126,9 +193,8 @@ HgEntity::HgEntity(HgEntity &&rhs)
 	m_spacialData = std::move(rhs.m_spacialData);
 	m_renderData = std::move(rhs.m_renderData);
 	//m_logic = std::move(rhs.m_logic);
-	m_extendedData = std::move(rhs.m_extendedData);
 	m_parentId = std::move(rhs.m_parentId);
-	m_updateNumber = std::move(rhs.m_updateNumber);
+	//m_updateNumber = std::move(rhs.m_updateNumber);
 	m_drawOrder = std::move(rhs.m_drawOrder);
 	flags = std::move(rhs.flags);
 
@@ -143,14 +209,11 @@ HgEntity::HgEntity(HgEntity &&rhs)
 
 void HgEntity::destroy()
 {
-	if (m_entityId.isValid())
-	{
-		EventSystem::PublishEvent(Events::EntityDestroyed(this, m_entityId));
-		Locator().RemoveEntity(m_entityId);
-	}
-	//m_logic.reset();
+	EventSystem::PublishEvent(Events::EntityDestroyed(this, m_entityId));
+	Locator().RemoveEntity(m_entityId);
+
 	m_renderData.reset();
-	m_entityId = EntityIdType(); //reset id
+	EntityTable::Manager.destroy(m_entityId);
 }
 
 HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool applyRotation, bool applyTranslation)
@@ -184,7 +247,7 @@ HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool 
 }
 
 HgMath::mat4f HgEntity::computeWorldSpaceMatrix(const bool applyScale, bool applyRotation, bool applyTranslation) const {
-	if (m_parentId.isValid())
+	if (EntityTable::Manager.exists(m_parentId))
 	{
 		return computeWorldSpaceMatrixIncludeParent(applyScale, applyRotation, applyTranslation);
 	}

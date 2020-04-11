@@ -47,6 +47,12 @@ public:
 		auto collection = getCollectionOf<T::InstanceCollection>();
 		return collection->newItem();
 	}
+	
+	template<typename T>
+	auto create_entity(int count) {
+		auto collection = getCollectionOf<T::InstanceCollection>();
+		return collection->newItems(count);
+	}
 
 	//Typed entity creation method
 	template<typename T, typename InstanceCollectionType>

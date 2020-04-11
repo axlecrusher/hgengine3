@@ -8,6 +8,10 @@
 
 class IUpdatable {
 public:
+	IUpdatable() = default;
+	virtual ~IUpdatable() {}
+	IUpdatable(IUpdatable&&) = default;
+
 	virtual void update(HgTime tdelta) = 0;
 
 	//inline void setEntity(const HgEntity* x) { element = x; }

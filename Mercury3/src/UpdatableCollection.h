@@ -58,7 +58,8 @@ public:
 	}
 
 	inline T* newItem() {
-		T* tmp = &m_items.newItem();
+		auto idx = m_items.newItem();
+		T* tmp = m_items.at(idx).ptr();
 		return tmp;
 	}
 

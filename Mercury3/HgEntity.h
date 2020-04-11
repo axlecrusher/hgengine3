@@ -17,6 +17,11 @@
 #include <unordered_map>
 //#include <ServiceLocator.h>
 #include <GuardedType.h>
+#include <deque>
+#include <stdint.h>
+#include <unordered_set>
+#include <EntityIdType.h>
+#include <TransformManager.h>
 
 //#include <core/HgScene2.h>
 #include <HgScene2.h> //REGISTER_LINKTIME2 needs this
@@ -94,41 +99,6 @@ public:
 };
 
 //typedef uint32_t EntityIdType;
-class EntityIdType
-{
-public:
-	EntityIdType(uint32_t id = 0)
-		:m_id(id)
-	{}
-
-	EntityIdType(const EntityIdType&) = default;
-	EntityIdType(EntityIdType &&rhs)
-	{
-		m_id = rhs.m_id;
-		rhs.m_id = 0;
-	}
-
-	EntityIdType operator=(const EntityIdType& rhs)
-	{
-		m_id = rhs.m_id;
-		return *this;
-	}
-
-	operator uint32_t() const { return m_id; }
-	EntityIdType& operator++() { ++m_id; return *this; } //pre
-	EntityIdType operator++(int)
-	{
-		auto tmp = *this;
-		++m_id;
-		return tmp;
-	}	//post
-
-	bool isValid() const { return m_id > 0; }
-private:
-	uint32_t m_id;
-};
-
-
 
 namespace Events
 {
@@ -159,19 +129,6 @@ namespace Events
 	};
 }
 
-namespace std
-{
-template<> struct hash<EntityIdType>
-{
-	typedef EntityIdType argument_type;
-	typedef std::size_t result_type;
-	result_type operator()(argument_type const& s) const noexcept
-	{
-		return std::hash<uint32_t>{}(s);
-	}
-};
-}
-
 class EntityLocator
 {
 public:
@@ -196,14 +153,86 @@ private:
 	mutable std::mutex m_mutex;
 };
 
-class ExtendedEntityData
+class EntityNameTable
 {
+	static inline auto notFound() { return std::numeric_limits<int32_t>::max(); }
+
 public:
-	void setName(std::string name) { m_name = std::move(name); }
-	const std::string& getName() const { return m_name; }
+	void setName(EntityIdType id, const std::string name);
+	const std::string& getName(EntityIdType id);
+
 private:
-	std::string m_name;
+	inline int32_t findName(EntityIdType id);
+
+	struct storage
+	{
+		EntityIdType id;
+		std::string name;
+
+		//inline bool operator<(const storage& rhs) const { return id < rhs.id; }
+	};
+
+	std::unordered_map<EntityIdType, int32_t> m_indices;
+	std::vector<storage> m_names;
+	std::string m_blankName;
 };
+
+class EntityTable
+{
+	//Based on http://bitsquid.blogspot.com/2014/08/building-data-oriented-entity-system.html
+public:
+	static const uint32_t MAX_ENTRIES = (1 << EntityIdType::INDEX_BITS);
+	//static const uint32_t MAX_ENTRIES = 5; //for testing create() assert
+	EntityTable()
+	{
+		m_generation.reserve(MAX_ENTRIES);
+		m_entityTotal = 0;
+		m_entityActive = 0;
+	}
+
+	//create a new entity id
+	EntityIdType create();
+
+	//check if an entity exists
+	bool exists(EntityIdType id) const
+	{
+		const auto idx = id.index();
+		if (idx < m_generation.size())
+		{
+			return (m_generation[idx] == id.generation());
+		}
+		return false; //this should never happen
+	}
+
+	//destroy an entity
+	void destroy(EntityIdType id);
+
+	//total number of entites ever created
+	uint32_t totalEntities() const { return m_entityTotal; }
+
+	//current number of entities in existance
+	uint32_t numberOfEntitiesExisting() const { return m_entityActive; }
+
+
+	static EntityTable Manager;
+
+private:
+	inline EntityIdType combine_bytes(uint32_t idx, uint8_t generation)
+	{
+		const uint32_t id = (generation << EntityIdType::INDEX_BITS) | idx;
+		return id;
+	}
+
+	std::vector<uint8_t> m_generation;
+
+	/* I think a deque is better than a list here because there
+	would be fewer heap allocaitons/fragmentation. */
+	std::deque<uint32_t> m_freeIndices;
+
+	uint32_t m_entityTotal; //total number of entities that have ever existed
+	uint32_t m_entityActive; //number of entities currently in existance
+};
+
 
 //Compute local transformation matrix
 HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale = true, bool applyRotation = true, bool applyTranslation = true);
@@ -217,7 +246,7 @@ handling special cases.
 class HgEntity {
 public:
 		HgEntity()
-			: m_updateNumber(0), m_renderData(nullptr)
+			:/* m_updateNumber(0), */m_renderData(nullptr)
 		{}
 
 		~HgEntity();
@@ -251,14 +280,14 @@ public:
 		inline bool isRenderable() const { return m_renderData != nullptr; }
 		//inline void render() { if (isRenderable()) m_renderData->render();  }
 
-		inline bool needsUpdate(uint32_t updateNumber) const { return ((m_updateNumber != updateNumber)); }
-		inline void update(HgTime dtime, uint32_t updateNumber) {
-			m_updateNumber = updateNumber;
-			//require parents to be updated first
-			auto parent = getParent();
-			if ((parent.isValid()) && parent->needsUpdate(updateNumber)) parent->update(dtime, updateNumber);
-			//m_logic->update(dtime);
-		}
+		//inline bool needsUpdate(uint32_t updateNumber) const { return ((m_updateNumber != updateNumber)); }
+		//inline void update(HgTime dtime, uint32_t updateNumber) {
+		//	m_updateNumber = updateNumber;
+		//	//require parents to be updated first
+		//	auto parent = getParent();
+		//	if ((parent.isValid()) && parent->needsUpdate(updateNumber)) parent->update(dtime, updateNumber);
+		//	//m_logic->update(dtime);
+		//}
 
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
 		//void updateGpuTextures();
@@ -269,7 +298,8 @@ public:
 		inline EntityLocator::SearchResult getParent() const
 		{
 			EntityLocator::SearchResult r;
-			if (m_parentId.isValid()) r = Find(m_parentId);
+
+			if (EntityTable::Manager.exists(m_parentId)) r = Find(m_parentId);
 			return r;
 		}
 
@@ -300,8 +330,8 @@ public:
 		inline void setDrawOrder(int8_t order) { m_drawOrder = order; }
 		inline int8_t getDrawOrder() const { return m_drawOrder; }
 
-		inline void setName(const std::string& name) { m_extendedData->setName(name); }
-		inline std::string& getName() const { m_extendedData->getName(); }
+		inline void setName(const std::string& name) { EntityNames.setName(m_entityId, name); }
+		inline std::string& getName() const { EntityNames.getName(m_entityId); }
 
 		inline EntityFlags getFlags() const { return flags; }
 
@@ -311,17 +341,18 @@ public:
 		static EntityLocator::SearchResult Find(EntityIdType id);
 private:
 
-	static EntityIdType m_nextEntityId;
+	static EntityNameTable EntityNames;
+
+	//static EntityIdType m_nextEntityId;
 	static EntityLocator& Locator();
 
 	SpacialData m_spacialData; //local transormations
 	EntityIdType m_entityId;
 
 	RenderDataPtr m_renderData;
-	std::unique_ptr<ExtendedEntityData> m_extendedData; //data we don't really care about and access infrequently
 
 	EntityIdType m_parentId;
-	uint32_t m_updateNumber;
+	//uint32_t m_updateNumber;
 	int8_t m_drawOrder;
 
 	EntityFlags flags;

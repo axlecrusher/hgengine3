@@ -27,6 +27,12 @@ void MatrixVertexAttribute::SendToGPU(const IHgGPUBuffer* bufferObject)
 	m_attributeBuffer.toGPU(bufferObject->getBufferPtr(), bufferObject->sizeBytes());
 }
 
+void InvalidAttributeError(const HgShader& shader, const std::string& name)
+{
+	auto ss = shader.sourceStruct();
+	fprintf(stderr, "Invalid Attribute: %s (shader %s)\n", name.c_str(), ss->vert_file_path.c_str());
+}
+
 void MatrixVertexAttribute::Setup(const Instancing::InstancingMetaData& imd, const HgShader& shader)
 {
 	//get the attribute location from the shader
@@ -36,8 +42,7 @@ void MatrixVertexAttribute::Setup(const Instancing::InstancingMetaData& imd, con
 
 	if (attribLocation < 0)
 	{
-		auto ss = shader.sourceStruct();
-		fprintf(stderr, "Invalid Attribute: %s (shader %s)\n", m_attributeName.c_str(), ss->vert_file_path.c_str());
+		InvalidAttributeError(shader, m_attributeName);
 		return;
 	}
 

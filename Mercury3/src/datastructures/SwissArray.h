@@ -25,23 +25,38 @@ public:
 		if (head != nullptr) m_alloc.deallocate(head, m_allocatedSize);
 	}
 	
-	inline T& newItem() {
-		for (size_t i = 0; i < m_size; ++i) {
-			if (!m_used[i]) {
-				m_used[i] = true;
-				m_usedSize++;
-				T& tmp = head[i];
-				new (&tmp) T();
-				return tmp;
-			}
+	inline int newItem() {
+		if (m_free.size() > 0)
+		{
+			const auto i = m_free.back();
+			m_free.pop_back();
+			m_used[i] = true;
+			m_usedSize++;
+			T& tmp = head[i];
+			new (&tmp) T();
+			//return tmp;
+			return i;
 		}
+
+		//for (size_t i = 0; i < m_size; ++i) {
+		//	if (!m_used[i]) {
+		//		m_used[i] = true;
+		//		m_usedSize++;
+		//		T& tmp = head[i];
+		//		new (&tmp) T();
+		//		//return tmp;
+		//		return i;
+		//	}
+		//}
 		//		m_size++;
 		//		m_entities.push_back(T());
-		T& tmp = push_back();
+		auto idx = push_back();
+		T& tmp = head[idx];
 		new (&tmp) T();
 		m_used.push_back(true);
 		m_usedSize++;
-		return tmp;
+		return idx;
+		//return tmp;
 	}
 
 	inline void remove(const T& x) {
@@ -52,6 +67,9 @@ public:
 		head[i].~T();
 		m_used[i] = false;
 		m_usedSize--;
+
+		m_free.push_back(i);
+
 		//		m_remove.insert(&x);
 	}
 
@@ -105,6 +123,7 @@ public:
 			return copy;
 		}
 
+		inline value_type* ptr() { return &sa->operator[](itr_); }
 		inline value_type& operator*() { return sa->operator[](itr_); }
 		inline value_type* operator->() { return &sa->operator[](itr_); }
 		inline bool operator==(const self_type& rhs) const { return (sa == rhs.sa) && (itr_ == rhs.itr_); }
@@ -204,11 +223,12 @@ private:
 	}
 
 	//add uninitalized element
-	T& push_back() {
+	int push_back() {
 		if (m_size >= m_allocatedSize) reallocate();
-		T& p = head[m_size];
+		int idx = m_size;
+		//T& p = head[idx];
 		m_size++;
-		return p;
+		return idx;
 	}
 
 	void reallocate() {
@@ -243,6 +263,8 @@ private:
 //	std::vector<T> m_entities;
 
 	std::vector<bool> m_used;
+
+	std::vector<int32_t> m_free;
 
 	
 };

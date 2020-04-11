@@ -157,7 +157,7 @@ void XAudio2Driver::processPlayEvents()
 		{
 			auto snd = asset->newPlayingInstance();
 			snd->setVolume(evt.volume);
-			if (evt.emittingEntityId.isValid())
+			if ( EntityTable::Manager.exists(evt.emittingEntityId) )
 			{
 				auto entity = HgEntity::Find(evt.emittingEntityId);
 				evt.emitter = snd->EmitFromEntity(entity.entity);

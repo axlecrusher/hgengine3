@@ -43,6 +43,9 @@ private:
 class HgModel : public IUpdatableInstance<Instancing::GPUTransformationMatrix>
 {
 public:
+	//HgModel() = default;
+	//HgModel(HgModel&&) = default;
+
 	using InstanceCollection = InstancedCollection<HgModel, Instancing::GPUTransformationMatrix, 1>;
 	using InstanceCollectionPtr = std::shared_ptr<InstanceCollection>;
 
