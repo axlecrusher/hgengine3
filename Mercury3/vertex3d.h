@@ -86,6 +86,13 @@ namespace HgMath {
 			return tmp;
 		}
 
+		inline vertex& operator*=(const vertex& rhs) {
+			auto tmp = *this * rhs;
+			*this = tmp;
+			//xyz = tmp.xyz;
+			return *this;
+		}
+
 		inline vertex operator/(const vertex& rhs) const {
 			vertex tmp;
 			for (int i = 0; i < fcount; i++) {
