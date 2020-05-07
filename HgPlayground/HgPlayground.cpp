@@ -180,6 +180,7 @@ int main()
 
 	uint8_t s = sizeof(HgEntity);
 	printf("entity size %d\n", s);
+	printf("entity SpacialData %d\n", sizeof(SpacialData));
 	printf("vertex size %zd\n", sizeof(vertex));
 	printf("render_packet size %zd\n", sizeof(render_packet));
 	printf("render data size %zd\n", sizeof(RenderData));
@@ -251,7 +252,7 @@ int main()
 		text->getEntity().setDrawOrder(110);
 		text->getEntity().position(point(1, 0, 0));
 		text->getEntity().scale(10.0);
-		text->getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
+		text->getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
 	}
 
 	{
@@ -260,18 +261,18 @@ int main()
 		text->getEntity().setDrawOrder(110);
 		text->getEntity().position(point(1, 2, 0));
 		text->getEntity().scale(10.0);
-		text->getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
+		text->getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
 	}
 
 	{
 		auto text = scene_2d.create_entity<HgText::Text>();
 		text->setText("Mercury Engine 3");
 		text->getEntity().position(point(-0.99, 0.95, 0));
-		//text.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
+		//text.getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
 
 		auto* text2 = scene_2d.create_entity<HgText::Text>();
 		text2->setText("https://github.com/axlecrusher/hgengine3");
-		//text2.getEntity().renderData()->renderFlags.BACKFACE_CULLING = false;
+		//text2.getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
 		text2->getEntity().position(point(-0.99, -0.98, 0));
 		text2->getEntity().scale(0.75);
 	}
@@ -296,7 +297,7 @@ int main()
 			if (entity) {
 				const auto tmp = entity->position();
 				entity->position(tmp.x(1.5f).z(-1.0f));
-				//entity->renderData()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
+				//entity->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
 				//	toQuaternion2(0, 0, 90, &entity->orientation);
 			}
 
@@ -304,7 +305,7 @@ int main()
 			if (entity) {
 				const auto tmp = entity->position();
 				entity->position(tmp.x(0.0f).z(-2.5f));
-				//entity->renderData()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
+				//entity->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
 				//	toQuaternion2(45,0,0,&entity->orientation);
 			}
 		}
@@ -326,7 +327,7 @@ int main()
 				//entity->scale(0.3f);
 				if (!EntityTable::Manager.exists(cubeId))
 				{
-					auto rd = entity->renderData();
+					auto rd = entity->getRenderDataPtr();
 					rd->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl"));
 				}
 				else
@@ -343,8 +344,8 @@ int main()
 		if (redCube) {
 			redCube->position(point(2,2,-2));
 			redCube->scale(1.3f);
-			redCube->renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_red.glsl"));
-			//entity->renderData()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
+			redCube->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_red.glsl"));
+			//entity->getRenderDataPtr()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 		}
 //
 ////		entity->position.
@@ -353,7 +354,7 @@ int main()
 //			//		entity->scale = 100.0f;
 //			entity->position().z(-10);
 //			//		toQuaternion2(0, -90, 0, &entity->orientation);
-//			entity->renderData()->getMaterial().setShader(HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl"));
+//			entity->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("basic_light1_v.glsl", "basic_light1_f.glsl"));
 //		}
 	}
 
@@ -363,10 +364,10 @@ int main()
 		grid->scale(100.0f);
 		grid->position().z(-4);
 		grid->orientation(quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO));
-		grid->renderData()->getMaterial().setShader(HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl"));
-		grid->renderData()->getMaterial().setBlendMode(BLEND_ADDITIVE);
-		grid->renderData()->getMaterial().setTransparent(true);
-		grid->renderData()->renderFlags.DEPTH_WRITE = false;
+		grid->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl"));
+		grid->getRenderDataPtr()->getMaterial().setBlendMode(BLEND_ADDITIVE);
+		grid->getRenderDataPtr()->getMaterial().setTransparent(true);
+		grid->getRenderDataPtr()->renderFlags.DEPTH_WRITE = false;
 		grid->setName("Grid");
 		grid->setDrawOrder(100);
 		//grid->flags.deptj
@@ -383,8 +384,8 @@ int main()
 			teapotSquare->scale(0.3);
 			teapotSquare->position(point(0, 3, 0));
 			teapotSquare->setInheritParentScale(false);
-			teapotSquare->setParent(teapot);
-			teapotSquare->renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_blue.glsl"));
+			teapotSquare->setParent(teapot->getEntityId());
+			teapotSquare->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_blue.glsl"));
 			//teapotSquare->setHidden(true);
 			SOUND->play3d(snd, snd->EmitFromEntity(teapotSquare));
 		}

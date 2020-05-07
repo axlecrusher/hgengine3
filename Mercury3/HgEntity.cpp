@@ -17,7 +17,9 @@
 
 EntityTable EntityTable::Manager;
 EntityNameTable HgEntity::EntityNames;
-
+EntityParentTable EntityParentTable::Manager;
+RenderDataTable RenderDataTable::Manager;
+PreviousPositionTable PreviousPositionTable::Manager;
 
 void RegisterEntityType(const char* c, factory_clbk factory) {
 	Engine::entity_factories[c] = factory;
@@ -120,6 +122,9 @@ int32_t EntityNameTable::findName(EntityIdType id)
 	return idx;
 }
 
+
+
+
 EntityIdType EntityTable::create()
 {
 	uint32_t idx = 0;
@@ -132,7 +137,7 @@ EntityIdType EntityTable::create()
 	{
 		idx = (uint32_t)m_generation.size();
 		assert(idx < MAX_ENTRIES);
-		m_generation.push_back(0); //what happens when we reach 2^22 ?
+		m_generation.push_back(1); //what happens when we reach 2^22 ?
 	}
 
 	m_entityTotal++;
@@ -149,6 +154,10 @@ void EntityTable::destroy(EntityIdType id)
 	{
 		//increment generation to invalidate current generation in the wild.
 		m_generation[idx]++;
+		if (m_generation[idx] == 0)
+		{
+			m_generation[idx] = 1;
+		}
 		m_freeIndices.push_back(idx);
 		m_entityActive--;
 	}
@@ -164,16 +173,106 @@ const std::string& EntityNameTable::getName(EntityIdType id)
 	return m_names[idx].name;
 }
 
+void EntityParentTable::setParent(EntityIdType id, EntityIdType parentId)
+{
+	m_parents[id] = parentId;
+}
+
+bool EntityParentTable::getParentId(EntityIdType id, EntityIdType& parent)
+{
+	const auto itr = m_parents.find(id);
+	if (itr == m_parents.end())
+	{
+		return false;
+	}
+	parent = itr->second;
+	return true;
+}
+
+template< typename T >
+typename std::vector<T>::iterator
+insert_sorted(std::vector<T> & vec, T const& item)
+{
+	return vec.insert
+	(
+		std::upper_bound(vec.begin(), vec.end(), item),
+		item
+	);
+}
+
+
+void RenderDataTable::insert(EntityIdType id, const RenderDataPtr& rd)
+{
+	const auto idx = id.index();
+
+	if (m_entityGeneration.size() < idx)
+	{
+		const uint32_t newSize = idx + 10000;
+		m_entityGeneration.resize(newSize);
+		m_renderData.resize(newSize);
+	}
+
+	m_entityGeneration[idx] = id.generation();
+	m_renderData[idx] = rd;
+}
+
+std::vector<EntityRDPair> RenderDataTable::getRenderDataForEntities(EntityIdType* id, int32_t count) const
+{
+	std::vector<EntityRDPair> r;
+	r.reserve(count);
+
+	for (int32_t i = 0; i < count; i++)
+	{
+		const auto entityid = id[i];
+		const auto idx = entityid.index();
+
+		if (m_entityGeneration.size() >= idx && m_entityGeneration[idx] == entityid.generation())
+		{
+			r.push_back({ entityid, m_renderData[idx] });
+		}
+	}
+
+	return r;
+}
+
+
+RenderDataPtr RenderDataTable::get(EntityIdType id) const
+{
+	auto idx = id.index();
+	if ((idx < m_renderData.size())
+		&& (m_entityGeneration[idx] == id.generation()))
+	{
+		return m_renderData[idx];
+	}
+	return nullptr;
+}
+
+void PreviousPositionTable::insert(EntityIdType id, vertex3f p)
+{
+	m_positions[id] = p;
+}
+
+bool PreviousPositionTable::get(EntityIdType id, vertex3f& pp)
+{
+	const auto itr = m_positions.find(id);
+	if (itr == m_positions.end())
+	{
+		return false;
+	}
+	pp = itr->second;
+	return true;
+}
+
 void HgEntity::init()
 {
 	EntityTable::Manager.destroy(m_entityId);
 
-	m_renderData = nullptr;
+	//m_renderData = nullptr;
 	//m_logic = nullptr;
-	m_renderData = nullptr;
+	//m_renderData = nullptr;
 
 	auto tmp = EntityIdType();
-	m_parentId = tmp;
+	//m_parentId = tmp;
 	//m_updateNumber = 0;
 
 	m_drawOrder = 0;
@@ -191,9 +290,9 @@ HgEntity::~HgEntity() {
 HgEntity::HgEntity(HgEntity &&rhs)
 {
 	m_spacialData = std::move(rhs.m_spacialData);
-	m_renderData = std::move(rhs.m_renderData);
+	//m_renderData = std::move(rhs.m_renderData);
 	//m_logic = std::move(rhs.m_logic);
-	m_parentId = std::move(rhs.m_parentId);
+	//m_parentId = std::move(rhs.m_parentId);
 	//m_updateNumber = std::move(rhs.m_updateNumber);
 	m_drawOrder = std::move(rhs.m_drawOrder);
 	flags = std::move(rhs.flags);
@@ -212,7 +311,7 @@ void HgEntity::destroy()
 	EventSystem::PublishEvent(Events::EntityDestroyed(this, m_entityId));
 	Locator().RemoveEntity(m_entityId);
 
-	m_renderData.reset();
+	//m_renderData.reset();
 	EntityTable::Manager.destroy(m_entityId);
 }
 
@@ -247,7 +346,11 @@ HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool 
 }
 
 HgMath::mat4f HgEntity::computeWorldSpaceMatrix(const bool applyScale, bool applyRotation, bool applyTranslation) const {
-	if (EntityTable::Manager.exists(m_parentId))
+	EntityIdType parentId;
+	const bool hasParent = EntityParentTable::Manager.getParentId(m_entityId, parentId);
+
+
+	if (hasParent && EntityTable::Manager.exists(parentId))
 	{
 		return computeWorldSpaceMatrixIncludeParent(applyScale, applyRotation, applyTranslation);
 	}

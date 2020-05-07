@@ -163,10 +163,10 @@ setFontIdentifier(loader.uniqueIdentifier());
 			if (rd == nullptr)
 			{
 				rd = RenderData::Create();
+				rd->getMaterial().setShader(HgShader::acquire("assets/shaders/FontShader.vert", "assets/shaders/FontShader.frag"));
+				rd->getMaterial().setTransparent(true);
+				rd->getMaterial().setBlendMode(BlendMode::BLEND_ALPHA);
 				getEntity().setRenderData(rd);
-				getEntity().renderData()->getMaterial().setShader(HgShader::acquire("assets/shaders/FontShader.vert", "assets/shaders/FontShader.frag"));
-				getEntity().renderData()->getMaterial().setTransparent(true);
-				getEntity().renderData()->getMaterial().setBlendMode(BlendMode::BLEND_ALPHA);
 				getEntity().setDrawOrder(127);
 			}
 

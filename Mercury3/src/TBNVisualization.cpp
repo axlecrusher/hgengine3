@@ -88,8 +88,8 @@ void TBNVisualization::buildFromVertexData(const vbo_layout_vnut* vboData, const
 	}
 
 	const auto vbo = HgVbo::GenerateUniqueFrom(m_lineVertices.data(), m_lineVertices.size());
-	getEntity().renderData()->VertexVboRecord(vbo);
-	getEntity().renderData()->setPrimitiveType(HgEngine::PrimitiveType::LINES);
+	getEntity().getRenderDataPtr()->VertexVboRecord(vbo);
+	getEntity().getRenderDataPtr()->setPrimitiveType(HgEngine::PrimitiveType::LINES);
 }
 
 } //TBNVisualization namespace
