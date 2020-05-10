@@ -1,5 +1,7 @@
 #include "MeshMath.h"
 
+#include <algorithm>
+
 namespace MeshMath
 {
 
@@ -38,6 +40,46 @@ namespace MeshMath
 		bitangent[indices[0]] += b;
 		bitangent[indices[1]] += b;
 		bitangent[indices[2]] += b;
+	}
+
+	void generatePolyboard(const vertex3f* p, int32_t vertexCount, const vector3f& camera, float r, vertex3f* outputVertexArray, uint32_t* indexArray)
+	{
+		for (int32_t i = 0; i < vertexCount; i++)
+		{
+
+			const auto Z = unitDirection(p[i], camera);
+			//const auto Zmag = Z.magnitude();
+
+			const auto idxA = std::max(0, i - 1);
+			const auto idxB = std::min(i + 1, vertexCount - 1);
+
+			auto T = unitDirection(p[idxA], p[idxB]);
+
+			const auto tcz = T.cross(Z).normal().scale(r);
+			const auto G = p[i] + tcz;
+			const auto H = p[i] - tcz;
+
+			outputVertexArray[(i*2)] = G;
+			outputVertexArray[(i*2)+1] = H;
+
+		}
+
+		int32_t vertexIdx = 0;
+		int32_t idxOffset = 0;
+		for (int32_t i = 0; i < vertexCount-1; i++)
+		{
+			//triangle list indices
+			indexArray[idxOffset + 0] = 3 + vertexIdx;
+			indexArray[idxOffset + 1] = 1 + vertexIdx;
+			indexArray[idxOffset + 2] = 0 + vertexIdx;
+			indexArray[idxOffset + 3] = 2 + vertexIdx;
+			indexArray[idxOffset + 4] = 3 + vertexIdx;
+			indexArray[idxOffset + 5] = 0 + vertexIdx;
+
+			vertexIdx += 2;
+			idxOffset += 6;
+		}
+
 	}
 
 }

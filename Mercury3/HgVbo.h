@@ -36,6 +36,7 @@ static void* _currentVbo;
 
 enum VBO_TYPE : uint8_t {
 	VBO_TYPE_INVALID = 0,
+	VBO_V,
 	VBO_VC,
 	VBO_VN,
 	VBO_VNU,
@@ -46,6 +47,10 @@ enum VBO_TYPE : uint8_t {
 	VBO_COLOR8,
 	VBO_COLOR16
 };
+
+typedef struct vbo_layout_c {
+	vertex v;
+} vbo_layout_v;
 
 //Vertex,Color
 typedef struct vbo_layout_vc {

@@ -50,6 +50,7 @@
 #include <HgFreetype.h>
 
 #include <cube.h>
+#include <MeshMath.h>
 
 float projection[16];
 
@@ -212,6 +213,34 @@ int main()
 
 	Engine::HgScene scene2;
 	Engine::HgScene scene_2d;
+
+	constexpr auto pathCount = 20;
+	vertex3f polyBoardLine[pathCount];
+	auto pb = scene2.create_entity<HgModel>();
+
+	{
+		for (int i = 0; i < pathCount; i++)
+		{
+			polyBoardLine[i].x(i*0.25);
+			polyBoardLine[i].y(i*0.4);
+			polyBoardLine[i].z(-i*i*0.125);
+		}
+
+		constexpr auto vertexCount = MeshMath::computePolyboardVertexCount(pathCount);
+		vertex3f polyBoardMesh[vertexCount];
+
+		constexpr auto indexCount = MeshMath::computePolyboardIndexCount(pathCount);
+		uint32_t polyBoardIndices[indexCount];
+		MeshMath::generatePolyboard(polyBoardLine, pathCount, PLAYER1.position(), 1, polyBoardMesh, polyBoardIndices);
+
+		auto rd = RenderData::Create();
+		rd->VertexVboRecord( HgVbo::GenerateUniqueFrom(polyBoardMesh, vertexCount) );
+		rd->indexVboRecord( HgVbo::GenerateUniqueFrom(polyBoardIndices, indexCount) );
+		//rd->renderFlags.BACKFACE_CULLING = false;
+
+		pb->getEntity().setRenderData(rd);
+	}
+
 
 	//scene2.create_entity("triangle");
 	HgEntity* teapot = NULL;
@@ -491,7 +520,7 @@ int main()
 				if (KeyDownMap[KeyCodes::KEY_R]) {
 					auto q = quaternion::fromEuler(angle::deg(0), angle::deg(0), angle::deg(0));
 					camera.setWorldSpaceOrientation(q);
-					point zero(0,1,0);
+					point zero(0, 1, 0);
 					camera.setWorldSpacePosition(zero);
 				}
 				MOUSE_INPUT.dx = 0;
@@ -500,8 +529,21 @@ int main()
 
 			grid->position(point(camera.getWorldSpacePosition()).y(0));
 
-			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg(std::fmod(time.msec(),10000) / 27.777777777777777777777777777778), angle::ZERO);
+			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg(std::fmod(time.msec(), 10000) / 27.777777777777777777777777777778), angle::ZERO);
 			teapot->orientation(orientation.conjugate());
+
+			{
+				constexpr auto vertexCount = MeshMath::computePolyboardVertexCount(pathCount);
+				vertex3f polyBoardMesh[vertexCount];
+
+				constexpr auto indexCount = MeshMath::computePolyboardIndexCount(pathCount);
+				uint32_t polyBoardIndices[indexCount];
+				MeshMath::generatePolyboard(polyBoardLine, pathCount, camera.getWorldSpacePosition(), 1, polyBoardMesh, polyBoardIndices);
+
+				pb->getEntity().renderData()->VertexVboRecord(
+					HgVbo::GenerateUniqueFrom(polyBoardMesh, vertexCount)
+				);
+			}
 
 			scene.update(timeStep);
 			scene2.update(timeStep);

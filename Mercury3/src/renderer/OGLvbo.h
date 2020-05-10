@@ -57,6 +57,7 @@ public:
 
 	static constexpr VBO_TYPE Type() {
 		//looks stupid but is compile time evaluated
+		if (std::is_same<T, vbo_layout_v>::value) { return VBO_V; }
 		if (std::is_same<T, vbo_layout_vc>::value) { return VBO_VC; }
 		if (std::is_same<T, vbo_layout_vn>::value) { return VBO_VN; }
 		if (std::is_same<T, vbo_layout_vnu>::value) { return VBO_VNU; }
@@ -246,6 +247,10 @@ void OGLvbo<T>::Setup()
 	//Compiler is not optimizing out the switch even though it could
 	//maybe write template functions for each part
 	switch (vbo_type) {
+	case VBO_V:
+	{
+		break;
+	}
 	case VBO_VC:
 	case VBO_COLOR8:
 	{
