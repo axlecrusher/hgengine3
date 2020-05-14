@@ -15,6 +15,7 @@ XAudio2Driver::XAudio2Driver() : m_initialized(false), IDriver() {
 	m_xaudioEngine = nullptr;
 	m_masteringVoice = nullptr;
 	m_voices.reserve(32);
+	m_3dvoices.reserve(32);
 	m_stop = false;
 }
 
@@ -101,7 +102,7 @@ bool XAudio2Driver::start() {
 	timeBeginPeriod(wTimerRes);
 
 	m_clbkData.driver = this;
-	m_clbkData.timerId = timeSetEvent(5, 2, TimerClbk, (DWORD_PTR)&m_clbkData, TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
+	m_clbkData.timerId = timeSetEvent(10, 4, TimerClbk, (DWORD_PTR)&m_clbkData, TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
 
 	timeEndPeriod(wTimerRes);
 
@@ -239,26 +240,23 @@ void XAudio2Driver::update3DAudio()
 
 
 
-	for (auto& voice : m_voices)
+	for (auto& voice : m_3dvoices)
 	{
 		auto& sound = voice->sound;
 
-		if (voice->voice3d)
-		{
-			auto& voice3d = voice->voice3d;
-			auto& DSPSettings = voice3d->dsp_settings;
+		auto& voice3d = voice->voice3d;
+		auto& DSPSettings = voice3d->dsp_settings;
 
-			updateEmitter(sound->getEmitter(), voice3d->emitter);
+		updateEmitter(sound->getEmitter(), voice3d->emitter);
 
-			X3DAudioCalculate(m_xaudio3d, &x_listener, &voice3d->emitter,
-				X3DAUDIO_CALCULATE_MATRIX |
-				X3DAUDIO_CALCULATE_DOPPLER |
-				X3DAUDIO_CALCULATE_LPF_DIRECT,
-				&DSPSettings);
+		X3DAudioCalculate(m_xaudio3d, &x_listener, &voice3d->emitter,
+			X3DAUDIO_CALCULATE_MATRIX |
+			X3DAUDIO_CALCULATE_DOPPLER |
+			X3DAUDIO_CALCULATE_LPF_DIRECT,
+			&DSPSettings);
 
-			voice->xaudioVoice->SetOutputMatrix(m_masteringVoice, DSPSettings.SrcChannelCount, DSPSettings.DstChannelCount, DSPSettings.pMatrixCoefficients);
-			voice->xaudioVoice->SetFrequencyRatio(DSPSettings.DopplerFactor);
-		}
+		voice->xaudioVoice->SetOutputMatrix(m_masteringVoice, DSPSettings.SrcChannelCount, DSPSettings.DstChannelCount, DSPSettings.pMatrixCoefficients);
+		voice->xaudioVoice->SetFrequencyRatio(DSPSettings.DopplerFactor);
 
 		voice->xaudioVoice->SetVolume(sound->getVolume() * VolumeMultiplier);
 	}
@@ -411,54 +409,84 @@ void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 void XAudio2Driver::InsertVoice(std::unique_ptr<Voice>& v)
 {
 	std::lock_guard<std::mutex> lock(m_callbackMtx);
-	m_voices.push_back(std::move(v));
+
+	if (v->voice3d)
+	{
+		m_3dvoices.push_back(std::move(v));
+	}
+	else
+	{
+		m_voices.push_back(std::move(v));
+	}
+}
+
+static std::unique_ptr<Voice> removeVoice(std::vector<std::unique_ptr<Voice>>& voices, VoiceCallback* x)
+{
+	std::unique_ptr<Voice> ret;
+
+	auto itr = std::find_if(voices.begin(), voices.end(), [x](std::unique_ptr<Voice>& p)
+	{
+		return *p == x;
+	});
+
+	if (itr != voices.end())
+	{
+		ret = std::move(*itr);
+		*itr = std::move(voices.back());
+		//		std::iter_swap(itr, voices.back());
+		voices.pop_back();
+	}
+
+	return std::move(ret);
 }
 
 std::unique_ptr<Voice> XAudio2Driver::RemoveVoice(VoiceCallback* x)
 {
 	std::lock_guard<std::mutex> lock(m_callbackMtx);
-	std::unique_ptr<Voice> ret;
 
-	auto itr = std::find_if(m_voices.begin(), m_voices.end(), [x](std::unique_ptr<Voice>& p)
-	{
-		return *p == x;
-	});
+	std::unique_ptr<Voice> ret = removeVoice(m_voices, x);
 
-	if (itr != m_voices.end())
+	if (ret)
 	{
-		ret = std::move(*itr);
-		*itr = std::move(m_voices.back());
-//		std::iter_swap(itr, m_voices.back());
-		m_voices.pop_back();
+		return std::move(ret);
 	}
 
+	ret = removeVoice(m_3dvoices, x);
+
 	return std::move(ret);
+}
+
+static void _stopPlayback(std::vector<std::unique_ptr<Voice>>& voices, const PlayingSound* sound)
+{
+	auto itr = std::find_if(voices.begin(), voices.end(), [sound](std::unique_ptr<Voice>& p)
+	{
+		return *p == sound;
+	});
+
+	if (itr != voices.end())
+	{
+		auto& voice = *itr;
+		//		voice->xaudioVoice->Stop();
+		voice->xaudioVoice->DestroyVoice();
+		*itr = std::move(voices.back());
+		voices.pop_back();
+	}
 }
 
 
 void XAudio2Driver::stopPlayback(const PlayingSound* sound)
 {
 	std::lock_guard<std::mutex> lock(m_callbackMtx);
-	auto itr = std::find_if(m_voices.begin(), m_voices.end(), [sound](std::unique_ptr<Voice>& p)
-	{
-		return *p == sound;
-	});
 
-	if (itr != m_voices.end())
-	{
-		auto& voice = *itr;
-//		voice->xaudioVoice->Stop();
-		voice->xaudioVoice->DestroyVoice();
-		*itr = std::move(m_voices.back());
-		m_voices.pop_back();
-	}
+	_stopPlayback(m_voices, sound);
+	_stopPlayback(m_3dvoices, sound);
 }
 
 void XAudio2Driver::update()
 {
 	std::lock_guard<std::mutex> lock(m_callbackMtx);
 
-	for (auto& voice : m_voices)
+	for (auto& voice : m_3dvoices)
 	{
 		auto entity = voice->sound->getEmittingEntity();
 		if (entity.isValid())
