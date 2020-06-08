@@ -214,32 +214,32 @@ int main()
 	Engine::HgScene scene2;
 	Engine::HgScene scene_2d;
 
-	constexpr auto pathCount = 20;
-	vertex3f polyBoardLine[pathCount];
-	auto pb = scene2.create_entity<HgModel>();
+	//constexpr auto pathCount = 20;
+	//vertex3f polyBoardLine[pathCount];
+	//auto pb = scene2.create_entity<HgModel>();
 
-	{
-		for (int i = 0; i < pathCount; i++)
-		{
-			polyBoardLine[i].x(i*0.25);
-			polyBoardLine[i].y(i*0.4);
-			polyBoardLine[i].z(-i*i*0.125);
-		}
+	//{
+	//	for (int i = 0; i < pathCount; i++)
+	//	{
+	//		polyBoardLine[i].x(i*0.25);
+	//		polyBoardLine[i].y(i*0.4);
+	//		polyBoardLine[i].z(-i*i*0.125);
+	//	}
 
-		constexpr auto vertexCount = MeshMath::computePolyboardVertexCount(pathCount);
-		vertex3f polyBoardMesh[vertexCount];
+	//	constexpr auto vertexCount = MeshMath::computePolyboardVertexCount(pathCount);
+	//	vertex3f polyBoardMesh[vertexCount];
 
-		constexpr auto indexCount = MeshMath::computePolyboardIndexCount(pathCount);
-		uint32_t polyBoardIndices[indexCount];
-		MeshMath::generatePolyboard(polyBoardLine, pathCount, PLAYER1.position(), 1, polyBoardMesh, polyBoardIndices);
+	//	constexpr auto indexCount = MeshMath::computePolyboardIndexCount(pathCount);
+	//	uint32_t polyBoardIndices[indexCount];
+	//	MeshMath::generatePolyboard(polyBoardLine, pathCount, PLAYER1.position(), 1, polyBoardMesh, polyBoardIndices);
 
-		auto rd = RenderData::Create();
-		rd->VertexVboRecord( HgVbo::GenerateUniqueFrom(polyBoardMesh, vertexCount) );
-		rd->indexVboRecord( HgVbo::GenerateUniqueFrom(polyBoardIndices, indexCount) );
-		//rd->renderFlags.BACKFACE_CULLING = false;
+	//	auto rd = RenderData::Create();
+	//	rd->VertexVboRecord( HgVbo::GenerateUniqueFrom(polyBoardMesh, vertexCount) );
+	//	rd->indexVboRecord( HgVbo::GenerateUniqueFrom(polyBoardIndices, indexCount) );
+	//	//rd->renderFlags.BACKFACE_CULLING = false;
 
-		pb->getEntity().setRenderData(rd);
-	}
+	//	pb->getEntity().setRenderData(rd);
+	//}
 
 
 	//scene2.create_entity("triangle");
@@ -305,12 +305,24 @@ int main()
 		text2->getEntity().scale(0.75);
 	}
 
-	//for (int i = 0; i < 4; ++i) {
-	//	HgEntity* statue = NULL;
-	//	scene.getNewEntity(&statue);
-	//	model_data::load_ini(statue, "statue.ini");
-	//	statue->origin(statue->origin().x(2).z(3).y(1));
-	//	statue->position(statue->position().x(i));
+	//HgEntity* statue = NULL;
+	//scene.getNewEntity(&statue);
+	//model_data::load_ini(statue, "statue.ini");
+	//statue->origin(statue->origin().x(2).z(3).y(1));
+	//statue->position(statue->position().x(0));
+
+
+	//for (int i = 1; i < 2; ++i)
+	//{
+
+	//	auto statue2 = scene2.create_entity<HgModel>();
+	//	auto& sent = statue2->getEntity();
+
+	//	sent.getSpacialData() = statue->getSpacialData();
+	//	sent.origin(sent.origin().x(2).z(3).y(1));
+	//	sent.position(sent.position().x(i*10));
+	//	sent.setRenderData(statue->getRenderDataPtr());
+	//	sent.renderData()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl"));
 	//}
 
 	EntityIdType cubeId;
@@ -532,18 +544,19 @@ int main()
 			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg(std::fmod(time.msec(), 10000) / 27.777777777777777777777777777778), angle::ZERO);
 			teapot->orientation(orientation.conjugate());
 
-			{
-				constexpr auto vertexCount = MeshMath::computePolyboardVertexCount(pathCount);
-				vertex3f polyBoardMesh[vertexCount];
+			//{
+			//	//Update polyboard when camera moves
+			//	constexpr auto vertexCount = MeshMath::computePolyboardVertexCount(pathCount);
+			//	vertex3f polyBoardMesh[vertexCount];
 
-				constexpr auto indexCount = MeshMath::computePolyboardIndexCount(pathCount);
-				uint32_t polyBoardIndices[indexCount];
-				MeshMath::generatePolyboard(polyBoardLine, pathCount, camera.getWorldSpacePosition(), 1, polyBoardMesh, polyBoardIndices);
+			//	constexpr auto indexCount = MeshMath::computePolyboardIndexCount(pathCount);
+			//	uint32_t polyBoardIndices[indexCount];
+			//	MeshMath::generatePolyboard(polyBoardLine, pathCount, camera.getWorldSpacePosition(), 1, polyBoardMesh, polyBoardIndices);
 
-				pb->getEntity().renderData()->VertexVboRecord(
-					HgVbo::GenerateUniqueFrom(polyBoardMesh, vertexCount)
-				);
-			}
+			//	pb->getEntity().renderData()->VertexVboRecord(
+			//		HgVbo::GenerateUniqueFrom(polyBoardMesh, vertexCount)
+			//	);
+			//}
 
 			scene.update(timeStep);
 			scene2.update(timeStep);
