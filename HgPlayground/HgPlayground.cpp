@@ -113,7 +113,7 @@ HgScene scene;
 
 DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	while (1) {
-		printf("UPS %u e_count %d %d\n", itrctr, EntityTable::Manager.numberOfEntitiesExisting(), scene.chunkCount());
+		printf("UPS %u e_count %d %d\n", itrctr, EntityIdTable::Manager.numberOfEntitiesExisting(), scene.chunkCount());
 		itrctr = 0;
 		CheckFilesForChange();
 		Sleep(1000);
@@ -325,7 +325,7 @@ int main()
 				cube->setScale(0.3f);
 				//entity->position(point(-20.0f + x, 5.0f, 30.0f - z));
 				//entity->scale(0.3f);
-				if (!EntityTable::Manager.exists(cubeId))
+				if (!EntityIdTable::Manager.exists(cubeId))
 				{
 					auto rd = entity->getRenderDataPtr();
 					rd->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl"));

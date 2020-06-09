@@ -237,63 +237,6 @@ private:
 	std::vector<RenderDataPtr> m_renderData;
 };
 
-class EntityTable
-{
-	//Based on http://bitsquid.blogspot.com/2014/08/building-data-oriented-entity-system.html
-public:
-	static const uint32_t MAX_ENTRIES = (1 << EntityIdType::INDEX_BITS);
-	//static const uint32_t MAX_ENTRIES = 5; //for testing create() assert
-	EntityTable()
-	{
-		m_generation.reserve(MAX_ENTRIES);
-		m_entityTotal = 0;
-		m_entityActive = 0;
-	}
-
-	//create a new entity id
-	EntityIdType create();
-
-	//check if an entity exists
-	bool exists(EntityIdType id) const
-	{
-		const auto idx = id.index();
-		if (idx < m_generation.size())
-		{
-			return (m_generation[idx] == id.generation());
-		}
-		return false; //this should never happen
-	}
-
-	//destroy an entity
-	void destroy(EntityIdType id);
-
-	//total number of entites ever created
-	uint32_t totalEntities() const { return m_entityTotal; }
-
-	//current number of entities in existance
-	uint32_t numberOfEntitiesExisting() const { return m_entityActive; }
-
-
-	static EntityTable Manager;
-
-private:
-	inline EntityIdType combine_bytes(uint32_t idx, uint8_t generation)
-	{
-		const uint32_t id = (generation << EntityIdType::INDEX_BITS) | idx;
-		return id;
-	}
-
-	std::vector<uint8_t> m_generation;
-
-	/* I think a deque is better than a list here because there
-	would be fewer heap allocaitons/fragmentation. */
-	std::deque<uint32_t> m_freeIndices;
-
-	uint32_t m_entityTotal; //total number of entities that have ever existed
-	uint32_t m_entityActive; //number of entities currently in existance
-};
-
-
 //Compute local transformation matrix
 HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale = true, bool applyRotation = true, bool applyTranslation = true);
 
@@ -361,7 +304,7 @@ public:
 			EntityIdType parentId;
 			if (EntityParentTable::Manager.getParentId(m_entityId, parentId))
 			{
-				if (EntityTable::Manager.exists(parentId)) r = Find(parentId);
+				if (EntityIdTable::Manager.exists(parentId)) r = Find(parentId);
 			}
 
 			return r;
@@ -416,8 +359,56 @@ private:
 	int8_t m_drawOrder;
 
 	EntityFlags flags;
-public:
 };
+
+
+//class EntityTable
+//{
+//public:
+//	static const uint32_t MAX_ENTRIES = (1 << EntityIdType::INDEX_BITS);
+//	//static const uint32_t MAX_ENTRIES = 5; //for testing create() assert
+//	EntityIdTable()
+//	{
+//		m_generation.reserve(MAX_ENTRIES);
+//		m_entityTotal = 0;
+//		m_entityActive = 0;
+//	}
+//
+//	//create a new entity id
+//	EntityIdType create();
+//
+//	//check if an entity exists
+//	bool exists(EntityIdType id) const
+//	{
+//		const auto idx = id.index();
+//		if (idx < m_generation.size())
+//		{
+//			return (m_generation[idx] == id.generation());
+//		}
+//		return false; //this should never happen
+//	}
+//
+//	//destroy an entity
+//	void destroy(EntityIdType id);
+//
+//	//total number of entites ever created
+//	uint32_t totalEntities() const { return m_entityTotal; }
+//
+//	//current number of entities in existance
+//	uint32_t numberOfEntitiesExisting() const { return m_entityActive; }
+//
+//
+//	static EntityIdTable Manager;
+//
+//private:
+//	inline EntityIdType combine_bytes(uint32_t idx, uint8_t generation)
+//	{
+//		const uint32_t id = (generation << EntityIdType::INDEX_BITS) | idx;
+//		return id;
+//	}
+//
+//	std::vector<HgEntity> m_entites;
+//};
 
 namespace Events
 {

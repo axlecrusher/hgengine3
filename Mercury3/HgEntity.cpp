@@ -15,7 +15,7 @@
 #include <EventSystem.h>
 #include <HgEngine.h>
 
-EntityTable EntityTable::Manager;
+EntityIdTable EntityIdTable::Manager;
 EntityNameTable HgEntity::EntityNames;
 EntityParentTable EntityParentTable::Manager;
 RenderDataTable RenderDataTable::Manager;
@@ -30,14 +30,14 @@ void EntityLocator::RegisterEntity(HgEntity* entity)
 	std::lock_guard<std::mutex> m_lock(m_mutex);
 
 	const auto id = entity->getEntityId();
-	if (!EntityTable::Manager.exists(id)) return;
+	if (!EntityIdTable::Manager.exists(id)) return;
 
 	m_entities[id] = entity;
 }
 
 void EntityLocator::RemoveEntity(EntityIdType id)
 {
-	if (!EntityTable::Manager.exists(id)) return;
+	if (!EntityIdTable::Manager.exists(id)) return;
 
 	std::lock_guard<std::mutex> m_lock(m_mutex);
 
@@ -51,7 +51,7 @@ void EntityLocator::RemoveEntity(EntityIdType id)
 EntityLocator::SearchResult EntityLocator::Find(EntityIdType id) const
 {
 	SearchResult result;
-	if (EntityTable::Manager.exists(id))
+	if (EntityIdTable::Manager.exists(id))
 	{
 		std::lock_guard<std::mutex> m_lock(m_mutex);
 
@@ -125,7 +125,7 @@ int32_t EntityNameTable::findName(EntityIdType id)
 
 
 
-EntityIdType EntityTable::create()
+EntityIdType EntityIdTable::create()
 {
 	uint32_t idx = 0;
 	if (m_freeIndices.size() > 1024)
@@ -146,7 +146,7 @@ EntityIdType EntityTable::create()
 	return combine_bytes(idx, m_generation[idx]);
 }
 
-void EntityTable::destroy(EntityIdType id)
+void EntityIdTable::destroy(EntityIdType id)
 {
 	const auto idx = id.index();
 
@@ -265,7 +265,7 @@ bool PreviousPositionTable::get(EntityIdType id, vertex3f& pp)
 
 void HgEntity::init()
 {
-	EntityTable::Manager.destroy(m_entityId);
+	EntityIdTable::Manager.destroy(m_entityId);
 
 	//m_renderData = nullptr;
 	//m_logic = nullptr;
@@ -277,7 +277,7 @@ void HgEntity::init()
 
 	m_drawOrder = 0;
 
-	m_entityId = EntityTable::Manager.create();
+	m_entityId = EntityIdTable::Manager.create();
 
 	Locator().RegisterEntity(this);
 	EventSystem::PublishEvent(Events::EntityCreated(this, m_entityId));
@@ -312,7 +312,7 @@ void HgEntity::destroy()
 	Locator().RemoveEntity(m_entityId);
 
 	//m_renderData.reset();
-	EntityTable::Manager.destroy(m_entityId);
+	EntityIdTable::Manager.destroy(m_entityId);
 }
 
 HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool applyRotation, bool applyTranslation)
@@ -350,7 +350,7 @@ HgMath::mat4f HgEntity::computeWorldSpaceMatrix(const bool applyScale, bool appl
 	const bool hasParent = EntityParentTable::Manager.getParentId(m_entityId, parentId);
 
 
-	if (hasParent && EntityTable::Manager.exists(parentId))
+	if (hasParent && EntityIdTable::Manager.exists(parentId))
 	{
 		return computeWorldSpaceMatrixIncludeParent(applyScale, applyRotation, applyTranslation);
 	}
