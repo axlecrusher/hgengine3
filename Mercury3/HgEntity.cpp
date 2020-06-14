@@ -172,7 +172,7 @@ void RenderDataTable::insert(EntityIdType id, const RenderDataPtr& rd)
 {
 	const auto idx = id.index();
 
-	if (m_entityGeneration.size() < idx)
+	if (m_entityGeneration.size() <= idx)
 	{
 		const uint32_t newSize = idx + 10000;
 		m_entityGeneration.resize(newSize);
