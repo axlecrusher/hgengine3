@@ -14,12 +14,13 @@
 
 #include <EventSystem.h>
 #include <HgEngine.h>
+#include <EntityIdType.h>
 
-EntityIdTable EntityIdTable::Manager;
-EntityNameTable HgEntity::EntityNames;
+EntityTable EntityTable::Singleton;
 EntityParentTable EntityParentTable::Manager;
 RenderDataTable RenderDataTable::Manager;
 PreviousPositionTable PreviousPositionTable::Manager;
+EntityNameTable HgEntity::EntityNames;
 
 void RegisterEntityType(const char* c, factory_clbk factory) {
 	Engine::entity_factories[c] = factory;
@@ -64,15 +65,18 @@ EntityLocator::SearchResult EntityLocator::Find(EntityIdType id) const
 	return result;
 }
 
-EntityLocator& HgEntity::Locator()
-{
-	static EntityLocator locator;
-	return locator;
-}
+//EntityLocator& HgEntity::Locator()
+//{
+//	static EntityLocator locator;
+//	return locator;
+//}
 
 EntityLocator::SearchResult HgEntity::Find(EntityIdType id)
 {
-	return Locator().Find(id);
+	EntityLocator::SearchResult r;
+	r.entity = EntityTable::Singleton.getPtr(id);
+	return r;
+	//return Locator().Find(id);
 }
 
 namespace Events
@@ -125,43 +129,6 @@ int32_t EntityNameTable::findName(EntityIdType id)
 
 
 
-EntityIdType EntityIdTable::create()
-{
-	uint32_t idx = 0;
-	if (m_freeIndices.size() > 1024)
-	{
-		idx = m_freeIndices.front();
-		m_freeIndices.pop_front();
-	}
-	else
-	{
-		idx = (uint32_t)m_generation.size();
-		assert(idx < MAX_ENTRIES);
-		m_generation.push_back(1); //what happens when we reach 2^22 ?
-	}
-
-	m_entityTotal++;
-	m_entityActive++;
-
-	return combine_bytes(idx, m_generation[idx]);
-}
-
-void EntityIdTable::destroy(EntityIdType id)
-{
-	const auto idx = id.index();
-
-	if (exists(id))
-	{
-		//increment generation to invalidate current generation in the wild.
-		m_generation[idx]++;
-		if (m_generation[idx] == 0)
-		{
-			m_generation[idx] = 1;
-		}
-		m_freeIndices.push_back(idx);
-		m_entityActive--;
-	}
-}
 
 const std::string& EntityNameTable::getName(EntityIdType id)
 {
@@ -263,23 +230,26 @@ bool PreviousPositionTable::get(EntityIdType id, vertex3f& pp)
 	return true;
 }
 
-void HgEntity::init()
+HgEntity::HgEntity()
+{
+}
+
+void HgEntity::init(EntityIdType id)
 {
 	EntityIdTable::Manager.destroy(m_entityId);
 
-	//m_renderData = nullptr;
-	//m_logic = nullptr;
-	//m_renderData = nullptr;
-
-	auto tmp = EntityIdType();
-	//m_parentId = tmp;
-	//m_updateNumber = 0;
-
 	m_drawOrder = 0;
 
-	m_entityId = EntityIdTable::Manager.create();
+	if (EntityIdTable::Manager.exists(id))
+	{
+		m_entityId = id;
+	}
+	else
+	{
+		m_entityId = EntityIdTable::Manager.create();
+	}
 
-	Locator().RegisterEntity(this);
+	//Locator().RegisterEntity(this);
 	EventSystem::PublishEvent(Events::EntityCreated(this, m_entityId));
 }
 
@@ -287,32 +257,32 @@ HgEntity::~HgEntity() {
 	destroy();
 }
 
-HgEntity::HgEntity(HgEntity &&rhs)
-{
-	m_spacialData = std::move(rhs.m_spacialData);
-	//m_renderData = std::move(rhs.m_renderData);
-	//m_logic = std::move(rhs.m_logic);
-	//m_parentId = std::move(rhs.m_parentId);
-	//m_updateNumber = std::move(rhs.m_updateNumber);
-	m_drawOrder = std::move(rhs.m_drawOrder);
-	flags = std::move(rhs.flags);
-
-	//setLogic(std::move(m_logic)); //reset logic pointer
-
-	std::swap(m_entityId, rhs.m_entityId);
-	Locator().RegisterEntity(this);
-
-	rhs.destroy();
-}
+//HgEntity::HgEntity(HgEntity &&rhs)
+//{
+//	m_spacialData = std::move(rhs.m_spacialData);
+//	//m_renderData = std::move(rhs.m_renderData);
+//	//m_logic = std::move(rhs.m_logic);
+//	//m_parentId = std::move(rhs.m_parentId);
+//	//m_updateNumber = std::move(rhs.m_updateNumber);
+//	m_drawOrder = std::move(rhs.m_drawOrder);
+//	flags = std::move(rhs.flags);
+//
+//	//setLogic(std::move(m_logic)); //reset logic pointer
+//
+//	std::swap(m_entityId, rhs.m_entityId);
+//	Locator().RegisterEntity(this);
+//
+//	rhs.destroy();
+//}
 
 
 void HgEntity::destroy()
 {
 	EventSystem::PublishEvent(Events::EntityDestroyed(this, m_entityId));
-	Locator().RemoveEntity(m_entityId);
+	//Locator().RemoveEntity(m_entityId);
 
 	//m_renderData.reset();
-	EntityIdTable::Manager.destroy(m_entityId);
+	//EntityIdTable::Manager.destroy(m_entityId);
 }
 
 HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool applyRotation, bool applyTranslation)

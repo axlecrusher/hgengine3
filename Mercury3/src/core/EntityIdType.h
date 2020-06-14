@@ -46,6 +46,8 @@ private:
 	uint32_t m_id;
 };
 
+using EntityIdList = std::vector<EntityIdType>;
+
 class EntityIdTable
 {
 	//Based on http://bitsquid.blogspot.com/2014/08/building-data-oriented-entity-system.html
@@ -63,6 +65,9 @@ public:
 
 	//create a new entity id
 	EntityIdType create();
+
+	//Return a list of contiguous IDs
+	EntityIdList createContiguous(uint32_t count);
 
 	//check if an entity exists
 	bool exists(EntityIdType id) const
@@ -94,6 +99,11 @@ private:
 		const uint32_t id = (generation << EntityIdType::INDEX_BITS) | idx;
 		return id;
 	}
+
+	bool hasIdPool() const { return m_freeIndices.size() > 1024; }
+
+	//returns the index into m_freeIndices which starts a contiguous block of free ids. Negative indicates no free
+	int32_t checkFreeContiguous(uint32_t count);
 
 	std::vector<uint8_t> m_generation;
 

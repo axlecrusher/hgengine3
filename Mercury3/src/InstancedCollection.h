@@ -9,14 +9,6 @@
 
 #include <OGL/VertexAttributeBuffer.h>
 
-namespace Instancing
-{
-	struct GPUTransformationMatrix
-	{
-		float matrix[16];
-	};
-}
-
 //Stride is how many gpuStructs are used per instance of T
 template<typename T, typename gpuStruct, int stride>
 class InstancedCollection : public IUpdatableCollection {

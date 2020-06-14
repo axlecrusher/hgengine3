@@ -49,6 +49,7 @@
 
 #include <HgFreetype.h>
 
+#include <triangle.h>
 #include <cube.h>
 
 float projection[16];
@@ -214,11 +215,15 @@ int main()
 	Engine::HgScene scene2;
 	Engine::HgScene scene_2d;
 
-	//scene2.create_entity("triangle");
-	HgEntity* teapot = NULL;
-	scene.getNewEntity(&teapot);
-	model_data::load_ini(teapot, "teapot.ini");
-	teapot->origin(teapot->origin().x(2).z(3).y(1));
+	EntityIdType teapotId;
+	{
+		auto idList = EntityHelpers::createContiguous(1);
+		scene2.addEntityIDs(idList);
+		teapotId = idList[0];
+		auto teapot = EntityTable::Singleton.getPtr(teapotId);
+		model_data::load_ini(teapot, "teapot.ini");
+		teapot->origin(teapot->origin().x(2).z(3).y(1));
+	}
 
 	//{
 	//	//tbn doesn't really work on the teapot because it doesn't have UV
@@ -245,36 +250,38 @@ int main()
 	//	pointCloud->getEntity().setParent(gun);
 	//	pointCloud->getEntity().setHidden(true);
 	//}
-
 	{
-		auto text = scene2.create_entity<HgText::Text>();
-		text->setText("HgEngine 3 -- Now with text! VV");
-		text->getEntity().setDrawOrder(110);
-		text->getEntity().position(point(1, 0, 0));
-		text->getEntity().scale(10.0);
-		text->getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
-	}
+		//auto textIDs = EntityHelpers::createContiguous(4);
+		{
+			auto text = scene2.create_entity<HgText::Text>();
+			text->setText("HgEngine 3 -- Now with text! VV");
+			text->getEntity().setDrawOrder(110);
+			text->getEntity().position(point(1, 0, 0));
+			text->getEntity().scale(10.0);
+			text->getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
+		}
 
-	{
-		auto text = scene2.create_entity<HgText::Text>();
-		text->setText("Woooooooooo!");
-		text->getEntity().setDrawOrder(110);
-		text->getEntity().position(point(1, 2, 0));
-		text->getEntity().scale(10.0);
-		text->getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
-	}
+		{
+			auto text = scene2.create_entity<HgText::Text>();
+			text->setText("Woooooooooo!");
+			text->getEntity().setDrawOrder(110);
+			text->getEntity().position(point(1, 2, 0));
+			text->getEntity().scale(10.0);
+			text->getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
+		}
 
-	{
-		auto text = scene_2d.create_entity<HgText::Text>();
-		text->setText("Mercury Engine 3");
-		text->getEntity().position(point(-0.99, 0.95, 0));
-		//text.getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
+		{
+			auto text = scene_2d.create_entity<HgText::Text>();
+			text->setText("Mercury Engine 3");
+			text->getEntity().position(point(-0.99, 0.95, 0));
+			//text.getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
 
-		auto* text2 = scene_2d.create_entity<HgText::Text>();
-		text2->setText("https://github.com/axlecrusher/hgengine3");
-		//text2.getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
-		text2->getEntity().position(point(-0.99, -0.98, 0));
-		text2->getEntity().scale(0.75);
+			auto* text2 = scene_2d.create_entity<HgText::Text>();
+			text2->setText("https://github.com/axlecrusher/hgengine3");
+			//text2.getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
+			text2->getEntity().position(point(-0.99, -0.98, 0));
+			text2->getEntity().scale(0.75);
+		}
 	}
 
 	//for (int i = 0; i < 4; ++i) {
@@ -285,68 +292,83 @@ int main()
 	//	statue->position(statue->position().x(i));
 	//}
 
-	EntityIdType cubeId;
-	uint32_t i;
+	//EntityIdType cubeId;
+	//uint32_t i;
 	{
 		HgEntity* entity = NULL;
 
 		{
-			auto triangle = scene2.create_entity<Triangle::Triangle>();
-			HgEntity* entity = &triangle->getEntity();
-			//HgEntity* entity = scene2.create_entity("triangle");
-			if (entity) {
+			//Create a couple of simple triangle entites
+			auto triangleList = EntityHelpers::createContiguous(2);
+			scene2.addEntityIDs(triangleList);
+			Triangle::init(triangleList);
+
+			{
+				auto entity = EntityTable::Singleton.getPtr(triangleList[0]);
 				const auto tmp = entity->position();
 				entity->position(tmp.x(1.5f).z(-1.0f));
-				//entity->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
-				//	toQuaternion2(0, 0, 90, &entity->orientation);
 			}
 
-			entity = scene2.create_entity("triangle");
-			if (entity) {
+
+			{
+				auto entity = EntityTable::Singleton.getPtr(triangleList[1]);
 				const auto tmp = entity->position();
 				entity->position(tmp.x(0.0f).z(-2.5f));
-				//entity->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("test_vertex_instanced.glsl", "test_frag_instanced.glsl"));
-				//	toQuaternion2(45,0,0,&entity->orientation);
 			}
 		}
 
+		//Create a lot of rotating cubes
+		auto idList = EntityHelpers::createContiguous(ANI_TRIS);
+		scene2.addEntityIDs(idList);
+		RotatingCube::initRotatingCubes(idList);
 
-		for (i = 0; i < ANI_TRIS; i++) {
+		uint32_t i = 0;
+		EntityIdType cubeId;
+		for (auto id : idList)
+		{
 			float x = (i % 40)*1.1f;
 			float z = (i / 40)*1.1f;
 
-			//HgEntity* entity = scene2.create_entity("rotating_cube");
-			auto cube = scene2.create_entity2<RotatingCube::RotatingCube2, RotatingCube::RotatingCube2InstanceCollection>();
-			HgEntity* entity = &cube->getEntity();
+			auto cube = EntityTable::Singleton.getPtr(id);
 
 			//if (entity)
 			{
-				cube->setPosition(point(-20.0f + x, 5.0f, 30.0f - z));
-				cube->setScale(0.3f);
-				//entity->position(point(-20.0f + x, 5.0f, 30.0f - z));
-				//entity->scale(0.3f);
+				cube->position(point(-20.0f + x, 5.0f, 30.0f - z));
+				cube->scale(0.3f);
+
 				if (!EntityIdTable::Manager.exists(cubeId))
 				{
-					auto rd = entity->getRenderDataPtr();
+					auto rd = cube->getRenderDataPtr();
 					rd->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl"));
 				}
 				else
 				{
 					auto r = HgEntity::Find(cubeId);
-					auto rd = r.entity->getRenderDataPtr();
-					entity->setRenderData(rd); //instance it
+					if (r.isValid())
+					{
+						auto rd = r.entity->getRenderDataPtr();
+						cube->setRenderData(rd); //instance it
+					}
 				}
-				cubeId = entity->getEntityId();
+				cubeId = id;
 			}
+
+			i++;
 		}
 
-		auto redCube = scene2.create_entity("cube");
-		if (redCube) {
-			redCube->position(point(2,2,-2));
-			redCube->scale(1.3f);
-			redCube->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_red.glsl"));
-			//entity->getRenderDataPtr()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
-		}
+		//HgEntity* redCube = nullptr;
+		//{
+		//	auto idList = EntityHelpers::createContiguous(1);
+		//	scene2.addEntityIDs(idList);
+
+		//	redCube = EntityTable::Singleton.getPtr(idList[0]);
+		//	change_to_cube(redCube);
+
+		//	redCube->position(point(2,2,-2));
+		//	redCube->scale(1.3f);
+		//	redCube->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_red.glsl"));
+		//	//entity->getRenderDataPtr()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
+		//}
 //
 ////		entity->position.
 //
@@ -384,6 +406,7 @@ int main()
 			teapotSquare->scale(0.3);
 			teapotSquare->position(point(0, 3, 0));
 			teapotSquare->setInheritParentScale(false);
+			auto teapot = EntityTable::Singleton.getPtr(teapotId);
 			teapotSquare->setParent(teapot->getEntityId());
 			teapotSquare->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_blue.glsl"));
 			//teapotSquare->setHidden(true);
@@ -475,7 +498,6 @@ int main()
 				if (KeyDownMap[KeyCodes::KEY_SPACE]) {
 					//snd->stop();
 				}
-
 				//			if (v.components.z > 0) DebugBreak();
 
 				v = v.normal().rotate(camera.getWorldSpaceOrientation());
@@ -502,11 +524,16 @@ int main()
 			grid->position(point(camera.getWorldSpacePosition()).y(0));
 
 			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg(std::fmod(time.msec(),10000) / 27.777777777777777777777777777778), angle::ZERO);
-			teapot->orientation(orientation.conjugate());
+			{
+				auto teapot = EntityTable::Singleton.getPtr(teapotId);
+				teapot->orientation(orientation.conjugate());
+			}
 
 			scene.update(timeStep);
 			scene2.update(timeStep);
 			scene_2d.update(timeStep);
+
+			RotatingCube::updateRotatingCubes(timeStep);
 
 			Engine::updateCollections(timeStep);
 			sceneUpdated = true;

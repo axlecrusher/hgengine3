@@ -93,7 +93,7 @@ public:
 	inline float scale() const { return m_spi.scale; }
 	inline void scale(float s) { m_spi.scale = s; }
 
-	inline const SPI getSPI() const { return m_spi; }
+	inline const SPI& getSPI() const { return m_spi; }
 	inline SPI& getSPI() { return m_spi; }
 };
 
@@ -247,17 +247,14 @@ having HgEntity free render data by default and then
 handling special cases.
 */
 class HgEntity {
-public:
-		HgEntity()
-			//: m_updateNumber(0), m_renderData(nullptr)
-		{}
-
+	public:
+		HgEntity();
 		~HgEntity();
 
-		HgEntity(const HgEntity &other) = delete;
-		HgEntity(HgEntity &&); //move operator
+		//HgEntity(const HgEntity &other) = delete;
+		//HgEntity(HgEntity &&); //move operator
 
-		void init();
+		void init(EntityIdType id = EntityIdType());
 		void destroy();
 
 		inline EntityIdType getEntityId() const { return m_entityId; }
@@ -304,7 +301,7 @@ public:
 			EntityIdType parentId;
 			if (EntityParentTable::Manager.getParentId(m_entityId, parentId))
 			{
-				if (EntityIdTable::Manager.exists(parentId)) r = Find(parentId);
+				//if (EntityIdTable::Manager.exists(parentId)) r = Find(parentId);
 			}
 
 			return r;
@@ -350,7 +347,7 @@ private:
 
 	static EntityNameTable EntityNames;
 
-	static EntityLocator& Locator();
+	//static EntityLocator& Locator();
 
 	//RenderDataPtr m_renderData;
 	SpacialData m_spacialData; //local transormations
@@ -362,53 +359,106 @@ private:
 };
 
 
-//class EntityTable
-//{
-//public:
-//	static const uint32_t MAX_ENTRIES = (1 << EntityIdType::INDEX_BITS);
-//	//static const uint32_t MAX_ENTRIES = 5; //for testing create() assert
-//	EntityIdTable()
-//	{
-//		m_generation.reserve(MAX_ENTRIES);
-//		m_entityTotal = 0;
-//		m_entityActive = 0;
-//	}
-//
-//	//create a new entity id
-//	EntityIdType create();
-//
-//	//check if an entity exists
-//	bool exists(EntityIdType id) const
-//	{
-//		const auto idx = id.index();
-//		if (idx < m_generation.size())
-//		{
-//			return (m_generation[idx] == id.generation());
-//		}
-//		return false; //this should never happen
-//	}
-//
-//	//destroy an entity
-//	void destroy(EntityIdType id);
-//
-//	//total number of entites ever created
-//	uint32_t totalEntities() const { return m_entityTotal; }
-//
-//	//current number of entities in existance
-//	uint32_t numberOfEntitiesExisting() const { return m_entityActive; }
-//
-//
-//	static EntityIdTable Manager;
-//
-//private:
-//	inline EntityIdType combine_bytes(uint32_t idx, uint8_t generation)
-//	{
-//		const uint32_t id = (generation << EntityIdType::INDEX_BITS) | idx;
-//		return id;
-//	}
-//
-//	std::vector<HgEntity> m_entites;
-//};
+class EntityTable
+{
+public:
+
+	EntityTable()
+	{
+	}
+
+	//create a new entity
+	inline HgEntity create()
+	{
+		const auto id = EntityIdTable::Manager.create();
+
+		HgEntity e;
+		e.init(id);
+
+		const auto idx = id.index();
+
+		if (idx >= m_entities.size())
+		{
+			m_entities.resize(idx + 1000);
+		}
+		return m_entities[idx];
+	}
+
+	//create multiple entities from an EntityIdList
+	inline void createMultiple(const EntityIdList& list)
+	{
+		allocateId(list.back());
+		for (auto id : list)
+		{
+			allocateId(id);
+
+			const auto idx = id.index();
+			m_entities[idx].init(id);
+		}
+	}
+
+	inline void store(const HgEntity& e)
+	{
+		const auto id = e.getEntityId();
+		if (EntityIdTable::Manager.exists(id))
+		{
+			const auto idx = id.index();
+			if (idx >= m_entities.size())
+			{
+				m_entities.resize(idx + 1000);
+			}
+
+			m_entities[idx] = e;
+		}
+	}
+
+	inline HgEntity* getPtr(EntityIdType id)
+	{
+		if (EntityIdTable::Manager.exists(id))
+		{
+			const auto idx = id.index();
+			if (idx < m_entities.size())
+			{
+				HgEntity* ptr = &m_entities[idx];
+				if (ptr->getEntityId() == id)
+				{
+					return ptr;
+				}
+			}
+		}
+		return nullptr;
+	}
+
+	//destroy an entity
+	void destroy(EntityIdType id);
+
+	static EntityTable Singleton;
+
+private:
+
+	//allocate entity storage for id
+	inline void allocateId(EntityIdType id)
+	{
+		const auto idx = id.index();
+		if (idx >= m_entities.size())
+		{
+			m_entities.resize(idx + 1000);
+		}
+	}
+
+	std::vector<HgEntity> m_entities;
+};
+
+namespace EntityHelpers
+{
+	//Create a contiguous block of entities. Allocates IDs and Entity storage.
+	inline EntityIdList createContiguous(uint32_t count)
+	{
+		auto idList = EntityIdTable::Manager.createContiguous(count);
+		EntityTable::Singleton.createMultiple(idList);
+		return idList;
+	}
+}
 
 namespace Events
 {

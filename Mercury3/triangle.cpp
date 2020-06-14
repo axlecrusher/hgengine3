@@ -55,6 +55,17 @@ static void* triangle_factory(HgEntity* e) {
 
 namespace Triangle {
 
+	void init(const EntityIdList& list)
+	{
+		auto rdPtr = triangle_init_render_data();
+		for (auto id : list)
+		{
+			EntityTable::Singleton.getPtr(id)->setRenderData(rdPtr);
+		}
+
+	}
+
+
 void Triangle::update(HgTime dt) {
 }
 

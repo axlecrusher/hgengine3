@@ -10,6 +10,8 @@ file(GLOB TEST_SRC
 	"${HGENGINE_INCLUDES}/quaternion.h"
 	"${HGENGINE_INCLUDES}/quaternion_dual.cpp"
 	"${HGENGINE_INCLUDES}/quaternion_dual.h"
+	"${HGENGINE_INCLUDES}/src/core/EntityIdType.h"
+	"${HGENGINE_INCLUDES}/src/core/EntityIdType.cpp"
 	"${HGENGINE_INCLUDES}/src/math/vector.h"
 	"${HGENGINE_INCLUDES}/src/math/matrix.h"
 	"${HGENGINE_INCLUDES}/vertex.h"
@@ -22,7 +24,7 @@ if(MSVC)
 #    set(WIDECHAR "/Zc:wchar_t")CMAKE_CXX_FLAGS_RELWITHDEBINFO 
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /MT")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 endif()
 
 add_executable(hgtests ${TEST_SRC})
