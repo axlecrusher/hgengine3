@@ -119,13 +119,13 @@ namespace RotatingCube
 		for (int i = 0; i < SpinningCubes.entityId.size(); i++)
 		{
 			auto& state = SpinningCubes.cubeState[i];
+			
 			state.age += dt;
-
-			const double degTime = 360.0 / state.rotationTime.msec();
-
 			while (state.age > state.rotationTime) {
 				state.age -= state.rotationTime;
 			}
+
+			const double degTime = 360.0 / state.rotationTime.msec();
 
 			const double deg = degTime * state.age.msec();
 			const quaternion rotation = quaternion::fromEuler(angle::ZERO, angle::deg(deg), angle::ZERO);
