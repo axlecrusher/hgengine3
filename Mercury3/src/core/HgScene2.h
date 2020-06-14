@@ -104,6 +104,11 @@ public:
 		return &typedObject->getEntity();
 	}
 
+	inline void addEntityID(const EntityIdType id)
+	{
+		m_entities.push_back(id);
+	}
+
 	inline void addEntityIDs(const EntityIdList list)
 	{
 		m_entities.insert(m_entities.end(), list.begin(), list.end());

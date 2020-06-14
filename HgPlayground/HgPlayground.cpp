@@ -251,36 +251,53 @@ int main()
 	//	pointCloud->getEntity().setHidden(true);
 	//}
 	{
-		//auto textIDs = EntityHelpers::createContiguous(4);
+		auto textIDs = EntityHelpers::createContiguous(4);
 		{
-			auto text = scene2.create_entity<HgText::Text>();
-			text->setText("HgEngine 3 -- Now with text! VV");
-			text->getEntity().setDrawOrder(110);
-			text->getEntity().position(point(1, 0, 0));
-			text->getEntity().scale(10.0);
-			text->getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
+			auto textEntity = EntityTable::Singleton.getPtr(textIDs[0]);
+			scene2.addEntityID(textIDs[0]);
+
+			HgText::Text t;
+			t.setText("HgEngine 3 -- Now with text! VV");
+			textEntity->setRenderData(t.CreateRenderData());
+			textEntity->setDrawOrder(110);
+			textEntity->position(point(1, 0, 0));
+			textEntity->scale(10.0);
+			textEntity->getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
 		}
 
 		{
-			auto text = scene2.create_entity<HgText::Text>();
-			text->setText("Woooooooooo!");
-			text->getEntity().setDrawOrder(110);
-			text->getEntity().position(point(1, 2, 0));
-			text->getEntity().scale(10.0);
-			text->getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
+			auto textEntity = EntityTable::Singleton.getPtr(textIDs[1]);
+			scene2.addEntityID(textIDs[1]);
+
+			HgText::Text t;
+			t.setText("Woooooooooo!");
+			textEntity->setRenderData(t.CreateRenderData());
+			textEntity->setDrawOrder(110);
+			textEntity->position(point(1, 2, 0));
+			textEntity->scale(10.0);
+			textEntity->getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
 		}
 
 		{
-			auto text = scene_2d.create_entity<HgText::Text>();
-			text->setText("Mercury Engine 3");
-			text->getEntity().position(point(-0.99, 0.95, 0));
+			auto textEntity = EntityTable::Singleton.getPtr(textIDs[2]);
+			scene_2d.addEntityID(textIDs[2]);
+
+			HgText::Text t;
+			t.setText("Mercury Engine 3");
+			textEntity->setRenderData(t.CreateRenderData());
+			textEntity->position(point(-0.99, 0.95, 0));
 			//text.getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
+		}
 
-			auto* text2 = scene_2d.create_entity<HgText::Text>();
-			text2->setText("https://github.com/axlecrusher/hgengine3");
-			//text2.getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
-			text2->getEntity().position(point(-0.99, -0.98, 0));
-			text2->getEntity().scale(0.75);
+		{
+			auto textEntity = EntityTable::Singleton.getPtr(textIDs[3]);
+			scene_2d.addEntityID(textIDs[3]);
+
+			HgText::Text t;
+			t.setText("https://github.com/axlecrusher/hgengine3");
+			textEntity->setRenderData(t.CreateRenderData());
+			textEntity->position(point(-0.99, -0.98, 0));
+			textEntity->scale(0.75);
 		}
 	}
 

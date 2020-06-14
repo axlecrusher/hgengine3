@@ -58,7 +58,7 @@ setFontIdentifier(loader.uniqueIdentifier());
 	void Text::setText(std::string str)
 	{
 		m_text = std::move(str);
-		BuildVbo();
+		//BuildVbo();
 	}
 
 	void Text::setFontIdentifier(std::string fontId)
@@ -66,8 +66,10 @@ setFontIdentifier(loader.uniqueIdentifier());
 		m_fontId = std::move(fontId);
 	}
 
-	void Text::BuildVbo()
+	RenderDataPtr Text::CreateRenderData()
 	{
+		RenderDataPtr rd;
+
 		const auto canvasHeight = Text::getCanvasHeight();
 		const auto canvasWidth = Text::getCanvasWidth();
 
@@ -159,16 +161,16 @@ setFontIdentifier(loader.uniqueIdentifier());
 
 		if (vertexData.size() > 0 && indices.size() > 0)
 		{
-			RenderDataPtr rd = getEntity().getRenderDataPtr();
-			if (rd == nullptr)
-			{
+			//RenderDataPtr rd = getEntity().getRenderDataPtr();
+			//if (rd == nullptr)
+			//{
 				rd = RenderData::Create();
 				rd->getMaterial().setShader(HgShader::acquire("assets/shaders/FontShader.vert", "assets/shaders/FontShader.frag"));
 				rd->getMaterial().setTransparent(true);
 				rd->getMaterial().setBlendMode(BlendMode::BLEND_ALPHA);
-				getEntity().setRenderData(rd);
-				getEntity().setDrawOrder(127);
-			}
+				//getEntity().setRenderData(rd);
+				//getEntity().setDrawOrder(127);
+			//}
 
 			auto rec = HgVbo::GenerateFrom(vertexData.data(), vertexData.size());
 			rd->VertexVboRecord(rec);
@@ -178,23 +180,25 @@ setFontIdentifier(loader.uniqueIdentifier());
 
 			rd->getMaterial().addTexture(m_fontImage);
 		}
+
+		return rd;
 	}
 
-	void Text::getInstanceData(gpuStruct* instanceData)
-	{
-		const auto mat = getEntity().computeWorldSpaceMatrix();
-		mat.store(instanceData->matrix);
-	}
+	//void Text::getInstanceData(gpuStruct* instanceData)
+	//{
+	//	const auto mat = getEntity().computeWorldSpaceMatrix();
+	//	mat.store(instanceData->matrix);
+	//}
 
-	void Text::init()
-	{
-		IUpdatableInstance<gpuStruct>::init();
+	//void Text::init()
+	//{
+	//	IUpdatableInstance<gpuStruct>::init();
 
-		//RenderDataPtr rd = std::make_shared<RenderData>(*crd);
+	//	//RenderDataPtr rd = std::make_shared<RenderData>(*crd);
 
-		//HgEntity* e = &getEntity();
-		//e->setRenderData(rd);
-	}
+	//	//HgEntity* e = &getEntity();
+	//	//e->setRenderData(rd);
+	//}
 
 	std::string FreetypeTextureLoader::uniqueIdentifier() const
 	{
@@ -345,4 +349,4 @@ setFontIdentifier(loader.uniqueIdentifier());
 
 }//namespace Text
 
-REGISTER_LINKTIME2(Text, HgText::Text);
+//REGISTER_LINKTIME2(Text, HgText::Text);

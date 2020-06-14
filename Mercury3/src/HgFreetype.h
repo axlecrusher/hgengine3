@@ -42,7 +42,7 @@ namespace HgText
 		float matrix[16];
 	};
 
-	class Text : public IUpdatableInstance<gpuStruct>
+	class Text// : public IUpdatableInstance<gpuStruct>
 	{
 	public:
 		using InstanceCollection = InstancedCollection<Text, gpuStruct, 1>;
@@ -63,16 +63,9 @@ namespace HgText
 		Text();
 
 		void setText(std::string str);
-		void BuildVbo();
+		RenderDataPtr CreateRenderData();
 
 		void setFontIdentifier(std::string);
-
-		virtual void update(HgTime tdelta)
-		{}
-
-		virtual void getInstanceData(gpuStruct* instanceData);
-
-		virtual void init();
 
 	private:
 		static uint16_t m_canvasWidth, m_canvasHeight;
