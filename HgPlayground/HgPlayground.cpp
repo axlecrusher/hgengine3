@@ -121,7 +121,8 @@ DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	}
 }
 
-#define ANI_TRIS 4000
+#define CUBE_COUNT 4000
+//#define CUBE_COUNT 150000
 
 //void fire(HgScene* scene) {
 //	HgEntity* entity = NULL;
@@ -276,6 +277,7 @@ int main()
 			textEntity->position(point(1, 2, 0));
 			textEntity->scale(10.0);
 			textEntity->getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
+			RotatingCube::initRotatingCube(textIDs[1]);
 		}
 
 		{
@@ -335,8 +337,9 @@ int main()
 		}
 
 		//Create a lot of rotating cubes
-		auto idList = EntityHelpers::createContiguous(ANI_TRIS);
+		auto idList = EntityHelpers::createContiguous(CUBE_COUNT);
 		scene2.addEntityIDs(idList);
+		Cube::changeToCube(idList);
 		RotatingCube::initRotatingCubes(idList);
 
 		uint32_t i = 0;

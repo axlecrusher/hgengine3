@@ -87,23 +87,25 @@ namespace RotatingCube
 
 	void initRotatingCubes(const EntityIdList& list)
 	{
-		for (auto id : list)
-		{
-			auto cube = EntityTable::Singleton.getPtr(id);
-			change_to_cube(cube);
-		}
-
 		SpinningCubes.entityId.reserve(SpinningCubes.entityId.size() + list.size());
 		SpinningCubes.cubeState.reserve(SpinningCubes.cubeState.size() + list.size());
 		for (auto id : list)
 		{
-			SpinningCubes.entityId.push_back(id);
-			CubeState state;
-			state.rotationTime = HgTime::msec(10000 + ((rand() % 10000) - 5000));
-			SpinningCubes.cubeState.push_back(state);
+			initRotatingCube(id);
+			//SpinningCubes.entityId.push_back(id);
+			//CubeState state;
+			//state.rotationTime = HgTime::msec(10000 + ((rand() % 10000) - 5000));
+			//SpinningCubes.cubeState.push_back(state);
 		}
 	}
 
+	void initRotatingCube(EntityIdType id)
+	{
+		SpinningCubes.entityId.push_back(id);
+		CubeState state;
+		state.rotationTime = HgTime::msec(10000 + ((rand() % 10000) - 5000));
+		SpinningCubes.cubeState.push_back(state);
+	}
 
 	void gcRotatingCubes()
 	{
@@ -151,7 +153,17 @@ void Cube::init() {
 	RenderDataPtr rd = std::make_shared<RenderData>(*crd);
 	e->setRenderData(rd);
 }
+
+void changeToCube(const EntityIdList& list)
+{
+	for (auto id : list)
+	{
+		auto cube = EntityTable::Singleton.getPtr(id);
+		change_to_cube(cube);
+	}
 }
+
+} //namespace Cubee
 
 namespace RotatingCube {
 
