@@ -94,16 +94,20 @@ struct RdDrawOrder
 struct {
 	bool operator()(const RdDrawOrder& a, const RdDrawOrder& b) const
 	{
-		if (a.drawOrder == b.drawOrder)
-		{
-			//sort to ascending entity id
-			if (a.rdPair.ptr == b.rdPair.ptr)
-			{
-				return a.rdPair.entity < b.rdPair.entity;
-			}
-			return a.rdPair.ptr < b.rdPair.ptr;
-		}
-		return a.drawOrder < b.drawOrder;
+		return (a.drawOrder < b.drawOrder) ||
+		((a.drawOrder == b.drawOrder) && (a.rdPair.ptr < b.rdPair.ptr)) ||
+		((a.drawOrder == b.drawOrder) && (a.rdPair.ptr == b.rdPair.ptr) && (a.rdPair.ptr < b.rdPair.ptr));
+
+	//if (a.drawOrder == b.drawOrder)
+	//	{
+	//		//sort to ascending entity id
+	//		if (a.rdPair.ptr == b.rdPair.ptr)
+	//		{
+	//			return a.rdPair.entity < b.rdPair.entity;
+	//		}
+	//		return a.rdPair.ptr < b.rdPair.ptr;
+	//	}
+	//	return a.drawOrder < b.drawOrder;
 	}
 } orderEntitesForDraw;
 
@@ -156,8 +160,8 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 			imd.byteOffset = sizeof(Instancing::GPUTransformationMatrix) * matrixOffset;
 			imd.renderData = t.rdPair.ptr;
 			imd.instanceData = m_vBuffer;
+			lastRDO = t;
 		}
-		lastRDO = t;
 		auto entity = EntityTable::Singleton.getPtr(t.rdPair.entity);
 
 		const auto m = entity->computeWorldSpaceMatrix();
