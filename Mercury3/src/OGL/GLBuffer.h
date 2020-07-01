@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glew.h>
+#include <RefCounterTable.h>
 
 struct GLBufferId
 {
@@ -83,3 +84,6 @@ struct GLVaoId
 
 	GLuint value;
 };
+
+using VaoManager = RefCountedTable< GLVaoId >;
+using VaoIndex = VaoManager::IndexType;

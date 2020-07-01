@@ -12,45 +12,45 @@
 //static void* _currentVbo;
 
 VboManager VboManager::singleton;
-static HgVboRecord emptyRec; // >:(
-
-VboIndex VboManager::InsertVboRecord(HgVboRecord& vboRec) {
-	VboIndexType index;
-	if (m_unusedVboRecords.size() > 0) {
-		index = m_unusedVboRecords.back();
-		m_unusedVboRecords.pop_back();
-		m_vboRecords[index] = vboRec;
-		m_useCount[index] = 1;
-		//fprintf(stderr, "Reusing index %d\n", index);
-	}
-	else {
-		index = (VboIndexType)m_vboRecords.size();
-		m_vboRecords.push_back(vboRec);
-		m_useCount.push_back(1);
-		//fprintf(stderr, "New index %d\n", index);
-	}
-	return VboIndex(index);
-}
-
-void VboManager::IncrementRecordCount(const VboIndex& x) {
-	auto idx = x.Index();
-	if (m_useCount.size() > idx) {
-		m_useCount[idx]++;
-	}
-}
-
-void VboManager::DecrementRecordCount(const VboIndex& x) {
-	auto idx = x.Index();
-	if (m_useCount.size() > idx) {
-		m_useCount[idx]--;
-		if (m_useCount[idx] == 0) {
-			m_unusedVboRecords.push_back(idx);
-			//fprintf(stderr, "reference count reached zero\n");
-			m_vboRecords[idx] = emptyRec;
-			//run cleanup routine here
-		}
-	}
-}
+//static HgVboRecord emptyRec; // >:(
+//
+//VboIndex VboManager::InsertVboRecord(HgVboRecord& vboRec) {
+//	VboIndexType index;
+//	if (m_unusedVboRecords.size() > 0) {
+//		index = m_unusedVboRecords.back();
+//		m_unusedVboRecords.pop_back();
+//		m_vboRecords[index] = vboRec;
+//		m_useCount[index] = 1;
+//		//fprintf(stderr, "Reusing index %d\n", index);
+//	}
+//	else {
+//		index = (VboIndexType)m_vboRecords.size();
+//		m_vboRecords.push_back(vboRec);
+//		m_useCount.push_back(1);
+//		//fprintf(stderr, "New index %d\n", index);
+//	}
+//	return VboIndex(index);
+//}
+//
+//void VboManager::IncrementRecordCount(const VboIndex& x) {
+//	auto idx = x.Index();
+//	if (m_useCount.size() > idx) {
+//		m_useCount[idx]++;
+//	}
+//}
+//
+//void VboManager::DecrementRecordCount(const VboIndex& x) {
+//	auto idx = x.Index();
+//	if (m_useCount.size() > idx) {
+//		m_useCount[idx]--;
+//		if (m_useCount[idx] == 0) {
+//			m_unusedVboRecords.push_back(idx);
+//			//fprintf(stderr, "reference count reached zero\n");
+//			m_vboRecords[idx] = emptyRec;
+//			//run cleanup routine here
+//		}
+//	}
+//}
 
 template<typename T>
 static std::unique_ptr<IHgVbo> vbo_from_api_type() {
@@ -110,46 +110,46 @@ namespace HgVbo {
 		return std::move(vbo_from_api_type<color16>());
 	}
 }
-
-VboIndex::~VboIndex() {
-	Decrement();
-}
-
-VboIndex::VboIndex(const VboIndex& o) : m_idx(o.m_idx) {
-	Increment();
-}
-
-VboIndex::VboIndex(VboIndex&& other) noexcept
-	: m_idx(std::exchange(other.m_idx, 0))
-{
-}
-
-VboIndex& VboIndex::operator=(VboIndex other) noexcept
-{
-	//I don't think decrement or increment need to happen here.
-	//Take it from the copied argument
-	std::swap(m_idx, other.m_idx);
-	return *this;
-}
-
-void VboIndex::Decrement() {
-	if (m_idx != 0) {
-		VboManager::Singleton().DecrementRecordCount(*this);
-	}
-}
-
-void VboIndex::Increment() {
-	if (m_idx != 0) {
-		VboManager::Singleton().IncrementRecordCount(*this);
-	}
-}
-
-HgVboRecord& VboIndex::VboRec() const {
-	if (m_idx != 0) {
-		return VboManager::Singleton().GetVboRecord(*this);
-	}
-	return emptyRec; //eewwww
-}
+//
+//VboIndex::~VboIndex() {
+//	Decrement();
+//}
+//
+//VboIndex::VboIndex(const VboIndex& o) : m_idx(o.m_idx) {
+//	Increment();
+//}
+//
+//VboIndex::VboIndex(VboIndex&& other) noexcept
+//	: m_idx(std::exchange(other.m_idx, 0))
+//{
+//}
+//
+//VboIndex& VboIndex::operator=(VboIndex other) noexcept
+//{
+//	//I don't think decrement or increment need to happen here.
+//	//Take it from the copied argument
+//	std::swap(m_idx, other.m_idx);
+//	return *this;
+//}
+//
+//void VboIndex::Decrement() {
+//	if (m_idx != 0) {
+//		VboManager::Singleton().DecrementRecordCount(*this);
+//	}
+//}
+//
+//void VboIndex::Increment() {
+//	if (m_idx != 0) {
+//		VboManager::Singleton().IncrementRecordCount(*this);
+//	}
+//}
+//
+//HgVboRecord& VboIndex::VboRec() const {
+//	if (m_idx != 0) {
+//		return VboManager::Singleton().GetVboRecord(*this);
+//	}
+//	return emptyRec; //eewwww
+//}
 
 void* HgVboRecord::getBuffer() const {
 	uint8_t* data = (uint8_t*)m_vbo->getBuffer();

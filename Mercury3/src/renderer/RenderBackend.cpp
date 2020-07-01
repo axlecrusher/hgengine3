@@ -28,12 +28,14 @@ static void submit_for_render_serial(const Viewport& vp, const RenderInstance& r
 	HgShader& shader = renderData->getMaterial().getShader();
 	bool shaderCompiled = shader.compile();
 
+	auto& vao = renderData->vao.Record();
+
 	if (shaderCompiled)
 	{
 		//if the shader recompiled, throw out the old VAO and build a new one
-		renderData->vao.Init();
+		vao.Init();
 	}
-	renderData->vao.Enable();
+	vao.Enable();
 
 	auto& imd = ri.imd;
 	if (imd.isValid())
@@ -84,7 +86,7 @@ static void submit_for_render_serial(const Viewport& vp, const RenderInstance& r
 
 		}
 
-		renderData->vao.Disable();
+		vao.Disable();
 }
 
 HgMath::mat4f ViewportRenderTarget::getPerspectiveMatrix() const

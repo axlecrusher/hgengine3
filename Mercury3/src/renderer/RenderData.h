@@ -20,6 +20,7 @@ public:
 	typedef std::shared_ptr<RenderData> RenderDataPtr;
 
 	static RenderDataPtr Create();
+	static RenderDataPtr Create(const RenderDataPtr rdp);
 
 	struct Flags {
 		Flags() : BACKFACE_CULLING(true), DEPTH_WRITE(true)
@@ -34,15 +35,15 @@ public:
 
 	void render(const Instancing::InstancingMetaData* imd = nullptr);
 
-	IHgVbo* hgVbo() { return m_vertexVbo.VboRec().Vbo().get(); }
-	IHgVbo* indexVbo() { return m_indexVbo.VboRec().Vbo().get(); }
-	IHgVbo* colorVbo() { return m_colorVbo.VboRec().Vbo().get(); }
+	IHgVbo* hgVbo() { return m_vertexVbo.Record().Vbo().get(); }
+	IHgVbo* indexVbo() { return m_indexVbo.Record().Vbo().get(); }
+	IHgVbo* colorVbo() { return m_colorVbo.Record().Vbo().get(); }
 
 	void VertexVboRecord(const VboIndex& vbo_index) { m_vertexVbo = vbo_index; }
-	const HgVboRecord& VertexVboRecord() const { return m_vertexVbo.VboRec(); }
+	const HgVboRecord& VertexVboRecord() const { return m_vertexVbo.Record(); }
 
 	void indexVboRecord(const VboIndex& vbo_index) { m_indexVbo = vbo_index; }
-	const HgVboRecord& indexVboRecord() const { return m_indexVbo.VboRec(); }
+	const HgVboRecord& indexVboRecord() const { return m_indexVbo.Record(); }
 
 	void colorVbo(const VboIndex& vbo_index) { m_colorVbo = vbo_index; }
 	//inline void colorVbo(std::unique_ptr<IHgVbo>& vbo) { m_colorVbo = std::move(vbo); }
@@ -61,7 +62,8 @@ public:
 
 	Flags renderFlags;
 
-	GLVaoId vao;
+	//GLVaoId vao;
+	VaoIndex vao;
 
 private:
 	Material m_material;

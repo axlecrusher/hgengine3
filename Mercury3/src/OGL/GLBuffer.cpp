@@ -1,5 +1,7 @@
 #include <GLBuffer.h>
 
+VaoManager VaoManager::singleton;
+
 bool GLBufferId::Init()
 {
 	if (value == 0) {
