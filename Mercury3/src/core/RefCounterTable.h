@@ -15,7 +15,9 @@ public:
 		using IdxType = uint32_t;
 
 		IndexType() : m_idx(0)
-		{}
+		{
+			m_idx = SelfType::Singleton().NewRecord() + 1;
+		}
 
 		~IndexType()
 		{
@@ -87,6 +89,24 @@ public:
 			m_useCount.push_back(1);
 		}
 		return IndexType(index);
+	}
+
+	//Create new record with default constructor
+	auto NewRecord()
+	{
+		IndexType::IdxType index;
+		if (m_unusedRecords.size() > 0) {
+			index = m_unusedRecords.back();
+			m_unusedRecords.pop_back();
+			//m_records[index] = vboRec;
+			m_useCount[index] = 1;
+		}
+		else {
+			index = (IndexType::IdxType)m_records.size();
+			m_records.push_back(T());
+			m_useCount.push_back(1);
+		}
+		return index;
 	}
 
 	const T& getRecord(const IndexType& x) const { return m_records[x.Index()]; }

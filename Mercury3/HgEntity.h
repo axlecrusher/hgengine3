@@ -339,6 +339,16 @@ class HgEntity {
 
 		inline EntityFlags getFlags() const { return flags; }
 
+		inline void clone(HgEntity* other) const
+		{
+			other->m_spacialData = m_spacialData;
+			other->m_drawOrder = m_drawOrder;
+			other->flags = flags;
+
+			auto tmp = getRenderDataPtr();
+			other->setRenderData(tmp);
+		}
+
 		/*	Find an existing entity by id. Returned pointer is managed, do not delete.
 			Return nullptr if the entity does not exist.
 		*/

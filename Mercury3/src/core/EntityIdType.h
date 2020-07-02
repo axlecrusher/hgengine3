@@ -70,7 +70,7 @@ public:
 	EntityIdList createContiguous(uint32_t count);
 
 	//check if an entity exists
-	bool exists(EntityIdType id) const
+	inline bool exists(EntityIdType id) const
 	{
 		const auto idx = id.index();
 		if (idx == 0) return false;
