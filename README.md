@@ -3,6 +3,8 @@ This is the 3rd generation of the Mercury game engine.
 Rewritten from the ground up with a focus on performance, making use of data oriented design while still being easy to use. Mercury 3 includes VR support via OpenVr.
 Its intended to be cross platform, though currently only builds on Windows.
 
+![Screenshot](web/images/screenshot1.jpg)
+
 ### Prior versions
 - Mercury Game Engine Version 1 https://sourceforge.net/projects/hgengine/
 - Mercury Game Engine Version 2 https://github.com/axlecrusher/hgengine
