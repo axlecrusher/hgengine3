@@ -303,6 +303,34 @@ int main()
 		}
 	}
 
+	//{
+	//	auto statueList = EntityHelpers::createContiguous(4);
+	//	scene2.addEntityIDs(statueList);
+	//	auto statueSource = EntityTable::Singleton.getPtr(statueList[0]);
+	//	model_data::load_ini(statueSource, "statue.ini");
+	//	for (int i = 0; i < 4; ++i)
+	//	{
+	//		auto statue = EntityTable::Singleton.getPtr(statueList[i]);
+	//		statueSource->clone(statue);
+	//		statue->origin(statue->origin().x(2).z(3).y(1));
+	//		statue->position(statue->position().x(i));
+	//	}
+	//}
+
+	//{
+	//	auto eratoList = EntityHelpers::createContiguous(1);
+	//	scene2.addEntityIDs(eratoList);
+	//	auto statueSource = EntityTable::Singleton.getPtr(eratoList[0]);
+	//	model_data::load_ini(statueSource, "erato.ini");
+	//	for (int i = 0; i < 1; ++i)
+	//	{
+	//		auto statue = EntityTable::Singleton.getPtr(eratoList[i]);
+	//		statueSource->clone(statue);
+	//		statue->origin(statue->origin().x(2).z(3).y(1));
+	//		statue->position(statue->position().x(i));
+	//	}
+	//}
+
 	//for (int i = 0; i < 4; ++i) {
 	//	HgEntity* statue = NULL;
 	//	scene.getNewEntity(&statue);

@@ -301,7 +301,7 @@ class HgEntity {
 			EntityIdType parentId;
 			if (EntityParentTable::Manager.getParentId(m_entityId, parentId))
 			{
-				//if (EntityIdTable::Manager.exists(parentId)) r = Find(parentId);
+				r = Find(parentId);
 			}
 
 			return r;
