@@ -12,6 +12,7 @@
 //#include <assert.h>
 //#include <RenderBackend.h>
 
+#include <RefCounterTable.h>
 
 /*	Interleaved vertex layout because it is faster to resize when adding
 	more mesh data. New mesh data can just be appened to the end. If it
@@ -163,57 +164,60 @@ private:
 	uint32_t m_offset;
 	uint32_t m_count;
 };
+//
+//class VboIndex {
+//public:
+//	typedef uint32_t VboIndexType;
+//
+//	VboIndex() : m_idx(0)
+//	{}
+//
+//	~VboIndex();
+//	VboIndex(const VboIndex& o);
+//	VboIndex& operator=(VboIndex other) noexcept;
+//	VboIndex(VboIndex&& other) noexcept;
+//
+//	VboIndexType Index() const { return m_idx-1; }
+//
+//	HgVboRecord& VboRec() const;
+//private:
+//	void Decrement();
+//	void Increment();
+//
+//	explicit VboIndex(VboIndexType idx) : m_idx(idx+1)
+//	{}
+//
+//	//void Index(VboIndexType idx) { m_idx = idx+1; }
+//
+//	VboIndexType m_idx;
+//
+//	friend class VboManager;
+//};
 
-class VboIndex {
-public:
-	typedef uint32_t VboIndexType;
+using VboManager = RefCountedTable< HgVboRecord >;
+using VboIndex = VboManager::IndexType;
 
-	VboIndex() : m_idx(0)
-	{}
-
-	~VboIndex();
-	VboIndex(const VboIndex& o);
-	VboIndex& operator=(VboIndex other) noexcept;
-	VboIndex(VboIndex&& other) noexcept;
-
-	VboIndexType Index() const { return m_idx-1; }
-
-	HgVboRecord& VboRec() const;
-private:
-	void Decrement();
-	void Increment();
-
-	explicit VboIndex(VboIndexType idx) : m_idx(idx+1)
-	{}
-
-	//void Index(VboIndexType idx) { m_idx = idx+1; }
-
-	VboIndexType m_idx;
-
-	friend class VboManager;
-};
-
-class VboManager {
-public:
-	typedef VboIndex::VboIndexType VboIndexType;
-	VboIndex InsertVboRecord(HgVboRecord& vboRec);
-
-	const HgVboRecord& GetVboRecord(const VboIndex& x) const { return m_vboRecords[x.Index()]; }
-	HgVboRecord& GetVboRecord(const VboIndex& x) { return m_vboRecords[x.Index()]; }
-
-	static VboManager& Singleton() { return singleton; }
-
-private:
-	void IncrementRecordCount(const VboIndex& x);
-	void DecrementRecordCount(const VboIndex& x);
-
-	std::vector< HgVboRecord > m_vboRecords;
-	std::vector< uint32_t > m_useCount;
-	std::vector< uint32_t > m_unusedVboRecords;
-
-	static VboManager singleton;
-	friend class VboIndex;
-};
+//class VboManager {
+//public:
+//	typedef VboIndex::VboIndexType VboIndexType;
+//	VboIndex InsertVboRecord(HgVboRecord& vboRec);
+//
+//	const HgVboRecord& GetVboRecord(const VboIndex& x) const { return m_vboRecords[x.Index()]; }
+//	HgVboRecord& GetVboRecord(const VboIndex& x) { return m_vboRecords[x.Index()]; }
+//
+//	static VboManager& Singleton() { return singleton; }
+//
+//private:
+//	void IncrementRecordCount(const VboIndex& x);
+//	void DecrementRecordCount(const VboIndex& x);
+//
+//	std::vector< HgVboRecord > m_vboRecords;
+//	std::vector< uint32_t > m_useCount;
+//	std::vector< uint32_t > m_unusedVboRecords;
+//
+//	static VboManager singleton;
+//	friend class VboIndex;
+//};
 
 namespace HgVbo {
 	//Factory Function
@@ -228,7 +232,7 @@ namespace HgVbo {
 
 		std::shared_ptr<IHgVbo> vbo = Create<T>();
 		auto offset = vbo->add_data<T>(data, count);
-		return VboManager::Singleton().InsertVboRecord(HgVboRecord(vbo, offset, count));
+		return VboManager::Singleton().InsertRecord(HgVboRecord(vbo, offset, count));
 	}
 
 	template<typename T>
@@ -239,7 +243,7 @@ namespace HgVbo {
 
 		static std::shared_ptr<IHgVbo> vbo = Create<T>();
 		auto offset = vbo->add_data<T>(data, count);
-		return VboManager::Singleton().InsertVboRecord(HgVboRecord(vbo, offset, count));
+		return VboManager::Singleton().InsertRecord(HgVboRecord(vbo, offset, count));
 	}
 
 

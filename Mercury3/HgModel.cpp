@@ -198,7 +198,7 @@ bool model_data::load_ini(HgEntity* entity, const IniLoader::Contents& contents)
 	entity->position(position);
 	entity->orientation(orientation);
 
-	auto renderData = entity->renderData();
+	auto renderData = entity->getRenderDataPtr().get();
 
 	if (!vertexShader.empty() && !fragmentShader.empty())
 		renderData->getMaterial().setShader( HgShader::acquire(vertexShader.c_str(), fragmentShader.c_str()) );

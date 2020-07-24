@@ -20,6 +20,13 @@ RenderDataPtr RenderData::Create()
 	return rd;
 }
 
+RenderDataPtr RenderData::Create(const RenderDataPtr rdp)
+{
+	auto t = new RenderData(*rdp);
+	std::shared_ptr<RenderData> rd(t);
+	return rd;
+}
+
 void RenderData::render(const Instancing::InstancingMetaData* imd) {
 	auto vertex = hgVbo();
 	auto idx = indexVbo();

@@ -112,7 +112,7 @@ render_packet* create_render_packet(HgEntity* e, const Viewport& vp, HgCamera* c
 		rp->position = e->position();
 		rp->rotation = e->orientation();
 		rp->scale = e->scale();
-		rp->renderData = e->renderData();
+		rp->renderData = e->getRenderDataPtr().get();
 	}
 	rp->camera = *camera;
 	rp->viewport = vp;

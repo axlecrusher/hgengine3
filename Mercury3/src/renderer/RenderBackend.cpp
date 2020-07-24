@@ -28,12 +28,14 @@ static void submit_for_render_serial(const Viewport& vp, const RenderInstance& r
 	HgShader& shader = renderData->getMaterial().getShader();
 	bool shaderCompiled = shader.compile();
 
+	auto& vao = renderData->vao.Record();
+
 	if (shaderCompiled)
 	{
 		//if the shader recompiled, throw out the old VAO and build a new one
-		renderData->vao.Init();
+		vao.Init();
 	}
-	renderData->vao.Enable();
+	vao.Enable();
 
 	auto& imd = ri.imd;
 	if (imd.isValid())
@@ -84,7 +86,7 @@ static void submit_for_render_serial(const Viewport& vp, const RenderInstance& r
 
 		}
 
-		renderData->vao.Disable();
+		vao.Disable();
 }
 
 HgMath::mat4f ViewportRenderTarget::getPerspectiveMatrix() const
@@ -158,20 +160,21 @@ void RenderQueue::Enqueue(const Instancing::InstancingMetaData& imd)
 velocity ComputeVelocity(const HgMath::mat4f& worldSpace, HgEntity* e, const HgTime& dt)
 {
 	//try to compute the velocity of an entity based on the previous rendered position
-	point currentPosition;
+	vector3f currentPosition,  prevPosition;
 
-	auto& spd = e->getSpacialData();
-	bool hasPrevious = spd.hasPrevious();
+	bool hasPrevious = PreviousPositionTable::Manager.get(e->getEntityId(), prevPosition);
 
 	//compute the position based on this game update loop result
 	transformPoint(worldSpace, vectorial::vec3f::zero()).store(currentPosition.raw());
-	const auto delta = currentPosition - spd.PreviousPosition();
 
 	//store the current position for use in the next render
-	spd.PreviousPosition(currentPosition);
+	PreviousPositionTable::Manager.insert(e->getEntityId(), currentPosition);
 
 	if (hasPrevious)
+	{
+		const auto delta = currentPosition - prevPosition;
 		return (delta / dt); //velocity
+	}
 
 	return velocity();
 }

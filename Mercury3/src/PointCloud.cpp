@@ -57,8 +57,8 @@ void PointCloud::buildFromVertexData(const vbo_layout_vnut* vboData, const uint3
 	}
 
 	const auto vbo = HgVbo::GenerateUniqueFrom(m_points.data(), m_points.size());
-	getEntity().renderData()->VertexVboRecord(vbo);
-	getEntity().renderData()->setPrimitiveType(HgEngine::PrimitiveType::POINTS);
+	getEntity().getRenderDataPtr()->VertexVboRecord(vbo);
+	getEntity().getRenderDataPtr()->setPrimitiveType(HgEngine::PrimitiveType::POINTS);
 }
 
 } //PointCloud namespace

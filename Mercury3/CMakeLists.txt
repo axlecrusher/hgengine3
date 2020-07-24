@@ -64,7 +64,7 @@ add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC} ${CORE
 target_compile_options(hgengine PRIVATE ${WIDECHAR})
 
 target_include_directories(hgengine PUBLIC "./")
-target_include_directories(hgengine PUBLIC "include/" "include/stb")
+target_include_directories(hgengine PUBLIC "include/" "include/stb" "include/tinyobjloader")
 target_include_directories(hgengine PUBLIC ${OGGINCLUDE})
 target_include_directories(hgengine PUBLIC ${FREETYPE_INCLUDE})
 target_include_directories(hgengine PUBLIC "src/")

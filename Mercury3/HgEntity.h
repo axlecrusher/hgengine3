@@ -66,22 +66,21 @@ struct SPI
 	vertex3f origin; //12 bytes
 };
 
+
+
 class SpacialData {
 private:
 	SPI m_spi;
-
-	bool m_hasPrevious;
-	vertex3f m_prevPosition;
 public:
-	SpacialData() : m_hasPrevious(false)
+	SpacialData()
 	{}
 
 	inline const vertex3f origin() const { return m_spi.origin; }
 	inline void origin(const vertex3f& p) { m_spi.origin = p; }
 
-	inline bool hasPrevious() const { return m_hasPrevious; }
-	inline const vertex3f& PreviousPosition() const { return m_prevPosition; }
-	inline void PreviousPosition(const vertex3f& p) { m_hasPrevious = true; m_prevPosition = p; }
+	//inline bool hasPrevious() const { return m_hasPrevious; }
+	//inline const vertex3f& PreviousPosition() const { return m_prevPosition; }
+	//inline void PreviousPosition(const vertex3f& p) { m_hasPrevious = true; m_prevPosition = p; }
 
 	//inline vertex3f& position() { return m_position; }
 	inline const vertex3f& position() const { return m_spi.position; }
@@ -94,8 +93,23 @@ public:
 	inline float scale() const { return m_spi.scale; }
 	inline void scale(float s) { m_spi.scale = s; }
 
-	inline const SPI getSPI() const { return m_spi; }
+	inline const SPI& getSPI() const { return m_spi; }
 	inline SPI& getSPI() { return m_spi; }
+};
+
+class PreviousPositionTable
+{
+	static inline auto notFound() { return std::numeric_limits<int32_t>::max(); }
+
+public:
+	void insert(EntityIdType id, vertex3f p);
+	bool get(EntityIdType id, vertex3f& pp);
+
+	static PreviousPositionTable Manager;
+private:
+
+	std::unordered_map<EntityIdType, vertex3f> m_positions;
+	//std::vector<EntityIdType> m_parents;
 };
 
 //typedef uint32_t EntityIdType;
@@ -177,62 +191,51 @@ private:
 	std::string m_blankName;
 };
 
-class EntityTable
+class EntityParentTable
 {
-	//Based on http://bitsquid.blogspot.com/2014/08/building-data-oriented-entity-system.html
+	static inline auto notFound() { return std::numeric_limits<int32_t>::max(); }
+
 public:
-	static const uint32_t MAX_ENTRIES = (1 << EntityIdType::INDEX_BITS);
-	//static const uint32_t MAX_ENTRIES = 5; //for testing create() assert
-	EntityTable()
-	{
-		m_generation.reserve(MAX_ENTRIES);
-		m_entityTotal = 0;
-		m_entityActive = 0;
-	}
+	void setParent(EntityIdType id, EntityIdType parentId);
+	bool getParentId(EntityIdType id, EntityIdType& parent);
 
-	//create a new entity id
-	EntityIdType create();
-
-	//check if an entity exists
-	bool exists(EntityIdType id) const
-	{
-		const auto idx = id.index();
-		if (idx < m_generation.size())
-		{
-			return (m_generation[idx] == id.generation());
-		}
-		return false; //this should never happen
-	}
-
-	//destroy an entity
-	void destroy(EntityIdType id);
-
-	//total number of entites ever created
-	uint32_t totalEntities() const { return m_entityTotal; }
-
-	//current number of entities in existance
-	uint32_t numberOfEntitiesExisting() const { return m_entityActive; }
-
-
-	static EntityTable Manager;
-
+	static EntityParentTable Manager;
 private:
-	inline EntityIdType combine_bytes(uint32_t idx, uint8_t generation)
-	{
-		const uint32_t id = (generation << EntityIdType::INDEX_BITS) | idx;
-		return id;
-	}
 
-	std::vector<uint8_t> m_generation;
-
-	/* I think a deque is better than a list here because there
-	would be fewer heap allocaitons/fragmentation. */
-	std::deque<uint32_t> m_freeIndices;
-
-	uint32_t m_entityTotal; //total number of entities that have ever existed
-	uint32_t m_entityActive; //number of entities currently in existance
+	std::unordered_map<EntityIdType, EntityIdType> m_parents;
+	//std::vector<EntityIdType> m_parents;
 };
 
+struct EntityRDIdxPair
+{
+	EntityIdType entity;
+	int32_t idx;
+}; 
+
+struct EntityRDPair
+{
+	EntityIdType entity;
+	RenderDataPtr ptr;
+};
+
+class RenderDataTable
+{
+	static inline auto notFound() { return std::numeric_limits<int32_t>::max(); }
+
+public:
+	using RenderDataId = int32_t;
+
+	void insert(EntityIdType id, const RenderDataPtr& rd);
+	RenderDataPtr get(EntityIdType id) const;
+
+	//returns vector of entity and render data index pairs
+	std::vector<EntityRDPair> getRenderDataForEntities(EntityIdType* id, int32_t count) const;
+
+	static RenderDataTable Manager;
+private:
+	std::vector<uint8_t> m_entityGeneration; //generation of entity that stored the render data
+	std::vector<RenderDataPtr> m_renderData;
+};
 
 //Compute local transformation matrix
 HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale = true, bool applyRotation = true, bool applyTranslation = true);
@@ -244,17 +247,14 @@ having HgEntity free render data by default and then
 handling special cases.
 */
 class HgEntity {
-public:
-		HgEntity()
-			:/* m_updateNumber(0), */m_renderData(nullptr)
-		{}
-
+	public:
+		HgEntity();
 		~HgEntity();
 
-		HgEntity(const HgEntity &other) = delete;
-		HgEntity(HgEntity &&); //move operator
+		//HgEntity(const HgEntity &other) = delete;
+		//HgEntity(HgEntity &&); //move operator
 
-		void init();
+		void init(EntityIdType id = EntityIdType());
 		void destroy();
 
 		inline EntityIdType getEntityId() const { return m_entityId; }
@@ -277,7 +277,7 @@ public:
 		SpacialData& getSpacialData() { return m_spacialData; }
 		void setSpacialData(const SpacialData& x) { m_spacialData = x; }
 
-		inline bool isRenderable() const { return m_renderData != nullptr; }
+		inline bool isRenderable() const { return getRenderDataPtr() != nullptr; }
 		//inline void render() { if (isRenderable()) m_renderData->render();  }
 
 		//inline bool needsUpdate(uint32_t updateNumber) const { return ((m_updateNumber != updateNumber)); }
@@ -292,26 +292,30 @@ public:
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
 		//void updateGpuTextures();
 
-		inline void setParent(HgEntity* parent) { m_parentId = parent->getEntityId(); }
-		inline void setParent(EntityIdType id) { m_parentId = id; }
+		inline void setParent(EntityIdType id) { EntityParentTable::Manager.setParent(m_entityId, id); }
 		
 		inline EntityLocator::SearchResult getParent() const
 		{
 			EntityLocator::SearchResult r;
 
-			if (EntityTable::Manager.exists(m_parentId)) r = Find(m_parentId);
+			EntityIdType parentId;
+			if (EntityParentTable::Manager.getParentId(m_entityId, parentId))
+			{
+				r = Find(parentId);
+			}
+
 			return r;
 		}
 
-		inline void setChild(HgEntity* child) { child->setParent(this); }
+		//inline void setChild(HgEntity* child) { child->setParent(this); }
 
-		inline void setRenderData(std::shared_ptr<RenderData>& rd) { m_renderData = rd; }
+		inline void setRenderData(std::shared_ptr<RenderData>& rd) { RenderDataTable::Manager.insert(m_entityId, rd); }
 
-		RenderData* renderData() { return m_renderData.get(); }
-		const RenderData* renderData() const { return m_renderData.get(); }
+		//RenderData* renderData() { return m_renderData.get(); }
+		//const RenderData* renderData() const { return m_renderData.get(); }
 
-		RenderDataPtr& getRenderDataPtr() { return m_renderData; }
-		const RenderDataPtr& getRenderDataPtr() const { return m_renderData; }
+		RenderDataPtr getRenderDataPtr() { return RenderDataTable::Manager.get(m_entityId); }
+		const RenderDataPtr getRenderDataPtr() const { return RenderDataTable::Manager.get(m_entityId); }
 
 		//inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 
@@ -335,6 +339,16 @@ public:
 
 		inline EntityFlags getFlags() const { return flags; }
 
+		inline void clone(HgEntity* other) const
+		{
+			other->m_spacialData = m_spacialData;
+			other->m_drawOrder = m_drawOrder;
+			other->flags = flags;
+
+			auto tmp = getRenderDataPtr();
+			other->setRenderData(tmp);
+		}
+
 		/*	Find an existing entity by id. Returned pointer is managed, do not delete.
 			Return nullptr if the entity does not exist.
 		*/
@@ -343,21 +357,118 @@ private:
 
 	static EntityNameTable EntityNames;
 
-	//static EntityIdType m_nextEntityId;
-	static EntityLocator& Locator();
+	//static EntityLocator& Locator();
 
+	//RenderDataPtr m_renderData;
 	SpacialData m_spacialData; //local transormations
 	EntityIdType m_entityId;
 
-	RenderDataPtr m_renderData;
-
-	EntityIdType m_parentId;
-	//uint32_t m_updateNumber;
 	int8_t m_drawOrder;
 
 	EntityFlags flags;
-public:
 };
+
+
+class EntityTable
+{
+public:
+
+	EntityTable()
+	{
+	}
+
+	//create a new entity
+	inline HgEntity create()
+	{
+		const auto id = EntityIdTable::Manager.create();
+
+		HgEntity e;
+		e.init(id);
+
+		const auto idx = id.index();
+
+		if (idx >= m_entities.size())
+		{
+			m_entities.resize(idx + 1000);
+		}
+		return m_entities[idx];
+	}
+
+	//create multiple entities from an EntityIdList
+	inline void createMultiple(const EntityIdList& list)
+	{
+		allocateId(list.back());
+		for (auto id : list)
+		{
+			allocateId(id);
+
+			const auto idx = id.index();
+			m_entities[idx].init(id);
+		}
+	}
+
+	inline void store(const HgEntity& e)
+	{
+		const auto id = e.getEntityId();
+		if (EntityIdTable::Manager.exists(id))
+		{
+			const auto idx = id.index();
+			if (idx >= m_entities.size())
+			{
+				m_entities.resize(idx + 1000);
+			}
+
+			m_entities[idx] = e;
+		}
+	}
+
+	inline HgEntity* getPtr(EntityIdType id)
+	{
+		if (EntityIdTable::Manager.exists(id))
+		{
+			const auto idx = id.index();
+			if (idx < m_entities.size())
+			{
+				HgEntity* ptr = &m_entities[idx];
+				if (ptr->getEntityId() == id)
+				{
+					return ptr;
+				}
+			}
+		}
+		return nullptr;
+	}
+
+	//destroy an entity
+	void destroy(EntityIdType id);
+
+	static EntityTable Singleton;
+
+private:
+
+	//allocate entity storage for id
+	inline void allocateId(EntityIdType id)
+	{
+		const auto idx = id.index();
+		if (idx >= m_entities.size())
+		{
+			m_entities.resize(idx + 1000);
+		}
+	}
+
+	std::vector<HgEntity> m_entities;
+};
+
+namespace EntityHelpers
+{
+	//Create a contiguous block of entities. Allocates IDs and Entity storage.
+	inline EntityIdList createContiguous(uint32_t count)
+	{
+		auto idList = EntityIdTable::Manager.createContiguous(count);
+		EntityTable::Singleton.createMultiple(idList);
+		return idList;
+	}
+}
 
 namespace Events
 {

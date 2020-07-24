@@ -14,10 +14,13 @@
 
 #include <EventSystem.h>
 #include <HgEngine.h>
+#include <EntityIdType.h>
 
-EntityTable EntityTable::Manager;
+EntityTable EntityTable::Singleton;
+EntityParentTable EntityParentTable::Manager;
+RenderDataTable RenderDataTable::Manager;
+PreviousPositionTable PreviousPositionTable::Manager;
 EntityNameTable HgEntity::EntityNames;
-
 
 void RegisterEntityType(const char* c, factory_clbk factory) {
 	Engine::entity_factories[c] = factory;
@@ -28,14 +31,14 @@ void EntityLocator::RegisterEntity(HgEntity* entity)
 	std::lock_guard<std::mutex> m_lock(m_mutex);
 
 	const auto id = entity->getEntityId();
-	if (!EntityTable::Manager.exists(id)) return;
+	if (!EntityIdTable::Manager.exists(id)) return;
 
 	m_entities[id] = entity;
 }
 
 void EntityLocator::RemoveEntity(EntityIdType id)
 {
-	if (!EntityTable::Manager.exists(id)) return;
+	if (!EntityIdTable::Manager.exists(id)) return;
 
 	std::lock_guard<std::mutex> m_lock(m_mutex);
 
@@ -49,7 +52,7 @@ void EntityLocator::RemoveEntity(EntityIdType id)
 EntityLocator::SearchResult EntityLocator::Find(EntityIdType id) const
 {
 	SearchResult result;
-	if (EntityTable::Manager.exists(id))
+	if (EntityIdTable::Manager.exists(id))
 	{
 		std::lock_guard<std::mutex> m_lock(m_mutex);
 
@@ -62,15 +65,18 @@ EntityLocator::SearchResult EntityLocator::Find(EntityIdType id) const
 	return result;
 }
 
-EntityLocator& HgEntity::Locator()
-{
-	static EntityLocator locator;
-	return locator;
-}
+//EntityLocator& HgEntity::Locator()
+//{
+//	static EntityLocator locator;
+//	return locator;
+//}
 
 EntityLocator::SearchResult HgEntity::Find(EntityIdType id)
 {
-	return Locator().Find(id);
+	EntityLocator::SearchResult r;
+	r.entity = EntityTable::Singleton.getPtr(id);
+	return r;
+	//return Locator().Find(id);
 }
 
 namespace Events
@@ -120,39 +126,9 @@ int32_t EntityNameTable::findName(EntityIdType id)
 	return idx;
 }
 
-EntityIdType EntityTable::create()
-{
-	uint32_t idx = 0;
-	if (m_freeIndices.size() > 1024)
-	{
-		idx = m_freeIndices.front();
-		m_freeIndices.pop_front();
-	}
-	else
-	{
-		idx = (uint32_t)m_generation.size();
-		assert(idx < MAX_ENTRIES);
-		m_generation.push_back(0); //what happens when we reach 2^22 ?
-	}
 
-	m_entityTotal++;
-	m_entityActive++;
 
-	return combine_bytes(idx, m_generation[idx]);
-}
 
-void EntityTable::destroy(EntityIdType id)
-{
-	const auto idx = id.index();
-
-	if (exists(id))
-	{
-		//increment generation to invalidate current generation in the wild.
-		m_generation[idx]++;
-		m_freeIndices.push_back(idx);
-		m_entityActive--;
-	}
-}
 
 const std::string& EntityNameTable::getName(EntityIdType id)
 {
@@ -164,23 +140,116 @@ const std::string& EntityNameTable::getName(EntityIdType id)
 	return m_names[idx].name;
 }
 
-void HgEntity::init()
+void EntityParentTable::setParent(EntityIdType id, EntityIdType parentId)
 {
-	EntityTable::Manager.destroy(m_entityId);
+	m_parents[id] = parentId;
+}
 
-	m_renderData = nullptr;
-	//m_logic = nullptr;
-	m_renderData = nullptr;
+bool EntityParentTable::getParentId(EntityIdType id, EntityIdType& parent)
+{
+	const auto itr = m_parents.find(id);
+	if (itr == m_parents.end())
+	{
+		return false;
+	}
+	parent = itr->second;
+	return true;
+}
 
-	auto tmp = EntityIdType();
-	m_parentId = tmp;
-	//m_updateNumber = 0;
+template< typename T >
+typename std::vector<T>::iterator
+insert_sorted(std::vector<T> & vec, T const& item)
+{
+	return vec.insert
+	(
+		std::upper_bound(vec.begin(), vec.end(), item),
+		item
+	);
+}
+
+
+void RenderDataTable::insert(EntityIdType id, const RenderDataPtr& rd)
+{
+	const auto idx = id.index();
+
+	if (m_entityGeneration.size() <= idx)
+	{
+		const uint32_t newSize = idx + 10000;
+		m_entityGeneration.resize(newSize);
+		m_renderData.resize(newSize);
+	}
+
+	m_entityGeneration[idx] = id.generation();
+	m_renderData[idx] = rd;
+}
+
+std::vector<EntityRDPair> RenderDataTable::getRenderDataForEntities(EntityIdType* id, int32_t count) const
+{
+	std::vector<EntityRDPair> r;
+	r.reserve(count);
+
+	for (int32_t i = 0; i < count; i++)
+	{
+		const auto entityid = id[i];
+		const auto idx = entityid.index();
+
+		if (m_entityGeneration.size() >= idx && m_entityGeneration[idx] == entityid.generation())
+		{
+			r.push_back({ entityid, m_renderData[idx] });
+		}
+	}
+
+	return r;
+}
+
+
+RenderDataPtr RenderDataTable::get(EntityIdType id) const
+{
+	auto idx = id.index();
+	if ((idx < m_renderData.size())
+		&& (m_entityGeneration[idx] == id.generation()))
+	{
+		return m_renderData[idx];
+	}
+	return nullptr;
+}
+
+void PreviousPositionTable::insert(EntityIdType id, vertex3f p)
+{
+	m_positions[id] = p;
+}
+
+bool PreviousPositionTable::get(EntityIdType id, vertex3f& pp)
+{
+	const auto itr = m_positions.find(id);
+	if (itr == m_positions.end())
+	{
+		return false;
+	}
+	pp = itr->second;
+	return true;
+}
+
+HgEntity::HgEntity()
+{
+}
+
+void HgEntity::init(EntityIdType id)
+{
+	EntityIdTable::Manager.destroy(m_entityId);
 
 	m_drawOrder = 0;
 
-	m_entityId = EntityTable::Manager.create();
+	if (EntityIdTable::Manager.exists(id))
+	{
+		m_entityId = id;
+	}
+	else
+	{
+		m_entityId = EntityIdTable::Manager.create();
+	}
 
-	Locator().RegisterEntity(this);
+	//Locator().RegisterEntity(this);
 	EventSystem::PublishEvent(Events::EntityCreated(this, m_entityId));
 }
 
@@ -188,32 +257,32 @@ HgEntity::~HgEntity() {
 	destroy();
 }
 
-HgEntity::HgEntity(HgEntity &&rhs)
-{
-	m_spacialData = std::move(rhs.m_spacialData);
-	m_renderData = std::move(rhs.m_renderData);
-	//m_logic = std::move(rhs.m_logic);
-	m_parentId = std::move(rhs.m_parentId);
-	//m_updateNumber = std::move(rhs.m_updateNumber);
-	m_drawOrder = std::move(rhs.m_drawOrder);
-	flags = std::move(rhs.flags);
-
-	//setLogic(std::move(m_logic)); //reset logic pointer
-
-	std::swap(m_entityId, rhs.m_entityId);
-	Locator().RegisterEntity(this);
-
-	rhs.destroy();
-}
+//HgEntity::HgEntity(HgEntity &&rhs)
+//{
+//	m_spacialData = std::move(rhs.m_spacialData);
+//	//m_renderData = std::move(rhs.m_renderData);
+//	//m_logic = std::move(rhs.m_logic);
+//	//m_parentId = std::move(rhs.m_parentId);
+//	//m_updateNumber = std::move(rhs.m_updateNumber);
+//	m_drawOrder = std::move(rhs.m_drawOrder);
+//	flags = std::move(rhs.flags);
+//
+//	//setLogic(std::move(m_logic)); //reset logic pointer
+//
+//	std::swap(m_entityId, rhs.m_entityId);
+//	Locator().RegisterEntity(this);
+//
+//	rhs.destroy();
+//}
 
 
 void HgEntity::destroy()
 {
 	EventSystem::PublishEvent(Events::EntityDestroyed(this, m_entityId));
-	Locator().RemoveEntity(m_entityId);
+	//Locator().RemoveEntity(m_entityId);
 
-	m_renderData.reset();
-	EntityTable::Manager.destroy(m_entityId);
+	//m_renderData.reset();
+	//EntityIdTable::Manager.destroy(m_entityId);
 }
 
 HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool applyRotation, bool applyTranslation)
@@ -247,7 +316,11 @@ HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool 
 }
 
 HgMath::mat4f HgEntity::computeWorldSpaceMatrix(const bool applyScale, bool applyRotation, bool applyTranslation) const {
-	if (EntityTable::Manager.exists(m_parentId))
+	EntityIdType parentId;
+	const bool hasParent = EntityParentTable::Manager.getParentId(m_entityId, parentId);
+
+
+	if (hasParent && EntityIdTable::Manager.exists(parentId))
 	{
 		return computeWorldSpaceMatrixIncludeParent(applyScale, applyRotation, applyTranslation);
 	}

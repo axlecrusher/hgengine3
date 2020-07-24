@@ -18,6 +18,8 @@ public:
 	Material();
 	Material(const Material& other);
 
+	Material& operator=(const Material& rhs);
+
 	void clearTextureIDs();
 
 	void setShader(HgShader* shader);
@@ -52,7 +54,7 @@ private:
 		void operator()(HgShader* shader);
 	};
 
-	std::unique_ptr<HgShader, ShaderDeleter> m_shader;
+	std::unique_ptr<HgShader, ShaderDeleter> m_shader; // TODO: make this auto copy so we can use automic copy constructor and =
 	std::vector< HgTexture::TexturePtr > m_textures;
 	BlendMode m_blendMode;
 	HgTexture::Handle m_gpuTextureHandles[HgTexture::TEXTURE_TYPE_COUNT];

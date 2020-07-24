@@ -6,6 +6,8 @@
 #include <typeinfo>
 #include <unordered_map>
 
+#include <core/Instancing.h>
+
 class HgEntity;
 class RenderQueue;
 class IUpdatableCollection;
@@ -34,6 +36,7 @@ typedef HgEntity*(*factoryCallback)(HgScene* scene);
 class HgScene
 {
 public:
+	HgScene();
 
 	/*	Attempts to create an object of type type_str.
 		Returns nullptr on failure. HgEntity pointer on success.
@@ -101,10 +104,27 @@ public:
 		return &typedObject->getEntity();
 	}
 
+	inline void addEntityID(const EntityIdType id)
+	{
+		m_entities.push_back(id);
+	}
+
+	inline void addEntityIDs(const EntityIdList list)
+	{
+		m_entities.insert(m_entities.end(), list.begin(), list.end());
+	}
+
 private:
 	using IUpdatableCollectionPtr = std::shared_ptr<IUpdatableCollection>;
 	std::vector<IUpdatableCollectionPtr> m_collections;
 	std::unordered_map< std::string, IUpdatableCollectionPtr> m_collectionMap;
+
+	void RemoveInvalidEntities();
+
+	EntityIdList m_entities;
+	EntityIdList m_tmpEntities;
+	std::vector< Instancing::GPUTransformationMatrix > m_modelMatrices;
+	std::shared_ptr<IHgGPUBuffer> m_vBuffer;
 
 	static std::unordered_map<std::string, factoryCallback> m_entityFactories;
 };

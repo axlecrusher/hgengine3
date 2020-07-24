@@ -32,7 +32,11 @@ namespace Cube {
 		void init();
 	private:
 	};
+
+	void changeToCube(const EntityIdList& list);
 }
+
+void* change_to_cube(HgEntity* entity);
 
 namespace RotatingCube {
 	struct CubeState
@@ -40,6 +44,18 @@ namespace RotatingCube {
 		HgTime age;
 		HgTime rotationTime;
 	};
+
+	struct SpinningCubeTables
+	{
+		std::vector<EntityIdType> entityId;
+		std::vector<CubeState> cubeState;
+	};
+
+	void initRotatingCube(EntityIdType id);
+	void initRotatingCubes(const EntityIdList& list);
+	void gcRotatingCubes();
+	void updateRotatingCubes(HgTime dt);
+
 
 	struct DataOrientedStruct; //forward declare
 

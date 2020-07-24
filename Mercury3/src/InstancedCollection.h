@@ -9,14 +9,6 @@
 
 #include <OGL/VertexAttributeBuffer.h>
 
-namespace Instancing
-{
-	struct GPUTransformationMatrix
-	{
-		float matrix[16];
-	};
-}
-
 //Stride is how many gpuStructs are used per instance of T
 template<typename T, typename gpuStruct, int stride>
 class InstancedCollection : public IUpdatableCollection {
@@ -65,8 +57,10 @@ public:
 			}
 
 			//m_items can change and b expanded. only store the index to the item.
-			const IdxSort t = { (size_t)entity.renderData(),itr.index()};
-			m_updatedItemIdx.push_back(t);
+			//const IdxSort t = { (size_t)entity.getRenderDataPtr().get(),itr.index()};
+			//m_updatedItemIdx.push_back(t);
+			//m_updatedItemIdx.push_back(itr.index());
+			m_updatedItemIdx.push_back(entity.getEntityId());
 		}
 
 		//if a thing is enqueued for rendering here, a different part
@@ -75,68 +69,89 @@ public:
 		//Enqueue in second pass after updates.
 	}
 
+	struct {
+		bool operator()(const EntityRDPair& a, const EntityRDPair& b) const
+		{
+			if (a.ptr == b.ptr)
+			{
+				return a.entity < b.entity;
+			}
+			return a.ptr < b.ptr;
+		}
+	} orderByRenderData;
 
 	virtual void EnqueueForRender(RenderQueue* queue, HgTime dt) final {
 		if (m_updatedItemIdx.empty()) return;
 
-		//Pointer address is used as the hash id
-		//std::unordered_map<size_t, GPUInstanceMetaData<gpuStruct> > instances;
+		auto renderDatas = RenderDataTable::Manager.getRenderDataForEntities(m_updatedItemIdx.data(), m_updatedItemIdx.size());
 
-		//Group item instances into groups that can be instance rendered
-		//gpuStruct* instanceDataPtr = m_instanceData->getBuffer();
+		std::sort(renderDatas.begin(), renderDatas.end(), orderByRenderData);
 
-		auto instanceDataPtr = m_modelMatrices.data();
-		const auto bufferBeginPtr = instanceDataPtr;
+		////Pointer address is used as the hash id
+		////std::unordered_map<size_t, GPUInstanceMetaData<gpuStruct> > instances;
 
-		std::sort(m_updatedItemIdx.begin(), m_updatedItemIdx.end());
+		////Group item instances into groups that can be instance rendered
+		////gpuStruct* instanceDataPtr = m_instanceData->getBuffer();
 
-		m_vBuffer->setDataSource(m_modelMatrices);
-		m_vBuffer->setNeedsLoadToGPU(true); //entire vector contents needs to be sent to the GPU
-		//vBuffer->setType(BUFFER_TYPE::VERTEX_ATTRIBUTES);
+		//auto instanceDataPtr = m_modelMatrices.data();
+		//const auto bufferBeginPtr = instanceDataPtr;
 
-		//Need a way to indicate how the data in vBuffer is supposed to be used.
-		//Is it vertex attribute. Is it a sample buffer? How do you use it? How is it tied to a specific attribute?
+		//std::sort(m_updatedItemIdx.begin(), m_updatedItemIdx.end());
 
+		//m_vBuffer->setDataSource(m_modelMatrices);
+		//m_vBuffer->setNeedsLoadToGPU(true); //entire vector contents needs to be sent to the GPU
+		////vBuffer->setType(BUFFER_TYPE::VERTEX_ATTRIBUTES);
 
+		////Need a way to indicate how the data in vBuffer is supposed to be used.
+		////Is it vertex attribute. Is it a sample buffer? How do you use it? How is it tied to a specific attribute?
 
-		std::vector< Instancing::InstancingMetaData > instances;
+		//std::vector<EntityIdType> updatedEntities(m_updatedItemIdx.size(), 0);
+		//for (int i = 0; i < 0; i++)
+		//{
+		//	const auto id = getItem(m_updatedItemIdx[i])->getEntity().getEntityId();
+		//	updatedEntities[i] = id;
+		//}
 
-		size_t lastHashId = 0;
-		Instancing::InstancingMetaData* ptr = nullptr;
+		//auto rd = RenderDataTable::Manager.getRenderDataForEntities(updatedEntities.data(), updatedEntities.size());
 
-		for (auto item : m_updatedItemIdx)
-		{
-			if (item.hashId != lastHashId)
-			{
-				lastHashId = item.hashId;
-				const auto idx = instances.size();
-				instances.emplace_back( m_vBuffer );
-				ptr = &instances[idx];
-				ptr->byteOffset = (instanceDataPtr - bufferBeginPtr) * sizeof(gpuStruct); //compute offset into buffer
-			}
+		//std::vector< Instancing::InstancingMetaData > instances;
 
-			auto itr = getItem(item.idx);
-			const HgEntity& entity = itr->getEntity();
+		//size_t lastHashId = 0;
+		//Instancing::InstancingMetaData* ptr = nullptr;
 
-			auto flags = entity.getFlags();
-			if (!flags.destroy && !flags.hidden)
-			{
+		//for (auto item : m_updatedItemIdx)
+		//{
+		//	if (item.hashId != lastHashId)
+		//	{
+		//		lastHashId = item.hashId;
+		//		const auto idx = instances.size();
+		//		instances.emplace_back( m_vBuffer );
+		//		ptr = &instances[idx];
+		//		ptr->byteOffset = (instanceDataPtr - bufferBeginPtr) * sizeof(gpuStruct); //compute offset into buffer
+		//	}
 
-				ptr->instanceCount++;
-				ptr->renderData = entity.getRenderDataPtr();
+		//	auto itr = getItem(item.idx);
+		//	const HgEntity& entity = itr->getEntity();
 
-				itr->T::getInstanceData(instanceDataPtr);
-				instanceDataPtr += stride;
-			}
-		}
+		//	auto flags = entity.getFlags();
+		//	if (!flags.destroy && !flags.hidden)
+		//	{
 
-		for (auto& itr : instances)
-		{
-			if (itr.instanceCount > 0)
-			{
-				queue->Enqueue(itr);
-			}
-		}
+		//		ptr->instanceCount++;
+		//		ptr->renderData = entity.getRenderDataPtr();
+
+		//		itr->T::getInstanceData(instanceDataPtr);
+		//		instanceDataPtr += stride;
+		//	}
+		//}
+
+		//for (auto& itr : instances)
+		//{
+		//	if (itr.instanceCount > 0)
+		//	{
+		//		queue->Enqueue(itr);
+		//	}
+		//}
 	}
 
 	inline T* newItem() {
@@ -230,8 +245,12 @@ private:
 	//size_t m_instanceCount;
 	SwissArray<T> m_items;
 	//std::vector<uint32_t> m_updatedItemIdx; //has been updated and ready for render
-	std::vector<IdxSort> m_updatedItemIdx; //has been updated and ready for render
+	//std::vector<IdxSort> m_updatedItemIdx; //has been updated and ready for render
+	//std::vector<int32_t> m_updatedItemIdx; //has been updated and ready for render
 	//std::shared_ptr<HgGPUBuffer<gpuStruct>> m_instanceData;
+
+	std::vector<EntityIdType> m_updatedItemIdx; //has been updated and ready for render
+
 
 	std::vector<gpuStruct> m_modelMatrices;
 	std::shared_ptr<IHgGPUBuffer> m_vBuffer;

@@ -8,6 +8,10 @@
 
 namespace Instancing
 {
+	struct GPUTransformationMatrix
+	{
+		float matrix[16];
+	};
 
 	/*
 	Structure containing the instancing data required for instance rendering.

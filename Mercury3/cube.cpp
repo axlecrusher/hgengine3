@@ -81,6 +81,59 @@ void* change_to_cube(HgEntity* entity) {
 	return nullptr;
 }
 
+namespace RotatingCube
+{
+	SpinningCubeTables SpinningCubes;
+
+	void initRotatingCubes(const EntityIdList& list)
+	{
+		SpinningCubes.entityId.reserve(SpinningCubes.entityId.size() + list.size());
+		SpinningCubes.cubeState.reserve(SpinningCubes.cubeState.size() + list.size());
+		for (auto id : list)
+		{
+			initRotatingCube(id);
+			//SpinningCubes.entityId.push_back(id);
+			//CubeState state;
+			//state.rotationTime = HgTime::msec(10000 + ((rand() % 10000) - 5000));
+			//SpinningCubes.cubeState.push_back(state);
+		}
+	}
+
+	void initRotatingCube(EntityIdType id)
+	{
+		SpinningCubes.entityId.push_back(id);
+		CubeState state;
+		state.rotationTime = HgTime::msec(10000 + ((rand() % 10000) - 5000));
+		SpinningCubes.cubeState.push_back(state);
+	}
+
+	void gcRotatingCubes()
+	{
+		//SpinningCubes
+	}
+
+	void updateRotatingCubes(HgTime dt)
+	{
+		using namespace HgMath;
+
+		for (int i = 0; i < SpinningCubes.entityId.size(); i++)
+		{
+			auto& state = SpinningCubes.cubeState[i];
+			
+			state.age += dt;
+			while (state.age > state.rotationTime) {
+				state.age -= state.rotationTime;
+			}
+
+			const double degTime = 360.0 / state.rotationTime.msec();
+
+			const double deg = degTime * state.age.msec();
+			const quaternion rotation = quaternion::fromEuler(angle::ZERO, angle::deg(deg), angle::ZERO);
+			EntityTable::Singleton.getPtr(SpinningCubes.entityId[i])->orientation(rotation);
+		}
+	}
+}
+
 namespace Cube {
 
 void Cube::update(HgTime dt) {
@@ -100,7 +153,17 @@ void Cube::init() {
 	RenderDataPtr rd = std::make_shared<RenderData>(*crd);
 	e->setRenderData(rd);
 }
+
+void changeToCube(const EntityIdList& list)
+{
+	for (auto id : list)
+	{
+		auto cube = EntityTable::Singleton.getPtr(id);
+		change_to_cube(cube);
+	}
 }
+
+} //namespace Cubee
 
 namespace RotatingCube {
 

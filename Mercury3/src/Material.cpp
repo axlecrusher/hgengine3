@@ -39,6 +39,19 @@ Material::Material(const Material& other)
 	setShader(HgShader::acquire(other.m_shader.get()));
 }
 
+Material& Material::operator=(const Material& rhs)
+{
+	m_textures = rhs.m_textures;
+	m_transparent = rhs.m_transparent;
+	m_blendMode = rhs.m_blendMode;
+	m_updateTextures = rhs.m_updateTextures;
+
+	memcpy(m_gpuTextureHandles, rhs.m_gpuTextureHandles, sizeof(m_gpuTextureHandles));
+	setShader(HgShader::acquire(rhs.m_shader.get()));
+
+	return *this;
+}
+
 void Material::setShader(HgShader* shader)
 {
 	m_shader = std::unique_ptr<HgShader, ShaderDeleter>(shader);

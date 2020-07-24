@@ -13,6 +13,9 @@ struct gpuStruct {
 	float matrix[16];
 };
 
+//Initialize a list of entites to triangle models
+void init(const EntityIdList& list);
+
 class Triangle : public IUpdatableInstance<gpuStruct> {
 public:
 	using InstanceCollection = InstancedCollection<Triangle, gpuStruct, 1>;
