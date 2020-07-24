@@ -38,4 +38,23 @@ namespace MeshMath
 		}
 	}
 
+	//calculate unit direction vector from a to b
+	inline vertex3f unitDirection(const vector3f& a, const vector3f& b)
+	{
+		const auto v = b - a;
+		return (v / v.magnitude());
+	}
+
+	//compute the number of vertices required for a polyboard following a path of N vertices
+	inline constexpr int32_t computePolyboardVertexCount(int32_t N) { return N*2; }
+
+	//compute the number of indices required for a polyboard following a path of N vertices
+	inline constexpr int32_t computePolyboardIndexCount(int32_t N) { return (N - 1) * 6; }
+
+	/* generate a polyboard mesh following a path constructed with points in vertexArray.
+	outputVertexArray must be twice the size of input vertexArray
+	outputIndexArray array size must equal (vertexCount-1)*6. use computePolyboardIndexCount() to calculate.
+	Indices are arranged as a triangle list.
+	*/
+	void generatePolyboard(const vertex3f* vertexArray, int32_t vertexCount, const vector3f& camera, float r, vertex3f* outputVertexArray, uint32_t* outputIndexArray);
 }

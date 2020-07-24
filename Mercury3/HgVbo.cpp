@@ -66,6 +66,16 @@ static std::unique_ptr<IHgVbo> vbo_from_api_type() {
 
 namespace HgVbo {
 	template<>
+	std::unique_ptr<IHgVbo> Create<vbo_layout_v>() {
+		return std::move(vbo_from_api_type<vbo_layout_v>());
+	}
+
+	template<>
+	std::unique_ptr<IHgVbo> Create<vector3f>() {
+		return std::move(vbo_from_api_type<vbo_layout_v>());
+	}
+
+	template<>
 	std::unique_ptr<IHgVbo> Create<vbo_layout_vc>() {
 		return std::move(vbo_from_api_type<vbo_layout_vc>());
 	}

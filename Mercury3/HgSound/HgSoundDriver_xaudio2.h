@@ -129,6 +129,7 @@ private:
 
 	std::mutex m_callbackMtx;
 	std::vector<std::unique_ptr<Voice>> m_voices; //mutex protect
+	std::vector<std::unique_ptr<Voice>> m_3dvoices; //mutex protect
 
 	ProtectedVector<VoiceCallback*> m_toDestroy;
 	ProtectedVector<Events::PlaySound3D> m_playSoundEvents;

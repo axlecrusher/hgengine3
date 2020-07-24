@@ -143,7 +143,8 @@ namespace HgMath {
 			//if very close to unit length, don't compute. more stable
 			if (std::abs(1.0f - length) > 1e-06f) {
 				if (length > 1e-06f) {
-					r = this->scale(T(1.0) / length);
+					r = *this / length;
+					//r = this->scale(T(1.0) / length);
 				}
 			}
 			return r;
