@@ -54,14 +54,7 @@ class EntityIdTable
 public:
 	static const uint32_t MAX_ENTRIES = (1 << EntityIdType::INDEX_BITS);
 	//static const uint32_t MAX_ENTRIES = 5; //for testing create() assert
-	EntityIdTable()
-	{
-		m_generation.reserve(MAX_ENTRIES);
-		m_generation.emplace_back(0); // consider id 0 invalid
-
-		m_entityTotal = 0;
-		m_entityActive = 0;
-	}
+	EntityIdTable();
 
 	//create a new entity id
 	EntityIdType create();
@@ -73,10 +66,13 @@ public:
 	inline bool exists(EntityIdType id) const
 	{
 		const auto idx = id.index();
+		const auto gen = id.generation();
+
 		if (idx == 0) return false;
 		if (idx < m_generation.size())
 		{
-			return (m_generation[idx] == id.generation());
+			const auto valid = (m_generation[idx] == gen);
+			return valid;
 		}
 		return false; //this should never happen
 	}
@@ -90,8 +86,7 @@ public:
 	//current number of entities in existance
 	uint32_t numberOfEntitiesExisting() const { return m_entityActive; }
 
-
-	static EntityIdTable Manager;
+	static EntityIdTable& Singleton();
 
 private:
 	inline EntityIdType combine_bytes(uint32_t idx, uint8_t generation)

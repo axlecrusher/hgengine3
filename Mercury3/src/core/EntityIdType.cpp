@@ -2,8 +2,29 @@
 
 #include <cassert>
 #include <EntityIdType.h>
+#include <memory>
 
-EntityIdTable EntityIdTable::Manager;
+//static EntityIdTable SingletonInstance;
+
+EntityIdTable& EntityIdTable::Singleton()
+{
+	static std::unique_ptr<EntityIdTable> instance;
+	if (instance == nullptr)
+	{
+		instance = std::make_unique<EntityIdTable>();
+	}
+
+	return *instance.get();
+}
+
+EntityIdTable::EntityIdTable()
+{
+	m_generation.reserve(MAX_ENTRIES);
+	m_generation.emplace_back(0); // consider id 0 invalid
+
+	m_entityTotal = 0;
+	m_entityActive = 0;
+}
 
 EntityIdType EntityIdTable::create()
 {

@@ -115,7 +115,7 @@ HgScene scene;
 
 DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	while (1) {
-		printf("UPS %u e_count %d %d\n", itrctr, EntityIdTable::Manager.numberOfEntitiesExisting(), scene.chunkCount());
+		printf("UPS %u e_count %d %d\n", itrctr, EntityIdTable::Singleton().numberOfEntitiesExisting(), scene.chunkCount());
 		itrctr = 0;
 		CheckFilesForChange();
 		Sleep(1000);
@@ -249,7 +249,7 @@ int main()
 		auto idList = EntityHelpers::createContiguous(1);
 		scene2.addEntityIDs(idList);
 		teapotId = idList[0];
-		auto teapot = EntityTable::Singleton.getPtr(teapotId);
+		auto teapot = EntityTable::Singleton().getPtr(teapotId);
 		model_data::load_ini(teapot, "teapot.ini");
 		teapot->origin(teapot->origin().x(2).z(3).y(1));
 	}
@@ -282,7 +282,7 @@ int main()
 	{
 		auto textIDs = EntityHelpers::createContiguous(4);
 		{
-			auto textEntity = EntityTable::Singleton.getPtr(textIDs[0]);
+			auto textEntity = EntityTable::Singleton().getPtr(textIDs[0]);
 			scene2.addEntityID(textIDs[0]);
 
 			HgText::Text t;
@@ -295,7 +295,7 @@ int main()
 		}
 
 		{
-			auto textEntity = EntityTable::Singleton.getPtr(textIDs[1]);
+			auto textEntity = EntityTable::Singleton().getPtr(textIDs[1]);
 			scene2.addEntityID(textIDs[1]);
 
 			HgText::Text t;
@@ -309,7 +309,7 @@ int main()
 		}
 
 		{
-			auto textEntity = EntityTable::Singleton.getPtr(textIDs[2]);
+			auto textEntity = EntityTable::Singleton().getPtr(textIDs[2]);
 			scene_2d.addEntityID(textIDs[2]);
 
 			HgText::Text t;
@@ -320,7 +320,7 @@ int main()
 		}
 
 		{
-			auto textEntity = EntityTable::Singleton.getPtr(textIDs[3]);
+			auto textEntity = EntityTable::Singleton().getPtr(textIDs[3]);
 			scene_2d.addEntityID(textIDs[3]);
 
 			HgText::Text t;
@@ -334,11 +334,11 @@ int main()
 	//{
 	//	auto statueList = EntityHelpers::createContiguous(4);
 	//	scene2.addEntityIDs(statueList);
-	//	auto statueSource = EntityTable::Singleton.getPtr(statueList[0]);
+	//	auto statueSource = EntityTable::Singleton().getPtr(statueList[0]);
 	//	model_data::load_ini(statueSource, "statue.ini");
 	//	for (int i = 0; i < 4; ++i)
 	//	{
-	//		auto statue = EntityTable::Singleton.getPtr(statueList[i]);
+	//		auto statue = EntityTable::Singleton().getPtr(statueList[i]);
 	//		statueSource->clone(statue);
 	//		statue->origin(statue->origin().x(2).z(3).y(1));
 	//		statue->position(statue->position().x(i));
@@ -348,11 +348,11 @@ int main()
 	//{
 	//	auto eratoList = EntityHelpers::createContiguous(1);
 	//	scene2.addEntityIDs(eratoList);
-	//	auto statueSource = EntityTable::Singleton.getPtr(eratoList[0]);
+	//	auto statueSource = EntityTable::Singleton().getPtr(eratoList[0]);
 	//	model_data::load_ini(statueSource, "erato.ini");
 	//	for (int i = 0; i < 1; ++i)
 	//	{
-	//		auto statue = EntityTable::Singleton.getPtr(eratoList[i]);
+	//		auto statue = EntityTable::Singleton().getPtr(eratoList[i]);
 	//		statueSource->clone(statue);
 	//		statue->origin(statue->origin().x(2).z(3).y(1));
 	//		statue->position(statue->position().x(i));
@@ -379,14 +379,14 @@ int main()
 			Triangle::init(triangleList);
 
 			{
-				auto entity = EntityTable::Singleton.getPtr(triangleList[0]);
+				auto entity = EntityTable::Singleton().getPtr(triangleList[0]);
 				const auto tmp = entity->position();
 				entity->position(tmp.x(1.5f).z(-1.0f));
 			}
 
 
 			{
-				auto entity = EntityTable::Singleton.getPtr(triangleList[1]);
+				auto entity = EntityTable::Singleton().getPtr(triangleList[1]);
 				const auto tmp = entity->position();
 				entity->position(tmp.x(0.0f).z(-2.5f));
 			}
@@ -405,14 +405,14 @@ int main()
 			float x = (i % 40)*1.1f;
 			float z = (i / 40)*1.1f;
 
-			auto cube = EntityTable::Singleton.getPtr(id);
+			auto cube = EntityTable::Singleton().getPtr(id);
 
 			//if (entity)
 			{
 				cube->position(point(-20.0f + x, 5.0f, 30.0f - z));
 				cube->scale(0.3f);
 
-				if (!EntityIdTable::Manager.exists(cubeId))
+				if (!EntityIdTable::Singleton().exists(cubeId))
 				{
 					auto rd = cube->getRenderDataPtr();
 					rd->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f2.glsl"));
@@ -468,7 +468,7 @@ int main()
 			auto idList = EntityHelpers::createContiguous(2);
 			scene2.addEntityIDs(idList);
 
-			HgEntity* redCube = EntityTable::Singleton.getPtr(idList[0]);
+			HgEntity* redCube = EntityTable::Singleton().getPtr(idList[0]);
 			change_to_cube(redCube);
 
 			redCube->setRenderData(RenderData::Create(redCube->getRenderDataPtr()));
@@ -477,7 +477,7 @@ int main()
 			redCube->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_red.glsl"));
 			//entity->getRenderDataPtr()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 
-			HgEntity* teapotSquare = EntityTable::Singleton.getPtr(idList[1]);
+			HgEntity* teapotSquare = EntityTable::Singleton().getPtr(idList[1]);
 			change_to_cube(teapotSquare);
 
 			teapotSquare->setRenderData(RenderData::Create(teapotSquare->getRenderDataPtr()));
@@ -602,7 +602,7 @@ int main()
 
 			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg(std::fmod(time.msec(),10000) / 27.777777777777777777777777777778), angle::ZERO);
 			{
-				auto teapot = EntityTable::Singleton.getPtr(teapotId);
+				auto teapot = EntityTable::Singleton().getPtr(teapotId);
 				teapot->orientation(orientation.conjugate());
 			}
 

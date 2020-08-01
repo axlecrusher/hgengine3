@@ -16,11 +16,21 @@
 #include <HgEngine.h>
 #include <EntityIdType.h>
 
-EntityTable EntityTable::Singleton;
 EntityParentTable EntityParentTable::Manager;
 RenderDataTable RenderDataTable::Manager;
 PreviousPositionTable PreviousPositionTable::Manager;
 EntityNameTable HgEntity::EntityNames;
+
+EntityTable& EntityTable::Singleton()
+{
+	static std::unique_ptr<EntityTable> instance;
+	if (instance == nullptr)
+	{
+		instance = std::make_unique<EntityTable>();
+	}
+
+	return *instance.get();
+}
 
 void RegisterEntityType(const char* c, factory_clbk factory) {
 	Engine::entity_factories[c] = factory;
@@ -31,14 +41,14 @@ void EntityLocator::RegisterEntity(HgEntity* entity)
 	std::lock_guard<std::mutex> m_lock(m_mutex);
 
 	const auto id = entity->getEntityId();
-	if (!EntityIdTable::Manager.exists(id)) return;
+	if (!EntityIdTable::Singleton().exists(id)) return;
 
 	m_entities[id] = entity;
 }
 
 void EntityLocator::RemoveEntity(EntityIdType id)
 {
-	if (!EntityIdTable::Manager.exists(id)) return;
+	if (!EntityIdTable::Singleton().exists(id)) return;
 
 	std::lock_guard<std::mutex> m_lock(m_mutex);
 
@@ -52,7 +62,7 @@ void EntityLocator::RemoveEntity(EntityIdType id)
 EntityLocator::SearchResult EntityLocator::Find(EntityIdType id) const
 {
 	SearchResult result;
-	if (EntityIdTable::Manager.exists(id))
+	if (EntityIdTable::Singleton().exists(id))
 	{
 		std::lock_guard<std::mutex> m_lock(m_mutex);
 
@@ -74,7 +84,7 @@ EntityLocator::SearchResult EntityLocator::Find(EntityIdType id) const
 EntityLocator::SearchResult HgEntity::Find(EntityIdType id)
 {
 	EntityLocator::SearchResult r;
-	r.entity = EntityTable::Singleton.getPtr(id);
+	r.entity = EntityTable::Singleton().getPtr(id);
 	return r;
 	//return Locator().Find(id);
 }
@@ -236,17 +246,17 @@ HgEntity::HgEntity()
 
 void HgEntity::init(EntityIdType id)
 {
-	EntityIdTable::Manager.destroy(m_entityId);
+	EntityIdTable::Singleton().destroy(m_entityId);
 
 	m_drawOrder = 0;
 
-	if (EntityIdTable::Manager.exists(id))
+	if (EntityIdTable::Singleton().exists(id))
 	{
 		m_entityId = id;
 	}
 	else
 	{
-		m_entityId = EntityIdTable::Manager.create();
+		m_entityId = EntityIdTable::Singleton().create();
 	}
 
 	//Locator().RegisterEntity(this);
@@ -282,7 +292,7 @@ void HgEntity::destroy()
 	//Locator().RemoveEntity(m_entityId);
 
 	//m_renderData.reset();
-	//EntityIdTable::Manager.destroy(m_entityId);
+	//EntityIdTable::Singleton().destroy(m_entityId);
 }
 
 HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool applyRotation, bool applyTranslation)
@@ -320,7 +330,7 @@ HgMath::mat4f HgEntity::computeWorldSpaceMatrix(const bool applyScale, bool appl
 	const bool hasParent = EntityParentTable::Manager.getParentId(m_entityId, parentId);
 
 
-	if (hasParent && EntityIdTable::Manager.exists(parentId))
+	if (hasParent && EntityIdTable::Singleton().exists(parentId))
 	{
 		return computeWorldSpaceMatrixIncludeParent(applyScale, applyRotation, applyTranslation);
 	}

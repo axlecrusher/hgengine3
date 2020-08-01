@@ -380,7 +380,7 @@ public:
 	//create a new entity
 	inline HgEntity create()
 	{
-		const auto id = EntityIdTable::Manager.create();
+		const auto id = EntityIdTable::Singleton().create();
 
 		HgEntity e;
 		e.init(id);
@@ -410,7 +410,7 @@ public:
 	inline void store(const HgEntity& e)
 	{
 		const auto id = e.getEntityId();
-		if (EntityIdTable::Manager.exists(id))
+		if (EntityIdTable::Singleton().exists(id))
 		{
 			const auto idx = id.index();
 			if (idx >= m_entities.size())
@@ -424,7 +424,7 @@ public:
 
 	inline HgEntity* getPtr(EntityIdType id)
 	{
-		if (EntityIdTable::Manager.exists(id))
+		if (EntityIdTable::Singleton().exists(id))
 		{
 			const auto idx = id.index();
 			if (idx < m_entities.size())
@@ -442,7 +442,7 @@ public:
 	//destroy an entity
 	void destroy(EntityIdType id);
 
-	static EntityTable Singleton;
+	static EntityTable& Singleton();
 
 private:
 
@@ -464,9 +464,15 @@ namespace EntityHelpers
 	//Create a contiguous block of entities. Allocates IDs and Entity storage.
 	inline EntityIdList createContiguous(uint32_t count)
 	{
-		auto idList = EntityIdTable::Manager.createContiguous(count);
-		EntityTable::Singleton.createMultiple(idList);
+		auto idList = EntityIdTable::Singleton().createContiguous(count);
+		EntityTable::Singleton().createMultiple(idList);
 		return idList;
+	}
+
+	inline EntityIdType createSingle()
+	{
+		auto id = EntityIdTable::Singleton().create();
+		return id;
 	}
 }
 

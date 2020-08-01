@@ -55,7 +55,7 @@ void HgScene::RemoveInvalidEntities()
 
 	for (auto id : m_entities)
 	{
-		if (EntityIdTable::Manager.exists(id))
+		if (EntityIdTable::Singleton().exists(id))
 		{
 			m_tmpEntities.push_back(id);
 		}
@@ -127,11 +127,11 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	{
 		RdDrawOrder t;
 		t.rdPair = rdp;
-		t.drawOrder = EntityTable::Singleton.getPtr(rdp.entity)->getDrawOrder();
+		t.drawOrder = EntityTable::Singleton().getPtr(rdp.entity)->getDrawOrder();
 		list.push_back(t);
 	}
 
-	if (m_modelMatrices.capacity() < list.size())
+	if (m_modelMatrices.size() < list.size())
 	{
 		m_modelMatrices.resize(list.size());
 	}
@@ -162,10 +162,18 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 			imd.instanceData = m_vBuffer;
 			lastRDO = t;
 		}
-		auto entity = EntityTable::Singleton.getPtr(t.rdPair.entity);
+		auto entity = EntityTable::Singleton().getPtr(t.rdPair.entity);
 
 		const auto m = entity->computeWorldSpaceMatrix();
-		m.store(m_modelMatrices[matrixOffset].matrix);
+
+		if (matrixOffset < m_modelMatrices.size())
+		{
+			m.store(m_modelMatrices[matrixOffset].matrix);
+		}
+		else
+		{
+			fprintf(stderr, "matrixOffset >= m_modelMatrices.size: %d < %d\n", matrixOffset, m_modelMatrices.size());
+		}
 
 		imd.instanceCount++;
 		matrixOffset++;

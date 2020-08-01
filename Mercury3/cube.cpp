@@ -129,7 +129,7 @@ namespace RotatingCube
 
 			const double deg = degTime * state.age.msec();
 			const quaternion rotation = quaternion::fromEuler(angle::ZERO, angle::deg(deg), angle::ZERO);
-			EntityTable::Singleton.getPtr(SpinningCubes.entityId[i])->orientation(rotation);
+			EntityTable::Singleton().getPtr(SpinningCubes.entityId[i])->orientation(rotation);
 		}
 	}
 }
@@ -158,7 +158,7 @@ void changeToCube(const EntityIdList& list)
 {
 	for (auto id : list)
 	{
-		auto cube = EntityTable::Singleton.getPtr(id);
+		auto cube = EntityTable::Singleton().getPtr(id);
 		change_to_cube(cube);
 	}
 }

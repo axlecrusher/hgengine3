@@ -60,7 +60,7 @@ namespace Triangle {
 		auto rdPtr = triangle_init_render_data();
 		for (auto id : list)
 		{
-			EntityTable::Singleton.getPtr(id)->setRenderData(rdPtr);
+			EntityTable::Singleton().getPtr(id)->setRenderData(rdPtr);
 		}
 
 	}
