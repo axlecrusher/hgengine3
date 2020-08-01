@@ -154,6 +154,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 		{
 			if (imd.instanceCount > 0)
 			{
+				//push previous instance meta data into instances
 				instances.push_back(imd);
 			}
 			imd = Instancing::InstancingMetaData();

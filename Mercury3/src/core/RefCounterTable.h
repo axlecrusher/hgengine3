@@ -121,7 +121,15 @@ public:
 		return m_records[idx];
 	}
 
-	static SelfType& Singleton() { return singleton; }
+	static SelfType& Singleton()
+	{
+		static std::unique_ptr<SelfType> instance;
+		if (instance == nullptr)
+		{
+			instance = std::make_unique<SelfType>();
+		}
+		return *instance.get();
+	}
 
 private:
 	void IncrementRecordCount(const IndexType& x)
