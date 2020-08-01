@@ -109,8 +109,17 @@ public:
 		return index;
 	}
 
-	const T& getRecord(const IndexType& x) const { return m_records[x.Index()]; }
-	T& getRecord(const IndexType& x) { return m_records[x.Index()]; }
+	inline const T& getRecord(const IndexType& x) const
+	{
+		const auto idx = x.Index();
+		return m_records[idx];
+	}
+
+	inline T& getRecord(const IndexType& x)
+	{
+		const auto idx = x.Index();
+		return m_records[idx];
+	}
 
 	static SelfType& Singleton() { return singleton; }
 

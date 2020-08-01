@@ -464,13 +464,11 @@ int main()
 		auto snd = testSound->newPlayingInstance();
 		snd->setVolume(0.5);
 
-		HgEntity* redCube = nullptr;
-		HgEntity* teapotSquare = nullptr;
 		{
 			auto idList = EntityHelpers::createContiguous(2);
 			scene2.addEntityIDs(idList);
 
-			redCube = EntityTable::Singleton.getPtr(idList[0]);
+			HgEntity* redCube = EntityTable::Singleton.getPtr(idList[0]);
 			change_to_cube(redCube);
 
 			redCube->setRenderData(RenderData::Create(redCube->getRenderDataPtr()));
@@ -479,7 +477,7 @@ int main()
 			redCube->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_red.glsl"));
 			//entity->getRenderDataPtr()->shader = HgShader::acquire("test_matrix_v.glsl", "test_matrix_f.glsl");
 
-			teapotSquare = EntityTable::Singleton.getPtr(idList[1]);
+			HgEntity* teapotSquare = EntityTable::Singleton.getPtr(idList[1]);
 			change_to_cube(teapotSquare);
 
 			teapotSquare->setRenderData(RenderData::Create(teapotSquare->getRenderDataPtr()));

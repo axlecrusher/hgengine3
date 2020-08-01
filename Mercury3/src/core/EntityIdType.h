@@ -37,7 +37,7 @@ public:
 		return tmp;
 	}	//post
 
-	//bool isValid() const { return m_id > 0; }
+	bool isValid() const { return index() > 0; }
 
 	inline int32_t index() const { return (INDEX_MASK & m_id); }
 	inline int32_t generation() const { return (m_id >> INDEX_BITS) & GENERATION_MASK; }

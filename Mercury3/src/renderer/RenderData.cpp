@@ -32,7 +32,11 @@ void RenderData::render(const Instancing::InstancingMetaData* imd) {
 	auto idx = indexVbo();
 	auto color = colorVbo();
 
-	if (vertex == nullptr) return;
+	if (vertex == nullptr)
+	{
+		fprintf(stderr, "Vertex VBO data is NULL, vbo index: %d\n", m_vertexVbo.Index());
+		return;
+	}
 
 	RENDERER()->setRenderAttributes(m_material.blendMode(), renderFlags);
 	vertex->use();

@@ -17,3 +17,5 @@ public:
 
 	void init();
 };
+
+void* change_to_square(HgEntity* entity);
