@@ -46,6 +46,8 @@ void MatrixVertexAttribute::Setup(const Instancing::InstancingMetaData& imd, con
 		return;
 	}
 
+//	fprintf(stderr, "%s : %d\n", m_attributeName.c_str(), m_attributeBuffer.getValue());
+
 	//glVertexAttribPointer requires a buffer be bound
 	glBindBuffer(GL_ARRAY_BUFFER, m_attributeBuffer.getValue());
 
@@ -54,9 +56,10 @@ void MatrixVertexAttribute::Setup(const Instancing::InstancingMetaData& imd, con
 	for (int i = 0; i < 4; i++)
 	{
 		const size_t byteOffset = imd.byteOffset + (sizeof(float) * 4 * i);
-		glEnableVertexAttribArray(attribLocation + i);
-		glVertexAttribPointer(attribLocation + i, 4, GL_FLOAT, GL_FALSE, stride, (void*)byteOffset);
-		glVertexAttribDivisor(attribLocation + i, 1); //advance per instance drawn
+		const auto location = attribLocation + i;
+		glEnableVertexAttribArray(location);
+		glVertexAttribPointer(location, 4, GL_FLOAT, GL_FALSE, stride, (void*)byteOffset);
+		glVertexAttribDivisor(location, 1); //advance per instance drawn
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
