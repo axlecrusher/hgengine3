@@ -79,6 +79,7 @@ namespace Projectile
 
 	void updateProjectiles(HgTime dt)
 	{
+		//uint32_t toRemove
 		for (auto& p : ProjectileTable)
 		{
 			p.update(dt);

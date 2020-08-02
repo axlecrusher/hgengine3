@@ -116,6 +116,8 @@ namespace RotatingCube
 	{
 		using namespace HgMath;
 
+		auto& idTable = EntityIdTable::Singleton();
+		auto& entityTable = EntityTable::Singleton();
 		for (int i = 0; i < SpinningCubes.entityId.size(); i++)
 		{
 			auto& state = SpinningCubes.cubeState[i];
@@ -129,7 +131,7 @@ namespace RotatingCube
 
 			const double deg = degTime * state.age.msec();
 			const quaternion rotation = quaternion::fromEuler(angle::ZERO, angle::deg(deg), angle::ZERO);
-			EntityTable::Singleton().getPtr(SpinningCubes.entityId[i])->orientation(rotation);
+			entityTable.getPtr(&idTable, SpinningCubes.entityId[i])->orientation(rotation);
 		}
 	}
 }

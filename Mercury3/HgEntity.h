@@ -423,9 +423,9 @@ public:
 		}
 	}
 
-	inline HgEntity* getPtr(EntityIdType id)
+	inline HgEntity* getPtr(EntityIdTable* table, EntityIdType id)
 	{
-		if (EntityIdTable::Singleton().exists(id))
+		if (table->exists(id))
 		{
 			const auto idx = id.index();
 			if (idx < m_entities.size())
@@ -438,6 +438,11 @@ public:
 			}
 		}
 		return nullptr;
+	}
+
+	inline HgEntity* getPtr(EntityIdType id)
+	{
+		return getPtr(&EntityIdTable::Singleton(), id);
 	}
 
 	//destroy an entity
