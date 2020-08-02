@@ -1,5 +1,6 @@
 #include "HgTexture.h"
 #include <FileWatch.h>
+#include <Logging.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -64,7 +65,7 @@ HgTexture::TexturePtr HgTexture::acquire(AssetManagerType::IAssetLoader& texture
 	auto ptr = imageMap.get(textureLoader, &isNew);
 
 	if (ptr == nullptr) {
-		fprintf(stderr, "Could not open image \"%s\"", uniqueId.c_str());
+		LOG_ERROR("Could not open image \"%s\"", uniqueId.c_str());
 	}
 
 	if (isNew) {
@@ -226,7 +227,7 @@ bool TexutureFileLoader::load_internal(AssetPtr& asset) const
 	char filecode[4];
 	FILE *f = fopen(m_path.c_str(), "rb");
 	if (f == nullptr) {
-		fprintf(stderr, "Unable to open file \"%s\"", m_path.c_str());
+		LOG_ERROR("Unable to open file \"%s\"", m_path.c_str());
 		return false;
 	}
 

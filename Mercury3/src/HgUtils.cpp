@@ -11,6 +11,7 @@
 #include <RenderBackend.h>
 
 #include <HgInput.h>
+#include <Logging.h>
 
 static int SymnumCheck(const char * path, const char * name, void * location, long size)
 {
@@ -46,7 +47,7 @@ namespace ENGINE {
 		BOOL b = SetPriorityClass(h, 0x80); //high priority
 		if (b == 0) {
 			DWORD error = GetLastError();
-			fprintf(stderr, "Could not set process priority class. (%d)\n", error);
+			LOG_ERROR("Could not set process priority class. (%d)", error);
 		}
 
 	}

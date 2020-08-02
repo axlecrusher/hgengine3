@@ -3,6 +3,7 @@
 #include <IniLoader.h>
 #include <algorithm>
 #include <string> 
+#include <Logging.h>
 
 static std::string emptyString;
 
@@ -35,16 +36,16 @@ namespace IniLoader {
 
 	void handleError(int r, const std::string &filename) {
 		if (r == -1) {
-			fprintf(stderr, "Error opening file \"%s\"\n", filename.c_str());
+			LOG_ERROR("Error opening file \"%s\"", filename.c_str());
 		}
 		else if (r == -2) {
-			fprintf(stderr, "Memory alignment error opening file \"%s\"\n", filename.c_str());
+			LOG_ERROR("Memory alignment error opening file \"%s\"", filename.c_str());
 		}
 		else if (r > 0) {
-			fprintf(stderr, "Error on line %d in file \"%s\"\n", r, filename.c_str());
+			LOG_ERROR("Error on line %d in file \"%s\"", r, filename.c_str());
 		}
 		else if (r != 0) {
-			fprintf(stderr, "Unknown error opening file \"%s\"\n", filename.c_str());
+			LOG_ERROR("Unknown error opening file \"%s\"", filename.c_str());
 		}
 	}
 

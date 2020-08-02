@@ -1,6 +1,7 @@
 #include "OggSource.h"
 #include <include/ThreadPool.h>
 #include <algorithm>
+#include <Logging.h>
 
 namespace HgSound
 {
@@ -104,7 +105,7 @@ void StreamingOggSource::State::open(const char* path)
 
 	if (r != 0)
 	{
-		fprintf(stderr, "Could not open vorbis file \"%s\"\n", path);
+		LOG_ERROR("Could not open vorbis file \"%s\"", path);
 		return;
 	}
 

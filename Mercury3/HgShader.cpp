@@ -8,6 +8,7 @@
 #include <FileWatch.h>
 #include <str_utils.h>
 #include <stdio.h>
+#include <Logging.h>
 
 #pragma warning(disable:4996)
 
@@ -27,7 +28,7 @@ shader_entry shader_list[MAX_SHADERS];
 
 static void ShaderFileChanged(void* data) {
 	shader_entry* entry = (shader_entry*)data;
-	fprintf(stderr, "Shader file changed:%s\n", entry->frag_path.c_str());
+	LOG_ERROR("Shader file changed:%s", entry->frag_path.c_str());
 	entry->shader->load();
 }
 

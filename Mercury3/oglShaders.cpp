@@ -14,6 +14,7 @@
 #include <RenderBackend.h>
 
 #include <OGLBackend.h>
+#include <Logging.h>
 
 static GLuint _currentShaderProgram = 0;
 
@@ -99,7 +100,7 @@ static GLuint compile_shader(const char* str, GLuint shader_type) {
 	int params = -1;
 	glGetShaderiv(f_shader, GL_COMPILE_STATUS, &params);
 	if (GL_TRUE != params) {
-		fprintf(stderr, "ERROR: GL shader index %i did not compile\n", f_shader);
+		LOG_ERROR("ERROR: GL shader index %i did not compile", f_shader);
 		_print_shader_info_log(f_shader);
 		glDeleteShader(f_shader);
 		return 0;
@@ -184,7 +185,7 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 		}
 		else
 		{
-			fprintf(stderr, "HgShaders: Unknown uniform \"%s\"\n", name);
+			LOG_ERROR("HgShaders: Unknown uniform \"%s\"", name);
 		}
 	}
 }
@@ -233,7 +234,7 @@ void HgOglShader::destroy() {
 bool HgOglShader::compile() {
 	if (m_loadState == LoadState::NOT_LOADED)
 	{
-		fprintf(stderr, "Can not compile, source not loaded\n");
+		LOG_ERROR("Can not compile, source not loaded");
 		return false;
 	}
 
@@ -268,7 +269,7 @@ void HgOglShader::setLocalUniforms(const ShaderUniforms& uniforms) {
 	}
 
 	//Log warning about being slow and change to this program
-	fprintf(stderr, "Warning (%s): setLocalUniforms forcing temporary shader context change.\n", __FUNCTION__);
+	LOG_ERROR("Warning (%s): setLocalUniforms forcing temporary shader context change.", __FUNCTION__);
 	enable();
 
 	sendLocalUniformsToGPU(uniforms);

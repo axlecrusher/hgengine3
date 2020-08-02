@@ -1,4 +1,5 @@
 #include "WavSource.h"
+#include <Logging.h>
 
 #define DR_WAV_IMPLEMENTATION
 #include <HgSound/dr_wav.h>
@@ -106,7 +107,7 @@ void StreamingWavSource::State::open(const char* path)
 	auto wav = get_drwav();
 	if (!drwav_init_file(wav, path, nullptr))
 	{
-		fprintf(stderr, "Could not open wave file \"%s\"\n", path);
+		LOG_ERROR("Could not open wave file \"%s\"", path);
 		return;
 	}
 

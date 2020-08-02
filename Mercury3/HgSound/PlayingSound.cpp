@@ -1,5 +1,6 @@
 #include <HgSound/PlayingSound.h>
 #include <HgSoundDriver.h>
+#include <Logging.h>
 
 namespace HgSound {
 
@@ -8,7 +9,7 @@ namespace HgSound {
 	{
 		if (!m_audioSourceState)
 		{
-			fprintf(stderr, "Audio source state null\n");
+			LOG_ERROR("Audio source state null");
 		}
 	}
 

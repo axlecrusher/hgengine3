@@ -4,6 +4,7 @@
 
 #include <FileWatch.h>
 #include <mutex>
+#include <Logging.h>
 
 static FileWatcher watcher;
 static std::mutex watcherMutex;
@@ -26,7 +27,7 @@ static uint64_t _GetFileTime(const char* path) {
 		return t;
 	}
 	else {
-		fprintf(stderr, "Unable to open file: %s\n", path);
+		LOG_ERROR("Unable to open file: %s", path);
 	}
 	return 0;
 }
@@ -42,7 +43,7 @@ void FileWatcher::watchFile(std::string path, CallbackFunction callback)
 
 	m_fileCallbacks.push_back(info);
 
-	fprintf(stdout, "Watching:%s\n", info.path.c_str());
+	LOG("Watching:%s", info.path.c_str());
 }
 
 void FileWatcher::checkForChange()
@@ -51,7 +52,7 @@ void FileWatcher::checkForChange()
 	{
 		uint64_t t = _GetFileTime(info.path.c_str());
 		if (t != info.mod_time) {
-			fprintf(stdout, "File changed:%s\n", info.path.c_str());
+			LOG("File changed:%s", info.path.c_str());
 			info.mod_time = t;
 			info.callback();
 		}

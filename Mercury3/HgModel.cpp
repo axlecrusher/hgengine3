@@ -10,6 +10,7 @@
 #include <StringConversions.h>
 
 #include <MeshMath.h>
+#include <Logging.h>
 
 typedef struct header {
 	uint32_t vertex_count, index_count;
@@ -21,7 +22,7 @@ std::unique_ptr<FILE, decltype(&fclose)> open(const char* filename) {
 	FILE* f = NULL;
 	errno_t err = fopen_s(&f, filename, "rb");
 	if (err != 0) {
-		fprintf(stderr, "Unable to open file \"%s\"\n", filename);
+		LOG_ERROR("Unable to open file \"%s\"", filename);
 	}
 	else {
 		ret = std::unique_ptr<FILE, decltype(&fclose)>(f,fclose);
@@ -40,12 +41,12 @@ static model_data LoadModel(const char* filename) {
 	auto f = file.get();
 	size_t read = fread(&head, sizeof(head), 1, f);
 	if (read != 1) {
-		fprintf(stderr, "Unable to read file header for \"%s\"\n", filename);
+		LOG_ERROR("Unable to read file header for \"%s\"", filename);
 		return r;
 	}
 
 	//if (head.vertex_count > 65535) {
-	//	fprintf(stderr, "Too many vertices for \"%s\"\n", filename);
+	//	LOG_ERROR("Too many vertices for \"%s\"", filename);
 	//	fclose(f);
 	//	return r;
 	//}
@@ -57,7 +58,7 @@ static model_data LoadModel(const char* filename) {
 	std::shared_ptr<uint16_t[]> indices16;
 
 	if (head.index_count > 50000000) {
-		fprintf(stderr, "Too many indices for \"%s\"\n", filename);
+		LOG_ERROR("Too many indices for \"%s\"", filename);
 		return r;
 	}
 
@@ -74,7 +75,7 @@ static model_data LoadModel(const char* filename) {
 
 	if (indices32 == nullptr && indices16 == nullptr)
 	{
-		fprintf(stderr, "No indices read");
+		LOG_ERROR("No indices read");
 		return r;
 	}
 
@@ -82,13 +83,13 @@ static model_data LoadModel(const char* filename) {
 
 	read = fread(vertices.get(), sizeof(*vertices.get()), head.vertex_count, f);
 	if (read != head.vertex_count) {
-		fprintf(stderr, "Error, %d vertices expected, read %zd", head.vertex_count, read);
+		LOG_ERROR("Error, %d vertices expected, read %zd", head.vertex_count, read);
 		return r;
 	}
 
 	read = fread(indexBuffer, sizeOfIndices, head.index_count, f);
 	if (read != head.index_count) {
-		fprintf(stderr, "Error, %d indices expected, read %zd", head.index_count, read);
+		LOG_ERROR("Error, %d indices expected, read %zd", head.index_count, read);
 		return r;
 	}
 

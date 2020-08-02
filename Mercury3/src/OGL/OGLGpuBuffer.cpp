@@ -1,6 +1,7 @@
 #include <OGL/OGLGpuBuffer.h>
 #include <RenderBackend.h>
 #include <OGLBackend.h>
+#include <Logging.h>
 
 std::vector<GLTextureBuffer> OGLHgGPUBuffer::m_useableBufferIds;
 
@@ -25,7 +26,7 @@ void GLTextureBuffer::AllocateOnGPU()
 
 	if (buffId == 0 || texId == 0)
 	{
-		fprintf(stderr, "Error creating texture buffer.\n");
+		LOG_ERROR("Error creating texture buffer.");
 	}
 }
 

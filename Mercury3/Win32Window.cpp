@@ -16,6 +16,8 @@ extern "C" {
 #include <HgInput.h>
 }
 
+#include <Logging.h>
+
 uint8_t GlobalMouseGrabbed_Set = 1;
 
 //LRESULT CALLBACK WindowCallback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam); //Window callback
@@ -245,7 +247,7 @@ bool Win32Window::ChangeDisplaySettings() {
 		break;
 	}
 	if (error_msg != nullptr) {
-		fprintf(stderr, "Failed to change screen mode: %s\n", error_msg);
+		LOG_ERROR("Failed to change screen mode: %s", error_msg);
 		ret = false;
 	}
 

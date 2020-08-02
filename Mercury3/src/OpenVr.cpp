@@ -1,5 +1,6 @@
 #include <OpenVr.h>
 #include <EventSystem.h>
+#include <Logging.h>
 
 OpenVrProxy::OpenVrProxy()
 	:m_HMD(nullptr)
@@ -21,7 +22,7 @@ void OpenVrProxy::printError(char* str, vr::HmdError error)
 {
 	char buf[1024];
 	sprintf_s(buf, sizeof(buf), str, vr::VR_GetVRInitErrorAsEnglishDescription(error));
-	fprintf(stderr, buf);
+	LOG_ERROR(buf);
 }
 
 bool OpenVrProxy::Init()
@@ -34,8 +35,8 @@ bool OpenVrProxy::Init()
 		if (error != vr::VRInitError_None)
 		{
 			m_HMD = nullptr;
-			fprintf(stderr, "Failed to start openvr: %d\n", error);
-			printError("Unable to init VR runtime : %s\n" ,error);
+			LOG_ERROR("Failed to start openvr: %d", error);
+			printError("Unable to init VR runtime : %s" ,error);
 			return false;
 		}
 

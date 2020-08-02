@@ -1,5 +1,6 @@
 #include <HgSound\HgSoundDriver_libsoundio.h>
 #include <Windows.h>
+#include <Logging.h>
 
 namespace HgSound {
 
@@ -12,10 +13,10 @@ namespace HgSound {
 	void handleError(errorEnum x, int err) {
 		switch (x) {
 		case ERR_UNRECOVERABLE_STREAM:
-			fprintf(stderr, "unrecoverable stream error: %s\n", soundio_strerror(err));
+			LOG_ERROR("unrecoverable stream error: %s", soundio_strerror(err));
 			break;
 		case ERR_SMALL_WRITE:
-			fprintf(stderr, "small write: %d\n", err);
+			LOG_ERROR("small write: %d", err);
 			break;
 		}
 	}
@@ -23,7 +24,7 @@ namespace HgSound {
 
 	static void underflow_callback(struct SoundIoOutStream *outstream) {
 		static int count = 0;
-		fprintf(stderr, "underflow %d\n", count++);
+		LOG_ERROR("underflow %d", count++);
 	}
 
 	inline void write_sample_float32le(char *ptr, float sample) {
@@ -103,7 +104,7 @@ namespace HgSound {
 		auto soundio = soundio_ptr(soundio_create(), soundio_destroy);
 
 		if (!soundio) {
-			fprintf(stderr, "out of memory\n");
+			LOG_ERROR("out of memory");
 			return false;
 		}
 
@@ -111,27 +112,27 @@ namespace HgSound {
 		int err = soundio_connect_backend(sound_ptr, SoundIoBackendWasapi); //windows
 
 		if (err) {
-			fprintf(stderr, "Unable to connect to sound backend: %s\n", soundio_strerror(err));
+			LOG_ERROR("Unable to connect to sound backend: %s", soundio_strerror(err));
 			return false;
 		}
 
-		fprintf(stderr, "Sound backend: %s\n", soundio_backend_name(soundio->current_backend));
+		LOG_ERROR("Sound backend: %s", soundio_backend_name(soundio->current_backend));
 		soundio_flush_events(sound_ptr);
 
 		int selected_device_index = soundio_default_output_device_index(sound_ptr);
 		if (selected_device_index < 0) {
-			fprintf(stderr, "Output device not found\n");
+			LOG_ERROR("Output device not found");
 			return false;
 		}
 
 		auto device = device_ptr(soundio_get_output_device(sound_ptr, selected_device_index), soundio_device_unref);
 		if (!device) {
-			fprintf(stderr, "out of memory\n");
+			LOG_ERROR("out of memory");
 			return false;
 		}
-		fprintf(stderr, "Sound output device: %s\n", device->name);
+		LOG("Sound output device: %s", device->name);
 		if (device->probe_error) {
-			fprintf(stderr, "Cannot probe device: %s\n", soundio_strerror(device->probe_error));
+			LOG_ERROR("Cannot probe device: %s", soundio_strerror(device->probe_error));
 			return false;
 		}
 
@@ -146,7 +147,7 @@ namespace HgSound {
 		outstream->userdata = this;
 		if (soundio_device_supports_format(device.get(), SoundIoFormatFloat32LE)) {
 			outstream->format = SoundIoFormatFloat32LE;
-			fprintf(stderr, "SoundIoFormatFloat32LE\n");
+			LOG("SoundIoFormatFloat32LE");
 			//			write_sample = write_sample_float32le;
 		}
 		//else if (soundio_device_supports_format(device.get(), SoundIoFormatS16LE)) {
@@ -154,7 +155,7 @@ namespace HgSound {
 		//	//		write_sample = write_sample_s16ne;
 		//}
 		else {
-			fprintf(stderr, "No suitable device format available.\n");
+			LOG_ERROR("No suitable device format available.");
 			return false;
 		}
 
@@ -164,13 +165,13 @@ namespace HgSound {
 
 		//Move to after buffer init?
 		if ((err = soundio_outstream_open(outstream.get()))) {
-			fprintf(stderr, "unable to open device: %s", soundio_strerror(err));
+			LOG_ERROR("unable to open device: %s", soundio_strerror(err));
 			return false;
 		}
-		fprintf(stderr, "Software latency: %f\n", outstream->software_latency);
+		LOG("Software latency: %f\n", outstream->software_latency);
 
 		if (outstream->layout_error)
-			fprintf(stderr, "unable to set channel layout: %s\n", soundio_strerror(outstream->layout_error));
+			LOG_ERROR("unable to set channel layout: %s", soundio_strerror(outstream->layout_error));
 
 		this->soundio = std::move(soundio);
 		this->device = std::move(device);
@@ -186,14 +187,14 @@ namespace HgSound {
 
 		if (!m_initialized)
 		{
-			fprintf(stderr, "LibSoundIoDriver uninitialized\n");
+			LOG_ERROR("LibSoundIoDriver uninitialized");
 			return false;
 		}
 
 		int err;
 
 		if ((err = soundio_outstream_start(outstream.get()))) {
-			fprintf(stderr, "unable to start device: %s\n", soundio_strerror(err));
+			LOG_ERROR("unable to start device: %s", soundio_strerror(err));
 			return false;
 		}
 

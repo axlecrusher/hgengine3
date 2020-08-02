@@ -42,7 +42,7 @@ bool create_entity(char* type, ::HgScene* scene, HgEntity** entity)
 	auto factory = entity_factories.find(type);
 
 	if (factory == entity_factories.end()) {
-		fprintf(stderr, "Unable to find entity type \"%s\"\n", type);
+		LOG_ERROR("Unable to find entity type \"%s\"", type);
 		return false;
 	}
 	factory_clbk clbk = factory->second;
@@ -57,7 +57,7 @@ bool create_entity(const char* type, HgEntity** entity)
 	auto factory = entity_factories.find(type);
 
 	if (factory == entity_factories.end()) {
-		fprintf(stderr, "Unable to find entity type \"%s\"\n", type);
+		LOG_ERROR("Unable to find entity type \"%s\"", type);
 		return false;
 	}
 	factory_clbk clbk = factory->second;

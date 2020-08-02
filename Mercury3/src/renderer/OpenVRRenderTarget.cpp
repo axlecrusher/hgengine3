@@ -7,6 +7,7 @@
 
 #include <OGLFramebuffer.h>
 #include <EventSystem.h>
+#include <Logging.h>
 
 OpenVRRenderTarget::OpenVRRenderTarget(OpenVrProxy* openvr)
 	:m_openvr(openvr), m_initalized(false), m_timerInited(false)
@@ -238,7 +239,7 @@ void OpenVRRenderTarget::Render(const RenderParamsList& l)
 
 	if (e1 != vr::VRInitError_None)
 	{
-		fprintf(stderr, "Failed to submit left eye: %d\n", e1);
+		LOG_ERROR("Failed to submit left eye: %d", e1);
 	}
 
 	vr::Texture_t rightEyeTexture = { (void*)(uintptr_t)right->getResolveTextureID(), vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
@@ -246,7 +247,7 @@ void OpenVRRenderTarget::Render(const RenderParamsList& l)
 
 	if (e2 != vr::VRInitError_None)
 	{
-		fprintf(stderr, "Failed to submit right eye: %d\n", e2);
+		LOG_ERROR("Failed to submit right eye: %d", e2);
 	}
 }
 

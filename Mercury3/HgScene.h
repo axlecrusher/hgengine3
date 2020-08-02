@@ -72,7 +72,7 @@ T* create_entity(char* type, HgScene* scene, HgEntity** entity) {
 	auto factory = Engine::entity_factories.find(type);
 
 	if (factory == Engine::entity_factories.end()) {
-		fprintf(stderr, "Unable to find entity type \"%s\"\n", type);
+		LOG_ERROR("Unable to find entity type \"%s\"", type);
 		return 0;
 	}
 	factory_clbk clbk = factory->second;
@@ -88,7 +88,7 @@ T* create_entity(char* type, HgScene* scene) {
 	auto factory = Engine::entity_factories.find(type);
 
 	if (factory == Engine::entity_factories.end()) {
-		fprintf(stderr, "Unable to find entity type \"%s\"\n", type);
+		LOG_ERROR("Unable to find entity type \"%s\"", type);
 		return 0;
 	}
 	factory_clbk clbk = factory->second;

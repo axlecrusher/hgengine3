@@ -3,6 +3,7 @@
 #include <Logging.h>
 #include <HgScene2.h>
 #include <HgEngine.h>
+#include <Logging.h>
 
 namespace Engine {
 
@@ -23,7 +24,7 @@ HgEntity* HgScene::create_entity(const char* type_str)
 	auto factory = m_entityFactories.find(type_str);
 
 	if (factory == m_entityFactories.end()) {
-		fprintf(stderr, "Unable to find entity type \"%s\"\n", type_str);
+		LOG_ERROR("Unable to find entity type \"%s\"", type_str);
 		return nullptr;
 	}
 	factoryCallback clbk = factory->second;
@@ -181,7 +182,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 		}
 		else
 		{
-			fprintf(stderr, "matrixOffset >= m_modelMatrices.size: %d < %d\n", matrixOffset, m_modelMatrices.size());
+			LOG_ERROR("matrixOffset >= m_modelMatrices.size: %d < %d\n", matrixOffset, m_modelMatrices.size());
 		}
 
 		imd.instanceCount++;

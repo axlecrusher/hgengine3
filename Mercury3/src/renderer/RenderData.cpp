@@ -1,5 +1,6 @@
 #include <RenderData.h>
 #include <RenderBackend.h>
+#include <Logging.h>
 
 //RenderData::newRenderDataCallback RenderData::Create = nullptr;
 
@@ -34,7 +35,7 @@ void RenderData::render(const Instancing::InstancingMetaData* imd) {
 
 	if (vertex == nullptr)
 	{
-		fprintf(stderr, "Vertex VBO data is NULL, vbo index: %d\n", m_vertexVbo.Index());
+		LOG_ERROR("Vertex VBO data is NULL, vbo index: %d", m_vertexVbo.Index());
 		return;
 	}
 

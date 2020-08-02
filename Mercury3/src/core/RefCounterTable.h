@@ -165,7 +165,7 @@ private:
 			m_useCount[idx]--;
 			if (m_useCount[idx] == 0) {
 				m_unusedRecords.push_back(idx);
-				//fprintf(stderr, "reference count reached zero\n");
+				//LOG_ERROR("reference count reached zero\n");
 				m_records[idx] = T();
 				//run cleanup routine here
 			}

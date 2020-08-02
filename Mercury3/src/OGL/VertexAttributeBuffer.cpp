@@ -1,4 +1,5 @@
 #include <VertexAttributeBuffer.h>
+#include <Logging.h>
 
 void GLVertexAttributeBuffer::toGPU(const void* data, const size_t size)
 {
@@ -30,7 +31,7 @@ void MatrixVertexAttribute::SendToGPU(const IHgGPUBuffer* bufferObject)
 void InvalidAttributeError(const HgShader& shader, const std::string& name)
 {
 	auto ss = shader.sourceStruct();
-	fprintf(stderr, "Invalid Attribute: %s (shader %s)\n", name.c_str(), ss->vert_file_path.c_str());
+	LOG_ERROR("Invalid Attribute: %s (shader %s)", name.c_str(), ss->vert_file_path.c_str());
 }
 
 void MatrixVertexAttribute::Setup(const Instancing::InstancingMetaData& imd, const HgShader& shader)
@@ -46,7 +47,7 @@ void MatrixVertexAttribute::Setup(const Instancing::InstancingMetaData& imd, con
 		return;
 	}
 
-//	fprintf(stderr, "%s : %d\n", m_attributeName.c_str(), m_attributeBuffer.getValue());
+//	LOG("%s : %d", m_attributeName.c_str(), m_attributeBuffer.getValue());
 
 	//glVertexAttribPointer requires a buffer be bound
 	glBindBuffer(GL_ARRAY_BUFFER, m_attributeBuffer.getValue());

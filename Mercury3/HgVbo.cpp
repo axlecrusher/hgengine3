@@ -21,13 +21,13 @@ VboManager VboManager::singleton;
 //		m_unusedVboRecords.pop_back();
 //		m_vboRecords[index] = vboRec;
 //		m_useCount[index] = 1;
-//		//fprintf(stderr, "Reusing index %d\n", index);
+//		//LOG("Reusing index %d", index);
 //	}
 //	else {
 //		index = (VboIndexType)m_vboRecords.size();
 //		m_vboRecords.push_back(vboRec);
 //		m_useCount.push_back(1);
-//		//fprintf(stderr, "New index %d\n", index);
+//		//LOG("New index %d", index);
 //	}
 //	return VboIndex(index);
 //}
@@ -45,7 +45,7 @@ VboManager VboManager::singleton;
 //		m_useCount[idx]--;
 //		if (m_useCount[idx] == 0) {
 //			m_unusedVboRecords.push_back(idx);
-//			//fprintf(stderr, "reference count reached zero\n");
+//			//LOG("reference count reached zero");
 //			m_vboRecords[idx] = emptyRec;
 //			//run cleanup routine here
 //		}

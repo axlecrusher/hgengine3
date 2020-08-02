@@ -6,6 +6,7 @@
 #include <glew.h>
 #include <RenderData.h>
 #include <core/Instancing.h>
+#include <Logging.h>
 
 #include <GLBuffer.h>
 
@@ -297,7 +298,7 @@ void OGLvbo<T>::Setup()
 		break;
 	}
 	default:
-		fprintf(stderr, "Unknown vbo type:%d\n", vbo_type);
+		LOG_ERROR("Unknown vbo type:%d", vbo_type);
 		assert(!"Unknown vbo type");
 	}
 }

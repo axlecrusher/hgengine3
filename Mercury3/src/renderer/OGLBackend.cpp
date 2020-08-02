@@ -11,6 +11,7 @@
 
 #include <HgVbo.h>
 #include <OGLFramebuffer.h>
+#include <Logging.h>
 
 //OGLBackend oglRenderer;
 
@@ -18,7 +19,7 @@ static void GLAPIENTRY ogl_error_clbk(GLenum source, GLenum type, GLuint id,
 	GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
 	if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
 	{
-		fprintf(stderr, "%s\n", message);
+		LOG_ERROR(message);
 	}
 }
 

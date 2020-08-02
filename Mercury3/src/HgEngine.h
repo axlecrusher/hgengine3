@@ -1,6 +1,8 @@
 #pragma once
 /* This file should only be included once in the main cpp file of the program.*/
 
+#include <Logging.h>
+
 #include <UpdatableCollection.h>
 #include <InstancedCollection.h>
 

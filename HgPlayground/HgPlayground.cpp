@@ -4,6 +4,7 @@
 //#include "stdafx.h"
 #include <HgEngine.h>
 #include <Win32Window.h>
+#include <Logging.h>
 
 #include <stdio.h>
 #include <stdlib.h>

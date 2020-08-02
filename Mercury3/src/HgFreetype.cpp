@@ -4,6 +4,7 @@
 #include <stb_image_write.h>
 #include <HgTexture.h>
 #include <HgVbo.h>
+#include <Logging.h>
 
 namespace HgText
 {
@@ -270,7 +271,7 @@ setFontIdentifier(loader.uniqueIdentifier());
 		auto error = FT_Init_FreeType(&m_freeType);
 		if (error)
 		{
-			fprintf(stderr, "Error init freetype library %d\n", error);
+			LOG_ERROR("Error init freetype library %d", error);
 		}
 	}
 
@@ -286,7 +287,7 @@ setFontIdentifier(loader.uniqueIdentifier());
 
 		if (error != 0)
 		{
-			fprintf(stderr, "Error loading font \"%s\", %d\n", path.c_str(), error);
+			LOG_ERROR("Error loading font \"%s\", %d", path.c_str(), error);
 			return false;
 		}
 
