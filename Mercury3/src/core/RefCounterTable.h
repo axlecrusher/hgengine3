@@ -16,7 +16,11 @@ public:
 
 		IndexType() : m_idx(0)
 		{
-			m_idx = SelfType::Singleton().NewRecord() + 1;
+			//I don't like this but some things rely on IndexType being
+			//initialized to something valid
+			//see VAOIndex
+			auto idx = SelfType::Singleton().NewRecord();
+			std::swap(m_idx, idx.m_idx);
 		}
 
 		~IndexType()
@@ -48,8 +52,11 @@ public:
 			if (m_idx != 0) {
 				return SelfType::Singleton().getRecord(*this);
 			}
+			//FIX ME!!! RETURNS REFERENCE
 			return SelfType::DataType(); //eewwww
 		}
+
+		bool isValid() const { return m_idx > 0; }
 	private:
 		void Decrement()
 		{
@@ -92,7 +99,7 @@ public:
 	}
 
 	//Create new record with default constructor
-	auto NewRecord()
+	IndexType NewRecord()
 	{
 		IndexType::IdxType index;
 		if (m_unusedRecords.size() > 0) {
@@ -106,7 +113,7 @@ public:
 			m_records.push_back(T());
 			m_useCount.push_back(1);
 		}
-		return index;
+		return IndexType(index);
 	}
 
 	inline const T& getRecord(const IndexType& x) const
@@ -119,6 +126,18 @@ public:
 	{
 		const auto idx = x.Index();
 		return m_records[idx];
+	}
+
+	inline const T* getRecordPtr(const IndexType& x) const
+	{
+		const auto idx = x.Index();
+		return &m_records[idx];
+	}
+
+	inline T* getRecordPtr(const IndexType& x)
+	{
+		const auto idx = x.Index();
+		return &m_records[idx];
 	}
 
 	static SelfType& Singleton()

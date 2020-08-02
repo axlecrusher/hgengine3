@@ -162,13 +162,13 @@ velocity ComputeVelocity(const HgMath::mat4f& worldSpace, HgEntity* e, const HgT
 	//try to compute the velocity of an entity based on the previous rendered position
 	vector3f currentPosition,  prevPosition;
 
-	bool hasPrevious = PreviousPositionTable::Manager.get(e->getEntityId(), prevPosition);
+	bool hasPrevious = PreviousPositionTable::Manager().get(e->getEntityId(), prevPosition);
 
 	//compute the position based on this game update loop result
 	transformPoint(worldSpace, vectorial::vec3f::zero()).store(currentPosition.raw());
 
 	//store the current position for use in the next render
-	PreviousPositionTable::Manager.insert(e->getEntityId(), currentPosition);
+	PreviousPositionTable::Manager().insert(e->getEntityId(), currentPosition);
 
 	if (hasPrevious)
 	{

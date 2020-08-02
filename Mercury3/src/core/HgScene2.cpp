@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Logging.h>
 #include <HgScene2.h>
 #include <HgEngine.h>
 
@@ -53,11 +54,17 @@ void HgScene::RemoveInvalidEntities()
 		m_tmpEntities.reserve(m_entities.size());
 	}
 
+	auto& entityTable = EntityIdTable::Singleton();
+
 	for (auto id : m_entities)
 	{
-		if (EntityIdTable::Singleton().exists(id))
+		if (entityTable.exists(id))
 		{
 			m_tmpEntities.push_back(id);
+		}
+		else
+		{
+			LOG("Removing entity %d", id);
 		}
 	}
 	std::swap(m_entities, m_tmpEntities);
@@ -118,16 +125,17 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 
 	if (m_entities.empty()) return;
 
-	auto renderDatas = RenderDataTable::Manager.getRenderDataForEntities(m_entities.data(), m_entities.size());
+	auto renderDatas = RenderDataTable::Manager().getRenderDataForEntities(m_entities.data(), m_entities.size());
 
 	std::vector<RdDrawOrder> list;
 	list.reserve(renderDatas.size());
 
+	auto& entityTableInstance = EntityTable::Singleton();
 	for (auto& rdp : renderDatas)
 	{
 		RdDrawOrder t;
 		t.rdPair = rdp;
-		t.drawOrder = EntityTable::Singleton().getPtr(rdp.entity)->getDrawOrder();
+		t.drawOrder = entityTableInstance.getPtr(rdp.entity)->getDrawOrder();
 		list.push_back(t);
 	}
 

@@ -44,7 +44,7 @@ EntityIdType EntityIdTable::create()
 	m_entityTotal++;
 	m_entityActive++;
 
-	return combine_bytes(idx, m_generation[idx]);
+	return EntityIdType(idx, m_generation[idx]);
 }
 
 int32_t EntityIdTable::checkFreeContiguous(uint32_t count)
@@ -74,7 +74,7 @@ EntityIdList EntityIdTable::createContiguous(uint32_t count)
 
 	for (uint32_t i = 0; i < count; i++)
 	{
-		list[i] = combine_bytes(idx + i, m_generation[idx]);
+		list[i] = EntityIdType(idx + i, m_generation[idx]);
 	}
 
 	m_entityTotal += count;

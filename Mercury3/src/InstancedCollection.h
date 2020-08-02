@@ -83,7 +83,7 @@ public:
 	virtual void EnqueueForRender(RenderQueue* queue, HgTime dt) final {
 		if (m_updatedItemIdx.empty()) return;
 
-		auto renderDatas = RenderDataTable::Manager.getRenderDataForEntities(m_updatedItemIdx.data(), m_updatedItemIdx.size());
+		auto renderDatas = RenderDataTable::Manager().getRenderDataForEntities(m_updatedItemIdx.data(), m_updatedItemIdx.size());
 
 		std::sort(renderDatas.begin(), renderDatas.end(), orderByRenderData);
 
@@ -112,7 +112,7 @@ public:
 		//	updatedEntities[i] = id;
 		//}
 
-		//auto rd = RenderDataTable::Manager.getRenderDataForEntities(updatedEntities.data(), updatedEntities.size());
+		//auto rd = RenderDataTable::Manager().getRenderDataForEntities(updatedEntities.data(), updatedEntities.size());
 
 		//std::vector< Instancing::InstancingMetaData > instances;
 

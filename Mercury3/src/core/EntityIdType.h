@@ -15,6 +15,11 @@ public:
 		:m_id(id)
 	{}
 
+	EntityIdType(uint32_t index, uint32_t generation)
+	{
+		m_id = combine_bytes(index, generation);
+	}
+
 	EntityIdType(const EntityIdType&) = default;
 	EntityIdType(EntityIdType &&rhs)
 	{
@@ -42,6 +47,12 @@ public:
 	inline int32_t index() const { return (INDEX_MASK & m_id); }
 	inline int32_t generation() const { return (m_id >> INDEX_BITS) & GENERATION_MASK; }
 
+	static inline EntityIdType combine_bytes(uint32_t idx, uint8_t generation)
+	{
+		const uint32_t id = (generation << EntityIdType::INDEX_BITS) | idx;
+		return id;
+	}
+
 private:
 	uint32_t m_id;
 };
@@ -63,18 +74,24 @@ public:
 	EntityIdList createContiguous(uint32_t count);
 
 	//check if an entity exists
+	inline bool exists(uint32_t index, uint32_t generation) const
+	{
+		if (index == 0) return false;
+		if (index < m_generation.size())
+		{
+			const auto valid = (m_generation[index] == generation);
+			return valid;
+		}
+		return false; //this should never happen
+	}
+
+	//check if an entity exists
 	inline bool exists(EntityIdType id) const
 	{
 		const auto idx = id.index();
 		const auto gen = id.generation();
 
-		if (idx == 0) return false;
-		if (idx < m_generation.size())
-		{
-			const auto valid = (m_generation[idx] == gen);
-			return valid;
-		}
-		return false; //this should never happen
+		return exists(idx, gen);
 	}
 
 	//destroy an entity
@@ -89,11 +106,6 @@ public:
 	static EntityIdTable& Singleton();
 
 private:
-	inline EntityIdType combine_bytes(uint32_t idx, uint8_t generation)
-	{
-		const uint32_t id = (generation << EntityIdType::INDEX_BITS) | idx;
-		return id;
-	}
 
 	bool hasIdPool() const { return m_freeIndices.size() > 1024; }
 

@@ -48,6 +48,12 @@ void change_to_triangle(HgEntity* entity) {
 	entity->setRenderData( triangle_init_render_data());
 }
 
+void change_to_triangle(EntityIdType id)
+{
+	//create an instance of the render data for all triangles to share
+	RenderDataTable::Manager().insert(id, triangle_init_render_data());
+}
+
 static void* triangle_factory(HgEntity* e) {
 	change_to_triangle(e);
 	return nullptr;

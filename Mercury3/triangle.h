@@ -4,6 +4,7 @@
 #include <InstancedCollection.h>
 
 void change_to_triangle(HgEntity* entity);
+void change_to_triangle(EntityIdType id);
 
 namespace Triangle {
 constexpr uint32_t vertexCount = 3;

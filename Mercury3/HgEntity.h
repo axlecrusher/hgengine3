@@ -105,7 +105,7 @@ public:
 	void insert(EntityIdType id, vertex3f p);
 	bool get(EntityIdType id, vertex3f& pp);
 
-	static PreviousPositionTable Manager;
+	static PreviousPositionTable& Manager();
 private:
 
 	std::unordered_map<EntityIdType, vertex3f> m_positions;
@@ -199,7 +199,7 @@ public:
 	void setParent(EntityIdType id, EntityIdType parentId);
 	bool getParentId(EntityIdType id, EntityIdType& parent);
 
-	static EntityParentTable Manager;
+	static EntityParentTable& Manager();
 private:
 
 	std::unordered_map<EntityIdType, EntityIdType> m_parents;
@@ -231,7 +231,9 @@ public:
 	//returns vector of entity and render data index pairs
 	std::vector<EntityRDPair> getRenderDataForEntities(EntityIdType* id, int32_t count) const;
 
-	static RenderDataTable Manager;
+	void GarbageCollectInvalidEntities(EntityIdTable* idTable);
+
+	static RenderDataTable& Manager();
 private:
 	std::vector<uint8_t> m_entityGeneration; //generation of entity that stored the render data
 	std::vector<RenderDataPtr> m_renderData;
@@ -292,14 +294,14 @@ class HgEntity {
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
 		//void updateGpuTextures();
 
-		inline void setParent(EntityIdType id) { EntityParentTable::Manager.setParent(m_entityId, id); }
+		inline void setParent(EntityIdType id) { EntityParentTable::Manager().setParent(m_entityId, id); }
 		
 		inline EntityLocator::SearchResult getParent() const
 		{
 			EntityLocator::SearchResult r;
 
 			EntityIdType parentId;
-			if (EntityParentTable::Manager.getParentId(m_entityId, parentId))
+			if (EntityParentTable::Manager().getParentId(m_entityId, parentId))
 			{
 				r = Find(parentId);
 			}
@@ -309,13 +311,13 @@ class HgEntity {
 
 		//inline void setChild(HgEntity* child) { child->setParent(this); }
 
-		inline void setRenderData(std::shared_ptr<RenderData>& rd) { RenderDataTable::Manager.insert(m_entityId, rd); }
+		inline void setRenderData(std::shared_ptr<RenderData>& rd) { RenderDataTable::Manager().insert(m_entityId, rd); }
 
 		//RenderData* renderData() { return m_renderData.get(); }
 		//const RenderData* renderData() const { return m_renderData.get(); }
 
-		RenderDataPtr getRenderDataPtr() { return RenderDataTable::Manager.get(m_entityId); }
-		const RenderDataPtr getRenderDataPtr() const { return RenderDataTable::Manager.get(m_entityId); }
+		RenderDataPtr getRenderDataPtr() { return RenderDataTable::Manager().get(m_entityId); }
+		const RenderDataPtr getRenderDataPtr() const { return RenderDataTable::Manager().get(m_entityId); }
 
 		//inline void setScene(HgScene* s) { m_extendedData->m_scene = s; }
 
@@ -334,8 +336,8 @@ class HgEntity {
 		inline void setDrawOrder(int8_t order) { m_drawOrder = order; }
 		inline int8_t getDrawOrder() const { return m_drawOrder; }
 
-		inline void setName(const std::string& name) { EntityNames.setName(m_entityId, name); }
-		inline std::string& getName() const { EntityNames.getName(m_entityId); }
+		inline void setName(const std::string& name) { EntityNames().setName(m_entityId, name); }
+		inline std::string& getName() const { EntityNames().getName(m_entityId); }
 
 		inline EntityFlags getFlags() const { return flags; }
 
@@ -355,7 +357,7 @@ class HgEntity {
 		static EntityLocator::SearchResult Find(EntityIdType id);
 private:
 
-	static EntityNameTable EntityNames;
+	static EntityNameTable& EntityNames();
 
 	//static EntityLocator& Locator();
 
@@ -378,20 +380,19 @@ public:
 	}
 
 	//create a new entity
-	inline HgEntity create()
+	inline EntityIdType create()
 	{
 		const auto id = EntityIdTable::Singleton().create();
-
-		HgEntity e;
-		e.init(id);
-
 		const auto idx = id.index();
 
 		if (idx >= m_entities.size())
 		{
 			m_entities.resize(idx + 1000);
 		}
-		return m_entities[idx];
+
+		m_entities[idx].init(id);
+
+		return id;
 	}
 
 	//create multiple entities from an EntityIdList
@@ -471,8 +472,7 @@ namespace EntityHelpers
 
 	inline EntityIdType createSingle()
 	{
-		auto id = EntityIdTable::Singleton().create();
-		return id;
+		return EntityTable::Singleton().create();
 	}
 }
 

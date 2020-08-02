@@ -11,48 +11,82 @@
 
 #include <UpdatableCollection.h>
 
-float projectileMsecSpeed = 1.0f / 50.0f;
-
-//static auto ProjectileCollection()
-//{
-//	return Engine::getCollectionOf<UpdatableCollection<Projectile>>();
-//}
-//
-//static Projectile* CreateProjectile() {
-//	return ProjectileCollection()->newItem();
-//}
-
-Projectile::Projectile()
+namespace Projectile
 {
-	//m_entity.init();
-}
 
-void Projectile::init()
-{
-	m_entity.init();
-	change_to_triangle(&getEntity());
-}
+	using namespace Projectile;
+	float projectileMsecSpeed = 1.0f / 50.0f;
 
-void Projectile::update(HgTime tdelta) {
+	ProjectileTableType ProjectileTable;
+
+	//static auto ProjectileCollection()
+	//{
+	//	return Engine::getCollectionOf<UpdatableCollection<Projectile>>();
+	//}
+	//
+	//static Projectile* CreateProjectile() {
+	//	return ProjectileCollection()->newItem();
+	//}
+
+	//Projectile::Projectile()
+	//{
+	//	//m_entity.init();
+	//}
+
+	//void Projectile::init()
+	//{
+	//	//m_entity.init();
+	//	//change_to_triangle(&getEntity());
+	//}
+
+	void Projectile::update(HgTime tdelta) {
 		total_time += tdelta;
 
 		if (total_time >= HgTime::msec(3000)) {
-//			printf("set destroy\n");
-			m_entity.setDestroy(true);
-			//ProjectileCollection()->remove(*this);
+			EntityIdTable::Singleton().destroy(entityId);
+			//EntityTable::Singleton().destroy(entityId);
 			return;
 		}
 
 		float distance = tdelta.seconds() * 20.0;
 		vector3 r = direction.normal().scale(distance);
-		m_entity.position(m_entity.position() + r);
-}
 
-void Projectile::getInstanceData(Instancing::GPUTransformationMatrix* instanceData)
-{
-	const auto mat = getEntity().computeWorldSpaceMatrix();
-	mat.store(instanceData->matrix);
-}
+		HgEntity* entity = EntityTable::Singleton().getPtr(entityId);
+		entity->position(entity->position() + r);
+	}
+
+	//void Projectile::getInstanceData(Instancing::GPUTransformationMatrix* instanceData)
+	//{
+	//	HgEntity* entity = EntityTable::Singleton().getPtr(entityId);
+	//	const auto mat = entity.computeWorldSpaceMatrix();
+	//	mat.store(instanceData->matrix);
+	//}
+
+
+	Projectile* CreateProjectileTriangle(Engine::HgScene* scene)
+	{
+		auto id = EntityHelpers::createSingle();
+		change_to_triangle(id);
+		scene->addEntityID(id);
+
+		Projectile p;
+		p.entityId = id;
+
+		ProjectileTable.push_back(p);
+
+		return &ProjectileTable.back();
+	}
+
+	void updateProjectiles(HgTime dt)
+	{
+		for (auto& p : ProjectileTable)
+		{
+			p.update(dt);
+		}
+	}
+
+
+} //namespace Projectile
 
 //static void* generate_projectile(HgEntity* entity) {
 //	//element->setLogic(std::make_unique<Projectile>());

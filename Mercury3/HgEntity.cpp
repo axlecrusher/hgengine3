@@ -16,10 +16,49 @@
 #include <HgEngine.h>
 #include <EntityIdType.h>
 
-EntityParentTable EntityParentTable::Manager;
-RenderDataTable RenderDataTable::Manager;
-PreviousPositionTable PreviousPositionTable::Manager;
-EntityNameTable HgEntity::EntityNames;
+EntityParentTable& EntityParentTable::Manager()
+{
+	static std::unique_ptr<EntityParentTable> instance;
+	if (instance == nullptr)
+	{
+		instance = std::make_unique<EntityParentTable>();
+	}
+
+	return *instance.get();
+}
+
+PreviousPositionTable& PreviousPositionTable::Manager()
+{
+	static std::unique_ptr<PreviousPositionTable> instance;
+	if (instance == nullptr)
+	{
+		instance = std::make_unique<PreviousPositionTable>();
+	}
+
+	return *instance.get();
+}
+
+EntityNameTable& HgEntity::EntityNames()
+{
+	static std::unique_ptr<EntityNameTable> instance;
+	if (instance == nullptr)
+	{
+		instance = std::make_unique<EntityNameTable>();
+	}
+
+	return *instance.get();
+}
+
+RenderDataTable& RenderDataTable::Manager()
+{
+	static std::unique_ptr<RenderDataTable> instance;
+	if (instance == nullptr)
+	{
+		instance = std::make_unique<RenderDataTable>();
+	}
+
+	return *instance.get();
+}
 
 EntityTable& EntityTable::Singleton()
 {
@@ -203,7 +242,8 @@ std::vector<EntityRDPair> RenderDataTable::getRenderDataForEntities(EntityIdType
 		const auto entityid = id[i];
 		const auto idx = entityid.index();
 
-		if (m_entityGeneration.size() >= idx && m_entityGeneration[idx] == entityid.generation())
+		if (m_entityGeneration.size() >= idx &&
+			m_entityGeneration[idx] == entityid.generation())
 		{
 			r.push_back({ entityid, m_renderData[idx] });
 		}
@@ -212,6 +252,17 @@ std::vector<EntityRDPair> RenderDataTable::getRenderDataForEntities(EntityIdType
 	return r;
 }
 
+void RenderDataTable::GarbageCollectInvalidEntities(EntityIdTable* idTable)
+{
+	const auto count = m_entityGeneration.size();
+	for (int32_t i = 0; i < count; i++)
+	{
+		if (m_renderData[i] && !idTable->exists(i, m_entityGeneration[i]))
+		{
+			m_renderData[i] = nullptr;
+		}
+	}
+}
 
 RenderDataPtr RenderDataTable::get(EntityIdType id) const
 {
@@ -327,7 +378,7 @@ HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool 
 
 HgMath::mat4f HgEntity::computeWorldSpaceMatrix(const bool applyScale, bool applyRotation, bool applyTranslation) const {
 	EntityIdType parentId;
-	const bool hasParent = EntityParentTable::Manager.getParentId(m_entityId, parentId);
+	const bool hasParent = EntityParentTable::Manager().getParentId(m_entityId, parentId);
 
 
 	if (hasParent && EntityIdTable::Singleton().exists(parentId))
@@ -357,6 +408,11 @@ point HgEntity::computeWorldSpacePosition() const
 	const vector3f p;
 	const auto matrix = computeWorldSpaceMatrix();
 	return matrix * p;
+}
+
+void EntityTable::destroy(EntityIdType id)
+{
+	//	m_entities
 }
 
 //Transform point p into world space of HgEntity e
