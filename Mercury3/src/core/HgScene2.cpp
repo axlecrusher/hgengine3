@@ -131,13 +131,26 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	std::vector<RdDrawOrder> list;
 	list.reserve(renderDatas.size());
 
-	auto& entityTableInstance = EntityTable::Singleton();
+	auto entityTable = EntityTable::Singleton();
+	auto& entityIdTable = EntityIdTable::Singleton();
+
 	for (auto& rdp : renderDatas)
 	{
 		RdDrawOrder t;
 		t.rdPair = rdp;
-		t.drawOrder = entityTableInstance.getPtr(rdp.entity)->getDrawOrder();
-		list.push_back(t);
+
+		auto entity = entityTable.getPtr(&entityIdTable, rdp.entity);
+
+		t.drawOrder = entity->getDrawOrder();
+
+		if (!entity->getFlags().hidden)
+		{
+			list.push_back(t);
+		}
+		//else
+		//{
+		//	LOG("Entity hidden, skip");
+		//}
 	}
 
 	if (m_modelMatrices.size() < list.size())
