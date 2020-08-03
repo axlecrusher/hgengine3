@@ -30,7 +30,9 @@ namespace Events
 enum ButtonType
 {
 	BUTTON_INVALID = 0,
-	BUTTON_TRIGGER
+	BUTTON_TRIGGER,
+	BUTTON_APP_MENU
+
 };
 
 struct VrControllerButton{

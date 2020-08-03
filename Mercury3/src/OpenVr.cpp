@@ -69,6 +69,12 @@ void OpenVrProxy::HandleInput()
 	vr::VREvent_t event;
 	while (m_HMD->PollNextEvent(&event, sizeof(event)))
 	{
+		if (event.eventType == vr::EVREventType::VREvent_ButtonUnpress)
+		{
+			const auto button = event.data.controller.button;
+			LOG("Button value: %d", button);
+		}
+
 		if (event.eventType == vr::EVREventType::VREvent_ButtonPress)
 		{
 			auto button = event.data.controller.button;
@@ -95,6 +101,21 @@ void OpenVrProxy::HandleInput()
 				//printf("trigger up\n");
 			}
 		}
+
+		if (event.eventType == vr::EVREventType::VREvent_ButtonUnpress)
+		{
+			const auto button = event.data.controller.button;
+			if (button == vr::EVRButtonId::k_EButton_ApplicationMenu)
+			{
+				auto trigger = Events::VrControllerButton();
+				trigger.controllerId = event.trackedDeviceIndex;
+				trigger.isDown = false;
+				trigger.buttonType = Events::ButtonType::BUTTON_APP_MENU;
+				EventSystem::PublishEvent(trigger);
+				//printf("trigger up\n");
+			}
+		}
+
 //		ProcessVREvent(event);
 	}
 
