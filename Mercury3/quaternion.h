@@ -85,6 +85,7 @@ public:
 	static quaternion mult_vectorized(const quaternion& q, const quaternion& r);
 
 	void toMatrix4(float* m) const;
+	void toMatrix4(HgMath::mat4f& m) const;
 
 	inline HgMath::mat4f toMatrix4() const {
 		float m[16];

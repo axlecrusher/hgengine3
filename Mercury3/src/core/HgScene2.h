@@ -16,6 +16,28 @@ class IUpdatableCollection;
 
 namespace Engine
 {
+	////same as EntityRDPair in HgEntity.h
+	//struct EntityRDPair
+	//{
+	//	EntityIdType entity;
+	//	RenderDataPtr ptr;
+	//};
+
+	//struct RdDrawOrder
+	//{
+	//	RdDrawOrder()
+	//		:drawOrder(0)
+	//	{}
+
+	//	EntityRDPair rdPair;
+	//	int8_t drawOrder;
+
+	//	inline bool isSameGroup(const RdDrawOrder& rhs)
+	//	{
+	//		return (drawOrder == rhs.drawOrder)
+	//			&& (rdPair.ptr == rhs.rdPair.ptr);
+	//	}
+	//};
 
 class HgScene;
 

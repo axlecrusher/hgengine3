@@ -5,6 +5,7 @@
 #include <HgCamera.h>
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 //#include <RenderData.h>
 #include <math/matrix.h>
@@ -63,6 +64,7 @@ class HgShader {
 		//return the handle of the compiled shader
 		inline ShaderHandle getProgramHandle() const { return m_handle; }
 
+		int32_t getAttributeLocation(const std::string& name) const;
 
 		inline shader_source* sourceStruct() const { return m_shaderSource.get(); }
 
@@ -81,6 +83,8 @@ protected:
 
 	//other things not needed often
 	std::unique_ptr<shader_source> m_shaderSource;
+
+	mutable std::unordered_map<std::string, uint32_t> m_attribLocations;
 
 private:
 	size_t m_uniqueId;

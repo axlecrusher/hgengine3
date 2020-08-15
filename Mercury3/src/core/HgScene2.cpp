@@ -63,25 +63,13 @@ void HgScene::RemoveInvalidEntities()
 		{
 			m_tmpEntities.push_back(id);
 		}
-		else
-		{
-			LOG("Removing entity %d", id);
-		}
+		//else
+		//{
+		//	LOG("Removing entity %d", id);
+		//}
 	}
 	std::swap(m_entities, m_tmpEntities);
 }
-
-struct {
-	bool operator()(const EntityRDPair& a, const EntityRDPair& b) const
-	{
-		//sort to ascending entity id
-		if (a.ptr == b.ptr)
-		{
-			return a.entity < b.entity;
-		}
-		return a.ptr < b.ptr;
-	}
-} orderByRenderData;
 
 struct RdDrawOrder
 {
@@ -98,6 +86,18 @@ struct RdDrawOrder
 			&& (rdPair.ptr == rhs.rdPair.ptr);
 	}
 };
+
+struct {
+	bool operator()(const EntityRDPair& a, const EntityRDPair& b) const
+	{
+		//sort to ascending entity id
+		if (a.ptr == b.ptr)
+		{
+			return a.entity < b.entity;
+		}
+		return a.ptr < b.ptr;
+	}
+} orderByRenderData;
 
 struct {
 	bool operator()(const RdDrawOrder& a, const RdDrawOrder& b) const
@@ -120,6 +120,9 @@ struct {
 } orderEntitesForDraw;
 
 void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
+
+	//This function does not scale well with huge entity counts
+
 	for (auto& i : m_collections) {
 		i->EnqueueForRender(queue, dt);
 	}
@@ -127,17 +130,17 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	if (m_entities.empty()) return;
 
 	auto renderDatas = RenderDataTable::Manager().getRenderDataForEntities(m_entities.data(), m_entities.size());
+	
+	std::vector<RdDrawOrder> rdoList;
+	rdoList.reserve(renderDatas.size());
 
-	std::vector<RdDrawOrder> list;
-	list.reserve(renderDatas.size());
-
-	auto entityTable = EntityTable::Singleton();
+	auto& entityTable = EntityTable::Singleton();
 	auto& entityIdTable = EntityIdTable::Singleton();
 
 	for (auto& rdp : renderDatas)
 	{
 		RdDrawOrder t;
-		t.rdPair = rdp;
+		t.rdPair = { rdp.entity, rdp.ptr };
 
 		auto entity = entityTable.getPtr(&entityIdTable, rdp.entity);
 
@@ -145,7 +148,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 
 		if (!entity->getFlags().hidden)
 		{
-			list.push_back(t);
+			rdoList.push_back(t);
 		}
 		//else
 		//{
@@ -153,10 +156,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 		//}
 	}
 
-	if (m_modelMatrices.size() < list.size())
-	{
-		m_modelMatrices.resize(list.size());
-	}
+	m_modelMatrices.resize(rdoList.size()); //always resize to send the smallest size to the gpu
 
 	std::vector< Instancing::InstancingMetaData > instances;
 
@@ -164,13 +164,13 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	m_vBuffer->setNeedsLoadToGPU(true); //entire vector contents needs to be sent to the GPU
 
 	//sort by draworder, renderdata, entityID
-	std::sort(list.begin(), list.end(), orderEntitesForDraw);
+	std::sort(rdoList.begin(), rdoList.end(), orderEntitesForDraw);
 
 	//group by draworder, renderdata
 	RdDrawOrder lastRDO;
 	Instancing::InstancingMetaData imd;
 	uint32_t matrixOffset = 0;
-	for (const auto& t : list)
+	for (const auto& t : rdoList)
 	{
 		if (!lastRDO.isSameGroup(t))
 		{
@@ -185,8 +185,8 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 			imd.instanceData = m_vBuffer;
 			lastRDO = t;
 		}
-		auto entity = EntityTable::Singleton().getPtr(t.rdPair.entity);
 
+		auto entity = entityTable.getPtr(&entityIdTable, t.rdPair.entity);
 		const auto m = entity->computeWorldSpaceMatrix();
 
 		if (matrixOffset < m_modelMatrices.size())

@@ -361,7 +361,10 @@ HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale, bool 
 	modelMatrix.value.w = (origin_vec * scaleFactor).xyz1().value;
 
 	if (applyRotation) {
-		modelMatrix = sd.orientation.toMatrix4() * modelMatrix;
+		HgMath::mat4f rotation;
+		sd.orientation.toMatrix4(rotation);
+		//const auto rotation = sd.orientation.toMatrix4();
+		modelMatrix = rotation * modelMatrix;
 	}
 
 	const float translationScalar = applyTranslation * 1.0f; //Integral promotion of bool, avoid branching

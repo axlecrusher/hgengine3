@@ -134,12 +134,12 @@ void quaternion::toMatrix4(float* m) const {
 	//const float sz = square(z());
 	const auto sq = square(wxyz);
 
-	const float qxqy2 = 2 * x()*y();
-	const float qzqw2 = 2 * z()*w();
-	const float qxqz2 = 2 * x()*z();
-	const float qyqw2 = 2 * y()*w();
-	const float qyqz2 = 2 * y()*z();
-	const float qxqw2 = 2 * x()*w();
+	const float qxqy2 = 2.0f * x()*y();
+	const float qzqw2 = 2.0f * z()*w();
+	const float qxqz2 = 2.0f * x()*z();
+	const float qyqw2 = 2.0f * y()*w();
+	const float qyqz2 = 2.0f * y()*z();
+	const float qxqw2 = 2.0f * x()*w();
 
 	//column major
 	m[0] = 1.0f - 2 * sq.y() -2 * sq.z();
@@ -161,4 +161,48 @@ void quaternion::toMatrix4(float* m) const {
 	m[13] = 0;
 	m[14] = 0;
 	m[15] = 1;
+}
+
+void quaternion::toMatrix4(HgMath::mat4f& m) const
+{
+	using namespace HgMath;
+
+	//const float sx = square(x());
+	//const float sy = square(y());
+	//const float sz = square(z());
+	const auto sq = square(wxyz);
+
+	const float qxqy2 = 2.0f * x()*y();
+	const float qzqw2 = 2.0f * z()*w();
+	const float qxqz2 = 2.0f * x()*z();
+	const float qyqw2 = 2.0f * y()*w();
+	const float qyqz2 = 2.0f * y()*z();
+	const float qxqw2 = 2.0f * x()*w();
+
+	//column major
+
+	const auto v0 = simd4f_create(
+		1.0f - 2 * sq.y() - 2 * sq.z(),
+		qxqy2 + qzqw2,
+		qxqz2 - qyqw2,
+		0.0);
+
+	const auto v1 = simd4f_create(
+		qxqy2 - qzqw2,
+		1.0f - 2 * sq.x() - 2 * sq.z(),
+		qyqz2 + qxqw2,
+		0.0);
+
+	const auto v2 = simd4f_create(
+		qxqz2 + qyqw2,
+		qyqz2 - qxqw2,
+		1.0f - 2 * sq.x() - 2 * sq.y(),
+		0.0);
+
+	//const auto v3 = simd4f_create(vectorial::vec4f::wAxis());
+
+	m.value.x = v0;
+	m.value.y = v1;
+	m.value.z = v2;
+	m.value.w = vectorial::vec4f::wAxis().value;
 }

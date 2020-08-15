@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <Logging.h>
 
+#include <../oglShaders.h>
+
 #pragma warning(disable:4996)
 
 #define MAX_SHADERS 1000
@@ -95,4 +97,20 @@ void HgShader::release(HgShader* s) {
 			return;
 		}
 	}
+}
+
+int32_t HgShader::getAttributeLocation(const std::string& name) const 
+{
+	auto itr = m_attribLocations.find(name);
+	if (itr == m_attribLocations.end())
+	{
+		//get the attribute location from the shader
+		OGLShaderHandle program_id = getProgramHandle();
+		const auto attribLocation = glGetAttribLocation(program_id, name.c_str());
+		m_attribLocations[name] = attribLocation;
+		return attribLocation;
+	}
+
+	return itr->second;
+
 }

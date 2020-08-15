@@ -188,6 +188,8 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 			LOG_ERROR("HgShaders: Unknown uniform \"%s\"", name);
 		}
 	}
+
+	shader->m_attribLocations.clear();
 }
 
 std::unique_ptr<HgShader> HgOglShader::Create(const char* vert, const char* frag) {
