@@ -150,9 +150,7 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 	GLint params = -1;
 	glGetProgramiv(shader_program, GL_LINK_STATUS, &params);
 	if (GL_TRUE != params) {
-		fprintf(stderr,
-			"ERROR: could not link shader programme GL index %u\n",
-			shader_program);
+		LOG_ERROR("ERROR: could not link shader programme GL index %u\n", shader_program);
 		_print_programme_info_log(shader_program);
 		return;
 	}
@@ -164,7 +162,8 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 	GLint size; // size of the variable
 	GLenum type; // type of the variable (float, vec3 or mat4, etc)
 
-	GLchar name[64]; // variable name in GLSL
+	constexpr int bufSize = 64;
+	GLchar name[bufSize]; // variable name in GLSL
 	GLsizei length; // name length
 
 	//create list of uniforms
@@ -173,9 +172,9 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 
 	memset(shader->m_uniformLocations, -1, sizeof(*shader->m_uniformLocations)*U_UNIFORM_COUNT);
 
-	for (GLuint i = 0; i < uniform_count; i++)
+	for (GLint i = 0; i < uniform_count; i++)
 	{
-		glGetActiveUniform(shader_program, i, 64, &length, &size, &type, name);
+		glGetActiveUniform(shader_program, i, bufSize, &length, &size, &type, name);
 		const auto itr = UniformStringMap.find(std::string(name, length));
 
 		if (itr != UniformStringMap.end())
@@ -190,6 +189,21 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 	}
 
 	shader->m_attribLocations.clear();
+
+	GLint attribCount = 0;
+	glGetProgramiv(shader_program, GL_ACTIVE_ATTRIBUTES, &attribCount);
+
+	//LOG("Active Attributes: %d\n", attribCount);
+
+	for (GLint i = 0; i < attribCount; i++)
+	{
+		glGetActiveAttrib(shader_program, (GLuint)i, bufSize, &length, &size, &type, name);
+		const auto attribLocation = glGetAttribLocation(shader_program, name);
+		//LOG("Attribute #%d Type: %u Name: %s Location :%d\n", i, type, name, attribLocation);
+		const std::string tmp(name);
+		shader->m_attribLocations[name] = attribLocation;
+	}
+
 }
 
 std::unique_ptr<HgShader> HgOglShader::Create(const char* vert, const char* frag) {
@@ -340,6 +354,6 @@ void HgOglShader::sendLocalUniformsToGPU(const ShaderUniforms& uniforms) {
 	//}
 
 	if ((m_uniformLocations[U_TIME_REMAIN] > -1) && (uniforms.remainingTime != nullptr)) {
-		glUniform1f(m_uniformLocations[U_TIME_REMAIN], uniforms.remainingTime->seconds());
+		glUniform1f(m_uniformLocations[U_TIME_REMAIN], (float)uniforms.remainingTime->seconds());
 	}
 }

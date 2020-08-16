@@ -83,8 +83,7 @@ protected:
 
 	//other things not needed often
 	std::unique_ptr<shader_source> m_shaderSource;
-
-	mutable std::unordered_map<std::string, uint32_t> m_attribLocations;
+	std::unordered_map<std::string, uint32_t> m_attribLocations;
 
 private:
 	size_t m_uniqueId;
