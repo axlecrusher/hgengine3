@@ -20,12 +20,12 @@ namespace Instancing
 	struct InstancingMetaData
 	{
 		InstancingMetaData()
-			:instanceCount(0), byteOffset(0)
+			:instanceCount(0), byteOffset(0), renderData(nullptr)
 		{
 		}
 
 		InstancingMetaData(std::shared_ptr< IHgGPUBuffer >& dataBuffer)
-			:instanceCount(0), byteOffset(0), instanceData(dataBuffer)
+			:instanceCount(0), byteOffset(0), instanceData(dataBuffer), renderData(nullptr)
 		{
 		}
 
@@ -41,7 +41,8 @@ namespace Instancing
 		//byte offset into the instanceData buffer where the instancing data begins
 		uint32_t byteOffset;
 
-		RenderDataPtr renderData;
+		//RenderDataPtr renderData;
+		RenderData* renderData;
 
 		//pointer to the data buffer
 		std::shared_ptr< IHgGPUBuffer > instanceData;

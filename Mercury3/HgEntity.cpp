@@ -232,24 +232,25 @@ void RenderDataTable::insert(EntityIdType id, const RenderDataPtr& rd)
 	m_renderData[idx] = rd;
 }
 
-std::vector<EntityRDPair> RenderDataTable::getRenderDataForEntities(EntityIdType* id, int32_t count) const
+uint32_t RenderDataTable::getRenderDataForEntities(EntityIdType* id, int32_t count, EntityRDPair* out) const
 {
-	std::vector<EntityRDPair> r;
-	r.reserve(count);
-
-	for (int32_t i = 0; i < count; i++)
+	const auto genSize = m_entityGeneration.size();
+	uint32_t rc = 0;
+	for (int i = 0; i < count; i++)
 	{
 		const auto entityid = id[i];
 		const auto idx = entityid.index();
 
-		if (m_entityGeneration.size() >= idx &&
-			m_entityGeneration[idx] == entityid.generation())
+		if (idx < genSize &&
+			( m_entityGeneration[idx] == entityid.generation() ))
 		{
-			r.push_back({ entityid, m_renderData[idx] });
+			out[rc].entityId = entityid;
+			out[rc].rd = m_renderData[idx].get();
+			rc++;
 		}
 	}
 
-	return r;
+	return rc;
 }
 
 void RenderDataTable::GarbageCollectInvalidEntities(EntityIdTable* idTable)

@@ -74,16 +74,16 @@ void HgScene::RemoveInvalidEntities()
 struct RdDrawOrder
 {
 	RdDrawOrder()
-		:drawOrder(0)
+		:rdPair(nullptr), drawOrder(0)
 	{}
 
-	EntityRDPair rdPair;
+	EntityRDPair* rdPair;
 	int8_t drawOrder;
 
 	inline bool isSameGroup(const RdDrawOrder& rhs)
 	{
 		return (drawOrder == rhs.drawOrder)
-			&& (rdPair.ptr == rhs.rdPair.ptr);
+			&& (rdPair && rdPair->rd == rhs.rdPair->rd);
 	}
 };
 
@@ -91,11 +91,11 @@ struct {
 	bool operator()(const EntityRDPair& a, const EntityRDPair& b) const
 	{
 		//sort to ascending entity id
-		if (a.ptr == b.ptr)
+		if (a.rd == b.rd)
 		{
-			return a.entity < b.entity;
+			return a.entityId < b.entityId;
 		}
-		return a.ptr < b.ptr;
+		return a.rd < b.rd;
 	}
 } orderByRenderData;
 
@@ -103,17 +103,17 @@ struct {
 	bool operator()(const RdDrawOrder& a, const RdDrawOrder& b) const
 	{
 		return (a.drawOrder < b.drawOrder) ||
-		((a.drawOrder == b.drawOrder) && (a.rdPair.ptr < b.rdPair.ptr)) ||
-		((a.drawOrder == b.drawOrder) && (a.rdPair.ptr == b.rdPair.ptr) && (a.rdPair.ptr < b.rdPair.ptr));
+		((a.drawOrder == b.drawOrder) && (a.rdPair->rd < b.rdPair->rd)) ||
+		((a.drawOrder == b.drawOrder) && (a.rdPair->rd == b.rdPair->rd) && (a.rdPair->rd < b.rdPair->rd));
 
 	//if (a.drawOrder == b.drawOrder)
 	//	{
 	//		//sort to ascending entity id
-	//		if (a.rdPair.ptr == b.rdPair.ptr)
+	//		if (a.rdPair->rd == b.rdPair->rd)
 	//		{
 	//			return a.rdPair.entity < b.rdPair.entity;
 	//		}
-	//		return a.rdPair.ptr < b.rdPair.ptr;
+	//		return a.rdPair->rd < b.rdPair->rd;
 	//	}
 	//	return a.drawOrder < b.drawOrder;
 	}
@@ -129,32 +129,45 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 
 	if (m_entities.empty()) return;
 
-	auto renderDatas = RenderDataTable::Manager().getRenderDataForEntities(m_entities.data(), m_entities.size());
+	if (m_renderDatas.size() < m_entities.size())
+	{
+		m_renderDatas.resize(m_entities.size());
+	}
+
+	//RenderData pointer is used for grouping draw calls. We don't really
+	//the pointer. We just need to know its the same RenderData across entties.
+	//Figure out how to do this without a pointer...
+
+	const auto renderCount = RenderDataTable::Manager().getRenderDataForEntities(m_entities.data(), m_entities.size(), m_renderDatas.data());
 	
 	std::vector<RdDrawOrder> rdoList;
-	rdoList.reserve(renderDatas.size());
+	rdoList.resize(renderCount);
 
 	auto& entityTable = EntityTable::Singleton();
 	auto& entityIdTable = EntityIdTable::Singleton();
 
-	for (auto& rdp : renderDatas)
+	uint32_t rdoCount = 0;
+	for (int i = 0; i < renderCount; i++)
 	{
+		auto& rdp = m_renderDatas[i];
+		auto entity = entityTable.getPtr(&entityIdTable, rdp.entityId);
+
 		RdDrawOrder t;
-		t.rdPair = { rdp.entity, rdp.ptr };
-
-		auto entity = entityTable.getPtr(&entityIdTable, rdp.entity);
-
+		t.rdPair = &m_renderDatas[i];
 		t.drawOrder = entity->getDrawOrder();
 
 		if (!entity->getFlags().hidden)
 		{
-			rdoList.push_back(t);
+			rdoList[rdoCount] = std::move(t);
+			rdoCount++;
 		}
 		//else
 		//{
 		//	LOG("Entity hidden, skip");
 		//}
 	}
+
+	rdoList.resize(rdoCount);
 
 	m_modelMatrices.resize(rdoList.size()); //always resize to send the smallest size to the gpu
 
@@ -181,12 +194,14 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 			}
 			imd = Instancing::InstancingMetaData();
 			imd.byteOffset = sizeof(Instancing::GPUTransformationMatrix) * matrixOffset;
-			imd.renderData = t.rdPair.ptr;
+			imd.renderData = t.rdPair->rd;
 			imd.instanceData = m_vBuffer;
 			lastRDO = t;
 		}
 
-		auto entity = entityTable.getPtr(&entityIdTable, t.rdPair.entity);
+		auto entity = entityTable.getPtr(&entityIdTable, t.rdPair->entityId);
+
+		//Computing the matrix is the slowest part. How can it be made faster?
 		const auto m = entity->computeWorldSpaceMatrix();
 
 		if (matrixOffset < m_modelMatrices.size())

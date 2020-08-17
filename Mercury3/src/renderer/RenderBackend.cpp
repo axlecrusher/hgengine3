@@ -17,7 +17,7 @@ RenderBackend* RENDERER() {
 }
 
 static void submit_for_render_serial(const Viewport& vp, const RenderInstance& ri, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection) {
-	RenderData* renderData = ri.renderData.get();
+	RenderData* renderData = ri.renderData;
 	const float* worldSpaceMatrix = ri.interpolatedWorldSpaceMatrix;
 
 	RENDERER()->setViewport(vp);
@@ -127,7 +127,7 @@ void Renderer::Render(const Viewport& vp, const HgMath::mat4f& viewMatrix, const
 //	Render(viewportIdx, viewMatrix, projection, queue);
 //}
 
-void RenderQueue::Enqueue(RenderDataPtr& renderData)
+void RenderQueue::Enqueue(RenderData* renderData)
 {
 	if (renderData)
 	{
@@ -142,7 +142,7 @@ void RenderQueue::Enqueue(const Instancing::InstancingMetaData& imd)
 {
 	if (imd.renderData)
 	{
-		RenderDataPtr rd = imd.renderData;
+		auto rd = imd.renderData;
 		if (imd.instanceData->NeedsLoadToGPU())
 		{
 			imd.instanceData->sendToGPU();
@@ -186,11 +186,11 @@ void RenderQueue::Enqueue(HgEntity* e, HgTime dt)
 	{
 		const auto worldSpaceMatrix = e->computeWorldSpaceMatrix();
 		const auto vel = ComputeVelocity(worldSpaceMatrix, e, dt);
-		Enqueue(renderData, worldSpaceMatrix, e->getDrawOrder(), vel);
+		Enqueue(renderData.get(), worldSpaceMatrix, e->getDrawOrder(), vel);
 	}
 }
 
-void RenderQueue::Enqueue(RenderDataPtr& rd, const HgMath::mat4f& wsm, int8_t drawOrder, const vector3f& velocityVector, const Instancing::InstancingMetaData* imd)
+void RenderQueue::Enqueue(RenderData* rd, const HgMath::mat4f& wsm, int8_t drawOrder, const vector3f& velocityVector, const Instancing::InstancingMetaData* imd)
 {
 	if (rd->getMaterial().isTransparent()) {
 		//order by distance back to front?

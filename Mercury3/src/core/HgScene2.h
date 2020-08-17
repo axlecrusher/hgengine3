@@ -14,6 +14,13 @@ class IUpdatableCollection;
 
 #include <UpdatableCollection.h>
 
+struct EntityRDPair
+{
+	EntityIdType entityId;
+	//RenderDataPtr ptr;
+	RenderData* rd;
+};
+
 namespace Engine
 {
 	////same as EntityRDPair in HgEntity.h
@@ -147,6 +154,8 @@ private:
 	EntityIdList m_tmpEntities;
 	std::vector< Instancing::GPUTransformationMatrix > m_modelMatrices;
 	std::shared_ptr<IHgGPUBuffer> m_vBuffer;
+
+	std::vector<EntityRDPair> m_renderDatas;
 
 	static std::unordered_map<std::string, factoryCallback> m_entityFactories;
 };

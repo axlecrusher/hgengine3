@@ -210,13 +210,9 @@ struct EntityRDIdxPair
 {
 	EntityIdType entity;
 	int32_t idx;
-}; 
-
-struct EntityRDPair
-{
-	EntityIdType entity;
-	RenderDataPtr ptr;
 };
+
+struct EntityRDPair; //forward declare
 
 class RenderDataTable
 {
@@ -228,8 +224,8 @@ public:
 	void insert(EntityIdType id, const RenderDataPtr& rd);
 	RenderDataPtr get(EntityIdType id) const;
 
-	//returns vector of entity and render data index pairs
-	std::vector<EntityRDPair> getRenderDataForEntities(EntityIdType* id, int32_t count) const;
+	//copies EntityRDPairs into [out] and returns number of entries
+	uint32_t getRenderDataForEntities(EntityIdType* id, int32_t count, EntityRDPair* out) const;
 
 	void GarbageCollectInvalidEntities(EntityIdTable* idTable);
 

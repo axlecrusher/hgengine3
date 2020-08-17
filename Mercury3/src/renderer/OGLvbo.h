@@ -88,7 +88,7 @@ private:
 	//instanced vbo rendering using array, not indice
 	inline void draw_arrays_instanced(const Instancing::InstancingMetaData* imd)
 	{
-		const RenderData* rd = imd->renderData.get();
+		const RenderData* rd = imd->renderData;
 
 		const auto& vbo_rec = rd->VertexVboRecord();
 		const auto offset = vbo_rec.Offset();
@@ -99,7 +99,7 @@ private:
 
 	//instanced vbo rendering using indices
 	inline void draw_elements_instanced(const Instancing::InstancingMetaData* imd) {
-		const RenderData* rd = imd->renderData.get();
+		const RenderData* rd = imd->renderData;
 
 		const auto& vbo_rec = rd->indexVboRecord();
 		const auto idx_offset = vbo_rec.Offset();

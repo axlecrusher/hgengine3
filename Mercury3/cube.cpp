@@ -231,7 +231,7 @@ namespace RotatingCube {
 
 		Instancing::InstancingMetaData imd;
 		imd.instanceCount = gpuStructArray.size();
-		imd.renderData = rd;
+		imd.renderData = rd.get();
 		imd.instanceData = gpuBuffer;
 
 		queue->Enqueue(imd);

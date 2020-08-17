@@ -72,18 +72,22 @@ public:
 	struct {
 		bool operator()(const EntityRDPair& a, const EntityRDPair& b) const
 		{
-			if (a.ptr == b.ptr)
+			if (a.rd == b.rd)
 			{
-				return a.entity < b.entity;
+				return a.entityId < b.entityId;
 			}
-			return a.ptr < b.ptr;
+			return a.rd < b.rd;
 		}
 	} orderByRenderData;
 
 	virtual void EnqueueForRender(RenderQueue* queue, HgTime dt) final {
 		if (m_updatedItemIdx.empty()) return;
 
-		auto renderDatas = RenderDataTable::Manager().getRenderDataForEntities(m_updatedItemIdx.data(), m_updatedItemIdx.size());
+		std::vector<EntityRDPair> renderDatas;
+		renderDatas.resize(m_updatedItemIdx.size());
+
+		auto rdCount = RenderDataTable::Manager().getRenderDataForEntities(m_updatedItemIdx.data(), m_updatedItemIdx.size(), renderDatas.data());
+		renderDatas.resize(rdCount);
 
 		std::sort(renderDatas.begin(), renderDatas.end(), orderByRenderData);
 
