@@ -1,34 +1,29 @@
 #include <VertexAttributeBuffer.h>
 #include <Logging.h>
 
-void GLVertexAttributeBuffer::toGPU(const void* data, const size_t size)
+void GLVertexAttributeBuffer::AllocateOnGPU(size_t sizeBytes)
 {
 	if (bufferId.value == 0)
 	{
 		Init();
 	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferId.value);
-
-	if (m_maxSize < size) {
-		//grow buffer and load all data
-		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_STREAM_DRAW);
+	if (m_maxSize < sizeBytes) {
+		//grow buffer size
+		glBindBuffer(GL_ARRAY_BUFFER, bufferId.value);
+		glBufferData(GL_ARRAY_BUFFER, sizeBytes, nullptr, GL_STREAM_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		m_maxSize = sizeBytes;
 	}
-	m_maxSize = size;
+}
+
+void GLVertexAttributeBuffer::toGPU(const void* data, const size_t size)
+{
+	AllocateOnGPU(size);
 
 	//Using mapped buffers seems to be faster than glBufferData or glBufferSubData
-	auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	if (ptr)
-	{
-		memcpy(ptr, data, size);
-		glUnmapBuffer(GL_ARRAY_BUFFER);
-	}
-	else
-	{
-		//error
-		const auto error = glGetError();
-		LOG_ERROR("OpenGL Error: %d", error);
-	}
+	auto mapped = getGPUMemoryPtr();
+	memcpy(mapped.ptr, data, size);
 
 	//if (m_maxSize < size) {
 	//	//grow buffer and load all data
@@ -39,7 +34,7 @@ void GLVertexAttributeBuffer::toGPU(const void* data, const size_t size)
 	//	glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	//}
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void MatrixVertexAttribute::SendToGPU(const IHgGPUBuffer* bufferObject)
@@ -81,4 +76,33 @@ void MatrixVertexAttribute::Setup(const Instancing::InstancingMetaData& imd, con
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	setNeedSetup(false);
+}
+
+MappedMemory MatrixVertexAttribute::getGPUMemoryPtr()
+{
+	MappedMemory mb(this);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_attributeBuffer.getValue());
+
+	//Using mapped buffers seems to be faster than glBufferData or glBufferSubData
+	auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	if (ptr)
+	{
+		mb.ptr = ptr;
+	}
+	else
+	{
+		//error
+		const auto error = glGetError();
+		LOG_ERROR("OpenGL Error: %d", error);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	return mb;
+}
+
+void MatrixVertexAttribute::ReleaseMappedMemory(MappedMemory* mm)
+{
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

@@ -3,6 +3,14 @@
 #include <RenderBackend.h>
 #include "OGL/OGLGpuBuffer.h"
 
+MappedMemory::~MappedMemory()
+{
+	if (ptr)
+	{
+		m_bufferInterface->ReleaseMappedMemory(this);
+	}
+}
+
 void IHgGPUBuffer::sendToGPU()
 {
 	m_bufferUse->SendToGPU(this);

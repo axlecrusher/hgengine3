@@ -152,7 +152,7 @@ private:
 
 	EntityIdList m_entities;
 	EntityIdList m_tmpEntities;
-	std::vector< Instancing::GPUTransformationMatrix > m_modelMatrices;
+	//std::vector< Instancing::GPUTransformationMatrix > m_modelMatrices;
 	std::shared_ptr<IHgGPUBuffer> m_vBuffer;
 
 	std::vector<EntityRDPair> m_renderDatas;

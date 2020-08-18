@@ -169,12 +169,16 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 
 	rdoList.resize(rdoCount);
 
-	m_modelMatrices.resize(rdoList.size()); //always resize to send the smallest size to the gpu
+	//TODO: Rework this to allocate space directly on the GPU rather than in m_modelMatrices.
+	//m_modelMatrices.resize(rdoList.size()); //always resize to send the smallest size to the gpu
+	//m_vBuffer->setDataSource(m_modelMatrices);
+	//m_vBuffer->setNeedsLoadToGPU(true); //entire vector contents needs to be sent to the GPU
+
+	const auto matrixSizeBytes = rdoCount * sizeof(float) * 16;
+	m_vBuffer->AllocateOnGPU(matrixSizeBytes);
+	auto mappedMem = m_vBuffer->getUseClass()->getGPUMemoryPtr();
 
 	std::vector< Instancing::InstancingMetaData > instances;
-
-	m_vBuffer->setDataSource(m_modelMatrices);
-	m_vBuffer->setNeedsLoadToGPU(true); //entire vector contents needs to be sent to the GPU
 
 	//sort by draworder, renderdata, entityID
 	std::sort(rdoList.begin(), rdoList.end(), orderEntitesForDraw);
@@ -183,6 +187,9 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	RdDrawOrder lastRDO;
 	Instancing::InstancingMetaData imd;
 	uint32_t matrixOffset = 0;
+
+	float* matrixMem = (float*)mappedMem.ptr;
+
 	for (const auto& t : rdoList)
 	{
 		if (!lastRDO.isSameGroup(t))
@@ -202,19 +209,22 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 		auto entity = entityTable.getPtr(&entityIdTable, t.rdPair->entityId);
 
 		//Computing the matrix is the slowest part. How can it be made faster?
-		const auto m = entity->computeWorldSpaceMatrix();
+		entity->computeWorldSpaceMatrix().store(matrixMem);
 
-		if (matrixOffset < m_modelMatrices.size())
-		{
-			m.store(m_modelMatrices[matrixOffset].matrix);
-		}
-		else
-		{
-			LOG_ERROR("matrixOffset >= m_modelMatrices.size: %d < %d\n", matrixOffset, m_modelMatrices.size());
-		}
+		//if (matrixOffset < m_modelMatrices.size())
+		//{
+			//TODO: Make this write to the GPU rather than m_modelMatrices.
+			//m.store(m_modelMatrices[matrixOffset].matrix);
+		//}
+		//else
+		//{
+		//	LOG_ERROR("matrixOffset >= m_modelMatrices.size: %d < %d\n", matrixOffset, m_modelMatrices.size());
+		//}
 
 		imd.instanceCount++;
 		matrixOffset++;
+
+		matrixMem += 16; //advance 1 matrix
 	}
 
 	if (imd.instanceCount > 0)

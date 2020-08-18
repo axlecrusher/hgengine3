@@ -6,13 +6,39 @@
 #include <core/Enumerations.h>
 #include <HgShader.h>
 
-//forward declirations
+//forward declarations
 class IHgGPUBuffer;
 namespace Instancing
 {
 	struct InstancingMetaData;
 }
 
+class IGLBufferUse; //forward declare for MappedMemory
+
+class MappedMemory
+{
+public:
+	MappedMemory(IGLBufferUse* bufferInterface = nullptr)
+		:ptr(nullptr), m_bufferInterface(bufferInterface)
+	{}
+
+	MappedMemory(const MappedMemory&) = delete;
+
+	MappedMemory(MappedMemory&& other)
+	{
+		ptr = other.ptr;
+		m_bufferInterface = other.m_bufferInterface;
+
+		other.ptr = nullptr;
+		other.m_bufferInterface = nullptr;
+	}
+
+	~MappedMemory();
+
+	void* ptr;
+private:
+	IGLBufferUse* m_bufferInterface;
+};
 
 //Graphics API implementation
 class IGPUBufferImpl {
@@ -30,10 +56,16 @@ public:
 	{}
 
 	virtual void SendToGPU(const IHgGPUBuffer* bufferObject) = 0;
+	virtual void AllocateOnGPU(size_t sizeBytes) = 0;
 	virtual void Setup(const Instancing::InstancingMetaData& imd, const HgShader& shader) = 0;
 
 	inline void setNeedSetup(bool t) { m_needSetup = t; }
 	inline bool getNeedsSetup() const { return m_needSetup; }
+
+	virtual MappedMemory getGPUMemoryPtr() = 0;
+	virtual void ReleaseMappedMemory(MappedMemory* mm) = 0;
+
+
 protected:
 	bool m_needSetup;
 };
@@ -49,6 +81,9 @@ public:
 	}
 	virtual ~IHgGPUBuffer() {
 	}
+
+	//Allocate data buffer on GPU
+	void AllocateOnGPU(size_t sizeBytes) { m_bufferUse->AllocateOnGPU(sizeBytes); }
 
 	//Set to true if the data needs to be updated on the GPU
 	inline void setNeedsLoadToGPU(bool needsUpdate) { m_needsUpdate = needsUpdate; }
@@ -80,6 +115,9 @@ public:
 		m_sizeBytes = sizeof(T) * v.size();
 		//setCount(v.size());
 	}
+
+	virtual MappedMemory getGPUMemoryPtr() = 0;
+	virtual void ReleaseMappedMemory(MappedMemory* mm) = 0;
 
 protected:
 	//static std::unique_ptr<IGPUBufferImpl> from_api_type();
@@ -139,6 +177,9 @@ template<typename T>
 class HgVectorBuffer : public IHgGPUBuffer {
 
 public:
+
+	virtual MappedMemory getGPUMemoryPtr() { MappedMemory r; return r; };
+	virtual void ReleaseMappedMemory(MappedMemory* mm) {};
 private:
 	//set the size of the buffer based on the number of items
 	//inline void setCount(uint32_t count) { m_sizeBytes = count * sizeof(T); }

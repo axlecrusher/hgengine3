@@ -7,6 +7,8 @@
 #include <core/Instancing.h>
 #include <../oglShaders.h>
 
+//#include <HgGPUBuffer.h>
+
 class GLVertexAttributeBuffer
 {
 public:
@@ -28,7 +30,12 @@ public:
 
 	auto getValue() const { return bufferId.value; }
 
+	void AllocateOnGPU(size_t sizeBytes);
 	void toGPU(const void* data, const size_t byteCount);
+
+	//get pointer to gpu memory
+	virtual MappedMemory getGPUMemoryPtr() { MappedMemory r; return r; };
+	virtual void ReleaseMappedMemory(MappedMemory* mm) {};
 
 private:
 
@@ -48,12 +55,16 @@ public:
 	}
 
 	virtual void SendToGPU(const IHgGPUBuffer* bufferObject);
-
+	virtual void AllocateOnGPU(size_t sizeBytes) { m_attributeBuffer.AllocateOnGPU(sizeBytes); }
 	virtual void Setup(const Instancing::InstancingMetaData& imd, const HgShader& shader);
 
 	void setAttributeName(const std::string& name) { m_attributeName = name; }
 
+	virtual MappedMemory getGPUMemoryPtr();
+	virtual void ReleaseMappedMemory(MappedMemory* mm);
+
 private:
+
 	GLVertexAttributeBuffer m_attributeBuffer;
 	std::string m_attributeName;
 };
