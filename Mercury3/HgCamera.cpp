@@ -1,6 +1,6 @@
 #include <HgCamera.h>
 #include <HgMath.h>
-#include <math/matrix.h>
+#include <math/MatrixMath.h>
 
 HgCamera::HgCamera() : initialDirection({0,0,-1}), orientation(quaternion::IDENTITY)
 {

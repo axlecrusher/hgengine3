@@ -2,7 +2,7 @@
 #include <quaternion.h>
 #include <quaternion_dual.h>
 
-#include <math/matrix.h>
+#include <math/MatrixMath.h>
 
 namespace {
 

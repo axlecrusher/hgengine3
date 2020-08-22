@@ -3,7 +3,7 @@
 #include <quaternion.h>
 #include <vertex3d.h>
 
-#include <math/matrix.h>
+#include <math/MatrixMath.h>
 
 //Based on, though the implementation seemed buggy.
 //A Beginners Guide to Dual-Quaternions

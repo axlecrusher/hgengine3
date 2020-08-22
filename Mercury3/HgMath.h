@@ -34,6 +34,8 @@ void Ortho(double left, double right,
 	float* M);
 
 namespace HgMath {
+	typedef vectorial::mat4f mat4f;
+
 	template<typename T>
 	inline T square(T x) { return x*x; }
 

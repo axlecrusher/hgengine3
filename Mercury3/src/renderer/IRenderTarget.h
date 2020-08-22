@@ -1,6 +1,6 @@
 #pragma once
 
-#include <math/matrix.h>
+#include <math/MatrixMath.h>
 #include <vector>
 
 class HgCamera;

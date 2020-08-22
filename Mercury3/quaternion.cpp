@@ -6,7 +6,7 @@
 #include <HgTypes.h>
 
 #include <math/vector.h>
-#include <math/matrix.h>
+#include <math/MatrixMath.h>
 
 const quaternion quaternion::IDENTITY = { 1.0f,0,0,0 };
 

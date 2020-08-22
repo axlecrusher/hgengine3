@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 #include <vertex3d.h>
-#include <math/matrix.h>
+#include <math/MatrixMath.h>
 
 //const vertex vertex_zero = { 0,0,0 };
 //const vector3 vector3_zero = { 0,0,0 };

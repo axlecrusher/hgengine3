@@ -3,7 +3,7 @@
 #include <HgTypes.h>
 #include <quaternion.h>
 #include <HgMath.h>
-#include <src/math/matrix.h>
+#include <src/math/MatrixMath.h>
 
 class HgCamera {
 	public:

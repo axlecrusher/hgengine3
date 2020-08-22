@@ -8,7 +8,7 @@
 
 #include <math/vector.h>
 //class vertex3f;
-#include <math/matrix.h>
+//#include <math/MatrixMath.h>
 
 typedef vertex3f vector3;
 

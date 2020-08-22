@@ -222,7 +222,7 @@ namespace RotatingCube {
 
 		for (uint32_t i = 0; i < spacial.size(); i++)
 		{
-			const auto mat = computeTransformMatrix(spacial[i]);
+			const auto mat = HgMath::computeTransformMatrix(spacial[i]);
 			mat.store(gpuStructArray[i].matrix);
 		}
 

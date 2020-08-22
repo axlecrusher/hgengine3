@@ -1,11 +1,12 @@
 #pragma once
 
+#include <HgMath.h>
 #include <HgTypes.h>
 #include <vectorial/vectorial.h>
 
-namespace HgMath {
-	typedef vectorial::mat4f mat4f;
+struct SPI; //forward declare
 
+namespace HgMath {
 	inline vector3f operator*(const mat4f& m, vector3f p) {
 		using namespace vectorial;
 		const auto t = vectorial::vec3f(p.raw());
@@ -21,10 +22,6 @@ namespace HgMath {
 		return mat4f::translation(v);
 	}
 
-	//class Matrix4x4f {
-	//public:
-	//	static Matrix4x4f identity()
-	//private:
-	//	vectorial::mat4f m_matrix;
-	//};
+	//Compute local transformation matrix
+	HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale = true, bool applyRotation = true, bool applyTranslation = true);
 }

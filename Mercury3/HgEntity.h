@@ -22,6 +22,7 @@
 #include <unordered_set>
 #include <EntityIdType.h>
 #include <TransformManager.h>
+#include <spi.h>
 
 //#include <core/HgScene2.h>
 #include <HgScene2.h> //REGISTER_LINKTIME2 needs this
@@ -54,19 +55,6 @@ struct EntityFlags {
 	bool inheritParentRotation : 1;
 	bool inheritParentTranslation : 1;
 };
-
-struct SPI
-{
-	SPI()
-		:scale(1.0)
-	{}
-
-	quaternion orientation; //16 bytes
-	vertex3f position; float scale; //16 bytes
-	vertex3f origin; //12 bytes
-};
-
-
 
 class SpacialData {
 private:
@@ -234,9 +222,6 @@ private:
 	std::vector<uint8_t> m_entityGeneration; //generation of entity that stored the render data
 	std::vector<RenderDataPtr> m_renderData;
 };
-
-//Compute local transformation matrix
-HgMath::mat4f computeTransformMatrix(const SPI& sd, const bool applyScale = true, bool applyRotation = true, bool applyTranslation = true);
 
 /* NOTES: Try to avoid pointers, especially on 64 bit.
 The entity that allocates memory for render data should
