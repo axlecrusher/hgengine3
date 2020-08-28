@@ -1,22 +1,6 @@
 #include <GLBuffer.h>
 #include <memory>
 
-bool GLBufferId::Init()
-{
-	if (value == 0) {
-		glGenBuffers(1, &value);
-	}
-	return true;
-}
-
-void GLBufferId::Destroy()
-{
-	if (value > 0) {
-		glDeleteBuffers(1, &value);
-	}
-	value = 0;
-}
-
 bool GLVaoId::Init()
 {
 	Destroy();

@@ -3,43 +3,6 @@
 #include <glew.h>
 #include <RefCounterTable.h>
 
-struct GLBufferId
-{
-	GLBufferId() : value(0)
-	{}
-
-	~GLBufferId() {
-		Destroy();
-	}
-
-	GLBufferId(const GLBufferId& rhs) = delete;
-	GLBufferId(GLBufferId&& rhs)
-	{
-		Destroy();
-		value = rhs.value;
-		rhs.value = 0;
-	}
-
-	const GLBufferId& operator=(const GLBufferId& rhs) = delete;
-	const GLBufferId& operator=(GLBufferId&& rhs)
-	{
-		Destroy();
-		value = rhs.value;
-		rhs.value = 0;
-		return *this;
-	}
-
-	inline operator GLuint() const { return value; }
-
-	//Instantiate buffer in OPENGL
-	bool Init();
-
-	//Deallocate in opengl
-	void Destroy();
-
-	GLuint value;
-};
-
 struct GLVaoId
 {
 	GLVaoId() : value(0)

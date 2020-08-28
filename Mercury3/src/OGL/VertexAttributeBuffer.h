@@ -7,7 +7,8 @@
 #include <core/Instancing.h>
 #include <../oglShaders.h>
 
-//#include <HgGPUBuffer.h>
+#include <HgGPUBuffer.h>
+#include <GpuBufferId.h>
 
 class GLVertexAttributeBuffer
 {
@@ -38,8 +39,7 @@ public:
 	virtual void ReleaseMappedMemory(MappedMemory* mm) {};
 
 private:
-
-	GLBufferId bufferId;
+	GpuBufferId bufferId;
 	size_t m_maxSize;
 };
 
