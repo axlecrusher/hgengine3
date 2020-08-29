@@ -1,5 +1,76 @@
+#include <glew.h>
 #include <VertexAttributeBuffer.h>
 #include <Logging.h>
+
+//TODO: Abstract away the OGL calls
+
+namespace VertexAttributeTypes
+{
+	void MapAttributeLocation(const SetupParams& p, int vCount)
+	{
+		const auto attribLocation = p.shader->getAttributeLocation(*p.attributeName);
+		if (attribLocation < 0)
+		{
+			InvalidAttributeError(p.shader, p.attributeName);
+			return;
+		}
+
+		//	LOG("%s : %d", m_attributeName.c_str(), m_attributeBuffer.getValue());
+
+			//glVertexAttribPointer requires a buffer be bound
+		glBindBuffer(GL_ARRAY_BUFFER, p.attribBuffer->getValue());
+
+		const GLsizei stride = sizeof(float) * 4 * vCount;
+
+		for (int i = 0; i < vCount; i++)
+		{
+			const size_t byteOffset = p.imd->byteOffset + (sizeof(float) * 4 * i);
+			const auto location = attribLocation + i;
+			glEnableVertexAttribArray(location);
+			glVertexAttribPointer(location, 4, GL_FLOAT, GL_FALSE, stride, (void*)byteOffset);
+			glVertexAttribDivisor(location, 1); //advance per instance drawn
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		p.iglbuffer->setNeedSetup(false);
+	}
+}
+
+namespace GraphicsDriverFunctions
+{
+	void ReleaseMappedMemory(MappedMemory* mm)
+	{
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	MappedMemory getGPUMemoryPtr(IGLBufferUse* iglBuffer, GLVertexAttributeBuffer* vab)
+	{
+		MappedMemory mb(iglBuffer);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vab->getValue());
+
+		//Using mapped buffers seems to be faster than glBufferData or glBufferSubData
+		auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+		if (ptr)
+		{
+			mb.ptr = ptr;
+		}
+		else
+		{
+			//error
+			const auto error = glGetError();
+			LOG_ERROR("OpenGL Error: %d", error);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+
+		return mb;
+	}
+
+
+}
+
 
 void GLVertexAttributeBuffer::AllocateOnGPU(size_t sizeBytes)
 {
@@ -7,6 +78,7 @@ void GLVertexAttributeBuffer::AllocateOnGPU(size_t sizeBytes)
 	{
 		Init();
 	}
+
 
 	if (m_maxSize < sizeBytes) {
 		//grow buffer size
@@ -42,67 +114,8 @@ void MatrixVertexAttribute::SendToGPU(const IHgGPUBuffer* bufferObject)
 	m_attributeBuffer.toGPU(bufferObject->getBufferPtr(), bufferObject->sizeBytes());
 }
 
-void InvalidAttributeError(const HgShader& shader, const std::string& name)
+void InvalidAttributeError(const HgShader* shader, const std::string* name)
 {
-	auto ss = shader.sourceStruct();
-	LOG_ERROR("Invalid Attribute: %s (shader %s)", name.c_str(), ss->vert_file_path.c_str());
-}
-
-void MatrixVertexAttribute::Setup(const Instancing::InstancingMetaData& imd, const HgShader& shader)
-{
-	const auto attribLocation = shader.getAttributeLocation(m_attributeName);
-	if (attribLocation < 0)
-	{
-		InvalidAttributeError(shader, m_attributeName);
-		return;
-	}
-
-//	LOG("%s : %d", m_attributeName.c_str(), m_attributeBuffer.getValue());
-
-	//glVertexAttribPointer requires a buffer be bound
-	glBindBuffer(GL_ARRAY_BUFFER, m_attributeBuffer.getValue());
-
-	constexpr size_t stride = sizeof(float) * 16;
-
-	for (int i = 0; i < 4; i++)
-	{
-		const size_t byteOffset = imd.byteOffset + (sizeof(float) * 4 * i);
-		const auto location = attribLocation + i;
-		glEnableVertexAttribArray(location);
-		glVertexAttribPointer(location, 4, GL_FLOAT, GL_FALSE, stride, (void*)byteOffset);
-		glVertexAttribDivisor(location, 1); //advance per instance drawn
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	setNeedSetup(false);
-}
-
-MappedMemory MatrixVertexAttribute::getGPUMemoryPtr()
-{
-	MappedMemory mb(this);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_attributeBuffer.getValue());
-
-	//Using mapped buffers seems to be faster than glBufferData or glBufferSubData
-	auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	if (ptr)
-	{
-		mb.ptr = ptr;
-	}
-	else
-	{
-		//error
-		const auto error = glGetError();
-		LOG_ERROR("OpenGL Error: %d", error);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
-
-	return mb;
-}
-
-void MatrixVertexAttribute::ReleaseMappedMemory(MappedMemory* mm)
-{
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	auto ss = shader->sourceStruct();
+	LOG_ERROR("Invalid Attribute: %s (shader %s)", name->c_str(), ss->vert_file_path.c_str());
 }
