@@ -13,6 +13,7 @@ class RenderQueue;
 class IUpdatableCollection;
 
 #include <UpdatableCollection.h>
+#include <VertexAttributeBuffer.h>
 
 struct EntityRDPair
 {
@@ -23,30 +24,8 @@ struct EntityRDPair
 
 namespace Engine
 {
-	////same as EntityRDPair in HgEntity.h
-	//struct EntityRDPair
-	//{
-	//	EntityIdType entity;
-	//	RenderDataPtr ptr;
-	//};
 
-	//struct RdDrawOrder
-	//{
-	//	RdDrawOrder()
-	//		:drawOrder(0)
-	//	{}
-
-	//	EntityRDPair rdPair;
-	//	int8_t drawOrder;
-
-	//	inline bool isSameGroup(const RdDrawOrder& rhs)
-	//	{
-	//		return (drawOrder == rhs.drawOrder)
-	//			&& (rdPair.ptr == rhs.rdPair.ptr);
-	//	}
-	//};
-
-class HgScene;
+class HgScene; //forward declare
 
 //typedef HgEntity&(*factoryCallback)(HgScene* scene);
 typedef HgEntity*(*factoryCallback)(HgScene* scene);
@@ -153,7 +132,8 @@ private:
 	EntityIdList m_entities;
 	EntityIdList m_tmpEntities;
 	//std::vector< Instancing::GPUTransformationMatrix > m_modelMatrices;
-	std::shared_ptr<IHgGPUBuffer> m_vBuffer;
+	//std::shared_ptr<IHgGPUBuffer> m_vBuffer;
+	std::shared_ptr<MatrixVertexAttribute> m_tranformMatrix;
 
 	std::vector<EntityRDPair> m_renderDatas;
 

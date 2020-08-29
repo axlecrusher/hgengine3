@@ -33,7 +33,7 @@ namespace Instancing
 		{
 		}
 
-		inline bool isValid() const { return instanceCount > 0 && instanceData; }
+		inline bool isValid() const { return instanceCount > 0; }
 
 		//number of instances to render
 		uint32_t instanceCount;
@@ -46,6 +46,7 @@ namespace Instancing
 
 		//pointer to the data buffer
 		std::shared_ptr< IHgGPUBuffer > instanceData;
+		std::shared_ptr< IGPUBuffer > transformMatrices;
 	};
 
 }

@@ -85,8 +85,8 @@ namespace RotatingCube {
 		{
 			gpuBuffer = std::make_shared< HgVectorBuffer<Instancing::GPUTransformationMatrix> >();
 
-			std::unique_ptr<IGLBufferUse> action = std::make_unique<MatrixVertexAttribute>("ModelMatrix");
-			gpuBuffer->setUseClass(action);
+			std::unique_ptr<IGPUBuffer> action = std::make_unique<MatrixVertexAttribute>("ModelMatrix");
+			//gpuBuffer->setUseClass(action);
 		}
 
 		void update(HgTime dt);

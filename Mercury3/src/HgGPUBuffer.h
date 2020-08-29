@@ -13,13 +13,13 @@ namespace Instancing
 	struct InstancingMetaData;
 }
 
-class IGLBufferUse; //forward declare for MappedMemory
+class IGPUBuffer; //forward declare for MappedMemory
 
 class MappedMemory
 {
 public:
-	MappedMemory(IGLBufferUse* bufferInterface = nullptr)
-		:ptr(nullptr), m_bufferInterface(bufferInterface)
+	MappedMemory(IGPUBuffer* gpuBuffer = nullptr)
+		:ptr(nullptr), m_bufferInterface(gpuBuffer)
 	{}
 
 	MappedMemory(const MappedMemory&) = delete;
@@ -37,7 +37,7 @@ public:
 
 	void* ptr;
 private:
-	IGLBufferUse* m_bufferInterface;
+	IGPUBuffer* m_bufferInterface;
 };
 
 //Graphics API implementation
@@ -48,6 +48,36 @@ public:
 	virtual void SendToGPU(const IHgGPUBuffer* bufferObject) = 0;
 	virtual void Bind(uint16_t textureLocation) = 0;
 };
+
+class IGPUBuffer
+{
+public:
+	virtual ~IGPUBuffer() {}
+
+	virtual void AllocateOnGPU(size_t sizeBytes) = 0;
+
+	virtual void Setup(const Instancing::InstancingMetaData& imd, const HgShader& shader) = 0;
+
+	virtual MappedMemory getGPUMemoryPtr() = 0;
+
+	virtual void ReleaseMappedMemory(MappedMemory* mm) = 0;
+
+	inline void setUseType(BUFFER_USE_TYPE t) { m_useType = t; }
+
+	inline BUFFER_USE_TYPE getUseType() const { return m_useType; }
+
+	//memcpy data into the buffer. Allocate more space if needed
+	void CopyDataIntoBuffer(char* data, size_t size)
+	{
+		AllocateOnGPU(size);
+		auto mm = getGPUMemoryPtr();
+		memcpy(mm.ptr, data, size);
+	}
+
+private:
+	BUFFER_USE_TYPE m_useType;
+};
+
 
 class IGLBufferUse
 {
@@ -63,8 +93,8 @@ public:
 	inline bool getNeedsSetup() const { return m_needSetup; }
 
 	virtual MappedMemory getGPUMemoryPtr() = 0;
-	virtual void ReleaseMappedMemory(MappedMemory* mm) = 0;
 
+	virtual void ReleaseMappedMemory(MappedMemory* mm) = 0;
 
 protected:
 	bool m_needSetup;

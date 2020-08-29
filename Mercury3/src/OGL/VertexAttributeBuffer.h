@@ -9,20 +9,22 @@
 #include <HgGPUBuffer.h>
 #include <GpuBufferId.h>
 
+#include <Enumerations.h>
+
 struct SetupParams; // Forward declare
 
 namespace VertexAttributeTypes
 {
 	//Map attribute buffer to attribute location in the shader
-	void MapAttributeLocation(const SetupParams& p, int vCount);
+	void MapToAttributeLocation(const SetupParams& p, int vCount);
 
 	struct vec4
 	{
-		//float xyzw[4]; //define so sizeof() can be used
+		float xyzw[4]; //define so sizeof() can be used
 
 		static void Setup(const SetupParams& p)
 		{
-			MapAttributeLocation(p, 1);
+			MapToAttributeLocation(p, 1);
 		}
 	};
 
@@ -33,11 +35,11 @@ namespace VertexAttributeTypes
 
 	struct mat4
 	{
-		//float xyzw[16]; //define so sizeof() can be used
+		float xyzw[16]; //define so sizeof() can be used
 
 		static void Setup(const SetupParams& p)
 		{
-			MapAttributeLocation(p, 4);
+			MapToAttributeLocation(p, 4);
 		}
 	};
 }
@@ -65,8 +67,8 @@ public:
 
 	auto getValue() const { return bufferId.value; }
 
-	void AllocateOnGPU(size_t sizeBytes);
-	void toGPU(const void* data, const size_t byteCount);
+	void AllocateOnGPU(size_t sizeBytes, BUFFER_USE_TYPE useType);
+	//void toGPU(const void* data, const size_t byteCount);
 
 	//get pointer to gpu memory
 	virtual MappedMemory getGPUMemoryPtr() { MappedMemory r; return r; };
@@ -82,12 +84,12 @@ namespace GraphicsDriverFunctions
 	//lame cop out for things that do opengl
 
 	void ReleaseMappedMemory(MappedMemory* mm);
-	MappedMemory getGPUMemoryPtr(IGLBufferUse* b, GLVertexAttributeBuffer* vab);
+	MappedMemory getGPUMemoryPtr(IGPUBuffer* gpuBuffer, GLVertexAttributeBuffer* vab);
 }
 
 struct SetupParams
 {
-	IGLBufferUse* iglbuffer;
+	IGPUBuffer* iglbuffer;
 	GLVertexAttributeBuffer* attribBuffer;
 	std::string* attributeName;
 	const Instancing::InstancingMetaData* imd;
@@ -95,21 +97,25 @@ struct SetupParams
 };
 
 template<typename T>
-class VertexAtributeBuffer : public IGLBufferUse
+//class VertexAttributeBuffer : public IGLBufferUse
+class VertexAttributeBuffer : public IGPUBuffer
 {
 public:
-	VertexAtributeBuffer(const std::string attributeName)
+	VertexAttributeBuffer(const std::string attributeName)
 		:m_attributeName(attributeName)
-	{}
-
-	virtual void SendToGPU(const IHgGPUBuffer* bufferObject)
 	{
-		m_attributeBuffer.toGPU(bufferObject->getBufferPtr(), bufferObject->sizeBytes());
+		setUseType(BUFFER_DRAW_STREAM);
+	}
+
+	//Allocates space for count instances of T on the GPU
+	void AllocateCountOnGPU(uint32_t count)
+	{
+		VertexAttributeBuffer<T>::AllocateOnGPU(sizeof(T) * count);
 	}
 
 	virtual void AllocateOnGPU(size_t sizeBytes)
 	{
-		m_attributeBuffer.AllocateOnGPU(sizeBytes);
+		m_attributeBuffer.AllocateOnGPU(sizeBytes, getUseType());
 	}
 
 	virtual void Setup(const Instancing::InstancingMetaData& imd, const HgShader& shader)
@@ -140,5 +146,5 @@ private:
 	std::string m_attributeName;
 };
 
-using vec4VertexAttribute = VertexAtributeBuffer<VertexAttributeTypes::vec4>;
-using MatrixVertexAttribute = VertexAtributeBuffer<VertexAttributeTypes::mat4>;
+using vec4VertexAttribute = VertexAttributeBuffer<VertexAttributeTypes::vec4>;
+using MatrixVertexAttribute = VertexAttributeBuffer<VertexAttributeTypes::mat4>;

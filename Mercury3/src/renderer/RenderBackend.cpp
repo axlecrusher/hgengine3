@@ -40,21 +40,18 @@ static void submit_for_render_serial(const Viewport& vp, const RenderInstance& r
 	auto& imd = ri.imd;
 	if (imd.isValid())
 	{
-		if (imd.instanceData->NeedsLoadToGPU())
+		//Setup or use additional buffers here
+
+		if (imd.transformMatrices)
 		{
-			imd.instanceData->sendToGPU();
+			imd.transformMatrices->Setup(imd, shader);
 		}
 
-		//if (shaderCompiled)
-		//{
-		//	//if the shader recompiled, we need to get the new attribute locations
-		//	imd.instanceData->getUseClass()->setNeedSetup(true);
-		//}
-
-		//if (imd.instanceData->getUseClass()->getNeedsSetup())
-		//{
+		if (imd.instanceData && imd.instanceData->NeedsLoadToGPU())
+		{
+			imd.instanceData->sendToGPU();
 			imd.instanceData->getUseClass()->Setup(imd, shader);
-		//}
+		}
 	}
 
 	shader.enable();
@@ -143,7 +140,8 @@ void RenderQueue::Enqueue(const Instancing::InstancingMetaData& imd)
 	if (imd.renderData)
 	{
 		auto rd = imd.renderData;
-		if (imd.instanceData->NeedsLoadToGPU())
+
+		if (imd.instanceData && imd.instanceData->NeedsLoadToGPU())
 		{
 			imd.instanceData->sendToGPU();
 		}

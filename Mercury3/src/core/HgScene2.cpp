@@ -11,12 +11,14 @@ std::unordered_map<std::string, factoryCallback> HgScene::m_entityFactories;
 
 HgScene::HgScene()
 {
-	auto vBuffer = std::make_shared<HgVectorBuffer<Instancing::GPUTransformationMatrix>>();
+	//auto vBuffer = std::make_shared<HgVectorBuffer<Instancing::GPUTransformationMatrix>>();
 
-	std::unique_ptr<IGLBufferUse> action = std::make_unique<MatrixVertexAttribute>("ModelMatrix");
-	vBuffer->setUseClass(action);
+	//std::unique_ptr<IGLBufferUse> action = std::make_unique<MatrixVertexAttribute>("ModelMatrix");
+	//vBuffer->setUseClass(action);
 
-	m_vBuffer = vBuffer;
+	//m_vBuffer = vBuffer;
+
+	m_tranformMatrix = std::make_unique<MatrixVertexAttribute>("ModelMatrix");
 }
 
 HgEntity* HgScene::create_entity(const char* type_str)
@@ -169,14 +171,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 
 	rdoList.resize(rdoCount);
 
-	//TODO: Rework this to allocate space directly on the GPU rather than in m_modelMatrices.
-	//m_modelMatrices.resize(rdoList.size()); //always resize to send the smallest size to the gpu
-	//m_vBuffer->setDataSource(m_modelMatrices);
-	//m_vBuffer->setNeedsLoadToGPU(true); //entire vector contents needs to be sent to the GPU
-
-	const auto matrixSizeBytes = rdoCount * sizeof(float) * 16;
-	m_vBuffer->AllocateOnGPU(matrixSizeBytes);
-	auto mappedMem = m_vBuffer->getUseClass()->getGPUMemoryPtr();
+	m_tranformMatrix->AllocateCountOnGPU(rdoCount);
 
 	std::vector< Instancing::InstancingMetaData > instances;
 
@@ -188,6 +183,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	Instancing::InstancingMetaData imd;
 	uint32_t matrixOffset = 0;
 
+	auto mappedMem = m_tranformMatrix->getGPUMemoryPtr();
 	float* matrixMem = (float*)mappedMem.ptr;
 
 	for (const auto& t : rdoList)
@@ -202,7 +198,8 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 			imd = Instancing::InstancingMetaData();
 			imd.byteOffset = sizeof(Instancing::GPUTransformationMatrix) * matrixOffset;
 			imd.renderData = t.rdPair->rd;
-			imd.instanceData = m_vBuffer;
+			//imd.instanceData = m_vBuffer;
+			imd.transformMatrices = std::dynamic_pointer_cast<IGPUBuffer>(m_tranformMatrix);;
 			lastRDO = t;
 		}
 
@@ -211,15 +208,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 		//Computing the matrix is the slowest part. How can it be made faster?
 		entity->computeWorldSpaceMatrix().store(matrixMem);
 
-		//if (matrixOffset < m_modelMatrices.size())
-		//{
-			//TODO: Make this write to the GPU rather than m_modelMatrices.
-			//m.store(m_modelMatrices[matrixOffset].matrix);
-		//}
-		//else
-		//{
-		//	LOG_ERROR("matrixOffset >= m_modelMatrices.size: %d < %d\n", matrixOffset, m_modelMatrices.size());
-		//}
+		//TODO: Fill per instance vertex attributes here
 
 		imd.instanceCount++;
 		matrixOffset++;

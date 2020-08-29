@@ -2,11 +2,13 @@
 #include <VertexAttributeBuffer.h>
 #include <Logging.h>
 
+#include <OGLvbo.h>
+
 //TODO: Abstract away the OGL calls
 
 namespace VertexAttributeTypes
 {
-	void MapAttributeLocation(const SetupParams& p, int vCount)
+	void MapToAttributeLocation(const SetupParams& p, int vCount)
 	{
 		const auto attribLocation = p.shader->getAttributeLocation(*p.attributeName);
 		if (attribLocation < 0)
@@ -33,7 +35,7 @@ namespace VertexAttributeTypes
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		p.iglbuffer->setNeedSetup(false);
+		//p.iglbuffer->setNeedSetup(false);
 	}
 }
 
@@ -41,13 +43,14 @@ namespace GraphicsDriverFunctions
 {
 	void ReleaseMappedMemory(MappedMemory* mm)
 	{
+		//glBindBuffer(GL_ARRAY_BUFFER, mm.);
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
-	MappedMemory getGPUMemoryPtr(IGLBufferUse* iglBuffer, GLVertexAttributeBuffer* vab)
+	MappedMemory getGPUMemoryPtr(IGPUBuffer* gpuBuffer, GLVertexAttributeBuffer* vab)
 	{
-		MappedMemory mb(iglBuffer);
+		MappedMemory mb(gpuBuffer);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vab->getValue());
 
@@ -71,8 +74,7 @@ namespace GraphicsDriverFunctions
 
 }
 
-
-void GLVertexAttributeBuffer::AllocateOnGPU(size_t sizeBytes)
+void GLVertexAttributeBuffer::AllocateOnGPU(size_t sizeBytes, BUFFER_USE_TYPE useType)
 {
 	if (bufferId.value == 0)
 	{
@@ -83,36 +85,20 @@ void GLVertexAttributeBuffer::AllocateOnGPU(size_t sizeBytes)
 	if (m_maxSize < sizeBytes) {
 		//grow buffer size
 		glBindBuffer(GL_ARRAY_BUFFER, bufferId.value);
-		glBufferData(GL_ARRAY_BUFFER, sizeBytes, nullptr, GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeBytes, nullptr, VboUseage(useType));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		m_maxSize = sizeBytes;
 	}
 }
 
-void GLVertexAttributeBuffer::toGPU(const void* data, const size_t size)
-{
-	AllocateOnGPU(size);
-
-	//Using mapped buffers seems to be faster than glBufferData or glBufferSubData
-	auto mapped = getGPUMemoryPtr();
-	memcpy(mapped.ptr, data, size);
-
-	//if (m_maxSize < size) {
-	//	//grow buffer and load all data
-	//	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STREAM_DRAW);
-	//}
-	//else {
-	//	//load all data
-	//	glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
-	//}
-
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void MatrixVertexAttribute::SendToGPU(const IHgGPUBuffer* bufferObject)
-{
-	m_attributeBuffer.toGPU(bufferObject->getBufferPtr(), bufferObject->sizeBytes());
-}
+//void GLVertexAttributeBuffer::toGPU(const void* data, const size_t size)
+//{
+//	AllocateOnGPU(size);
+//
+//	//Using mapped buffers seems to be faster than glBufferData or glBufferSubData
+//	auto mapped = getGPUMemoryPtr();
+//	memcpy(mapped.ptr, data, size);
+//}
 
 void InvalidAttributeError(const HgShader* shader, const std::string* name)
 {

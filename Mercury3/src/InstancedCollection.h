@@ -29,10 +29,10 @@ public:
 	InstancedCollection() {
 		auto vBuffer = std::make_shared<HgVectorBuffer<gpuStruct>>();
 
-		std::unique_ptr<IGLBufferUse> action = std::make_unique<MatrixVertexAttribute>("ModelMatrix");
-		vBuffer->setUseClass(action);
+		std::unique_ptr<IGPUBuffer> action = std::make_unique<MatrixVertexAttribute>("ModelMatrix");
+		//vBuffer->setUseClass(action);
 
-		m_vBuffer = vBuffer;
+		//m_vBuffer = vBuffer;
 	}
 
 	virtual void update(HgTime dtime) final {
