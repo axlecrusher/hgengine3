@@ -20,20 +20,20 @@ namespace VertexAttributeTypes
 		//	LOG("%s : %d", m_attributeName.c_str(), m_attributeBuffer.getValue());
 
 			//glVertexAttribPointer requires a buffer be bound
-		glBindBuffer(GL_ARRAY_BUFFER, p.attribBuffer->getValue());
+		StackHelpers::GLBindBuffer bbuffer(GL_ARRAY_BUFFER, p.attribBuffer->getValue());
 
 		const GLsizei stride = sizeof(float) * 4 * vCount;
 
 		for (int i = 0; i < vCount; i++)
 		{
-			const size_t byteOffset = p.imd->byteOffset + (sizeof(float) * 4 * i);
+			//p.imd->byteOffset needs to refer tot he offset into the vertex attribute buffer
+			//const size_t byteOffset = p.imd->byteOffset + (sizeof(float) * 4 * i);
+			const size_t byteOffset = p.bufferSettings.byteOffset + (sizeof(float) * 4 * i);
 			const auto location = attribLocation + i;
-			glEnableVertexAttribArray(location);
+			glEnableVertexAttribArray(location);  //uses currently bound VAO
 			glVertexAttribPointer(location, 4, GL_FLOAT, GL_FALSE, stride, (void*)byteOffset);
 			glVertexAttribDivisor(location, 1); //advance per instance drawn
 		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		//p.iglbuffer->setNeedSetup(false);
 	}
@@ -41,18 +41,17 @@ namespace VertexAttributeTypes
 
 namespace GraphicsDriverFunctions
 {
-	void ReleaseMappedMemory(MappedMemory* mm)
+	void ReleaseMappedMemory(GLVertexAttributeBuffer* vab)
 	{
-		//glBindBuffer(GL_ARRAY_BUFFER, mm.);
+		StackHelpers::GLBindBuffer bbuffer(GL_ARRAY_BUFFER, vab->getValue());
 		glUnmapBuffer(GL_ARRAY_BUFFER);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	MappedMemory getGPUMemoryPtr(IGPUBuffer* gpuBuffer, GLVertexAttributeBuffer* vab)
 	{
 		MappedMemory mb(gpuBuffer);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vab->getValue());
+		StackHelpers::GLBindBuffer bbuffer(GL_ARRAY_BUFFER, vab->getValue());
 
 		//Using mapped buffers seems to be faster than glBufferData or glBufferSubData
 		auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -65,7 +64,6 @@ namespace GraphicsDriverFunctions
 			//error
 			const auto error = glGetError();
 			LOG_ERROR("OpenGL Error: %d", error);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 
 		return mb;
@@ -84,9 +82,8 @@ void GLVertexAttributeBuffer::AllocateOnGPU(size_t sizeBytes, BUFFER_USE_TYPE us
 
 	if (m_maxSize < sizeBytes) {
 		//grow buffer size
-		glBindBuffer(GL_ARRAY_BUFFER, bufferId.value);
+		StackHelpers::GLBindBuffer bbuffer(GL_ARRAY_BUFFER, bufferId.value);
 		glBufferData(GL_ARRAY_BUFFER, sizeBytes, nullptr, VboUseage(useType));
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		m_maxSize = sizeBytes;
 	}
 }

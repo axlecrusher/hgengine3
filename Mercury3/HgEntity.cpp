@@ -16,6 +16,15 @@
 #include <HgEngine.h>
 #include <EntityIdType.h>
 
+#include <OrderedVector.h>
+
+EntityIdLookupTable<fMatrix4>& getEntityMatrixTable()
+{
+	static EntityIdLookupTable<fMatrix4> table;
+	return table;
+}
+
+
 EntityParentTable& EntityParentTable::Manager()
 {
 	static std::unique_ptr<EntityParentTable> instance;
@@ -205,18 +214,6 @@ bool EntityParentTable::getParentId(EntityIdType id, EntityIdType& parent)
 	return true;
 }
 
-template< typename T >
-typename std::vector<T>::iterator
-insert_sorted(std::vector<T> & vec, T const& item)
-{
-	return vec.insert
-	(
-		std::upper_bound(vec.begin(), vec.end(), item),
-		item
-	);
-}
-
-
 void RenderDataTable::insert(EntityIdType id, const RenderDataPtr& rd)
 {
 	const auto idx = id.index();
@@ -232,16 +229,21 @@ void RenderDataTable::insert(EntityIdType id, const RenderDataPtr& rd)
 	m_renderData[idx] = rd;
 }
 
-uint32_t RenderDataTable::getRenderDataForEntities(EntityIdType* id, int32_t count, EntityRDPair* out) const
+uint32_t RenderDataTable::getRenderDataForEntities(EntityIdType* entityList, int32_t numEntities, EntityRDPair* out) const
 {
-	const auto genSize = m_entityGeneration.size();
+	//This function seems to scale well with a huge number of renderable entities
+
+	//If we had an ordered entity list ordered by entityid.index, we could cap the
+	//loop at max size and make the if statement only check the generation
+
+	const auto maxIndex = m_entityGeneration.size();
 	uint32_t rc = 0;
-	for (int i = 0; i < count; i++)
+	for (int i = 0; i < numEntities; i++)
 	{
-		const auto entityid = id[i];
+		const auto entityid = entityList[i];
 		const auto idx = entityid.index();
 
-		if (idx < genSize &&
+		if (idx < maxIndex &&
 			( m_entityGeneration[idx] == entityid.generation() ))
 		{
 			out[rc].entityId = entityid;
@@ -258,7 +260,7 @@ void RenderDataTable::GarbageCollectInvalidEntities(EntityIdTable* idTable)
 	const auto count = m_entityGeneration.size();
 	for (int32_t i = 0; i < count; i++)
 	{
-		if (m_renderData[i] && !idTable->exists(i, m_entityGeneration[i]))
+		if (!idTable->exists(i, m_entityGeneration[i]))
 		{
 			m_renderData[i] = nullptr;
 		}

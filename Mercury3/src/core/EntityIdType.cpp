@@ -92,7 +92,7 @@ void EntityIdTable::destroy(EntityIdType id)
 	{
 		//increment generation to invalidate current generation in the wild.
 		m_generation[idx]++;
-		if (m_generation[idx] == 0)
+		if (m_generation[idx] == GenerationType::INVALID)
 		{
 			m_generation[idx] = 1;
 		}

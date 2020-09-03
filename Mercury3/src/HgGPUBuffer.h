@@ -13,7 +13,9 @@ namespace Instancing
 	struct InstancingMetaData;
 }
 
-class IGPUBuffer; //forward declare for MappedMemory
+//Forward declaration
+class IGPUBuffer; //for MappedMemory
+struct GPUBufferMapSettings;
 
 class MappedMemory
 {
@@ -56,7 +58,7 @@ public:
 
 	virtual void AllocateOnGPU(size_t sizeBytes) = 0;
 
-	virtual void Setup(const Instancing::InstancingMetaData& imd, const HgShader& shader) = 0;
+	virtual void Setup(const GPUBufferMapSettings* settings, const HgShader& shader) = 0;
 
 	virtual MappedMemory getGPUMemoryPtr() = 0;
 
@@ -87,7 +89,7 @@ public:
 
 	virtual void SendToGPU(const IHgGPUBuffer* bufferObject) = 0;
 	virtual void AllocateOnGPU(size_t sizeBytes) = 0;
-	virtual void Setup(const Instancing::InstancingMetaData& imd, const HgShader& shader) = 0;
+	virtual void Setup(const Instancing::InstancingMetaData* imd, const HgShader& shader) = 0;
 
 	inline void setNeedSetup(bool t) { m_needSetup = t; }
 	inline bool getNeedsSetup() const { return m_needSetup; }

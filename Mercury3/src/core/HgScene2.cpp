@@ -106,7 +106,7 @@ struct {
 	{
 		return (a.drawOrder < b.drawOrder) ||
 		((a.drawOrder == b.drawOrder) && (a.rdPair->rd < b.rdPair->rd)) ||
-		((a.drawOrder == b.drawOrder) && (a.rdPair->rd == b.rdPair->rd) && (a.rdPair->rd < b.rdPair->rd));
+		((a.drawOrder == b.drawOrder) && (a.rdPair->rd == b.rdPair->rd) && (a.rdPair->entityId < b.rdPair->entityId));
 
 	//if (a.drawOrder == b.drawOrder)
 	//	{
@@ -137,7 +137,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	}
 
 	//RenderData pointer is used for grouping draw calls. We don't really
-	//the pointer. We just need to know its the same RenderData across entties.
+	//the pointer. We just need to know its the same RenderData across entities.
 	//Figure out how to do this without a pointer...
 
 	const auto renderCount = RenderDataTable::Manager().getRenderDataForEntities(m_entities.data(), m_entities.size(), m_renderDatas.data());
@@ -186,6 +186,11 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	auto mappedMem = m_tranformMatrix->getGPUMemoryPtr();
 	float* matrixMem = (float*)mappedMem.ptr;
 
+	EntityIdList batchEntities;
+	batchEntities.resize(rdoList.size());
+
+	auto& matrices = getEntityMatrixTable();
+
 	for (const auto& t : rdoList)
 	{
 		if (!lastRDO.isSameGroup(t))
@@ -194,16 +199,36 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 			{
 				//push previous instance meta data into instances
 				instances.push_back(imd);
+
+				auto CopyPerInstanceData = imd.renderData->CopyPerInstanceData;
+				if (CopyPerInstanceData)
+				{
+					CopyPerInstanceData(batchEntities.data(), imd.instanceCount);
+				}
 			}
 			imd = Instancing::InstancingMetaData();
-			imd.byteOffset = sizeof(Instancing::GPUTransformationMatrix) * matrixOffset;
 			imd.renderData = t.rdPair->rd;
 			//imd.instanceData = m_vBuffer;
-			imd.transformMatrices = std::dynamic_pointer_cast<IGPUBuffer>(m_tranformMatrix);;
+
+			{
+				GPUBufferMapSettings matrixBufferSettings;
+				matrixBufferSettings.gpuBuffer = (IGPUBuffer*)m_tranformMatrix.get();
+				matrixBufferSettings.byteOffset = sizeof(Instancing::GPUTransformationMatrix) * matrixOffset;
+				imd.gpuBufferSettings.push_back(matrixBufferSettings);
+			}
+
+			for (auto gpuBuffer : imd.renderData->perInstanceVertexAttributes)
+			{
+				GPUBufferMapSettings bufferSettings;
+				bufferSettings.gpuBuffer = gpuBuffer;
+				imd.gpuBufferSettings.push_back(bufferSettings);
+			}
+
 			lastRDO = t;
 		}
 
 		auto entity = entityTable.getPtr(&entityIdTable, t.rdPair->entityId);
+		batchEntities[imd.instanceCount] = t.rdPair->entityId;
 
 		//Computing the matrix is the slowest part. How can it be made faster?
 		entity->computeWorldSpaceMatrix().store(matrixMem);
@@ -219,11 +244,18 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	if (imd.instanceCount > 0)
 	{
 		instances.push_back(imd);
+
+		auto CopyPerInstanceData = imd.renderData->CopyPerInstanceData;
+		if (CopyPerInstanceData)
+		{
+			CopyPerInstanceData(batchEntities.data(), imd.instanceCount);
+		}
 	}
 
-	for (const auto& i : instances)
+	for (const auto& imd : instances)
 	{
-		queue->Enqueue(i);
+		Renderer::prepare(&imd);
+		queue->Enqueue(imd);
 	}
 }
 

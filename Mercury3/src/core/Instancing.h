@@ -6,6 +6,8 @@
 #include <HgGPUBuffer.h>
 #include <RenderData.h>
 
+#include <VertexAttributeBuffer.h>
+
 namespace Instancing
 {
 	struct GPUTransformationMatrix
@@ -20,12 +22,12 @@ namespace Instancing
 	struct InstancingMetaData
 	{
 		InstancingMetaData()
-			:instanceCount(0), byteOffset(0), renderData(nullptr)
+			:instanceCount(0), renderData(nullptr)
 		{
 		}
 
 		InstancingMetaData(std::shared_ptr< IHgGPUBuffer >& dataBuffer)
-			:instanceCount(0), byteOffset(0), instanceData(dataBuffer), renderData(nullptr)
+			:instanceCount(0), instanceData(dataBuffer), renderData(nullptr)
 		{
 		}
 
@@ -39,14 +41,14 @@ namespace Instancing
 		uint32_t instanceCount;
 
 		//byte offset into the instanceData buffer where the instancing data begins
-		uint32_t byteOffset;
+		//uint32_t byteOffset;
 
 		//RenderDataPtr renderData;
 		RenderData* renderData;
 
 		//pointer to the data buffer
 		std::shared_ptr< IHgGPUBuffer > instanceData;
-		std::shared_ptr< IGPUBuffer > transformMatrices;
+		std::vector< GPUBufferMapSettings > gpuBufferSettings;
 	};
 
 }

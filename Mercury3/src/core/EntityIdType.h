@@ -59,6 +59,19 @@ private:
 
 using EntityIdList = std::vector<EntityIdType>;
 
+struct GenerationType
+{
+	static const uint8_t INVALID = 0;
+
+	GenerationType(uint32_t v = INVALID)
+		:value(v)
+	{}
+
+	bool operator==(GenerationType rhs) const { return value == rhs.value; }
+
+	uint8_t value;
+};
+
 class EntityIdTable
 {
 	//Based on http://bitsquid.blogspot.com/2014/08/building-data-oriented-entity-system.html
@@ -76,13 +89,11 @@ public:
 	//check if an entity exists
 	inline bool exists(uint32_t index, uint32_t generation) const
 	{
-		if (index == 0) return false;
-		if (index < m_generation.size())
-		{
-			const auto valid = (m_generation[index] == generation);
-			return valid;
-		}
-		return false; //this should never happen
+		//this function is used everywhere. Make it branchless and fast.
+		const auto idx = (index < m_generation.size()) * index; //0 index if out of range
+
+		//check generation, 0 index is invalid so false
+		return (m_generation[index] == generation) && (idx > 0);
 	}
 
 	//check if an entity exists
@@ -120,6 +131,64 @@ private:
 
 	uint32_t m_entityTotal; //total number of entities that have ever existed
 	uint32_t m_entityActive; //number of entities currently in existance
+};
+
+template<typename T>
+class EntityIdLookupTable
+{
+public:
+	void store(EntityIdType id, const T& x)
+	{
+		const auto i = id.index();
+		if (m_gen.size() <= i)
+		{
+			m_gen.resize(i + 1);
+			m_data.resize(i + 1);
+		}
+
+		m_gen[i] = id.generation();
+		m_data[i] = x;
+	}
+
+	bool lookup(EntityIdType id, T& out) const
+	{
+		const auto i = id.index();
+		if (i < m_gen.size())
+		{
+			if (m_gen[i] == id.generation())
+			{
+				out = m_data[i];
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool lookup(EntityIdType id, const T*& out) const
+	{
+		const auto i = id.index();
+		if (i < m_gen.size())
+		{
+			if (m_gen[i] == id.generation())
+			{
+				out = &m_data[i];
+				return true;
+			}
+		}
+		return false;
+	}
+	void invalidate(EntityIdType id)
+	{
+		T tmp;
+		if (lookup(id, tmp))
+		{
+			m_gen[id.index()] = 0;
+		}
+	}
+
+private:
+	std::vector<GenerationType> m_gen;
+	std::vector<T> m_data;
 };
 
 namespace std

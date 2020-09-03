@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <GLBuffer.h>
 
-#include <core/Instancing.h>
+//#include <core/Instancing.h>
 #include <../oglShaders.h>
 
 #include <HgGPUBuffer.h>
@@ -11,7 +11,12 @@
 
 #include <Enumerations.h>
 
-struct SetupParams; // Forward declare
+//Forward declarations
+struct SetupParams;
+namespace Instancing
+{
+	struct InstancingMetaData;
+}
 
 namespace VertexAttributeTypes
 {
@@ -20,7 +25,14 @@ namespace VertexAttributeTypes
 
 	struct vec4
 	{
-		float xyzw[4]; //define so sizeof() can be used
+		union xyzw
+		{
+			struct
+			{
+				float r, g, b, a;
+			} color;
+			float xyzw[4]; //define so sizeof() can be used
+		} xyzw;
 
 		static void Setup(const SetupParams& p)
 		{
@@ -83,16 +95,25 @@ namespace GraphicsDriverFunctions
 {
 	//lame cop out for things that do opengl
 
-	void ReleaseMappedMemory(MappedMemory* mm);
+	void ReleaseMappedMemory(GLVertexAttributeBuffer* vab);
 	MappedMemory getGPUMemoryPtr(IGPUBuffer* gpuBuffer, GLVertexAttributeBuffer* vab);
 }
 
+struct GPUBufferMapSettings
+{
+	GPUBufferMapSettings()
+		:gpuBuffer(nullptr), byteOffset(0)
+	{}
+
+	IGPUBuffer* gpuBuffer;
+	uint32_t byteOffset;
+};
+
 struct SetupParams
 {
-	IGPUBuffer* iglbuffer;
+	GPUBufferMapSettings bufferSettings;
 	GLVertexAttributeBuffer* attribBuffer;
 	std::string* attributeName;
-	const Instancing::InstancingMetaData* imd;
 	const HgShader* shader;
 };
 
@@ -118,13 +139,12 @@ public:
 		m_attributeBuffer.AllocateOnGPU(sizeBytes, getUseType());
 	}
 
-	virtual void Setup(const Instancing::InstancingMetaData& imd, const HgShader& shader)
+	virtual void Setup(const GPUBufferMapSettings* settings, const HgShader& shader)
 	{
 		SetupParams p;
-		p.iglbuffer = this;
+		p.bufferSettings = *settings;
 		p.attribBuffer = &m_attributeBuffer;
 		p.attributeName = &m_attributeName;
-		p.imd = &imd;
 		p.shader = &shader;
 		T::Setup(p);
 	}
@@ -138,7 +158,7 @@ public:
 
 	virtual void ReleaseMappedMemory(MappedMemory* mm)
 	{
-		GraphicsDriverFunctions::ReleaseMappedMemory(mm);
+		GraphicsDriverFunctions::ReleaseMappedMemory(&m_attributeBuffer);
 	}
 
 private:

@@ -8,6 +8,7 @@
 #include <Material.h>
 
 #include <GLBuffer.h>
+#include <EntityIdType.h>
 
 class RenderData {
 private:
@@ -33,6 +34,8 @@ public:
 	RenderData();
 	~RenderData();
 
+	//RenderData(const RenderData&) = delete;
+
 	void render(const Instancing::InstancingMetaData* imd = nullptr);
 
 	IHgVbo* hgVbo() { return m_vertexVbo.Record().Vbo().get(); }
@@ -46,7 +49,6 @@ public:
 	const HgVboRecord& indexVboRecord() const { return m_indexVbo.Record(); }
 
 	void colorVbo(const VboIndex& vbo_index) { m_colorVbo = vbo_index; }
-	//inline void colorVbo(std::unique_ptr<IHgVbo>& vbo) { m_colorVbo = std::move(vbo); }
 
 	Material& getMaterial() { return m_material; }
 	const Material& getMaterial() const { return m_material; }
@@ -54,11 +56,13 @@ public:
 	HgEngine::PrimitiveType getPrimitiveType() const { return m_primitive; }
 	void setPrimitiveType(HgEngine::PrimitiveType t) { m_primitive = t; }
 
-	//uint32_t instanceCount;
+	//Copy per instance data into IGPUBuffers.
+	//List should contain the entity IDs in the order they will be rendered.
+	std::function<void(EntityIdType* list, uint32_t listLength)> CopyPerInstanceData;
 
-	////std::shared_ptr<IHgGPUBuffer> gpuBuffer;
-	////IHgGPUBuffer* gpuBuffer;
-	//std::shared_ptr<IHgGPUBuffer> gpuBuffer;
+	//void addPerInstanceAttribute()
+	//std::vector<IGLBufferUse*> vertexAttributes;
+	std::vector<IGPUBuffer*> perInstanceVertexAttributes;
 
 	Flags renderFlags;
 

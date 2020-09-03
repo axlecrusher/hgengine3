@@ -15,16 +15,13 @@ RenderData::~RenderData()
 
 RenderDataPtr RenderData::Create()
 {
-	auto t = new RenderData();
-	std::shared_ptr<RenderData> rd(t);
-	//auto rd = std::make_shared<RenderData>();
+	auto rd = std::make_shared<RenderData>();
 	return rd;
 }
 
 RenderDataPtr RenderData::Create(const RenderDataPtr rdp)
 {
-	auto t = new RenderData(*rdp);
-	std::shared_ptr<RenderData> rd(t);
+	auto rd = std::make_shared<RenderData>(*rdp);
 	return rd;
 }
 

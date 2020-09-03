@@ -13,6 +13,30 @@
 
 GLenum hgPrimitiveTypeToGLType(HgEngine::PrimitiveType t);
 
+namespace StackHelpers
+{
+	//Provides stack calling of glBindBuffer
+	struct GLBindBuffer
+	{
+		GLBindBuffer(GLenum target, GLuint buffer)
+			:m_target(target)
+		{
+			glBindBuffer(m_target, buffer);
+		};
+
+		~GLBindBuffer()
+		{
+			glBindBuffer(m_target, 0);
+		}
+
+		GLBindBuffer(const GLBindBuffer&) = delete;
+		GLBindBuffer(GLBindBuffer&&) = delete;
+		GLBindBuffer& operator=(GLBindBuffer&&) = delete;
+
+		GLenum m_target;
+	};
+}
+
 template<typename T>
 class OGLvbo : public IHgVbo {
 public:
@@ -110,10 +134,9 @@ private:
 		const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
 		const auto iType = indiceType();
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id.value);
+		StackHelpers::GLBindBuffer bbuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id.value);
 		glDrawElementsInstancedBaseVertex(mode, idx_count, iType, (void*)offset, imd->instanceCount, vetexOffest);
 		//glDrawElementsInstancedBaseVertexBaseInstance(mode, idx_count, iType, (void*)offset, imd->instanceCount, vetexOffest, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	//vbo rendering using indices
@@ -125,20 +148,17 @@ private:
 		const auto iType = indiceType();
 		const auto mode = hgPrimitiveTypeToGLType(rd->getPrimitiveType());
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id.value);
+		StackHelpers::GLBindBuffer bbuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id.value);
 		glDrawElementsBaseVertex(mode, indice_count, iType, (void*)offset, vertex_offset);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	void sendIndicesToGPU() {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id.value);
-
 		const auto count = m_mem.getCount();
 		const auto stride = m_mem.Stride();
 		const auto useType = VboUseage(m_useType);
 
+		StackHelpers::GLBindBuffer bbuffer(GL_ELEMENT_ARRAY_BUFFER, handle.vbo_id.value);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count*stride, m_mem.getBuffer(), useType);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	HgVboMemory<T> m_mem;
@@ -210,7 +230,7 @@ void OGLvbo<T>::sendToGPU()
 
 	const auto useType = VboUseage(m_useType);
 
-	glBindBuffer(GL_ARRAY_BUFFER, handle.vbo_id.value);
+	StackHelpers::GLBindBuffer bbuffer(GL_ARRAY_BUFFER, handle.vbo_id.value);
 
 	const GLsizei size = (GLsizei)m_mem.getSizeBytes();
 
@@ -225,8 +245,6 @@ void OGLvbo<T>::sendToGPU()
 	//}
 
 	glBufferData(GL_ARRAY_BUFFER, size, m_mem.getBuffer(), useType);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	//Setup();
 }
 
@@ -237,7 +255,7 @@ void OGLvbo<T>::Setup()
 
 	//glBindVertexArray(handle.vao_id);
 
-	glBindBuffer(GL_ARRAY_BUFFER, handle.vbo_id.value);
+	StackHelpers::GLBindBuffer bbuffer(GL_ARRAY_BUFFER, handle.vbo_id.value);
 	//minimize calls to glVertexAttribPointer, use same format for all meshes in a VBO
 
 	glVertexAttribPointer(L_VERTEX, 3, GL_FLOAT, GL_FALSE, stride, NULL);
@@ -405,7 +423,7 @@ inline void OGLvbo<uint32_t>::bind() { }
 
 template<>
 inline void OGLvbo<color8>::bind() {
-	glBindBuffer(GL_ARRAY_BUFFER, (GLuint)handle.vbo_id.value);
+	StackHelpers::GLBindBuffer bbuffer(GL_ARRAY_BUFFER, (GLuint)handle.vbo_id.value);
 	glVertexAttribPointer(L_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, NULL);
 	glEnableVertexAttribArray(L_COLOR);
 }

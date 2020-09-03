@@ -194,6 +194,13 @@ private:
 	//std::vector<EntityIdType> m_parents;
 };
 
+struct fMatrix4
+{
+	float m[16];
+};
+
+EntityIdLookupTable<fMatrix4>& getEntityMatrixTable();
+
 struct EntityRDIdxPair
 {
 	EntityIdType entity;
@@ -212,7 +219,7 @@ public:
 	void insert(EntityIdType id, const RenderDataPtr& rd);
 	RenderDataPtr get(EntityIdType id) const;
 
-	//copies EntityRDPairs into [out] and returns number of entries
+	//copies EntityRDPairs into [out] and returns number of EntityRDPair entries
 	uint32_t getRenderDataForEntities(EntityIdType* id, int32_t count, EntityRDPair* out) const;
 
 	void GarbageCollectInvalidEntities(EntityIdTable* idTable);
@@ -406,19 +413,26 @@ public:
 
 	inline HgEntity* getPtr(EntityIdTable* table, EntityIdType id)
 	{
-		if (table->exists(id))
-		{
-			const auto idx = id.index();
-			if (idx < m_entities.size())
-			{
-				HgEntity* ptr = &m_entities[idx];
-				if (ptr->getEntityId() == id)
-				{
-					return ptr;
-				}
-			}
-		}
-		return nullptr;
+		const auto exist = table->exists(id) * 1;
+		const auto idx = exist * id.index();
+
+		HgEntity* ptr = &m_entities[idx];
+		size_t tmp((size_t)ptr);
+		tmp *= exist;
+		return ((HgEntity*)tmp);
+
+		//if ()
+		//{
+		//	if (idx < m_entities.size())
+		//	{
+		//		HgEntity* ptr = &m_entities[idx];
+		//		if (ptr->getEntityId() == id)
+		//		{
+		//			return ptr;
+		//		}
+		//	}
+		//}
+		//return nullptr;
 	}
 
 	inline HgEntity* getPtr(EntityIdType id)

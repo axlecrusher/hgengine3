@@ -142,6 +142,7 @@ namespace Renderer {
 	//Must happen after window is created;
 	void Init();
 
+	void prepare(const Instancing::InstancingMetaData* imd);
 	void Render(const Viewport& vp, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection, RenderQueue* queue);
 }
 

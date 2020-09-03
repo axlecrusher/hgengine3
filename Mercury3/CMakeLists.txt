@@ -55,12 +55,18 @@ file(GLOB ENGINESOURCES
 
 source_group("Source" FILES ${ENGINESOURCES})
 
+file(GLOB DATA_STRUCTURES
+	"src/datastructures/*.h"
+	"src/datastructures/*.cpp"
+)
+source_group("Data Structures" FILES ${DATA_STRUCTURES})
+
 if(MSVC)
     add_definitions(-DUNICODE -D_UNICODE)
     set(WIDECHAR "/Zc:wchar_t")
 endif()
 
-add_library(hgengine STATIC ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC} ${CORE_ENGINESOURCES} ${OPENVR_LIB} ${OGGLIBS})
+add_library(hgengine STATIC ${DATA_STRUCTURES} ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC} ${CORE_ENGINESOURCES} ${OPENVR_LIB} ${OGGLIBS})
 target_compile_options(hgengine PRIVATE ${WIDECHAR})
 
 

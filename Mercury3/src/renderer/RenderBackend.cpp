@@ -8,6 +8,48 @@ namespace Renderer {
 	void Init() {
 		RENDERER()->Init();
 	}
+
+
+	void prepare(const Instancing::InstancingMetaData* imd)
+	{
+		auto rd = imd->renderData;
+		//load texture data to GPU here. Can this be made to be done right after loading the image data, regardless of thread?
+		rd->getMaterial().updateGpuTextures();
+
+		HgShader& shader = rd->getMaterial().getShader();
+		bool shaderCompiled = shader.compile();
+
+		auto& vao = rd->vao.Record();
+
+		if (shaderCompiled)
+		{
+			//if the shader recompiled, throw out the old VAO and build a new one
+			vao.Init();
+		}
+		vao.Enable();
+
+		//setup attribute buffers
+		for (auto& settings : imd->gpuBufferSettings)
+		{
+			settings.gpuBuffer->Setup(&settings, shader);
+		}
+
+		if (imd->isValid())
+		{
+			//Setup or use additional buffers here
+
+			if (imd->instanceData && imd->instanceData->NeedsLoadToGPU())
+			{
+				assert(false);
+				assert(true);
+				imd->instanceData->sendToGPU();
+				imd->instanceData->getUseClass()->Setup(imd, shader);
+			}
+		}
+
+		vao.Disable();
+	}
+
 }
 
 RenderBackend* RENDERER() {
@@ -16,44 +58,94 @@ RenderBackend* RENDERER() {
 	return api;
 }
 
+//static void submit_for_render_serial(const Viewport& vp, const RenderInstance& ri, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection) {
+//	RenderData* renderData = ri.renderData;
+//	const float* worldSpaceMatrix = ri.interpolatedWorldSpaceMatrix;
+//
+//	RENDERER()->setViewport(vp);
+//
+//	//load texture data to GPU here. Can this be made to be done right after loading the image data, regardless of thread?
+//	renderData->getMaterial().updateGpuTextures();
+//
+//	HgShader& shader = renderData->getMaterial().getShader();
+//	bool shaderCompiled = shader.compile();
+//
+//	auto& vao = renderData->vao.Record();
+//
+//	if (shaderCompiled)
+//	{
+//		//if the shader recompiled, throw out the old VAO and build a new one
+//		vao.Init();
+//	}
+//	vao.Enable();
+//
+//	auto& imd = ri.imd;
+//	if (imd.isValid())
+//	{
+//		//Setup or use additional buffers here
+//
+//		auto& perInstanceVertexAttributes = imd.renderData->perInstanceVertexAttributes;
+//		for (int i = 0; i < imd.renderData->perInstanceVertexAttributes.size(); i++)
+//		{
+//			perInstanceVertexAttributes[i]->Setup(imd, shader);
+//		}
+//
+//		if (imd.transformMatrices)
+//		{
+//			imd.transformMatrices->Setup(imd, shader);
+//		}
+//
+//		if (imd.instanceData && imd.instanceData->NeedsLoadToGPU())
+//		{
+//			imd.instanceData->sendToGPU();
+//			imd.instanceData->getUseClass()->Setup(imd, shader);
+//		}
+//	}
+//
+//	shader.enable();
+//
+//
+//	//if (shader) {
+//		//shader.enable();
+//		//perspective and camera probably need to be rebound here as well. (if the shader program changed. uniforms are local to shader programs).
+//		//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
+//		//shader->setGlobalUniforms(*camera);
+//		//const auto spacial = e->getSpacialData();
+//
+//		//settings uniforms can't be done in advance.
+//		//It has to be done after enabling the shader and before rendering.
+//		shader.uploadMatrices(worldSpaceMatrix, projection, viewMatrix);
+//
+//		ShaderUniforms uniforms;
+//		uniforms.material = &(renderData->getMaterial());
+//		//uniforms.gpuBuffer = renderData->gpuBuffer.get();
+//		uniforms.remainingTime = &ri.remainingTime;
+//
+//		shader.setLocalUniforms(uniforms);
+//	//}
+//
+//		if (ri.imd.isValid())
+//		{
+//			renderData->render(&ri.imd);
+//		}
+//		else
+//		{
+//			renderData->render();
+//
+//		}
+//
+//		vao.Disable();
+//}
+
 static void submit_for_render_serial(const Viewport& vp, const RenderInstance& ri, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection) {
 	RenderData* renderData = ri.renderData;
 	const float* worldSpaceMatrix = ri.interpolatedWorldSpaceMatrix;
 
 	RENDERER()->setViewport(vp);
 
-	//load texture data to GPU here. Can this be made to be done right after loading the image data, regardless of thread?
-	renderData->getMaterial().updateGpuTextures();
-
 	HgShader& shader = renderData->getMaterial().getShader();
-	bool shaderCompiled = shader.compile();
-
 	auto& vao = renderData->vao.Record();
-
-	if (shaderCompiled)
-	{
-		//if the shader recompiled, throw out the old VAO and build a new one
-		vao.Init();
-	}
 	vao.Enable();
-
-	auto& imd = ri.imd;
-	if (imd.isValid())
-	{
-		//Setup or use additional buffers here
-
-		if (imd.transformMatrices)
-		{
-			imd.transformMatrices->Setup(imd, shader);
-		}
-
-		if (imd.instanceData && imd.instanceData->NeedsLoadToGPU())
-		{
-			imd.instanceData->sendToGPU();
-			imd.instanceData->getUseClass()->Setup(imd, shader);
-		}
-	}
-
 	shader.enable();
 
 
@@ -63,27 +155,30 @@ static void submit_for_render_serial(const Viewport& vp, const RenderInstance& r
 		//we could give each shader program a "needsGlobalUniforms" flag that is reset every frame, to check if uniforms need to be updated
 		//shader->setGlobalUniforms(*camera);
 		//const auto spacial = e->getSpacialData();
-		shader.uploadMatrices(worldSpaceMatrix, projection, viewMatrix);
 
-		ShaderUniforms uniforms;
-		uniforms.material = &(renderData->getMaterial());
-		//uniforms.gpuBuffer = renderData->gpuBuffer.get();
-		uniforms.remainingTime = &ri.remainingTime;
+		//settings uniforms can't be done in advance.
+		//It has to be done after enabling the shader and before rendering.
+	shader.uploadMatrices(worldSpaceMatrix, projection, viewMatrix);
 
-		shader.setLocalUniforms(uniforms);
+	ShaderUniforms uniforms;
+	uniforms.material = &(renderData->getMaterial());
+	//uniforms.gpuBuffer = renderData->gpuBuffer.get();
+	uniforms.remainingTime = &ri.remainingTime;
+
+	shader.setLocalUniforms(uniforms);
 	//}
 
-		if (ri.imd.isValid())
-		{
-			renderData->render(&ri.imd);
-		}
-		else
-		{
-			renderData->render();
+	if (ri.imd.isValid())
+	{
+		renderData->render(&ri.imd);
+	}
+	else
+	{
+		renderData->render();
 
-		}
+	}
 
-		vao.Disable();
+	vao.Disable();
 }
 
 HgMath::mat4f ViewportRenderTarget::getPerspectiveMatrix() const

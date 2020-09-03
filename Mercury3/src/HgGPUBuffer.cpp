@@ -9,6 +9,7 @@ MappedMemory::~MappedMemory()
 	{
 		m_bufferInterface->ReleaseMappedMemory(this);
 	}
+	ptr = nullptr;
 }
 
 void IHgGPUBuffer::sendToGPU()
