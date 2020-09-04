@@ -289,7 +289,7 @@ int main()
 			HgText::Text t;
 			t.setText("HgEngine 3 -- Now with text! VV");
 			textEntity->setRenderData(t.CreateRenderData());
-			textEntity->setDrawOrder(110);
+			EntityHelpers::setDrawOrder(textIDs[0], 110);
 			textEntity->position(point(1, 0, 0));
 			textEntity->scale(10.0);
 			textEntity->getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
@@ -302,7 +302,7 @@ int main()
 			HgText::Text t;
 			t.setText("Woooooooooo!");
 			textEntity->setRenderData(t.CreateRenderData());
-			textEntity->setDrawOrder(110);
+			EntityHelpers::setDrawOrder(textIDs[1], 110);
 			textEntity->position(point(1, 2, 0));
 			textEntity->scale(10.0);
 			textEntity->getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
@@ -455,7 +455,7 @@ int main()
 		grid->getRenderDataPtr()->getMaterial().setTransparent(true);
 		grid->getRenderDataPtr()->renderFlags.DEPTH_WRITE = false;
 		grid->setName("Grid");
-		grid->setDrawOrder(100);
+		EntityHelpers::setDrawOrder(grid->getEntityId(), 100);
 		//grid->flags.deptj
 		//	model_data d = LoadModel("test.hgmdl");
 	}
@@ -469,7 +469,9 @@ int main()
 			auto idList = EntityHelpers::createContiguous(2);
 			scene2.addEntityIDs(idList);
 
-			HgEntity* redCube = EntityTable::Singleton().getPtr(idList[0]);
+			auto& et = EntityTable::Singleton();
+
+			HgEntity* redCube = et.getPtr(idList[0]);
 			change_to_cube(redCube);
 
 			redCube->setRenderData(RenderData::Create(redCube->getRenderDataPtr()));
@@ -484,7 +486,11 @@ int main()
 			teapotSquare->setRenderData(RenderData::Create(teapotSquare->getRenderDataPtr()));
 			teapotSquare->scale(0.3);
 			teapotSquare->position(point(0, 3, 0));
-			teapotSquare->setInheritParentScale(false);
+
+			auto flags = et.getFlags(idList[1]);
+			flags.inheritParentTranslation = false;
+			et.setFlags(idList[1], flags);
+
 			teapotSquare->setParent(teapotId);
 			teapotSquare->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("basic_light2_v_instance.glsl", "basic_light2_f_blue.glsl"));
 			//teapotSquare->setHidden(true);

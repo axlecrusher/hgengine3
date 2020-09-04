@@ -93,7 +93,7 @@ public:
 		const auto idx = (index < m_generation.size()) * index; //0 index if out of range
 
 		//check generation, 0 index is invalid so false
-		return (m_generation[index] == generation) && (idx > 0);
+		return (m_generation[idx] == generation) && (idx > 0);
 	}
 
 	//check if an entity exists

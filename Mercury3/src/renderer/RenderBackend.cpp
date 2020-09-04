@@ -279,7 +279,8 @@ void RenderQueue::Enqueue(HgEntity* e, HgTime dt)
 	{
 		const auto worldSpaceMatrix = e->computeWorldSpaceMatrix();
 		const auto vel = ComputeVelocity(worldSpaceMatrix, e, dt);
-		Enqueue(renderData.get(), worldSpaceMatrix, e->getDrawOrder(), vel);
+		const auto drawOrder = EntityHelpers::getDrawOrder(e->getEntityId());
+		Enqueue(renderData.get(), worldSpaceMatrix, drawOrder, vel);
 	}
 }
 

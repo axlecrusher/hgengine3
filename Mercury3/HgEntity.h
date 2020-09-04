@@ -313,31 +313,23 @@ class HgEntity {
 		HgMath::mat4f computeWorldSpaceMatrixIncludeParent(bool scale = true, bool rotation = true, bool translation = true) const;
 		point computeWorldSpacePosition() const;
 
-		inline void setInheritParentScale(bool x) { flags.inheritParentScale = x; }
-		inline void setInheritParentRotation(bool x) { flags.inheritParentRotation = x; }
-		inline void setInheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
+		//inline void setInheritParentScale(bool x) { flags.inheritParentScale = x; }
+		//inline void setInheritParentRotation(bool x) { flags.inheritParentRotation = x; }
+		//inline void setInheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
 
-		inline void setDestroy(bool x) { flags.destroy = x; }
-		inline void setHidden(bool x) { flags.hidden = x; }
+		//inline void setDestroy(bool x) { flags.destroy = x; }
+		//inline void setHidden(bool x) { flags.hidden = x; }
 
-		//Lower numbers draw first. default draw order is 0
-		inline void setDrawOrder(int8_t order) { m_drawOrder = order; }
-		inline int8_t getDrawOrder() const { return m_drawOrder; }
+		////Lower numbers draw first. default draw order is 0
+		//inline void setDrawOrder(int8_t order) { m_drawOrder = order; }
+		//inline int8_t getDrawOrder() const { return m_drawOrder; }
 
 		inline void setName(const std::string& name) { EntityNames().setName(m_entityId, name); }
 		inline std::string& getName() const { EntityNames().getName(m_entityId); }
 
-		inline EntityFlags getFlags() const { return flags; }
+		//inline EntityFlags getFlags() const { return flags; }
 
-		inline void clone(HgEntity* other) const
-		{
-			other->m_spacialData = m_spacialData;
-			other->m_drawOrder = m_drawOrder;
-			other->flags = flags;
-
-			auto tmp = getRenderDataPtr();
-			other->setRenderData(tmp);
-		}
+		void clone(HgEntity* other) const;
 
 		/*	Find an existing entity by id. Returned pointer is managed, do not delete.
 			Return nullptr if the entity does not exist.
@@ -353,11 +345,9 @@ private:
 	SpacialData m_spacialData; //local transormations
 	EntityIdType m_entityId;
 
-	int8_t m_drawOrder;
-
-	EntityFlags flags;
+	//int8_t m_drawOrder;
+	//EntityFlags flags;
 };
-
 
 class EntityTable
 {
@@ -413,26 +403,14 @@ public:
 
 	inline HgEntity* getPtr(EntityIdTable* table, EntityIdType id)
 	{
-		const auto exist = table->exists(id) * 1;
-		const auto idx = exist * id.index();
+		const auto idx = id.index();
 
-		HgEntity* ptr = &m_entities[idx];
-		size_t tmp((size_t)ptr);
-		tmp *= exist;
-		return ((HgEntity*)tmp);
+		if (idx < m_entities.size() && table->exists(id))
+		{
+			return &m_entities[idx];
+		}
 
-		//if ()
-		//{
-		//	if (idx < m_entities.size())
-		//	{
-		//		HgEntity* ptr = &m_entities[idx];
-		//		if (ptr->getEntityId() == id)
-		//		{
-		//			return ptr;
-		//		}
-		//	}
-		//}
-		//return nullptr;
+		return nullptr;
 	}
 
 	inline HgEntity* getPtr(EntityIdType id)
@@ -440,8 +418,59 @@ public:
 		return getPtr(&EntityIdTable::Singleton(), id);
 	}
 
+	inline EntityFlags getFlags(EntityIdType id)
+	{
+		const auto idx = id.index();
+		return m_flags[idx];
+	}
+
+	inline void setFlags(EntityIdType id, EntityFlags flags)
+	{
+		const auto idx = id.index();
+		m_flags[idx] = flags;
+	}
+
+	inline int8_t getDrawOrder(EntityIdType id)
+	{
+		const auto idx = id.index();
+		return m_drawOrder[idx];
+	}
+
+	inline void setDrawOrder(EntityIdType id, int8_t drawOrder)
+	{
+		const auto idx = id.index();
+		m_drawOrder[idx] = drawOrder;
+	}
+
+	inline void clone(EntityIdType src, EntityIdType dest)
+	{
+		const auto sidx = src.index();
+		const auto didx = dest.index();
+
+		m_dirtyTransform[didx] = m_dirtyTransform[sidx];
+		m_spi[didx] = m_spi[sidx];
+		m_drawOrder[didx] = m_drawOrder[sidx];
+		m_flags[didx] = m_flags[sidx];
+		m_worldSpaceMatrix[didx] = m_worldSpaceMatrix[sidx];
+	}
+
+	void initEntity(EntityIdType id)
+	{
+		const auto idx = id.index();
+
+		if (idx < m_entities.size())
+		{
+			m_dirtyTransform[idx] = false;
+			m_spi[idx] = SPI();
+			m_drawOrder[idx] = 0;
+			m_flags[idx] = EntityFlags();
+			memset(&m_worldSpaceMatrix[idx], 0, sizeof(float) * 16);
+		}
+	}
+
+
 	//destroy an entity
-	void destroy(EntityIdType id);
+	//void destroy(EntityIdType id);
 
 	static EntityTable& Singleton();
 
@@ -453,11 +482,29 @@ private:
 		const auto idx = id.index();
 		if (idx >= m_entities.size())
 		{
-			m_entities.resize(idx + 1000);
+			//m_entities.resize(idx + 1000);
+			resize(idx + 1000);
 		}
 	}
 
+	inline void resize(size_t newSize)
+	{
+		m_entities.resize(newSize);
+		m_dirtyTransform.resize(newSize, false);
+		m_spi.resize(newSize);
+		m_drawOrder.resize(newSize, 0);
+		m_flags.resize(newSize);
+		m_worldSpaceMatrix.resize(newSize);
+	}
+
+
 	std::vector<HgEntity> m_entities;
+
+	std::vector<bool> m_dirtyTransform;
+	std::vector<SPI> m_spi;
+	std::vector<int8_t> m_drawOrder;
+	std::vector<EntityFlags> m_flags;
+	std::vector<fMatrix4> m_worldSpaceMatrix;
 };
 
 namespace EntityHelpers
@@ -473,6 +520,32 @@ namespace EntityHelpers
 	inline EntityIdType createSingle()
 	{
 		return EntityTable::Singleton().create();
+	}
+
+	inline void setDestroy(EntityIdType id, bool v)
+	{
+		auto& et = EntityTable::Singleton();
+		auto flags = et.getFlags(id);
+		flags.destroy = v;
+		et.setFlags(id, flags);
+	}
+
+	inline EntityFlags getFlags(EntityIdType id)
+	{
+		auto& et = EntityTable::Singleton();
+		return et.getFlags(id);
+	}
+
+	inline int8_t getDrawOrder(EntityIdType id)
+	{
+		auto& et = EntityTable::Singleton();
+		return et.getDrawOrder(id);
+	}
+
+	inline void setDrawOrder(EntityIdType id, int8_t order)
+	{
+		auto& et = EntityTable::Singleton();
+		return et.setDrawOrder(id, order);
 	}
 }
 

@@ -302,7 +302,7 @@ void HgEntity::init(EntityIdType id)
 {
 	EntityIdTable::Singleton().destroy(m_entityId);
 
-	m_drawOrder = 0;
+	EntityTable::Singleton().initEntity(id);
 
 	if (EntityIdTable::Singleton().exists(id))
 	{
@@ -367,6 +367,8 @@ HgMath::mat4f HgEntity::computeWorldSpaceMatrix(const bool applyScale, bool appl
 HgMath::mat4f HgEntity::computeWorldSpaceMatrixIncludeParent(const bool applyScale, bool applyRotation, bool applyTranslation) const {
 	HgMath::mat4f modelMatrix = HgMath::computeTransformMatrix(m_spacialData.getSPI(), applyScale, applyRotation, applyTranslation);
 
+	const auto flags = EntityTable::Singleton().getFlags(getEntityId());
+
 	auto parent = getParent();
 	if (parent.isValid()) {
 		modelMatrix = parent->computeWorldSpaceMatrix(flags.inheritParentScale,
@@ -383,10 +385,20 @@ point HgEntity::computeWorldSpacePosition() const
 	return matrix * p;
 }
 
-void EntityTable::destroy(EntityIdType id)
+void HgEntity::clone(HgEntity* other) const
 {
-	//	m_entities
+	other->m_spacialData = m_spacialData;
+
+	EntityTable::Singleton().clone(getEntityId(), other->getEntityId());
+
+	auto tmp = getRenderDataPtr();
+	other->setRenderData(tmp);
 }
+
+//void EntityTable::destroy(EntityIdType id)
+//{
+//	//	m_entities
+//}
 
 //Transform point p into world space of HgEntity e
 //I'm not 100% sure this matches the functionality of computeWorldSpaceMatrix so remove for now

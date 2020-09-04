@@ -50,7 +50,7 @@ public:
 			itr->T::update(dtime); //avoid vtable lookup
 
 			auto& entity = itr->T::getEntity();
-			if (entity.getFlags().destroy)
+			if (EntityHelpers::getFlags(entity.getEntityId()).destroy)
 			{
 				remove(*itr);
 				continue;
