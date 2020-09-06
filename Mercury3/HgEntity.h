@@ -413,26 +413,21 @@ public:
 
 	inline HgEntity* getPtr(EntityIdTable* table, EntityIdType id)
 	{
-		const auto exist = table->exists(id) * 1;
-		const auto idx = exist * id.index();
+		const auto exist = table->exists(id);
+		const auto idx = id.index();
 
-		HgEntity* ptr = &m_entities[idx];
-		size_t tmp((size_t)ptr);
-		tmp *= exist;
-		return ((HgEntity*)tmp);
-
-		//if ()
-		//{
-		//	if (idx < m_entities.size())
-		//	{
-		//		HgEntity* ptr = &m_entities[idx];
-		//		if (ptr->getEntityId() == id)
-		//		{
-		//			return ptr;
-		//		}
-		//	}
-		//}
-		//return nullptr;
+		if (exist)
+		{
+			if (idx < m_entities.size())
+			{
+				HgEntity* ptr = &m_entities[idx];
+				if (ptr->getEntityId() == id)
+				{
+					return ptr;
+				}
+			}
+		}
+		return nullptr;
 	}
 
 	inline HgEntity* getPtr(EntityIdType id)

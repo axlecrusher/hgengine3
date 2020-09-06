@@ -89,11 +89,11 @@ public:
 	//check if an entity exists
 	inline bool exists(uint32_t index, uint32_t generation) const
 	{
-		//this function is used everywhere. Make it branchless and fast.
-		const auto idx = (index < m_generation.size()) * index; //0 index if out of range
-
-		//check generation, 0 index is invalid so false
-		return (m_generation[index] == generation) && (idx > 0);
+		if ( index < m_generation.size() )
+		{
+			return (m_generation[index] == generation);
+		}
+		return false;
 	}
 
 	//check if an entity exists
