@@ -66,8 +66,14 @@ public:
 
 	Flags renderFlags;
 
-	//GLVaoId vao;
-	VaoIndex vao;
+	//VaoIndex vao;
+
+	/*	Vertex attribute buffer offsets are set per instance,
+		and instancing is done based on render data pointer address.
+		VAO needs to be unique to the render data instance or the
+		buffer offsets will be incorrect.
+	*/
+	GLVaoId vao;
 
 private:
 	Material m_material;
