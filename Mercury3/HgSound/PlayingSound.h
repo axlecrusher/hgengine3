@@ -31,10 +31,7 @@ namespace HgSound {
 
 		//playbackEndedFunc callback will be called from a thread
 		inline void setEventPlaybackEnded(const playbackEndedFunc& clbk) { m_playbackEndedClbk = clbk; }
-		inline void eventPlaybackEnded() {
-			auto clbk = m_playbackEndedClbk.load();
-			if (clbk) clbk(m_sound);
-		}
+		void eventPlaybackEnded();
 
 		//void jumpToTime(HgTime t) {
 		//	auto sound = m_sound.get();

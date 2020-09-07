@@ -31,6 +31,12 @@ namespace HgSound {
 		SOUND->stopPlayback(this);
 	}
 
+	void PlayingSound::eventPlaybackEnded()
+	{
+		auto clbk = m_playbackEndedClbk.load();
+		if (clbk) clbk(m_sound);
+	}
+
 	Emitter PlayingSound::EmitFromEntity(const HgEntity* e)
 	{
 		m_emittingEntityId = e->getEntityId();
