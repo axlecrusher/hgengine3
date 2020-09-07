@@ -16,8 +16,10 @@ public:
 private:
 	static uint8_t convertTextureTarget(GLenum target);
 
-	GLuint m_targets[3] = { 0 };
+	GLuint m_targets[4] = { 0 };
 };
+
+OGLTextureUnit& ActiveTexture(uint16_t t);
 
 class OGLBackend : public RenderBackend {
 public:

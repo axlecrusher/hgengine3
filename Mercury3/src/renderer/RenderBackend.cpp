@@ -74,7 +74,7 @@ RenderBackend* RENDERER() {
 //	HgShader& shader = renderData->getMaterial().getShader();
 //	bool shaderCompiled = shader.compile();
 //
-//	auto& vao = renderData->vao.Record();
+//	auto& vao = renderData->vao;
 //
 //	if (shaderCompiled)
 //	{
