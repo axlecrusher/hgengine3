@@ -461,9 +461,9 @@ int main()
 	}
 
 	{
-		auto testSound = HgSound::SoundAsset::acquire("tone2.wav");
+		auto testSound = HgSound::SoundAsset::acquire("assets/music/crush_mono.ogg");
 		auto snd = testSound->newPlayingInstance();
-		snd->setVolume(0.5);
+		snd->setVolume(0.75);
 
 		{
 			auto idList = EntityHelpers::createContiguous(2);
