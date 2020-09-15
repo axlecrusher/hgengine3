@@ -27,12 +27,15 @@ uint8_t OGLTextureUnit::convertTextureTarget(GLenum target)
 {
 	switch (target)
 	{
+
 	case GL_TEXTURE_2D:
 		return 0;
 	case GL_TEXTURE_BUFFER:
 		return 1;
-	default:
+	case GL_TEXTURE_2D_MULTISAMPLE:
 		return 2;
+	default:
+		return 3;
 	}
 }
 
@@ -169,7 +172,7 @@ static GLenum convertTextureLocation(uint16_t location)
 	return GL_TEXTURE0 + location;
 }
 
-OGLTextureUnit& OGLBackend::ActiveTexture(uint16_t t)
+OGLTextureUnit& ActiveTexture(uint16_t t)
 {
 	static OGLTextureUnit units[40];
 	static GLenum activeTextureUnit = -1;
@@ -185,11 +188,19 @@ OGLTextureUnit& OGLBackend::ActiveTexture(uint16_t t)
 	return units[t];
 }
 
+
+OGLTextureUnit& OGLBackend::ActiveTexture(uint16_t t)
+{
+	return ::ActiveTexture(t);
+}
+
 void OGLBackend::BindTexture(uint16_t textureLocation, HgTexture::Handle textureHandle, GLenum target)
 {
-	auto& unit = ActiveTexture(textureLocation);
+	//auto& unit = ActiveTexture(textureLocation);
 
-	if (textureHandle == 0) return;
+	//if (textureHandle == 0) return;
 
-	unit.BindTexture(target, textureHandle);
+	//unit.BindTexture(target, textureHandle);
+	glActiveTexture(convertTextureLocation(textureLocation));
+	glBindTexture(target, textureHandle);
 }

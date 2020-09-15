@@ -19,7 +19,11 @@ namespace Renderer {
 		HgShader& shader = rd->getMaterial().getShader();
 		bool shaderCompiled = shader.compile();
 
-		auto& vao = rd->vao.Record();
+		//If is shader is shared with another render data, and is recompiled elsewhere,
+		//how will we know the VAO needs to be rebuilt?
+
+
+		auto& vao = rd->vao;
 
 		if (shaderCompiled)
 		{
@@ -57,7 +61,7 @@ RenderBackend* RENDERER() {
 	static RenderBackend* api = OGLBackend::Create();
 	return api;
 }
-
+//
 //static void submit_for_render_serial(const Viewport& vp, const RenderInstance& ri, const HgMath::mat4f& viewMatrix, const HgMath::mat4f& projection) {
 //	RenderData* renderData = ri.renderData;
 //	const float* worldSpaceMatrix = ri.interpolatedWorldSpaceMatrix;
@@ -70,7 +74,7 @@ RenderBackend* RENDERER() {
 //	HgShader& shader = renderData->getMaterial().getShader();
 //	bool shaderCompiled = shader.compile();
 //
-//	auto& vao = renderData->vao.Record();
+//	auto& vao = renderData->vao;
 //
 //	if (shaderCompiled)
 //	{
@@ -84,21 +88,23 @@ RenderBackend* RENDERER() {
 //	{
 //		//Setup or use additional buffers here
 //
-//		auto& perInstanceVertexAttributes = imd.renderData->perInstanceVertexAttributes;
-//		for (int i = 0; i < imd.renderData->perInstanceVertexAttributes.size(); i++)
+//		//setup attribute buffers
+//		for (auto& settings : imd.gpuBufferSettings)
 //		{
-//			perInstanceVertexAttributes[i]->Setup(imd, shader);
+//			settings.gpuBuffer->Setup(&settings, shader);
 //		}
 //
-//		if (imd.transformMatrices)
-//		{
-//			imd.transformMatrices->Setup(imd, shader);
-//		}
+//		//if (imd.transformMatrices)
+//		//{
+//		//	imd.transformMatrices->Setup(imd, shader);
+//		//}
 //
 //		if (imd.instanceData && imd.instanceData->NeedsLoadToGPU())
 //		{
+//			assert(false);
+//			assert(true);
 //			imd.instanceData->sendToGPU();
-//			imd.instanceData->getUseClass()->Setup(imd, shader);
+//			imd.instanceData->getUseClass()->Setup(&imd, shader);
 //		}
 //	}
 //
@@ -144,7 +150,7 @@ static void submit_for_render_serial(const Viewport& vp, const RenderInstance& r
 	RENDERER()->setViewport(vp);
 
 	HgShader& shader = renderData->getMaterial().getShader();
-	auto& vao = renderData->vao.Record();
+	auto& vao = renderData->vao;
 	vao.Enable();
 	shader.enable();
 

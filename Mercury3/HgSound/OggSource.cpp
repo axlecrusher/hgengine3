@@ -43,7 +43,11 @@ SamplePacket StreamingOggSource::State::Decode(StreamingOggSource::State* state)
 		int toRead = std::min(4096, bytesToRead - bytesRead);
 		auto r = ov_read(state->get_vorbis(), (char*)&buffer, toRead, 0, 2, 1, &bitstream);
 
-		if (r == 0) return p; //nothing to read
+		if (r == 0)
+		{
+			p.hasMorePackets = false;
+			return p; //nothing to read
+		}
 
 		bytesRead += r;
 

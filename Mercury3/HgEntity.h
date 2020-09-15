@@ -403,11 +403,19 @@ public:
 
 	inline HgEntity* getPtr(EntityIdTable* table, EntityIdType id)
 	{
+		const auto exist = table->exists(id);
 		const auto idx = id.index();
 
-		if (idx < m_entities.size() && table->exists(id))
+		if (exist)
 		{
-			return &m_entities[idx];
+			if (idx < m_entities.size())
+			{
+				HgEntity* ptr = &m_entities[idx];
+				if (ptr->getEntityId() == id)
+				{
+					return ptr;
+				}
+			}
 		}
 
 		return nullptr;
