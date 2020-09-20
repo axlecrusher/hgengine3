@@ -432,6 +432,12 @@ public:
 		return m_flags[idx];
 	}
 
+	inline void setHidden(EntityIdType id, bool t)
+	{
+		const auto idx = id.index();
+		m_flags[idx].hidden = t;
+	}
+
 	inline void setFlags(EntityIdType id, EntityFlags flags)
 	{
 		const auto idx = id.index();
@@ -538,10 +544,28 @@ namespace EntityHelpers
 		et.setFlags(id, flags);
 	}
 
+	inline bool isValid(EntityIdType id)
+	{
+		auto& idTable = EntityIdTable::Singleton();
+		return idTable.exists(id);
+	}
+
 	inline EntityFlags getFlags(EntityIdType id)
 	{
 		auto& et = EntityTable::Singleton();
 		return et.getFlags(id);
+	}
+
+	inline void setFlags(EntityIdType id, EntityFlags f)
+	{
+		auto& et = EntityTable::Singleton();
+		et.setFlags(id, f);
+	}
+
+	inline void setHidden(EntityIdType id, bool t)
+	{
+		auto& et = EntityTable::Singleton();
+		et.setHidden(id, t);
 	}
 
 	inline int8_t getDrawOrder(EntityIdType id)

@@ -488,7 +488,7 @@ int main()
 			teapotSquare->position(point(0, 3, 0));
 
 			auto flags = et.getFlags(idList[1]);
-			flags.inheritParentTranslation = false;
+			flags.inheritParentScale = false;
 			et.setFlags(idList[1], flags);
 
 			teapotSquare->setParent(teapotId);
