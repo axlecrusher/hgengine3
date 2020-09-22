@@ -19,3 +19,4 @@ public:
 };
 
 void* change_to_square(HgEntity* entity);
+void change_to_square(EntityIdType id);

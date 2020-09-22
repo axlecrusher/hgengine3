@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #include <HgEntity.h>
-#include <HgScene.h>
+//#include <HgScene.h>
 //#include <shapes.h>
 
 #include <HgMath.h>
@@ -53,6 +53,8 @@
 #include <triangle.h>
 #include <cube.h>
 #include <MeshMath.h>
+
+#include <square.h>
 
 float projection[16];
 
@@ -112,11 +114,11 @@ int32_t RenderThreadLoop() {
 //}
 
 volatile LONG itrctr;
-HgScene scene;
+//HgScene scene;
 
 DWORD WINAPI PrintCtr(LPVOID lpParam) {
 	while (1) {
-		printf("UPS %u e_count %d %d\n", itrctr, EntityIdTable::Singleton().numberOfEntitiesExisting(), scene.chunkCount());
+		printf("UPS %u e_count %d\n", itrctr, EntityIdTable::Singleton().numberOfEntitiesExisting());
 		itrctr = 0;
 		CheckFilesForChange();
 		Sleep(1000);
@@ -203,7 +205,7 @@ int main()
 	print_matrix(projection);
 	printf("\n");
 
-	scene.init();
+	//scene.init();
 
 	Player PLAYER1;
 	PLAYER1.entity().init();
@@ -444,13 +446,20 @@ int main()
 //		}
 	}
 
-	HgEntity* grid = nullptr;
-	if (Engine::create_entity("square", &scene, &grid) > 0) {
+	//Create a lot of rotating cubes
+	auto idList = EntityHelpers::createContiguous(1);
+	EntityIdType gridId = idList[0];
+	scene2.addEntityIDs(idList);
+	change_to_square(idList[0]);
+
+//	if (Engine::create_entity("square", &scene, &grid) > 0) {
+	{
 		using namespace HgMath;
+		HgEntity* grid = EntityTable::Singleton().getPtr(gridId);
 		grid->scale(100.0f);
 		grid->position().z(-4);
 		grid->orientation(quaternion::fromEuler(angle::deg(-90), angle::ZERO, angle::ZERO));
-		grid->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("grid_vertex.glsl", "grid_frag.glsl"));
+		grid->getRenderDataPtr()->getMaterial().setShader(HgShader::acquire("assets/shaders/grid.vert", "assets/shaders/grid.frag"));
 		grid->getRenderDataPtr()->getMaterial().setBlendMode(BLEND_ADDITIVE);
 		grid->getRenderDataPtr()->getMaterial().setTransparent(true);
 		grid->getRenderDataPtr()->renderFlags.DEPTH_WRITE = false;
@@ -605,7 +614,10 @@ int main()
 				MOUSE_INPUT.dy = 0;
 			}
 
-			grid->position(point(camera.getWorldSpacePosition()).y(0));
+			{
+				HgEntity* grid = EntityTable::Singleton().getPtr(gridId);
+				grid->position(point(camera.getWorldSpacePosition()).y(0));
+			}
 
 			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg(std::fmod(time.msec(),10000) / 27.777777777777777777777777777778), angle::ZERO);
 			{
@@ -627,7 +639,7 @@ int main()
 			//	);
 			//}
 
-			scene.update(timeStep);
+			//scene.update(timeStep);
 			scene2.update(timeStep);
 			scene_2d.update(timeStep);
 
@@ -664,7 +676,7 @@ int main()
 				renderQueue.Clear();
 				renderQueue2d.Clear();
 
-				scene.EnqueueForRender(&renderQueue, elaspedTime);
+				//scene.EnqueueForRender(&renderQueue, elaspedTime);
 				scene2.EnqueueForRender(&renderQueue, elaspedTime);
 
 				scene_2d.EnqueueForRender(&renderQueue2d, elaspedTime);
