@@ -613,7 +613,8 @@ class RenderQueue;
 
 extern RenderData* (*new_RenderData)();
 
-typedef void*(*factory_clbk)(HgEntity* e);
+//typedef void*(*factory_clbk)(HgEntity* e);
+typedef void (*factory_clbk)(EntityIdType id);
 
 void RegisterEntityType(const char* c, factory_clbk);
 

@@ -54,8 +54,6 @@
 #include <cube.h>
 #include <MeshMath.h>
 
-#include <square.h>
-
 float projection[16];
 
 HgCamera camera;
@@ -449,12 +447,11 @@ int main()
 	//Create a lot of rotating cubes
 	auto idList = EntityHelpers::createContiguous(1);
 	EntityIdType gridId = idList[0];
-	scene2.addEntityIDs(idList);
-	change_to_square(idList[0]);
 
-//	if (Engine::create_entity("square", &scene, &grid) > 0) {
+	if (Engine::create_entity("square", gridId))
 	{
 		using namespace HgMath;
+		scene2.addEntityIDs(idList);
 		HgEntity* grid = EntityTable::Singleton().getPtr(gridId);
 		grid->scale(100.0f);
 		grid->position().z(-4);
