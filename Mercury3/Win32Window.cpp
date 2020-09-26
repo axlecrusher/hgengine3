@@ -340,7 +340,13 @@ bool Win32Window::SwapBuffers()
 	//glFinish();
 	//DwmFlush();
 	const auto r = (::SwapBuffers(m_hdc) == TRUE);
-	//glFinish(); //seems to help smooth motion
+
+	/* If VSYNC is enabled, drivers seem to prefender frames into some kind of queue.
+	This adds latency and causes blocking of glMapMemory
+	This glFinish will force us to wait for the VSYNC.
+	seems to help smooth motion
+	*/
+	//glFinish();
 	return r;
 }
 

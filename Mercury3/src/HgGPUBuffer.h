@@ -105,7 +105,7 @@ protected:
 class IHgGPUBuffer {
 public:
 	IHgGPUBuffer() : m_needsUpdate(false),
-		m_useType(BUFFER_DRAW_STATIC), m_buffer(nullptr)
+		m_useType(BUFFER_STATIC_DRAW), m_buffer(nullptr)
 	{
 		m_sizeBytes = 0;
 		m_type = BUFFER_TYPE::VERTEX_ATTRIBUTES;

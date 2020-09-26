@@ -19,7 +19,7 @@ namespace VertexAttributeTypes
 
 		//	LOG("%s : %d", m_attributeName.c_str(), m_attributeBuffer.getValue());
 
-			//glVertexAttribPointer requires a buffer be bound
+		//glVertexAttribPointer requires a buffer be bound
 		StackHelpers::GLBindBuffer bbuffer(GL_ARRAY_BUFFER, p.attribBuffer->getValue());
 
 		const GLsizei stride = sizeof(float) * 4 * vCount;
@@ -54,7 +54,10 @@ namespace GraphicsDriverFunctions
 		StackHelpers::GLBindBuffer bbuffer(GL_ARRAY_BUFFER, vab->getValue());
 
 		//Using mapped buffers seems to be faster than glBufferData or glBufferSubData
+		//glBufferData(GL_ARRAY_BUFFER, vab->size(), nullptr, VboUseage(gpuBuffer->getUseType()));
+
 		auto ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+		//auto ptr = glMapBufferRange(GL_ARRAY_BUFFER, 0, vab->size(), GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 		if (ptr)
 		{
 			mb.ptr = ptr;

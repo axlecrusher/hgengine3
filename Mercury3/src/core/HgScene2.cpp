@@ -185,6 +185,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	Instancing::InstancingMetaData imd;
 	uint32_t matrixOffset = 0;
 
+	m_tranformMatrix->SwapBuffer();
 	auto mappedMem = m_tranformMatrix->getGPUMemoryPtr();
 	float* matrixMem = (float*)mappedMem.ptr;
 

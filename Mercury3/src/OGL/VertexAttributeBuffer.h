@@ -86,6 +86,8 @@ public:
 	virtual MappedMemory getGPUMemoryPtr() { MappedMemory r; return r; };
 	virtual void ReleaseMappedMemory(MappedMemory* mm) {};
 
+	inline size_t size() const { return m_maxSize; }
+
 private:
 	GpuBufferId bufferId;
 	size_t m_maxSize;
@@ -117,6 +119,8 @@ struct SetupParams
 	const HgShader* shader;
 };
 
+#define BUFSIZE 1
+
 template<typename T>
 //class VertexAttributeBuffer : public IGLBufferUse
 class VertexAttributeBuffer : public IGPUBuffer
@@ -125,7 +129,8 @@ public:
 	VertexAttributeBuffer(const std::string attributeName)
 		:m_attributeName(attributeName)
 	{
-		setUseType(BUFFER_DRAW_STREAM);
+		setUseType(BUFFER_STREAM_DRAW);
+		m_bufferIdx = 0;
 	}
 
 	//Allocates space for count instances of T on the GPU
@@ -136,14 +141,17 @@ public:
 
 	virtual void AllocateOnGPU(size_t sizeBytes)
 	{
-		m_attributeBuffer.AllocateOnGPU(sizeBytes, getUseType());
+		for (int i = 0; i < BUFSIZE; i++)
+		{
+			m_attributeBuffer[i].AllocateOnGPU(sizeBytes, getUseType());
+		}
 	}
 
 	virtual void Setup(const GPUBufferMapSettings* settings, const HgShader& shader)
 	{
 		SetupParams p;
 		p.bufferSettings = *settings;
-		p.attribBuffer = &m_attributeBuffer;
+		p.attribBuffer = getAttribBuffer();
 		p.attributeName = &m_attributeName;
 		p.shader = &shader;
 		T::Setup(p);
@@ -153,16 +161,21 @@ public:
 
 	virtual MappedMemory getGPUMemoryPtr()
 	{
-		return GraphicsDriverFunctions::getGPUMemoryPtr(this, &m_attributeBuffer);
+		return GraphicsDriverFunctions::getGPUMemoryPtr(this, getAttribBuffer());
 	}
 
 	virtual void ReleaseMappedMemory(MappedMemory* mm)
 	{
-		GraphicsDriverFunctions::ReleaseMappedMemory(&m_attributeBuffer);
+		GraphicsDriverFunctions::ReleaseMappedMemory( getAttribBuffer() );
 	}
 
+	void SwapBuffer() { m_bufferIdx = (m_bufferIdx + 1) % BUFSIZE; }
+
 private:
-	GLVertexAttributeBuffer m_attributeBuffer;
+	inline GLVertexAttributeBuffer* getAttribBuffer() { return &m_attributeBuffer[m_bufferIdx]; }
+
+	GLVertexAttributeBuffer m_attributeBuffer[BUFSIZE];
+	uint8_t m_bufferIdx;
 	std::string m_attributeName;
 };
 
