@@ -20,7 +20,12 @@ namespace HgSound {
 			virtual ~State();
 
 			void open(const char* path);
-			inline OggVorbis_File* get_vorbis() { return m_vorbisPtr.get(); }
+			
+			//Return C pointer to vorbis file. Can be nullptr.
+			inline OggVorbis_File* get_vorbis() {
+				if (m_vorbisPtr) { return m_vorbisPtr.get(); } return nullptr;
+			}
+
 			inline float* get_sampleBuffer() { return m_frontBuffer; }
 			inline float* getBackBuffer() { return m_backBuffer; }
 
