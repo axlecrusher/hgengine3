@@ -3,7 +3,7 @@
 #include <HgVbo.h>
 #include <HgVboMemory.h>
 
-#include <glew.h>
+#include <OGLheaders.h>
 #include <RenderData.h>
 #include <core/Instancing.h>
 #include <Logging.h>

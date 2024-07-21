@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include <atomic>
+#include <functional>
 
 #include <AssetManager.h>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
-#include <glew.h>
+#include <OGLheaders.h>
 #include <vertex.h>
 
 #include <RenderData.h>

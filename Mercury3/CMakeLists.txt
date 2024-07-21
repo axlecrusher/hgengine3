@@ -67,8 +67,7 @@ if(MSVC)
 endif()
 
 add_library(hgengine STATIC ${DATA_STRUCTURES} ${ENGINESOURCES} ${HGSOUNDSRC} ${RENDERERSRC} ${CORE_ENGINESOURCES} ${OPENVR_LIB} ${OGGLIBS})
-target_compile_options(hgengine PRIVATE ${WIDECHAR})
-
+target_compile_options(hgengine PRIVATE "${WIDECHAR}")
 
 target_include_directories(hgengine PUBLIC "./")
 target_include_directories(hgengine PUBLIC "include/" "include/stb" "include/tinyobjloader")

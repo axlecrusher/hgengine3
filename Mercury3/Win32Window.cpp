@@ -10,7 +10,7 @@
 #include <glcorearb.h>
 #include <glext.h>
 */
-#include <glew.h>
+#include <OGLheaders.h>
 
 extern "C" {
 #include <HgInput.h>

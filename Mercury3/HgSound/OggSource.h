@@ -15,12 +15,12 @@ namespace HgSound {
 		{
 		public:
 			State()
-				:m_frontBuffer(nullptr), m_backBuffer(nullptr), m_samplesToRead(0)
+				:m_frontBuffer(nullptr), m_backBuffer(nullptr), m_samplesToRead(0), m_vorbisPtr(nullptr)
 			{}
 			virtual ~State();
 
 			void open(const char* path);
-			inline OggVorbis_File* get_vorbis() { return &m_vorbis; }
+			inline OggVorbis_File* get_vorbis() { return m_vorbisPtr.get(); }
 			inline float* get_sampleBuffer() { return m_frontBuffer; }
 			inline float* getBackBuffer() { return m_backBuffer; }
 
@@ -36,7 +36,7 @@ namespace HgSound {
 			SamplePacket currentPlaying;
 		private:
 			SourceInfo m_info;
-			OggVorbis_File m_vorbis;
+			std::unique_ptr<OggVorbis_File> m_vorbisPtr;
 			long m_samplesToRead;
 			float *m_frontBuffer, *m_backBuffer;
 		};

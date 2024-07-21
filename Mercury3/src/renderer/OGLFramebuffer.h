@@ -1,6 +1,6 @@
 #pragma once
 #include <IFramebuffer.h>
-#include <glew.h>
+#include <OGLheaders.h>
 
 class OGLFramebuffer : public IFramebuffer
 {

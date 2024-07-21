@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glew.h>
+#include <OGLheaders.h>
 #include <quaternion.h>
 #include <stdint.h>
 
