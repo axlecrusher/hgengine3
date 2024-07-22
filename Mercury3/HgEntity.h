@@ -155,44 +155,23 @@ private:
 	mutable std::mutex m_mutex;
 };
 
-class EntityNameTable
+struct EntityInfo
 {
-	static inline auto notFound() { return std::numeric_limits<int32_t>::max(); }
-
-public:
-	void setName(EntityIdType id, const std::string name);
-	const std::string& getName(EntityIdType id);
-
-private:
-	inline int32_t findName(EntityIdType id);
-
-	struct storage
-	{
-		EntityIdType id;
-		std::string name;
-
-		//inline bool operator<(const storage& rhs) const { return id < rhs.id; }
-	};
-
-	std::unordered_map<EntityIdType, int32_t> m_indices;
-	std::vector<storage> m_names;
-	std::string m_blankName;
+	EntityIdType parentId;
+	std::string name;
 };
 
-class EntityParentTable
+class EntityInfoTable
 {
-	static inline auto notFound() { return std::numeric_limits<int32_t>::max(); }
-
 public:
-	void setParent(EntityIdType id, EntityIdType parentId);
-	bool getParentId(EntityIdType id, EntityIdType& parent);
-
-	static EntityParentTable& Manager();
+	//Can return nullptr
+	EntityInfo* getInfo(EntityIdType id);
+	static EntityInfoTable& Manager();
 private:
-
-	std::unordered_map<EntityIdType, EntityIdType> m_parents;
-	//std::vector<EntityIdType> m_parents;
+	std::unordered_map<EntityIdType, EntityInfo> m_data;
 };
+
+
 
 struct fMatrix4
 {
@@ -282,14 +261,22 @@ class HgEntity {
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
 		//void updateGpuTextures();
 
-		inline void setParent(EntityIdType id) { EntityParentTable::Manager().setParent(m_entityId, id); }
+		inline void setParent(EntityIdType id)
+		{
+			EntityInfoTable::Manager().getInfo(m_entityId)->parentId = id;
+		}
 		
+		static EntityIdType getParentId(EntityIdType entityId)
+		{
+			return EntityInfoTable::Manager().getInfo(entityId)->parentId;
+		}
+
 		inline EntityLocator::SearchResult getParent() const
 		{
 			EntityLocator::SearchResult r;
 
-			EntityIdType parentId;
-			if (EntityParentTable::Manager().getParentId(m_entityId, parentId))
+			EntityIdType parentId = getParentId(m_entityId);
+			if (parentId.isValid())
 			{
 				r = Find(parentId);
 			}
@@ -324,8 +311,8 @@ class HgEntity {
 		//inline void setDrawOrder(int8_t order) { m_drawOrder = order; }
 		//inline int8_t getDrawOrder() const { return m_drawOrder; }
 
-		inline void setName(const std::string& name) { EntityNames().setName(m_entityId, name); }
-		inline std::string& getName() const { EntityNames().getName(m_entityId); }
+		inline void setName(const std::string& name) { EntityInfoTable::Manager().getInfo(m_entityId)->name = name; }
+		inline std::string& getName() const { return EntityInfoTable::Manager().getInfo(m_entityId)->name; }
 
 		//inline EntityFlags getFlags() const { return flags; }
 
@@ -337,7 +324,7 @@ class HgEntity {
 		static EntityLocator::SearchResult Find(EntityIdType id);
 private:
 
-	static EntityNameTable& EntityNames();
+	//static EntityNameTable& EntityNames();
 
 	//static EntityLocator& Locator();
 

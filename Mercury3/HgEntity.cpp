@@ -18,6 +18,13 @@
 
 #include <OrderedVector.h>
 
+EntityInfo* EntityInfoTable::getInfo(EntityIdType id)
+{
+	//What happens to EntityInfo if the map is rebalanced?
+	EntityInfo& t = m_data[id]; //default construct if it doesn't exist
+	return &t; //is this ok to do?
+}
+
 EntityIdLookupTable<fMatrix4>& getEntityMatrixTable()
 {
 	static EntityIdLookupTable<fMatrix4> table;
@@ -25,12 +32,12 @@ EntityIdLookupTable<fMatrix4>& getEntityMatrixTable()
 }
 
 
-EntityParentTable& EntityParentTable::Manager()
+EntityInfoTable& EntityInfoTable::Manager()
 {
-	static std::unique_ptr<EntityParentTable> instance;
+	static std::unique_ptr<EntityInfoTable> instance;
 	if (instance == nullptr)
 	{
-		instance = std::make_unique<EntityParentTable>();
+		instance = std::make_unique<EntityInfoTable>();
 	}
 
 	return *instance.get();
@@ -42,17 +49,6 @@ PreviousPositionTable& PreviousPositionTable::Manager()
 	if (instance == nullptr)
 	{
 		instance = std::make_unique<PreviousPositionTable>();
-	}
-
-	return *instance.get();
-}
-
-EntityNameTable& HgEntity::EntityNames()
-{
-	static std::unique_ptr<EntityNameTable> instance;
-	if (instance == nullptr)
-	{
-		instance = std::make_unique<EntityNameTable>();
 	}
 
 	return *instance.get();
@@ -155,63 +151,6 @@ namespace Events
 			spi.origin = spiValues.origin;
 	}
 
-}
-
-void EntityNameTable::setName(EntityIdType id, const std::string name)
-{
-	const auto idx = findName(id);
-	storage newRecord{ id, name };
-	if (idx == notFound())
-	{
-		int32_t idx = (int32_t)m_names.size();
-		m_names.emplace_back(newRecord);
-		m_indices.insert({ id, idx });
-	}
-	else
-	{
-		m_names[idx] = newRecord;
-	}
-}
-
-int32_t EntityNameTable::findName(EntityIdType id)
-{
-	int32_t idx = notFound();
-	const auto itr = m_indices.find(id);
-	if (itr != m_indices.end())
-	{
-		idx = itr->second;
-	}
-	return idx;
-}
-
-
-
-
-
-const std::string& EntityNameTable::getName(EntityIdType id)
-{
-	const auto idx = findName(id);
-	if (idx == notFound())
-	{
-		return m_blankName;
-	}
-	return m_names[idx].name;
-}
-
-void EntityParentTable::setParent(EntityIdType id, EntityIdType parentId)
-{
-	m_parents[id] = parentId;
-}
-
-bool EntityParentTable::getParentId(EntityIdType id, EntityIdType& parent)
-{
-	const auto itr = m_parents.find(id);
-	if (itr == m_parents.end())
-	{
-		return false;
-	}
-	parent = itr->second;
-	return true;
 }
 
 void RenderDataTable::insert(EntityIdType id, const RenderDataPtr& rd)
@@ -350,11 +289,9 @@ void HgEntity::destroy()
 }
 
 HgMath::mat4f HgEntity::computeWorldSpaceMatrix(const bool applyScale, bool applyRotation, bool applyTranslation) const {
-	EntityIdType parentId;
-	const bool hasParent = EntityParentTable::Manager().getParentId(m_entityId, parentId);
+	EntityIdType parentId = HgEntity::getParentId(m_entityId);
 
-
-	if (hasParent && EntityIdTable::Singleton().exists(parentId))
+	if (parentId.isValid() && EntityIdTable::Singleton().exists(parentId))
 	{
 		return computeWorldSpaceMatrixIncludeParent(applyScale, applyRotation, applyTranslation);
 	}
