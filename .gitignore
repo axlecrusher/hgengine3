@@ -3,3 +3,9 @@ x64/
 .vs/
 prop_*
 build/
+CmakeFiles/
+*.vcxproj.user
+*.vcxproj
+*.vcxproj.filters
+*.sln
+cmake_install.cmake
