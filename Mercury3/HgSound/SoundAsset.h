@@ -61,6 +61,11 @@ namespace HgSound {
 
 		virtual bool sourceChanged() const { return false; }
 
+		const std::string& path() const
+		{
+			return m_path;
+		}
+
 	private:
 		std::string m_path;
 	};

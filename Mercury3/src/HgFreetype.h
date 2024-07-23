@@ -86,6 +86,10 @@ namespace HgText
 
 		virtual std::string uniqueIdentifier() const;
 		virtual bool load(AssetPtr& asset) const;
+		const std::string& path() const
+		{
+			return m_fontPath;
+		}
 
 		//return true if the source data changed and should be reloaded
 		virtual bool sourceChanged() const;

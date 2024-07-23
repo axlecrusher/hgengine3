@@ -70,7 +70,7 @@ HgTexture::TexturePtr HgTexture::acquire(AssetManagerType::IAssetLoader& texture
 
 	if (isNew) {
 		ptr->setType(type);
-		ptr->m_path = uniqueId;
+		ptr->m_path = textureLoader.path();
 		wireReload(ptr);
 	}
 	return std::move(ptr);
