@@ -109,7 +109,7 @@ StreamingOggSource::State::~State()
 
 void StreamingOggSource::State::open(const char* path)
 {
-	std::unique_ptr<OggVorbis_File> ptr = std::unique_ptr< OggVorbis_File>();
+	auto ptr = std::make_unique<OggVorbis_File>();
 	auto r = ov_fopen(path, ptr.get()); //FIXME: this should be done in a thread
 
 	if (r < 0)
