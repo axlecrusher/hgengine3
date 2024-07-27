@@ -40,8 +40,17 @@ HgMath::mat4f WindowRenderTarget::getPerspectiveMatrix() const
 
 HgMath::mat4f WindowRenderTarget::getOrthoMatrix() const
 {
+	//float reverse[16];
+	//HgMath::mat4f::identity().store(reverse);
+	//reverse[10] = -1;
+	//reverse[14] = -1;
+
+	//HgMath::mat4f t;
+	//t.load(reverse);
+	//t = vectorial::transpose(t);
+	const auto r = HgMath::mat4f::ortho(-1, 1, -1, 1, -1, 1);
 	//return getPerspectiveMatrix();
-	return vectorial::transpose(HgMath::mat4f::ortho(-1, 1, -1, 1, -1, 1));
+	return vectorial::transpose(r);
 }
 
 void WindowRenderTarget::Render(const RenderParamsList& l)

@@ -316,7 +316,7 @@ int main()
 			HgText::Text t;
 			t.setText("Mercury Engine 3");
 			textEntity->setRenderData(t.CreateRenderData());
-			textEntity->position(point(-0.99, 0.95, 0));
+			textEntity->position(point(-0.99, 0.95, -0.5));
 			//text.getEntity().getRenderDataPtr()->renderFlags.BACKFACE_CULLING = false;
 		}
 
@@ -327,7 +327,7 @@ int main()
 			HgText::Text t;
 			t.setText("https://github.com/axlecrusher/hgengine3");
 			textEntity->setRenderData(t.CreateRenderData());
-			textEntity->position(point(-0.99, -0.98, 0));
+			textEntity->position(point(-0.99, -0.98, -0.5));
 			textEntity->scale(0.75);
 		}
 	}
