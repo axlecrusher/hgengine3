@@ -66,6 +66,12 @@ void* change_to_square(HgEntity* entity) {
 	return nullptr;
 }
 
+void change_to_square(EntityIdType id) {
+	//create an instance of the render data for all triangles to share
+	auto entity = EntityTable::Singleton().getPtr(id);
+	entity->setRenderData(init_render_data());
+}
+
 void Square::getInstanceData(Instancing::GPUTransformationMatrix* instanceData)
 {
 	const auto mat = getEntity().computeWorldSpaceMatrix();

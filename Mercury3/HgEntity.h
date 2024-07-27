@@ -22,7 +22,7 @@
 #include <unordered_set>
 #include <EntityIdType.h>
 #include <TransformManager.h>
-#include <spi.h>
+#include <EntityTable.h>
 
 //#include <core/HgScene2.h>
 #include <HgScene2.h> //REGISTER_LINKTIME2 needs this
@@ -36,24 +36,6 @@ struct PositionalData {
 	point origin; //origin (0,0,0) in local space
 	quaternion rotation; //16
 	uint8_t flags; //1
-};
-
-struct EntityFlags {
-	EntityFlags() :
-		used(false), active(false), hidden(false), updated(false),
-		destroy(false), /*update_textures(false),*/
-		inheritParentScale(true), inheritParentRotation(true),
-		inheritParentTranslation(true)
-	{}
-	bool used : 1; //used in scene graph
-	bool active : 1;
-	bool hidden : 1;
-	bool updated : 1;
-	bool destroy : 1;
-	//bool update_textures : 1;
-	bool inheritParentScale : 1;
-	bool inheritParentRotation : 1;
-	bool inheritParentTranslation : 1;
 };
 
 class SpacialData {
@@ -155,49 +137,22 @@ private:
 	mutable std::mutex m_mutex;
 };
 
-class EntityNameTable
+struct EntityInfo
 {
-	static inline auto notFound() { return std::numeric_limits<int32_t>::max(); }
+	EntityIdType parentId;
+	std::string name;
+};
 
+class EntityInfoTable
+{
 public:
-	void setName(EntityIdType id, const std::string name);
-	const std::string& getName(EntityIdType id);
-
+	//Can return nullptr
+	EntityInfo* getInfo(EntityIdType id);
+	static EntityInfoTable& Manager();
 private:
-	inline int32_t findName(EntityIdType id);
-
-	struct storage
-	{
-		EntityIdType id;
-		std::string name;
-
-		//inline bool operator<(const storage& rhs) const { return id < rhs.id; }
-	};
-
-	std::unordered_map<EntityIdType, int32_t> m_indices;
-	std::vector<storage> m_names;
-	std::string m_blankName;
+	std::unordered_map<EntityIdType, EntityInfo> m_data;
 };
 
-class EntityParentTable
-{
-	static inline auto notFound() { return std::numeric_limits<int32_t>::max(); }
-
-public:
-	void setParent(EntityIdType id, EntityIdType parentId);
-	bool getParentId(EntityIdType id, EntityIdType& parent);
-
-	static EntityParentTable& Manager();
-private:
-
-	std::unordered_map<EntityIdType, EntityIdType> m_parents;
-	//std::vector<EntityIdType> m_parents;
-};
-
-struct fMatrix4
-{
-	float m[16];
-};
 
 EntityIdLookupTable<fMatrix4>& getEntityMatrixTable();
 
@@ -282,14 +237,22 @@ class HgEntity {
 		//Send texture data to GPU. I don't like this here and it pulls in extended data.
 		//void updateGpuTextures();
 
-		inline void setParent(EntityIdType id) { EntityParentTable::Manager().setParent(m_entityId, id); }
+		inline void setParent(EntityIdType id)
+		{
+			EntityInfoTable::Manager().getInfo(m_entityId)->parentId = id;
+		}
 		
+		static EntityIdType getParentId(EntityIdType entityId)
+		{
+			return EntityInfoTable::Manager().getInfo(entityId)->parentId;
+		}
+
 		inline EntityLocator::SearchResult getParent() const
 		{
 			EntityLocator::SearchResult r;
 
-			EntityIdType parentId;
-			if (EntityParentTable::Manager().getParentId(m_entityId, parentId))
+			EntityIdType parentId = getParentId(m_entityId);
+			if (parentId.isValid())
 			{
 				r = Find(parentId);
 			}
@@ -313,31 +276,23 @@ class HgEntity {
 		HgMath::mat4f computeWorldSpaceMatrixIncludeParent(bool scale = true, bool rotation = true, bool translation = true) const;
 		point computeWorldSpacePosition() const;
 
-		inline void setInheritParentScale(bool x) { flags.inheritParentScale = x; }
-		inline void setInheritParentRotation(bool x) { flags.inheritParentRotation = x; }
-		inline void setInheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
+		//inline void setInheritParentScale(bool x) { flags.inheritParentScale = x; }
+		//inline void setInheritParentRotation(bool x) { flags.inheritParentRotation = x; }
+		//inline void setInheritParentTranslation(bool x) { flags.inheritParentTranslation = x; }
 
-		inline void setDestroy(bool x) { flags.destroy = x; }
-		inline void setHidden(bool x) { flags.hidden = x; }
+		//inline void setDestroy(bool x) { flags.destroy = x; }
+		//inline void setHidden(bool x) { flags.hidden = x; }
 
-		//Lower numbers draw first. default draw order is 0
-		inline void setDrawOrder(int8_t order) { m_drawOrder = order; }
-		inline int8_t getDrawOrder() const { return m_drawOrder; }
+		////Lower numbers draw first. default draw order is 0
+		//inline void setDrawOrder(int8_t order) { m_drawOrder = order; }
+		//inline int8_t getDrawOrder() const { return m_drawOrder; }
 
-		inline void setName(const std::string& name) { EntityNames().setName(m_entityId, name); }
-		inline std::string& getName() const { EntityNames().getName(m_entityId); }
+		inline void setName(const std::string& name) { EntityInfoTable::Manager().getInfo(m_entityId)->name = name; }
+		inline std::string& getName() const { return EntityInfoTable::Manager().getInfo(m_entityId)->name; }
 
-		inline EntityFlags getFlags() const { return flags; }
+		//inline EntityFlags getFlags() const { return flags; }
 
-		inline void clone(HgEntity* other) const
-		{
-			other->m_spacialData = m_spacialData;
-			other->m_drawOrder = m_drawOrder;
-			other->flags = flags;
-
-			auto tmp = getRenderDataPtr();
-			other->setRenderData(tmp);
-		}
+		void clone(HgEntity* other) const;
 
 		/*	Find an existing entity by id. Returned pointer is managed, do not delete.
 			Return nullptr if the entity does not exist.
@@ -345,7 +300,7 @@ class HgEntity {
 		static EntityLocator::SearchResult Find(EntityIdType id);
 private:
 
-	static EntityNameTable& EntityNames();
+	//static EntityNameTable& EntityNames();
 
 	//static EntityLocator& Locator();
 
@@ -353,106 +308,8 @@ private:
 	SpacialData m_spacialData; //local transormations
 	EntityIdType m_entityId;
 
-	int8_t m_drawOrder;
-
-	EntityFlags flags;
-};
-
-
-class EntityTable
-{
-public:
-
-	EntityTable()
-	{
-	}
-
-	//create a new entity
-	inline EntityIdType create()
-	{
-		const auto id = EntityIdTable::Singleton().create();
-		const auto idx = id.index();
-
-		if (idx >= m_entities.size())
-		{
-			m_entities.resize(idx + 1000);
-		}
-
-		m_entities[idx].init(id);
-
-		return id;
-	}
-
-	//create multiple entities from an EntityIdList
-	inline void createMultiple(const EntityIdList& list)
-	{
-		allocateId(list.back());
-		for (auto id : list)
-		{
-			allocateId(id);
-
-			const auto idx = id.index();
-			m_entities[idx].init(id);
-		}
-	}
-
-	inline void store(const HgEntity& e)
-	{
-		const auto id = e.getEntityId();
-		if (EntityIdTable::Singleton().exists(id))
-		{
-			const auto idx = id.index();
-			if (idx >= m_entities.size())
-			{
-				m_entities.resize(idx + 1000);
-			}
-
-			m_entities[idx] = e;
-		}
-	}
-
-	inline HgEntity* getPtr(EntityIdTable* table, EntityIdType id)
-	{
-		const auto exist = table->exists(id);
-		const auto idx = id.index();
-
-		if (exist)
-		{
-			if (idx < m_entities.size())
-			{
-				HgEntity* ptr = &m_entities[idx];
-				if (ptr->getEntityId() == id)
-				{
-					return ptr;
-				}
-			}
-		}
-		return nullptr;
-	}
-
-	inline HgEntity* getPtr(EntityIdType id)
-	{
-		return getPtr(&EntityIdTable::Singleton(), id);
-	}
-
-	//destroy an entity
-	void destroy(EntityIdType id);
-
-	static EntityTable& Singleton();
-
-private:
-
-	//allocate entity storage for id
-	inline void allocateId(EntityIdType id)
-	{
-		const auto idx = id.index();
-		if (idx >= m_entities.size())
-		{
-			m_entities.resize(idx + 1000);
-		}
-	}
-
-	std::vector<HgEntity> m_entities;
+	//int8_t m_drawOrder;
+	//EntityFlags flags;
 };
 
 namespace EntityHelpers
@@ -468,6 +325,50 @@ namespace EntityHelpers
 	inline EntityIdType createSingle()
 	{
 		return EntityTable::Singleton().create();
+	}
+
+	inline void setDestroy(EntityIdType id, bool v)
+	{
+		auto& et = EntityTable::Singleton();
+		auto flags = et.getFlags(id);
+		flags.destroy = v;
+		et.setFlags(id, flags);
+	}
+
+	inline bool isValid(EntityIdType id)
+	{
+		auto& idTable = EntityIdTable::Singleton();
+		return idTable.exists(id);
+	}
+
+	inline EntityFlags getFlags(EntityIdType id)
+	{
+		auto& et = EntityTable::Singleton();
+		return et.getFlags(id);
+	}
+
+	inline void setFlags(EntityIdType id, EntityFlags f)
+	{
+		auto& et = EntityTable::Singleton();
+		et.setFlags(id, f);
+	}
+
+	inline void setHidden(EntityIdType id, bool t)
+	{
+		auto& et = EntityTable::Singleton();
+		et.setHidden(id, t);
+	}
+
+	inline int8_t getDrawOrder(EntityIdType id)
+	{
+		auto& et = EntityTable::Singleton();
+		return et.getDrawOrder(id);
+	}
+
+	inline void setDrawOrder(EntityIdType id, int8_t order)
+	{
+		auto& et = EntityTable::Singleton();
+		return et.setDrawOrder(id, order);
 	}
 }
 
@@ -503,7 +404,8 @@ class RenderQueue;
 
 extern RenderData* (*new_RenderData)();
 
-typedef void*(*factory_clbk)(HgEntity* e);
+//typedef void*(*factory_clbk)(HgEntity* e);
+typedef void (*factory_clbk)(EntityIdType id);
 
 void RegisterEntityType(const char* c, factory_clbk);
 

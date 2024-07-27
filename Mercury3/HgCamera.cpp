@@ -2,7 +2,7 @@
 #include <HgMath.h>
 #include <math/MatrixMath.h>
 
-HgCamera::HgCamera() : initialDirection({0,0,-1}), orientation(quaternion::IDENTITY)
+HgCamera::HgCamera() :/* initialDirection({0,0,-1}),*/ orientation(quaternion::IDENTITY)
 {
 }
 

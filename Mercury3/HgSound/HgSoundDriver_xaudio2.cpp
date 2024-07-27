@@ -31,6 +31,7 @@ bool XAudio2Driver::init() {
 	});
 
 	HRESULT hr;
+	CoInitializeEx(NULL, COINIT_MULTITHREADED); //suddenly this is needed
 	hr = XAudio2Create(&m_xaudioEngine, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	if (hr != S_OK)
 	{
@@ -129,6 +130,7 @@ void XAudio2Driver::shutdown()
 	if (m_xaudioEngine)
 	{
 		m_xaudioEngine->Release();
+		CoUninitialize();
 		m_xaudioEngine = nullptr;
 	}
 }
@@ -310,7 +312,7 @@ std::unique_ptr<Voice> XAudio2Driver::initVoice(PlayingSound::ptr& sound)
 	if (hr != S_OK)
 	{
 		std::cerr << "Failed to create source voice: " << hr << std::endl;
-		return v;
+		return nullptr;
 	}
 
 	v->xaudioVoice = pSourceVoice;
@@ -365,6 +367,8 @@ void XAudio2Driver::play3d(PlayingSound::ptr& sound, const Emitter& emitter)
 	}
 
 	auto v = initVoice(sound);
+	if (v == nullptr) return;
+
 	v->submitAudio();
 
 	X3DAUDIO_EMITTER x_emitter = { 0 };

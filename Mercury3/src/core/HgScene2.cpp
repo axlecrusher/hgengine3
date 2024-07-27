@@ -152,13 +152,15 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	for (int i = 0; i < renderCount; i++)
 	{
 		auto& rdp = m_renderDatas[i];
-		auto entity = entityTable.getPtr(&entityIdTable, rdp.entityId);
+		//auto entity = entityTable.getPtr(&entityIdTable, rdp.entityId);
 
 		RdDrawOrder t;
 		t.rdPair = &m_renderDatas[i];
-		t.drawOrder = entity->getDrawOrder();
 
-		if (!entity->getFlags().hidden)
+		t.drawOrder = entityTable.getDrawOrder(rdp.entityId);
+		const auto flags = entityTable.getFlags(rdp.entityId);
+
+		if (!flags.hidden)
 		{
 			rdoList[rdoCount] = std::move(t);
 			rdoCount++;
@@ -183,6 +185,7 @@ void HgScene::EnqueueForRender(RenderQueue* queue, HgTime dt) {
 	Instancing::InstancingMetaData imd;
 	uint32_t matrixOffset = 0;
 
+	m_tranformMatrix->SwapBuffer();
 	auto mappedMem = m_tranformMatrix->getGPUMemoryPtr();
 	float* matrixMem = (float*)mappedMem.ptr;
 

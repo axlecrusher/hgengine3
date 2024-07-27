@@ -39,7 +39,7 @@ class HgCamera {
 
 private:
 
-	vector3 initialDirection; //direction vector that rotations are relative to
+	//vector3 initialDirection; //direction vector that rotations are relative to
 };
 
 

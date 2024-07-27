@@ -97,7 +97,11 @@ StreamingOggSource::State::~State()
 		nextToPlay.wait();
 	}
 
-	ov_clear(&m_vorbis);
+	if (m_vorbisPtr)
+	{
+		ov_clear(m_vorbisPtr.get());
+	}
+	m_vorbisPtr = nullptr;
 
 	if (m_frontBuffer) delete[] m_frontBuffer;
 	if (m_backBuffer) delete[] m_backBuffer;
@@ -105,15 +109,18 @@ StreamingOggSource::State::~State()
 
 void StreamingOggSource::State::open(const char* path)
 {
-	auto r = ov_fopen(path, get_vorbis()); //FIXME: this should be done in a thread
+	auto ptr = std::make_unique<OggVorbis_File>();
+	auto r = ov_fopen(path, ptr.get()); //FIXME: this should be done in a thread
 
-	if (r != 0)
+	if (r < 0)
 	{
 		LOG_ERROR("Could not open vorbis file \"%s\"", path);
 		return;
 	}
 
-	auto info = ov_info(&m_vorbis, -1);
+	m_vorbisPtr = std::move(ptr);
+
+	auto info = ov_info(m_vorbisPtr.get(), -1);
 
 	m_info.channels = info->channels;
 	m_info.sampleRate = info->rate;

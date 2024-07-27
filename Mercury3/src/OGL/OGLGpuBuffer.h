@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glew.h>
+#include <OGLheaders.h>
 #include <HgVboMemory.h>
 #include <HgGPUBuffer.h>
 #include <GLBuffer.h>

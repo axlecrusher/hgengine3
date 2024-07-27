@@ -36,8 +36,38 @@ void EnqueueForRender(std::vector<std::shared_ptr<IUpdatableCollection>>& c, Ren
 		i->EnqueueForRender(queue, dt);
 	}
 }
+//
+//bool create_entity(char* type, ::HgScene* scene, HgEntity** entity)
+//{
+//	auto factory = entity_factories.find(type);
+//
+//	if (factory == entity_factories.end()) {
+//		LOG_ERROR("Unable to find entity type \"%s\"", type);
+//		return false;
+//	}
+//	factory_clbk clbk = factory->second;
+//	scene->getNewEntity(entity);
+//	clbk(*entity);
+//
+//	return true;
+//}
+//
+//bool create_entity(const char* type, HgEntity** entity)
+//{
+//	auto factory = entity_factories.find(type);
+//
+//	if (factory == entity_factories.end()) {
+//		LOG_ERROR("Unable to find entity type \"%s\"", type);
+//		return false;
+//	}
+//	factory_clbk clbk = factory->second;
+//	*entity = (HgEntity*)clbk(*entity);
+//
+//	return true;
+//}
 
-bool create_entity(char* type, ::HgScene* scene, HgEntity** entity)
+
+bool create_entity(const char* type, EntityIdType id)
 {
 	auto factory = entity_factories.find(type);
 
@@ -46,22 +76,7 @@ bool create_entity(char* type, ::HgScene* scene, HgEntity** entity)
 		return false;
 	}
 	factory_clbk clbk = factory->second;
-	scene->getNewEntity(entity);
-	clbk(*entity);
-
-	return true;
-}
-
-bool create_entity(const char* type, HgEntity** entity)
-{
-	auto factory = entity_factories.find(type);
-
-	if (factory == entity_factories.end()) {
-		LOG_ERROR("Unable to find entity type \"%s\"", type);
-		return false;
-	}
-	factory_clbk clbk = factory->second;
-	*entity = (HgEntity*)clbk(*entity);
+	clbk(id);
 
 	return true;
 }

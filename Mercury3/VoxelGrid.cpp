@@ -67,20 +67,16 @@ void change_to_voxelGrid(HgEntity* entity) {
 	//create an instance of the render data for all triangles to share
 	if (crd == nullptr) SetupRenderData();
 
+
 	entity->setRenderData( crd );
 }
 
-void* voxelGrid_create(HgEntity* entity) {
-//	entity->position.components.x = 0.0f;
-//	entity->position.components.y = 0.0f;
-//	entity->position.components.z = 0.0f;
-
-//	entity->rotation.w = 1.0f;
-	//	entity->rotation.z = 0.707f;
+void voxelGrid_create(EntityIdType id)
+{
+	auto entity =EntityTable::Singleton().getPtr(id);
 	entity->scale(1.0f);
 
 	change_to_voxelGrid(entity);
-	return nullptr;
 }
 
 REGISTER_LINKTIME(voxelGrid, voxelGrid_create);

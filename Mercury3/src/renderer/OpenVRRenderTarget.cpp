@@ -299,10 +299,9 @@ HgMath::mat4f OpenVRRenderTarget::getHMDEyeTransform(vr::EVREye eye)
 
 	vr::HmdMatrix34_t mat = hmd->GetEyeToHeadTransform(eye);
 
-	//unsure why this is messed up
-	mat.m[0][3] *= -1.0;
-
-	return vectorial::transpose(ConvertToMat4f(mat));
+	//inverse becasue GetEyeToHeadTransform documentations says to.
+	const auto eyeMatrix = vectorial::inverse(ConvertToMat4f(mat));
+	return vectorial::transpose(eyeMatrix);
 }
 
 REGISTER_EVENT_TYPE(Events::HMDPoseUpdated)

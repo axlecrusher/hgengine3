@@ -1,7 +1,7 @@
 #pragma once
 
 #include <RenderBackend.h>
-#include <glew.h>
+#include <OGLheaders.h>
 
 //Class representing the OpenGL texture unit being modified
 class OGLTextureUnit

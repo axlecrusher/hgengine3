@@ -3,7 +3,7 @@
 #include <HgVbo.h>
 #include <HgVboMemory.h>
 
-#include <glew.h>
+#include <OGLheaders.h>
 #include <RenderData.h>
 #include <core/Instancing.h>
 #include <Logging.h>
@@ -209,11 +209,11 @@ OGLvbo<T>::~OGLvbo() {
 
 inline GLenum VboUseage(BUFFER_USE_TYPE t) {
 	switch (t) {
-	case BUFFER_DRAW_STATIC:
+	case BUFFER_STATIC_DRAW:
 		return GL_STATIC_DRAW;
-	case BUFFER_DRAW_DYNAMIC:
+	case BUFFER_DYNAMIC_DRAW:
 		return GL_DYNAMIC_DRAW;
-	case BUFFER_DRAW_STREAM:
+	case BUFFER_STREAM_DRAW:
 		return GL_STREAM_DRAW;
 	}
 	return 0;

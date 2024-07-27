@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include <atomic>
+#include <functional>
 
 #include <AssetManager.h>
 
@@ -180,6 +181,10 @@ public:
 	
 	virtual bool sourceChanged() const;
 
+	const std::string& path() const
+	{
+		return m_path;
+	}
 private:
 	bool load_internal(AssetPtr& asset) const;
 

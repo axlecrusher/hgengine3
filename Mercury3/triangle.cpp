@@ -54,11 +54,6 @@ void change_to_triangle(EntityIdType id)
 	RenderDataTable::Manager().insert(id, triangle_init_render_data());
 }
 
-static void* triangle_factory(HgEntity* e) {
-	change_to_triangle(e);
-	return nullptr;
-}
-
 namespace Triangle {
 
 	void init(const EntityIdList& list)
@@ -92,4 +87,4 @@ void Triangle::init() {
 }
 
 REGISTER_LINKTIME2(triangle, Triangle::Triangle);
-REGISTER_LINKTIME(triangle, triangle_factory)
+REGISTER_LINKTIME(triangle, change_to_triangle)
