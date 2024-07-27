@@ -68,7 +68,7 @@ void print_matrix(const float* m) {
 	}
 }
 
-
+//right handed
 void Perspective(
 	double fov,
 	const double aspect,
@@ -90,6 +90,7 @@ void Perspective(
 	M[14] = (float)((2 * zfar*znear) / (zfar - znear));
 }
 
+//right handed
 void Perspective2(
 	double fov,
 	const double aspect,
@@ -98,7 +99,7 @@ void Perspective2(
 {
 	fov *= DEG_RAD;
 
-	double f = 1.0 / tan(fov*0.5);
+	const double f = 1.0 / tan(fov*0.5);
 	memset(M, 0, 16 * sizeof* M);
 
 	//column major
@@ -107,6 +108,56 @@ void Perspective2(
 	M[10] = (float)((zfar + znear) / (znear - zfar));
 	M[11] = -1.0f;
 	M[14] = (float)((2 * zfar*znear) / (znear - zfar));
+}
+
+/*
+*	Similar to glFrustum, but with a few changes.
+	Construct right handed projection matrix with infinate zFar
+	and reversed depth. Reversing the depth gives better zbuffer bitdepth
+	distribution. Clipping must be set from 0 to 1.
+*/
+void Projection_RH_InfZ_RevDepth(float fLeft, float fRight, float fTop, float fBottom, float zNear, float* M)
+{
+	float idx = 1.0f / (fRight - fLeft);
+	float idy = 1.0f / (fBottom - fTop);
+	//float idz = 1.0f / (zFar - zNear);
+	float sx = fRight + fLeft;
+	float sy = fBottom + fTop;
+
+	memset(M, 0, 16 * sizeof * M);
+
+	M[0] = 2 * idx;
+	M[5] = 2 * idy;
+
+	M[8] = sx * idx;
+	M[9] = sy * idy;
+	M[10] = 0;
+	M[11] = -1.0f;
+	M[14] = zNear;
+}
+
+
+/*
+	Construct right handed projection matrix with infinate z-plane
+	and reversed z depth
+*/
+void Projection_RH_InfZ_RevDepth(
+	double fov_deg,
+	const double aspect,
+	const double znear,
+	float* M)
+{
+	fov_deg *= DEG_RAD;
+
+	const double f = 1.0 / tan(fov_deg * 0.5);
+	memset(M, 0, 16 * sizeof * M);
+
+	//column major
+	M[0] = (float)(f / aspect);
+	M[5] = (float)f;
+	M[10] = 0.0f;
+	M[11] = -1.0f;
+	M[14] = (float)znear;
 }
 
 void Ortho(	double left, double right,

@@ -28,6 +28,23 @@ void Perspective2(
 	const double znear,
 	const double zfar, float* M);
 
+/*
+*	Construct right handed projection matrix with infinate z-plane
+	and reversed z depth
+*/
+void Projection_RH_InfZ_RevDepth(float fLeft, float fRight, float fTop, float fBottom, float zNear, float* projection);
+
+
+/*
+	Construct right handed projection matrix with infinate z-plane
+	and reversed z depth
+*/
+void Projection_RH_InfZ_RevDepth(
+	double fov_deg,
+	const double aspect,
+	const double znear,
+	float* M);
+
 void Ortho(double left, double right,
 	double bottom, double top,
 	double near, double far,

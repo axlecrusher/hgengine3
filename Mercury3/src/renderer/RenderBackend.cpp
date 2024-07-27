@@ -197,7 +197,8 @@ HgMath::mat4f ViewportRenderTarget::getPerspectiveMatrix() const
 	const double height = getHeight();
 	const double aspect = width / height;
 
-	Perspective2(60, aspect, 0.1f, 100.0f, projection);
+	//Perspective2(60, aspect, 0.1f, 100.0f, projection);
+	Projection_RH_InfZ_RevDepth(60, aspect, 0.1f, projection);
 	projectionMatrix.load(projection);
 
 	return projectionMatrix;

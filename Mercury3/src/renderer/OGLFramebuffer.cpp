@@ -26,7 +26,8 @@ bool OGLFramebuffer::Init(uint16_t width, uint16_t height)
 
 	glGenRenderbuffers(1, &m_depthBufferId);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_depthBufferId);
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT, width, height);
+	//glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT, width, height);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT32F, width, height); //floating point depth buffer works better for reversed depth buffer
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBufferId);
 
 	glGenTextures(1, &m_renderTextureId);

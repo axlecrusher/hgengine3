@@ -13,10 +13,6 @@ OpenVRRenderTarget::OpenVRRenderTarget(OpenVrProxy* openvr)
 	:m_openvr(openvr), m_initalized(false), m_timerInited(false)
 {
 	m_HMDPose = vectorial::mat4f::identity();
-	m_projectionLeftEye = vectorial::mat4f::identity();
-	m_projectionRightEye = vectorial::mat4f::identity();
-	//m_leftEyePos = vectorial::mat4f::identity();
-	//m_rightEyePos = vectorial::mat4f::identity();
 
 	memset(m_deviceClass, 0, sizeof(m_deviceClass));
 }
@@ -40,19 +36,8 @@ bool OpenVRRenderTarget::Init()
 	m_windowViewport.width = width;
 	m_windowViewport.height = height;
 
-	double renderWidth = width;
-	double renderHeight = height;
-	double aspect = renderWidth / renderHeight;
-	Perspective2(60, aspect, 0.03f, 100.0f, projection);
-	m_projection.load(projection);
-
 	m_openvr->InitCompositor();
 	initEyeFramebuffers();
-
-	m_projectionLeftEye = getHMDProjectionEye(vr::Eye_Left);
-	m_projectionRightEye = getHMDProjectionEye(vr::Eye_Right);
-	//m_leftEyePos = getHMDEyeTransform(vr::Eye_Left);
-	//m_rightEyePos = getHMDEyeTransform(vr::Eye_Right);
 
 	m_timerInited = false;
 	m_initalized = true;
@@ -285,11 +270,21 @@ HgMath::mat4f OpenVRRenderTarget::getHMDProjectionEye(vr::EVREye eye) const
 	auto hmd = m_openvr->getDevice();
 	if (!hmd) return HgMath::mat4f();
 
-	const vr::HmdMatrix44_t mat = hmd->GetProjectionMatrix(eye, 0.1, 100);
+	//const vr::HmdMatrix44_t mat = hmd->GetProjectionMatrix(eye, 0.1, 100);
+	//const auto r = vectorial::transpose(ConvertToMat4f(mat));
+	//return r;
 
-	const auto r = vectorial::transpose(ConvertToMat4f(mat));
-	return r;
+	//Construct a custom matrix
+	float left, right, top, bottom;
+	hmd->GetProjectionRaw(eye, &left, &right, &top, &bottom);
 
+	float projection[16] = { 0.0f };
+	Projection_RH_InfZ_RevDepth(left, right, top, bottom, 0.1, projection);
+
+	HgMath::mat4f projectionMatrix;
+	projectionMatrix.load(projection);
+
+	return projectionMatrix;
 }
 
 HgMath::mat4f OpenVRRenderTarget::getHMDEyeTransform(vr::EVREye eye)

@@ -94,6 +94,7 @@ void OGLBackend::Init() {
 
 	//	glEnable(GL_MULTISAMPLE);
 
+	glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE); // 0 to 1 because of reverse depth buffer
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 }
@@ -103,11 +104,13 @@ void OGLBackend::Clear() {
 	glDepthMask(GL_TRUE); //glClear requires depth mask
 	glDisable(GL_SCISSOR_TEST);
 	glClearColor(.1f, .1f, .1f, 0.0f);
+	glClearDepth(0.0f); //clear to 0 because we reverse depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void OGLBackend::BeginFrame() {
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_GREATER); //because we reverse depth buffer
 	glEnable(GL_CULL_FACE);
 }
 

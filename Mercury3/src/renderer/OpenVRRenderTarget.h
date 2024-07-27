@@ -58,14 +58,7 @@ private:
 
 	HgCamera m_hmdCamera; //camera construct from HMD pose
 
-
-	HgMath::mat4f m_projection;
-
 	HgMath::mat4f m_HMDPose;
-	HgMath::mat4f m_projectionLeftEye;
-	HgMath::mat4f m_projectionRightEye;
-	//HgMath::mat4f m_leftEyePos;
-	//HgMath::mat4f m_rightEyePos;
 
 	Viewport m_windowViewport;
 	Viewport m_framebufferViewport;
