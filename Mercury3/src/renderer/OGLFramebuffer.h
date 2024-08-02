@@ -1,5 +1,7 @@
 #pragma once
 #include <IFramebuffer.h>
+#include <IRenderTarget.h>
+
 #include <OGLheaders.h>
 
 class OGLFramebuffer : public IFramebuffer
@@ -13,6 +15,7 @@ public:
 	virtual void Disable();
 	
 	void Copy();
+	void BlitTo(IRenderTarget*);
 
 	GLuint getRenderFramebufferID() const { return m_renderFramebufferId; }
 	GLuint getRenderTextureID() const { return m_renderTextureId; }

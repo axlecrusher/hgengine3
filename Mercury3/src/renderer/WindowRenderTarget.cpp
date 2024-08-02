@@ -60,7 +60,7 @@ void WindowRenderTarget::Render(const RenderParamsList& l)
 	m_windowViewport.width = window->CurrentWidth();
 	m_windowViewport.height = window->CurrentHeight();
 
-	RENDERER()->Clear();
+	//RENDERER()->Clear();
 	RENDERER()->BeginFrame();
 
 	for (const RenderParams& i : l)
@@ -71,4 +71,9 @@ void WindowRenderTarget::Render(const RenderParamsList& l)
 	}
 
 	//Renderer::Render(m_windowViewport, camera->toViewMatrix(), projection, queue);
+}
+
+void WindowRenderTarget::BindFramebuffer()
+{
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }

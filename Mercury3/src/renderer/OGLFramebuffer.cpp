@@ -80,3 +80,21 @@ void OGLFramebuffer::Copy()
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
+
+void OGLFramebuffer::BlitTo(IRenderTarget* renderTarget)
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_renderFramebufferId);
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+	renderTarget->BindFramebuffer();
+
+	const auto destination_width = renderTarget->getWidth();
+	const auto destination_height = renderTarget->getHeight();
+
+	glViewport(0, 0, destination_width, destination_height);
+	glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, destination_width, destination_height, GL_COLOR_BUFFER_BIT,
+		GL_NEAREST);
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}

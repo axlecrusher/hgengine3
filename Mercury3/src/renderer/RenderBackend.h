@@ -54,6 +54,8 @@ public:
 		return m_vp->height;
 	}
 
+	virtual void BindFramebuffer() override {};
+
 private:
 	const Viewport* m_vp;
 };

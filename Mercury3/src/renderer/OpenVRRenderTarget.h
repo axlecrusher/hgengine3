@@ -34,6 +34,8 @@ public:
 
 	virtual void Finish();
 
+	virtual void BindFramebuffer() override {};
+
 private:
 	void initEyeFramebuffers();
 	void RenderToEye(IFramebuffer* eyeBuffer, const HgMath::mat4f& eyeMatrix, const HgMath::mat4f& eyeProjection, const RenderParams& p);
@@ -104,6 +106,8 @@ public:
 	{
 		return 0;
 	}
+
+	virtual void BindFramebuffer() override {};
 
 private:
 	const OpenVRRenderTarget* m_rt;

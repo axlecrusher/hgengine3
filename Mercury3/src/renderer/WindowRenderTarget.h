@@ -20,7 +20,7 @@ public:
 	virtual uint32_t getWidth() const { return m_windowViewport.width; };
 	virtual uint32_t getHeight() const { return m_windowViewport.height; };
 
-
+	virtual void BindFramebuffer() override;
 
 private:
 	//HgMath::mat4f m_projection;

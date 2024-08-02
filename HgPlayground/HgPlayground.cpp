@@ -54,6 +54,8 @@
 #include <cube.h>
 #include <MeshMath.h>
 
+#include <OGLFramebuffer.h>
+
 float projection[16];
 
 HgCamera camera;
@@ -173,6 +175,9 @@ int main()
 		renderTarget = std::make_unique<WindowRenderTarget>();
 	}
 	renderTarget->Init();
+
+	OGLFramebuffer test;
+	test.Init(renderTarget->getWidth(), renderTarget->getHeight());
 
 	auto window = MercuryWindow::GetCurrentWindow();
 
@@ -614,6 +619,7 @@ int main()
 			{
 				HgEntity* grid = EntityTable::Singleton().getPtr(gridId);
 				grid->position(point(camera.getWorldSpacePosition()).y(0));
+				grid->getRenderDataPtr()->setCastShadow(false);
 			}
 
 			const auto orientation = quaternion::fromEuler(angle::ZERO, angle::deg(std::fmod(time.msec(),10000) / 27.777777777777777777777777777778), angle::ZERO);
@@ -689,10 +695,22 @@ int main()
 
 			RenderParamsList rpl;
 			rpl.emplace_back(&camera, &perspective, &renderQueue);
-			rpl.emplace_back(&cam2d, &orthographic, &renderQueue2d);
 
+			//clear the window's buffer
+			RENDERER()->Clear();
 
+			//render to a frame buffer
+			test.Enable();
+			RENDERER()->Clear();
 			renderTarget->Render(rpl);
+			test.Disable();
+
+			test.BlitTo(renderTarget.get());
+
+			rpl.clear();
+			rpl.emplace_back(&cam2d, &orthographic, &renderQueue2d);
+			renderTarget->Render(rpl);
+
 			//renderTarget->Render(&cam2d, &renderQueue2d, projection2d);
 
 			window->SwapBuffers();
