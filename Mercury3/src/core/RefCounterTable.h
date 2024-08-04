@@ -10,6 +10,11 @@ public:
 	using DataType = T;
 	//using IndexType = IndexType<SelfType>;
 
+	RefCountedTable()
+	{
+		NewRecord(); //create default entry
+	}
+
 	class IndexType {
 	public:
 		using IdxType = uint32_t;
@@ -35,9 +40,8 @@ public:
 
 		IndexType& operator=(IndexType other) noexcept
 		{
-			//I don't think decrement or increment need to happen here.
-			//Take it from the copied argument
-			std::swap(m_idx, other.m_idx);
+			m_idx = other.m_idx;
+			Increment();
 			return *this;
 		}
 
@@ -45,39 +49,36 @@ public:
 			: m_idx(std::exchange(other.m_idx, 0)) 
 		{}
 
-		IdxType Index() const { return m_idx - 1; }
+		IdxType Index() const { return m_idx; }
 
 		SelfType::DataType& Record() const
 		{
-			if (m_idx != 0) {
-				return SelfType::Singleton().getRecord(*this);
-			}
-			//FIX ME!!! RETURNS REFERENCE
-			return SelfType::DataType(); //eewwww
+			//m_idx == 0 will return default type
+			return SelfType::Singleton().getRecord(*this);
 		}
 
 		bool isValid() const { return m_idx > 0; }
 	private:
 		void Decrement()
 		{
-			if (m_idx != 0) {
+			if (m_idx > 0) {
 				SelfType::Singleton().DecrementRecordCount(*this);
 			}
 		}
 
 		void Increment()
 		{
-			if (m_idx != 0) {
+			if (m_idx > 0) {
 				SelfType::Singleton().IncrementRecordCount(*this);
 			}
 		}
 
-		explicit IndexType(IdxType idx) : m_idx(idx + 1)
+		explicit IndexType(IdxType idx) : m_idx(idx)
 		{}
 
 		//void IndexType(IndexType idx) { m_idx = idx+1; }
 
-		IdxType m_idx;
+		IdxType m_idx; //0 is invalid but will be used for default value
 		friend class SelfType;
 	};
 
@@ -87,12 +88,12 @@ public:
 		if (m_unusedRecords.size() > 0) {
 			index = m_unusedRecords.back();
 			m_unusedRecords.pop_back();
-			m_records[index] = vboRec;
+			m_records[index] = std::move(vboRec);
 			m_useCount[index] = 1;
 		}
 		else {
 			index = (IndexType::IdxType)m_records.size();
-			m_records.push_back(vboRec);
+			m_records.push_back(std::move(vboRec));
 			m_useCount.push_back(1);
 		}
 		return IndexType(index);
@@ -153,14 +154,18 @@ public:
 private:
 	void IncrementRecordCount(const IndexType& x)
 	{
-		auto idx = x.Index();
+		const auto idx = x.Index();
+		if (idx == 0) return;
+
 		if (m_useCount.size() > idx) {
 			m_useCount[idx]++;
 		}
 	}
 	void DecrementRecordCount(const IndexType& x)
 	{
-		auto idx = x.Index();
+		const auto idx = x.Index();
+		if (idx == 0) return;
+
 		if (m_useCount.size() > idx) {
 			m_useCount[idx]--;
 			if (m_useCount[idx] == 0) {
