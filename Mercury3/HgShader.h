@@ -33,21 +33,23 @@ struct shader_source {
 
 struct ShaderHandle
 {
+public:
 	ShaderHandle(uint32_t v = 0)
-		:value(v)
+		:m_value(v)
 	{}
 
-	uint32_t value;
+	operator uint32_t() const { return m_value; }
+private:
+	uint32_t m_value;
 };
 
-class HgShader {
+class IShaderImpl {
 	public:
-		HgShader()
+		IShaderImpl()
 			:m_uniqueId(0)
 		{}
 
-		virtual ~HgShader()
-		{};
+		virtual ~IShaderImpl() = default;
 
 		virtual void load() = 0;
 
@@ -68,15 +70,12 @@ class HgShader {
 
 		inline shader_source* sourceStruct() const { return m_shaderSource.get(); }
 
-		static HgShader* acquire(const char* vert, const char* frag);
+		inline void setFragmentPath(std::string& p) { frag_path = p; }
+		inline const std::string& getFragmentPath() const { return frag_path; }
 
-		//increase the shader use count if it exists
-		static HgShader* HgShader::acquire(HgShader* shader);
+		inline void setVertexPath(std::string& p) { vertex_path = p; }
+		inline const std::string& getVertexPath() const { return vertex_path; }
 
-		static void release(HgShader* shader);
-
-		typedef std::unique_ptr<HgShader>(*createShaderCallback)(const char* vert, const char* frag);
-		static createShaderCallback Create;
 protected:
 	inline void setUniqueId(size_t uniqueId) { m_uniqueId = uniqueId; }
 	ShaderHandle m_handle;
@@ -84,7 +83,51 @@ protected:
 	//other things not needed often
 	std::unique_ptr<shader_source> m_shaderSource;
 	std::unordered_map<std::string, uint32_t> m_attribLocations;
+	std::string vertex_path, frag_path;
 
 private:
 	size_t m_uniqueId;
+};
+
+class HgShader {
+public:
+	HgShader() = default;
+
+	HgShader(const HgShader& other) = default;
+
+	HgShader(const std::shared_ptr<IShaderImpl> impl)
+		:m_impl(impl)
+	{}
+
+	inline IShaderImpl* getImplementation() const {
+		return m_impl.get();
+	}
+
+	inline int32_t getAttributeLocation(const std::string& name) const
+	{
+		return getImplementation()->getAttributeLocation(name);
+	}
+
+	inline shader_source* sourceStruct() const { return getImplementation()->sourceStruct(); }
+
+	void enable() { getImplementation()->enable(); }
+
+	bool compile() { return getImplementation()->compile(); }
+
+	void setLocalUniforms(const ShaderUniforms& uniforms) { getImplementation()->setLocalUniforms(uniforms); }
+	void uploadMatrices(const float* worldSpaceMatrix, const HgMath::mat4f& projection, const HgMath::mat4f& view)
+	{
+		getImplementation()->uploadMatrices(worldSpaceMatrix, projection, view);
+	}
+
+	static HgShader acquire(const char* vert, const char* frag);
+
+	//increase the shader use count if it exists
+	static HgShader HgShader::acquire(const HgShader& shader);
+
+	typedef std::shared_ptr<IShaderImpl>(*createShaderCallback)(const char* vert, const char* frag);
+	static createShaderCallback Create;
+
+private:
+	std::shared_ptr<IShaderImpl> m_impl;
 };

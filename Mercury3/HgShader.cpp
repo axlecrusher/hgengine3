@@ -10,94 +10,63 @@
 #include <stdio.h>
 #include <Logging.h>
 
-#pragma warning(disable:4996)
+#include <map>
 
-#define MAX_SHADERS 1000
+//#pragma warning(disable:4996)
 
 HgShader::createShaderCallback HgShader::Create = nullptr;
 
-typedef struct shader_entry {
-	uint32_t use_count;
-	std::unique_ptr<HgShader> shader;
-	std::string vertex_path, frag_path;
-} shader_entry;
+std::map<std::string, std::weak_ptr<IShaderImpl>> shaderMap;
 
-/* keep shader_names seperate, we iterate through the list, want it cached*/
-static char* shader_names[MAX_SHADERS] = { NULL }; //replace strings with CRC32?
-shader_entry shader_list[MAX_SHADERS];
-
-static void ShaderFileChanged(void* data) {
-	shader_entry* entry = (shader_entry*)data;
-	LOG_ERROR("Shader file changed:%s", entry->frag_path.c_str());
-	entry->shader->load();
+static void ShaderFileChanged(IShaderImpl* shader) {
+	LOG_ERROR("Shader file changed:%s", shader->getVertexPath().c_str());
+	shader->load();
 }
 
-HgShader* HgShader::acquire(HgShader* shader)
+HgShader HgShader::acquire(const HgShader& shader)
 {
-	for (int i = 0; i < MAX_SHADERS; ++i)
+	return shader; //copy;
+}
+
+HgShader HgShader::acquire(const char* vert, const char* frag)
+{
+	std::string v(vert), f(frag);
+	std::string name = v + f;
+
+	std::shared_ptr<IShaderImpl> shaderImpl;
+
+	const auto itr = shaderMap.find(name);
+	if (itr != shaderMap.end())
 	{
-		if (shader_list[i].shader.get() == shader)
+		shaderImpl = itr->second.lock();
+		if (shaderImpl)
 		{
-			if (shader_list[i].use_count > 0)
-			{
-				shader_list[i].use_count++;
-				return shader;
-			}
-			return nullptr;
-		}
-	}
-	return nullptr;
-}
-
-
-HgShader* HgShader::acquire(const char* vert, const char* frag) {
-	uint32_t i = 0;
-	char* name = str_cat(vert, frag);
-	uint32_t funused = 0xFFFFFFFF;
-	for (i = 0; i < MAX_SHADERS; ++i) {
-		if (shader_names[i] == NULL && funused == 0xFFFFFFFF) funused = i;
-		if (shader_names[i] == NULL) continue;
-		if (strcmp(name, shader_names[i]) == 0) {
-			free(name);
-			shader_list[i].use_count++;
-			return shader_list[i].shader.get();
+			return HgShader(shaderImpl);
 		}
 	}
 
-	assert(funused != 0xFFFFFFFF); //out of shader spaces! increase MAX_SHADERS
+	shaderImpl = HgShader::Create(vert, frag);
 
-	i = funused;
-	shader_names[i] = name;
-	shader_list[i].use_count = 1;
-	shader_list[i].shader = HgShader::Create(vert, frag);
-	shader_list[i].frag_path = std::string(frag);
-	shader_list[i].vertex_path = std::string(vert);
+	auto shader = shaderImpl.get();
+	shader->setFragmentPath(f);
+	shader->setVertexPath(v);
 
-	void* addr1 = shader_list + i;
-	WatchFileForChange(frag, [addr1]() {
-		ShaderFileChanged(addr1);
+	WatchFileForChange(frag, [shader]() {
+		ShaderFileChanged(shader);
+		});
+
+	WatchFileForChange(vert, [shader]() {
+		ShaderFileChanged(shader);
 	});
 
-	WatchFileForChange(vert, [addr1]() {
-		ShaderFileChanged(addr1);
-	});
+	shader->load();
 
-	shader_list[i].shader->load();
+	shaderMap[name] = std::move(shaderImpl);
 
-	return shader_list[i].shader.get();
+	return HgShader(shaderImpl);
 }
 
-void HgShader::release(HgShader* s) {
-	uint32_t i = 0;
-	for (i = 0; i < MAX_SHADERS; ++i) {
-		if (s == shader_list[i].shader.get()) {
-			shader_list[i].use_count--;
-			return;
-		}
-	}
-}
-
-int32_t HgShader::getAttributeLocation(const std::string& name) const 
+int32_t IShaderImpl::getAttributeLocation(const std::string& name) const
 {
 	auto itr = m_attribLocations.find(name);
 	if (itr == m_attribLocations.end())
@@ -107,5 +76,4 @@ int32_t HgShader::getAttributeLocation(const std::string& name) const
 	}
 
 	return itr->second;
-
 }

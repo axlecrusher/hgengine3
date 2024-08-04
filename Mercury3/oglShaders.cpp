@@ -206,7 +206,7 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 
 }
 
-std::unique_ptr<HgShader> HgOglShader::Create(const char* vert, const char* frag) {
+std::shared_ptr<IShaderImpl> HgOglShader::Create(const char* vert, const char* frag) {
 	std::unique_ptr<HgOglShader> s = std::make_unique<HgOglShader>();
 
 
@@ -224,7 +224,7 @@ std::unique_ptr<HgShader> HgOglShader::Create(const char* vert, const char* frag
 }
 
 HgOglShader::HgOglShader()
-	:HgShader(), m_loadState(LoadState::NOT_LOADED)
+	:IShaderImpl(), m_loadState(LoadState::NOT_LOADED)
 {
 	memset(m_uniformLocations, -1, sizeof(m_uniformLocations));
 }

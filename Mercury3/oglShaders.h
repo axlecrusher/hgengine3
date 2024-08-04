@@ -12,7 +12,7 @@
 struct OGLShaderHandle
 {
 	OGLShaderHandle(ShaderHandle h)
-		:value(h.value)
+		:value(uint32_t(h))
 	{}
 
 	OGLShaderHandle(GLuint h)
@@ -25,7 +25,7 @@ struct OGLShaderHandle
 	GLuint value;
 };
 
-class HgOglShader : public HgShader {
+class HgOglShader : public IShaderImpl {
 	public:
 		HgOglShader();
 		virtual ~HgOglShader();
@@ -40,7 +40,7 @@ class HgOglShader : public HgShader {
 		virtual void setLocalUniforms(const ShaderUniforms& uniforms);
 		virtual void uploadMatrices(const float* worldSpaceMatrix, const HgMath::mat4f& projection, const HgMath::mat4f& view);
 
-		static std::unique_ptr<HgShader> Create(const char* vert, const char* frag);
+		static std::shared_ptr<IShaderImpl> Create(const char* vert, const char* frag);
 	private:
 		enum class LoadState: uint8_t{
 			NOT_LOADED=0,

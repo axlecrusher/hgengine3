@@ -22,8 +22,8 @@ public:
 
 	void clearTextureIDs();
 
-	void setShader(HgShader* shader);
-	HgShader& getShader() { return *m_shader.get(); }
+	void setShader(const HgShader& shader);
+	HgShader& getShader() { return m_shader; }
 
 	void updateGpuTextures();
 	//bool updateTextures() const { return m_updateTextures; }
@@ -50,11 +50,7 @@ private:
 	//use the texture
 	void setTexture(const HgTexture* t);
 
-	struct ShaderDeleter {
-		void operator()(HgShader* shader);
-	};
-
-	std::unique_ptr<HgShader, ShaderDeleter> m_shader; // TODO: make this auto copy so we can use automic copy constructor and =
+	HgShader m_shader;
 	std::vector< HgTexture::TexturePtr > m_textures;
 	BlendMode m_blendMode;
 	HgTexture::Handle m_gpuTextureHandles[HgTexture::TEXTURE_TYPE_COUNT];
