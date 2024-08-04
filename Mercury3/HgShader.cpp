@@ -16,6 +16,7 @@
 
 HgShader::createShaderCallback HgShader::Create = nullptr;
 
+std::mutex m_shaderMapMutex;
 std::map<std::string, std::weak_ptr<IShaderImpl>> shaderMap;
 
 static void ShaderFileChanged(std::weak_ptr<IShaderImpl> shader) {
@@ -43,17 +44,21 @@ HgShader HgShader::acquire(const char* vert, const char* frag)
 
 	std::shared_ptr<IShaderImpl> shaderImpl;
 
-	const auto itr = shaderMap.find(name);
-	if (itr != shaderMap.end())
 	{
-		shaderImpl = itr->second.lock();
-		if (shaderImpl)
+		std::lock_guard<std::mutex> m(m_shaderMapMutex);
+		const auto itr = shaderMap.find(name);
+		if (itr != shaderMap.end())
 		{
-			return HgShader(shaderImpl);
+			shaderImpl = itr->second.lock();
+			if (shaderImpl)
+			{
+				return HgShader(shaderImpl);
+			}
 		}
-	}
 
-	shaderImpl = HgShader::Create(vert, frag);
+		shaderImpl = HgShader::Create(vert, frag);
+		shaderMap[name] = shaderImpl;
+	}
 
 	auto shader = shaderImpl.get();
 	shader->setFragmentPath(f);
@@ -70,8 +75,6 @@ HgShader HgShader::acquire(const char* vert, const char* frag)
 	});
 
 	shader->load();
-
-	shaderMap[name] = weakPtr;
 
 	return HgShader(shaderImpl);
 }
