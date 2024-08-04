@@ -18,9 +18,17 @@ HgShader::createShaderCallback HgShader::Create = nullptr;
 
 std::map<std::string, std::weak_ptr<IShaderImpl>> shaderMap;
 
-static void ShaderFileChanged(IShaderImpl* shader) {
-	LOG_ERROR("Shader file changed:%s", shader->getVertexPath().c_str());
-	shader->load();
+static void ShaderFileChanged(std::weak_ptr<IShaderImpl> shader) {
+	auto impl = shader.lock();
+	if (impl)
+	{
+		LOG_ERROR("Shader file changed:%s", impl->getVertexPath().c_str());
+		impl->load();
+	}
+	else
+	{
+		//TODO: disable watching somehow
+	}
 }
 
 HgShader HgShader::acquire(const HgShader& shader)
@@ -51,17 +59,19 @@ HgShader HgShader::acquire(const char* vert, const char* frag)
 	shader->setFragmentPath(f);
 	shader->setVertexPath(v);
 
-	WatchFileForChange(frag, [shader]() {
-		ShaderFileChanged(shader);
+	auto weakPtr = shaderImpl;
+
+	WatchFileForChange(frag, [weakPtr]() {
+		ShaderFileChanged(weakPtr);
 		});
 
-	WatchFileForChange(vert, [shader]() {
-		ShaderFileChanged(shader);
+	WatchFileForChange(vert, [weakPtr]() {
+		ShaderFileChanged(weakPtr);
 	});
 
 	shader->load();
 
-	shaderMap[name] = std::move(shaderImpl);
+	shaderMap[name] = weakPtr;
 
 	return HgShader(shaderImpl);
 }
