@@ -79,14 +79,15 @@ HgShader HgShader::acquire(const char* vert, const char* frag)
 	return HgShader(shaderImpl);
 }
 
-int32_t IShaderImpl::getAttributeLocation(const std::string& name) const
-{
-	auto itr = m_attribLocations.find(name);
-	if (itr == m_attribLocations.end())
-	{
-		//not found
-		return -1;
-	}
 
-	return itr->second;
+int32_t IShaderImpl::getAttributeLocation(attributeNameType name) const
+{
+	for (uint32_t i = 0; i < m_attribLocations.size(); i++)
+	{
+		if (m_attribLocations[i].first == name)
+		{
+			return m_attribLocations[i].second;
+		}
+	}
+	return -1;
 }

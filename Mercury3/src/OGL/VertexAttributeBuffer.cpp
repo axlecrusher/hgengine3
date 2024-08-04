@@ -10,10 +10,10 @@ namespace VertexAttributeTypes
 {
 	void MapToAttributeLocation(const SetupParams& p, int vCount)
 	{
-		const auto attribLocation = p.shader->getAttributeLocation(*p.attributeName);
+		const auto attribLocation = p.shader->getAttributeLocation(p.attributeNameHash);
 		if (attribLocation < 0)
 		{
-			InvalidAttributeError(p.shader, p.attributeName);
+			InvalidAttributeError(p.shader, p.attributeNameString);
 			return;
 		}
 

@@ -115,7 +115,8 @@ struct SetupParams
 {
 	GPUBufferMapSettings bufferSettings;
 	GLVertexAttributeBuffer* attribBuffer;
-	std::string* attributeName;
+	IShaderImpl::attributeNameType attributeNameHash;
+	std::string* attributeNameString = nullptr;
 	const HgShader* shader;
 };
 
@@ -127,8 +128,8 @@ class VertexAttributeBuffer : public IGPUBuffer
 {
 public:
 	VertexAttributeBuffer(const std::string attributeName)
-		:m_attributeName(attributeName)
 	{
+		setAttributeName(attributeName);
 		setUseType(BUFFER_STREAM_DRAW);
 		m_bufferIdx = 0;
 	}
@@ -152,12 +153,16 @@ public:
 		SetupParams p;
 		p.bufferSettings = *settings;
 		p.attribBuffer = getAttribBuffer();
-		p.attributeName = &m_attributeName;
+		p.attributeNameHash = m_nameHash;
+		p.attributeNameString = &m_attributeName;
 		p.shader = &shader;
 		T::Setup(p);
 	}
 
-	void setAttributeName(const std::string& name) { m_attributeName = name; }
+	void setAttributeName(const std::string& name) {
+		m_nameHash = std::hash<std::string>{}(name);
+		m_attributeName = name; 
+	}
 
 	virtual MappedMemory getGPUMemoryPtr()
 	{
@@ -176,6 +181,7 @@ private:
 
 	GLVertexAttributeBuffer m_attributeBuffer[BUFSIZE];
 	uint8_t m_bufferIdx;
+	IShaderImpl::attributeNameType m_nameHash;
 	std::string m_attributeName;
 };
 

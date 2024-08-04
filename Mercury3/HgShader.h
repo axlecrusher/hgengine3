@@ -45,6 +45,8 @@ private:
 
 class IShaderImpl {
 	public:
+		using attributeNameType = std::hash<std::string>::result_type;
+
 		IShaderImpl()
 			:m_uniqueId(0)
 		{}
@@ -66,7 +68,7 @@ class IShaderImpl {
 		//return the handle of the compiled shader
 		inline ShaderHandle getProgramHandle() const { return m_handle; }
 
-		int32_t getAttributeLocation(const std::string& name) const;
+		int32_t getAttributeLocation(attributeNameType name) const;
 
 		inline shader_source* sourceStruct() const { return m_shaderSource.get(); }
 
@@ -82,7 +84,8 @@ protected:
 
 	//other things not needed often
 	std::unique_ptr<shader_source> m_shaderSource;
-	std::unordered_map<std::string, uint32_t> m_attribLocations;
+	//std::unordered_map<std::string, uint32_t> m_attribLocations;
+	std::vector< std::pair<attributeNameType, int32_t> > m_attribLocations;
 	std::string vertex_path, frag_path;
 
 private:
@@ -103,7 +106,7 @@ public:
 		return m_impl.get();
 	}
 
-	inline int32_t getAttributeLocation(const std::string& name) const
+	inline int32_t getAttributeLocation(IShaderImpl::attributeNameType name) const
 	{
 		return getImplementation()->getAttributeLocation(name);
 	}

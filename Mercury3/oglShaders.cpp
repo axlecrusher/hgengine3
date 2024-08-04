@@ -200,8 +200,11 @@ void HgOglShader::setup_shader(HgOglShader* shader) {
 		glGetActiveAttrib(shader_program, (GLuint)i, bufSize, &length, &size, &type, name);
 		const auto attribLocation = glGetAttribLocation(shader_program, name);
 		//LOG("Attribute #%d Type: %u Name: %s Location :%d\n", i, type, name, attribLocation);
+
 		const std::string tmp(name);
-		shader->m_attribLocations[name] = attribLocation;
+		const auto h = std::hash<std::string>{}(name);
+
+		shader->m_attribLocations.push_back(std::make_pair(h, attribLocation));
 	}
 
 }
@@ -295,17 +298,23 @@ void HgOglShader::setLocalUniforms(const ShaderUniforms& uniforms) {
 
 void HgOglShader::uploadMatrices(const float* worldSpaceMatrix, const HgMath::mat4f& projection, const HgMath::mat4f& view) {
 	using namespace HgMath;
-	constexpr const int matrixCount = 3;
+	constexpr const int matrixCount = 4;
 
 	float mm[16 * matrixCount];
 
 	if (m_uniformLocations[U_MATRICES] <= -1) return; //sometimes opengl will optimize the matrices uniform out
 
+	HgMath::mat4f world;
+	world.load(worldSpaceMatrix);
+
+	const auto MVP = projection * view * world;
+
 	//rd->getWorldSpaceMatrix(mm);
 	memcpy(mm, worldSpaceMatrix, sizeof(float) * 16);
 	//modelView.store(mm);
-	projection.store(mm + 16);
-	view.store(mm + 32);
+	projection.store(mm + (16*1));
+	view.store(mm + (16*2));
+	MVP.store(mm + (16 * 3));
 	glUniformMatrix4fv(m_uniformLocations[U_MATRICES], matrixCount, GL_FALSE, mm);
 }
 
