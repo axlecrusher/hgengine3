@@ -94,7 +94,7 @@ class RenderData;
 
 class IHgVbo {
 public:
-	IHgVbo() : m_useType(BUFFER_STATIC_DRAW), m_type(VBO_TYPE_INVALID) {}
+	IHgVbo() : m_useType(BUFFER_STATIC_DRAW), m_type(VBO_TYPE_INVALID), m_stride(0) {}
 	virtual ~IHgVbo() {}
 
 	//	Copy data straight into VBO. Ensure that data, is using the correct vbo layout for your data
