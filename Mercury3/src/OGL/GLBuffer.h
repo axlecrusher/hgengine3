@@ -17,7 +17,7 @@ struct GLVaoId
 		value = 0; //does not copy
 	}
 
-	GLVaoId(GLVaoId&& rhs)
+	GLVaoId(GLVaoId&& rhs) noexcept
 	{
 		Destroy();
 		value = rhs.value;
@@ -25,7 +25,7 @@ struct GLVaoId
 	}
 
 	const GLVaoId& operator=(const GLVaoId& rhs) = delete;
-	const GLVaoId& operator=(GLVaoId&& rhs)
+	const GLVaoId& operator=(GLVaoId&& rhs) noexcept
 	{
 		Destroy();
 		value = rhs.value;

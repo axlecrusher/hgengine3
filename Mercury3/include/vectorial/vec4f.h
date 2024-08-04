@@ -22,7 +22,7 @@ namespace vectorial {
 
         simd4f value;
     
-        inline vec4f() {}
+        inline vec4f() :value(simd4f_zero()) {}
         inline vec4f(const vec4f& v) : value(v.value) {}
         inline vec4f(const simd4f& v) : value(v) {}
         explicit inline vec4f(float xyzw) : value( simd4f_splat(xyzw) ) {}

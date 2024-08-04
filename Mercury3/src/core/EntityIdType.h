@@ -21,7 +21,7 @@ public:
 	}
 
 	EntityIdType(const EntityIdType&) = default;
-	EntityIdType(EntityIdType &&rhs)
+	EntityIdType(EntityIdType &&rhs) noexcept
 	{
 		m_id = rhs.m_id;
 		rhs.m_id = 0;

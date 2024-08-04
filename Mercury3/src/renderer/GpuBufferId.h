@@ -12,7 +12,7 @@ struct GpuBufferId
 	}
 
 	GpuBufferId(const GpuBufferId& rhs) = delete;
-	GpuBufferId(GpuBufferId&& rhs)
+	GpuBufferId(GpuBufferId&& rhs) noexcept
 	{
 		Destroy();
 		value = rhs.value;
@@ -20,7 +20,7 @@ struct GpuBufferId
 	}
 
 	const GpuBufferId& operator=(const GpuBufferId& rhs) = delete;
-	const GpuBufferId& operator=(GpuBufferId&& rhs)
+	const GpuBufferId& operator=(GpuBufferId&& rhs) noexcept
 	{
 		Destroy();
 		value = rhs.value;

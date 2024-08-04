@@ -26,7 +26,7 @@ public:
 
 	MappedMemory(const MappedMemory&) = delete;
 
-	MappedMemory(MappedMemory&& other)
+	MappedMemory(MappedMemory&& other) noexcept
 	{
 		ptr = other.ptr;
 		m_bufferInterface = other.m_bufferInterface;
